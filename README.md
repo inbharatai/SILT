@@ -75,6 +75,25 @@ hash-chained audit trail.
 > the same brand/import split as scikit-learn/`sklearn`. Existing code and
 > `ASEA_*` environment variables are unaffected.
 
+### 🚀 Get started
+
+A 60-second path from clone to a gated skill transfer:
+
+```bash
+git clone https://github.com/inbharatai/SILT.git && cd SILT
+python -m pip install -r requirements.txt          # core: pydantic only, no torch
+PYTHONPATH=src python -m pytest tests/ -q           # 420+ passing, offline
+PYTHONPATH=src python -m asea.cli run --config configs/assamese_transfer.json --workspace .work
+PYTHONPATH=src python -m asea.cli report --workspace .work
+```
+
+Optional extras, the full CLI, the mock flows and Windows / PowerShell notes
+are in [Quick start](#quick-start) below.
+
+📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
+[`docs/teaser.html`](docs/teaser.html) in this repo, or open your local copy —
+<a href="file:///C:/Users/reetu/Downloads/silt-the-trust-gate-for-ai-learning-public-teaser%20(1).html">silt-the-trust-gate-for-ai-learning-public-teaser (1).html</a>.
+
 ---
 
 ## Architecture at a glance
@@ -296,7 +315,8 @@ evidence, never merged into base weights in v1. See
 ## Quick start
 
 ```bash
-cd adaptive-skill-extraction-adapter
+git clone https://github.com/inbharatai/SILT.git
+cd SILT
 
 # core (packet mode): pydantic + pytest
 python -m pip install -r requirements.txt
