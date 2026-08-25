@@ -4,10 +4,10 @@
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
-<p align="center"><em>The trust gate for AI training.</em></p>
+<p align="center"><em>Transfer a specialist skill. Prove the gain. Adapt and certify for constrained hardware.</em></p>
 
-<p align="center"><strong>Your AI trains.<br>Nobody checks its homework.<br>SILT does.</strong></p>
-<p align="center"><em>One principle — never trust the process, verify the outcome — and the portfolio of firsts it unlocks.</em></p>
+<p align="center"><strong>A powerful model can still be missing one specialist capability.<br>Another AI may already have it.<br>SILT is built to transfer that narrow capability — not copy the teacher — and verify what the receiver can actually use.</strong></p>
+<p align="center"><em>Local-first skill interchange · held-out evaluation · trust-gated admission · hardware-aware adaptation.</em></p>
 
 <p align="center">
   <a href="https://github.com/inbharatai/SILT/actions/workflows/ci.yml"><img src="https://github.com/inbharatai/SILT/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -26,23 +26,48 @@
 > Across Heterogeneous Artificial Intelligence Systems*. Full notice in
 > [`PATENT.md`](PATENT.md).
 
-### ⚡ What's new here — the innovation portfolio
+### 🎯 The SILT thesis — Transfer → Prove → Adapt
 
-*Most of this repo is careful engineering. These parts, as far as we can tell
-from our prior-art sweeps, exist nowhere else — each one measured, tested, and
-honest about its limits.*
+SILT began from a practical problem: the model you want to use may be powerful,
+but still lack a narrow specialist capability — a language, a domain workflow,
+a coding pattern, a pronunciation rule set, or another measurable skill. A
+different AI may already have that capability.
 
-| What it is | Why nothing else does this | Proof in this repo |
+SILT is designed to **extract and represent that narrow capability, transfer it
+to the chosen receiver, prove on held-out cases that the receiver actually
+improved, and then support hardware-aware adaptation while certifying which
+skills survive the resulting model state**. The **trust gate is the enforcement
+layer**, not the whole purpose: it exists so transfer, training and compression
+cannot silently claim success.
+
+> [!IMPORTANT]
+> **Scope, stated plainly.** SILT does **not** claim universal model-to-model
+> capability copying, complete transfer of a teacher's knowledge, AGI, or that
+> any arbitrary large model can be made to run on any small device. The current
+> repository implements and tests specific skill-transfer, gating, LoRA,
+> streaming/zeroth-order and compression-certification mechanisms. Extending
+> those mechanisms reliably across larger model families, domains and hardware
+> remains an engineering and research goal.
+
+### ⚙️ What exists in this repository
+
+*The rows below describe implemented mechanisms and point to their evidence or
+current boundary. Novelty is a patent question; this README does not require
+every individual component to be unprecedented for SILT's combined system to be
+useful.*
+
+| Mechanism | Role in SILT | Evidence / current boundary |
 | :-- | :-- | :-- |
-| 🛡️ **Double Gate** — Gate 1 (16 checks) admits a packet; Gate 2 (14 checks) re-examines the trained result before it sticks. Both all-or-nothing. | Fine-tuning ships what you train; SILT checks twice, and one hard failure at either gate rolls the model back. | [`gate2.py`](src/asea/deepapply/gate2.py) · [`gate.py`](src/asea/promotion/gate.py) · Gate 2 rejected a real run with named reasons — [`deep_apply_real_run_findings.md`](docs/deep_apply_real_run_findings.md) |
-| 🔒 **Trainer-independent admission** — Gate 2 has provably zero backend-conditional branches; standard, streamed and ZeroForge backends face the same checks. | The gate cannot quietly lower its bar for a weaker trainer — there is no `if backend == …` path. | static test `"backend" not in gate2.py` — [`test_streamed_backend.py`](tests/test_streamed_backend.py), [`test_deep_apply.py`](tests/test_deep_apply.py) · [`backends/__init__.py`](src/asea/deepapply/backends/__init__.py) |
-| 🌊 **SiltStream** — layer-streamed LoRA for low-VRAM cards, with parity as the admission bar; a parity failure aborts (`DeepApplyBlocked`), never a silent fallback. | Streaming trainers drift silently; SILT refuses to train unless streamed matches resident execution. | [`backends/__init__.py`](src/asea/deepapply/backends/__init__.py) · parity-abort covered in backend tests. *Honest limit: the CUDA streamed runtime was not verified on this machine — see "NOT VERIFIABLE HERE" in [`deep_apply_real_run_findings.md`](docs/deep_apply_real_run_findings.md).* |
-| 🔥 **ZeroForge** — forward-only, zeroth-order LoRA (SPSA / MeZO-spirit); `backward_passes == 0` is recorded to make the claim auditable. | Trains where backprop physically can't go (no GPU, quantized inference engine); designed to sit behind Gate 2. | [`zeroforge.py`](src/asea/deepapply/backends/zeroforge.py) · `assert backward_passes == 0` in [`test_streamed_backend.py`](tests/test_streamed_backend.py). *Honest limit: a stochastic method, exercised on the toy path — no real-HF ZeroForge run is recorded in-repo.* |
-| 🌀 **SiltSpring** — per-(state, skill) capability certificates for int8 / int4 / int2; a revoked or stale pair refuses to serve. | The industry quantizes and hopes; SILT certifies which skills survive each state and refuses to serve a skill its state lost. | [`certifier.py`](src/asea/spring/certifier.py) · [`test_siltspring_certification.py`](tests/test_siltspring_certification.py). *Honest limit: unit tests exercise the toy SpringModel path; real-HF state certification is opt-in only (it downloads a model).* |
-| ⚖️ **Asymmetric SPRT** — early-stop that can only REJECT early, never early-promote; `should_stop` is true only on a REJECT verdict. | A standard SPRT can stop early on a lucky streak and promote a skill that hasn't proven itself; SILT's cannot. | [`sprt.py`](src/asea/sprt.py) |
-| 🔏 **Signed Capability Diff** — a tamper-evident signature over what changed between two capability states, verifiable later. | Honest about scope: local HMAC-SHA256, tamper-evident to the local key holder only — *not* a portable third-party attestation (B1b is deliberately not built). | [`capability_diff.py`](src/asea/capability_diff.py) (`asea diff` / `asea diff-verify`) |
-| 🧹 **Verified Unlearning** — a signed report that the skill is absent from the approved set the receiver reads and held-out capability reverted to baseline within tolerance. | Verified at the skill layer, not the weight layer — SILT trains no weights, so it does not claim weight-level forgetting. | [`unlearning.py`](src/asea/unlearning.py) (`asea unlearn` / `asea unlearn-verify`) |
-| 🚫 **Honest refusal as architecture** — bad inputs, missing humans, stale certificates and parity failures raise typed, named errors — never warnings, never silent fallbacks. | A rejection with named reasons is the system working; refusal is the product, not an error to handle. | [`core/errors.py`](src/asea/core/errors.py) · the typed-error table in the "Honest refusal" section below |
+| 🔁 **Inspectable skill transfer** — the default L3 path moves a distilled packet of rules / lexicon / glossary / exemplars; it does not copy teacher weights. | Gives the receiver a narrow capability in a form that can be inspected, gated, removed and re-tested. | [`core/pipeline.py`](src/asea/core/pipeline.py) · [`protocol.py`](src/asea/core/protocol.py) · [`prompting.py`](src/asea/modules/real/prompting.py) · [`real_run_findings.md`](docs/real_run_findings.md) |
+| 🛡️ **Double Gate** — Gate 1 admits a packet; optional Gate 2 independently re-examines a trained LoRA result before it is admitted. Both are all-or-nothing over the checks they emit. | Separates *how a capability was produced* from *whether the measured result is allowed into the receiver*. | [`gate.py`](src/asea/promotion/gate.py) · [`gate2.py`](src/asea/deepapply/gate2.py) · [`deep_apply_real_run_findings.md`](docs/deep_apply_real_run_findings.md) |
+| 🔒 **Trainer-independent admission** — Gate 2 does not lower its checks based on which training backend produced the adapter. | Keeps admission criteria separate from trainer choice. | [`gate2.py`](src/asea/deepapply/gate2.py) · [`test_streamed_backend.py`](tests/test_streamed_backend.py) · [`test_deep_apply.py`](tests/test_deep_apply.py) |
+| 🌊 **SiltStream** — layer-streamed LoRA for constrained VRAM, with parity checks used as an admission safeguard. | Explores weight adaptation where a fully resident training path is impractical. | [`backends/streamed.py`](src/asea/deepapply/backends/streamed.py) · [`siltstream_vendor/`](src/asea/deepapply/backends/siltstream_vendor/) · hardware-specific results must be read from recorded run artifacts rather than inferred from the implementation alone. |
+| 🔥 **ZeroForge** — forward-only zeroth-order LoRA (SPSA / MeZO-spirit), recording `backward_passes == 0`. | Explores adaptation when conventional backpropagation is unavailable or undesirable. | [`backends/zeroforge.py`](src/asea/deepapply/backends/zeroforge.py) · [`test_streamed_backend.py`](tests/test_streamed_backend.py); stochastic results must be validated per model/task. |
+| 🌀 **SiltSpring** — per-(state, skill) capability certificates for int8 / int4 / int2. | Compresses toward smaller memory footprints while refusing to assume every skill survived quantization. | [`certifier.py`](src/asea/spring/certifier.py) · [`test_siltspring_certification.py`](tests/test_siltspring_certification.py) · real-model scripts in [`scripts/`](scripts/); certification is model/state/skill specific. |
+| ⚖️ **Asymmetric SPRT** — may early-reject, never early-promote. | Saves evaluation work on clearly failing candidates without using an early lucky streak as proof of admission. | [`sprt.py`](src/asea/sprt.py) · [`test_sprt.py`](tests/test_sprt.py) |
+| 🔏 **Signed Capability Diff** — local HMAC-signed record of capability-state change. | Makes local before/after capability changes inspectable and tamper-evident to the key holder. | [`capability_diff.py`](src/asea/capability_diff.py); this is **not** portable third-party attestation. |
+| 🧹 **Verified Unlearning** — verifies removal at the approved-skill layer and checks held-out behaviour against baseline. | Provides evidence that a SILT-managed skill was removed from the receiver-visible approved set. | [`unlearning.py`](src/asea/unlearning.py); this is skill-layer verification, **not** a claim of weight-level forgetting. |
+| 🚫 **Honest refusal as architecture** — invalid inputs, missing human approval, stale certificates and failed parity checks raise typed errors instead of being silently treated as success. | Makes failure explicit so the system can reject an unsupported or unproven path. | [`core/errors.py`](src/asea/core/errors.py) · the typed-error table below. |
 
 The combination of these mechanisms is patent-pending (India, app. no.
 **202631101454**) — see [`PATENT.md`](PATENT.md) for the inventive families.
@@ -66,14 +91,13 @@ Optional extras, the full CLI, the mock flows and Windows / PowerShell notes
 are in [Quick start](#quick-start) below.
 
 📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
-[`docs/teaser.html`](docs/teaser.html) in this repo, or open your local copy —
-<a href="file:///C:/Users/reetu/Downloads/silt-the-trust-gate-for-ai-learning-public-teaser%20(1).html">silt-the-trust-gate-for-ai-learning-public-teaser (1).html</a>.
+[`docs/teaser.html`](docs/teaser.html).
 
 <p align="center">
-  <a href="#architecture-at-a-glance">Architecture</a> ·
+  <a href="#architecture--transfer--prove--adapt">Architecture</a> ·
   <a href="architecture.md">Design</a> ·
   <a href="risk_report.md">Risk report</a> ·
-  <a href="#silt-studio">Studio</a> ·
+  <a href="#silt-studio--the-web-platform">Studio</a> ·
   <a href="#the-flows">Examples</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="CONTRIBUTING.md">Contributing</a> ·
@@ -84,30 +108,31 @@ are in [Quick start](#quick-start) below.
 ---
 
 > [!IMPORTANT]
-> **Measured admission, not blind training.** A skill crosses the gate only
-> after it proves itself on cases the teacher never saw — through a
-> **non-bypassable all-or-nothing gate**, **structural human sign-off** for
-> medical / legal / finance, a **tamper-evident audit trail**, and
-> **one-command rollback**. Local-first — **₹0 cloud**.
+> **Transfer → verify → adapt.** A skill is useful to SILT only when the
+> receiver demonstrates measurable benefit on held-out evidence. The gate then
+> enforces safety, regression, provenance, rollback and human-approval rules;
+> optional deep-apply can internalize already-approved packets with LoRA; and
+> SiltSpring can test compressed states to determine which skills remain
+> certified. Local-first — **₹0 cloud** for the core path.
 
-### 🧱 The six guarantees
+### 🧱 Trust guarantees that make transfer reversible
 
 | | Guarantee | What it means |
 | :-- | :-- | :-- |
 | 🎯 | **Measured admission** | A skill is admitted only after held-out proof it helps — the [asymmetric SPRT](src/asea/sprt.py) early-rejects, never early-promotes (see the portfolio row above). |
-| 🔒 | **All-or-nothing gate** | Gate 1 runs 16 checks as one verdict — no bypass argument, no partial pass, no silent skip. |
+| 🔒 | **All-or-nothing gate** | Gate 1 runs its checks as one verdict — no bypass argument, no partial pass, no silent skip. |
 | 🩺 | **Human sign-off** | High-risk domains (medical / legal / finance) require a *named* human in the audit log — structurally non-bypassable. |
 | 📜 | **Tamper-evident audit** | Every decision lands in a hash-chained, append-only log — the single source of truth. |
 | ↩️ | **One-command rollback** | Each admitted skill carries a rollback token bound to a pre-admission snapshot; undo is one command. |
-| 🏠 | **Local-first** | Keys, weights and audit stay on your host — nothing is uploaded. Runs on consumer hardware, ₹0 cloud. |
+| 🏠 | **Local-first** | Keys, weights and audit stay on your host — nothing is uploaded by the core path. |
 
-A local-first adapter that connects two AI modules — one acting as
-**Sender/Teacher**, one as **Receiver/Learner** — and moves *inspectable
-skill packets* between them under an evaluation gate. A skill crosses only
-after it proves itself on cases the teacher never saw. SILT is a **trust
-layer, not a trainer**: it decides whether a trained skill may be *admitted*
-to a receiver, with held-out proof, a non-bypassable gate, and a
-hash-chained audit trail.
+SILT connects two AI modules — one acting as **Sender/Teacher**, one as
+**Receiver/Learner** — and attempts to move a *narrow, inspectable capability*
+between them under measured evaluation. The default path transfers a skill
+packet without changing weights; the optional deep-apply path can train a
+removable LoRA from already-approved packets; hardware-aware surfaces then
+address constrained training and compressed serving. **The trust gate is what
+keeps those transitions from silently declaring success.**
 
 > [!TIP]
 > *Like river silt, skills here are deposited only after filtration — settling
@@ -121,7 +146,7 @@ hash-chained audit trail.
 
 ---
 
-## Architecture at a glance
+## Architecture — transfer → prove → adapt
 
 ```
         ┌────────────────────────────────  SILT  ────────────────────────────────┐
@@ -151,7 +176,7 @@ flowchart LR
     Safety --> Distil[Distil<br/>compress to packet]
     Distil --> Eval[Held-out A/B<br/>+ regression sweep]
     Eval --> Snapshot[Rollback snapshot<br/>before the gate]
-    Snapshot --> Gate1{"Gate 1<br/>all-or-nothing<br/>16 checks · no bypass"}
+    Snapshot --> Gate1{"Gate 1<br/>all-or-nothing<br/>no bypass"}
     Gate1 -->|REJECTED| Rej[Named reasons<br/>model untouched]
     Gate1 -->|PENDING_HUMAN| Park[High-risk domain<br/>named human required]
     Gate1 -->|PROMOTED| Approved[Approved store]
@@ -162,8 +187,8 @@ flowchart LR
     Audit -.-> Approved
 
     Approved --> Train[optional deep-apply<br/>train LoRA]
-    Train --> Parity[bitwise parity]
-    Parity --> Gate2{"Gate 2<br/>3 checks · no trainer branches"}
+    Train --> Parity[parity / backend safeguards]
+    Parity --> Gate2{"Gate 2<br/>all-or-nothing<br/>trainer-independent"}
     Gate2 -->|PROMOTED| Adapter[removable adapter]
     Adapter --> Spring[optional SiltSpring<br/>quantize int8/4/2]
     Spring --> Cert[certify per<br/>state,skill<br/>revoke on damage]
@@ -185,7 +210,7 @@ Unlearning** (B3) — both locally HMAC-signed, both honest about their limits.
 
 ---
 
-## What the "trained model" actually is (read this first)
+## What SILT actually transfers (read this first)
 
 By default, SILT **trains no weights**. There is no trainer in the core
 install and the design forbids one inside the adapter
@@ -197,7 +222,7 @@ receiver's system prompt by `render_skills`
 (`src/asea/modules/real/prompting.py:90`).
 
 So by default **"the trained model" = receiver model + approved skill packet.**
-That is what you download (see [Downloading the trained model](#downloading-the-trained-model)).
+That is what you download (see [Downloading the approved skill bundle](#downloading-the-approved-skill-bundle)).
 For the L5 level, SILT additionally emits a distillation **dataset** and a
 `NOT_EXECUTED` training **job spec** you take to an external trainer — a recipe,
 not a trained adapter. No "% of knowledge transferred" appears anywhere,
@@ -221,7 +246,7 @@ because no such measurement exists.
 
 ---
 
-## What this is, and what it is not
+## Scope: what SILT can do today — and what it does not claim
 
 **It is:** a protocol, a set of registries, a filter chain, a benchmark harness
 with enforced split discipline, an evaluator, a promotion gate with
@@ -267,15 +292,15 @@ otherwise. See [`docs/feasibility_review.md`](docs/feasibility_review.md).
 
 ---
 
-## Can a complete skill auto-transfer from teacher to learner?
+## Can SILT add a missing specialist capability to the model you want to use?
 
-Short answer: **no weight copying, ever — but yes, a skill can move across
-automatically once it proves itself.** SILT is a trust/gate layer, not a model
-copier; one model cannot become a copy of another. What crosses is an
-**inspectable skill packet**, and only after it beats the learner on cases the
-teacher never saw.
+Short answer: **no weight copying, ever — but yes, a narrow skill can move
+across automatically once it proves itself.** SILT is a skill-interchange and
+trust-gating layer, not a model copier; one model cannot become a copy of
+another. What crosses by default is an **inspectable skill packet**, and only
+after it beats the learner on cases the teacher never saw.
 
-### Your Hindi example, end to end
+### Specialist teacher → general learner: Hindi example
 
 Teacher = a model fully trained in Hindi. Learner = a model with ~0 Hindi.
 
@@ -329,7 +354,7 @@ learner from *already-Gate-1-promoted* packets — but behind a **second gate
 This is the closest SILT gets to "weights transfer," and it is still: a
 removable adapter, trained only from proven packets, re-gated on held-out
 evidence, never merged into base weights in v1. See
-[Optional surfaces — deep-apply](#optional-surfaces).
+[Beyond packet transfer](#beyond-packet-transfer--deep-apply-hardware-adaptation-and-verification).
 
 > Recorded real run: NLLB-200 (genuinely covers Hindi + Assamese) → Qwen2.5
 > student, strict policy, no mock bypass — honest held-out delta **+0.053**
@@ -491,7 +516,7 @@ a silent fallback. The Studio is structurally unable to serve a mock
 
 ---
 
-## Optional surfaces
+## Beyond packet transfer — deep-apply, hardware adaptation, and verification
 
 ### deep-apply — three gated LoRA backends (`src/asea/deepapply/`)
 
@@ -509,7 +534,7 @@ identically (zero backend-conditional branches — `backends/__init__.py:18`):
 | Backend | Class | How it trains | Parity? |
 |---|---|---|---|
 | `standard` | `StandardTrainerBackend` (`trainer.py:297`) | model resident on device; CPU-graceful for small models | no parity probe — Gate 2's all-or-nothing checks are the bar |
-| `streamed` | `SiltStreamBackend` (`backends/streamed.py`) | low-VRAM **layer-streamed** LoRA (siltstream vendor): frozen base streams one layer at a time, peft LoRA on device | **parity is the admission bar** — unverified → `parity_verified=false`; fail → `DeepApplyBlocked` wrapping `ParityError`, before Gate 2 |
+| `streamed` | `SiltStreamBackend` (`backends/streamed.py`) | low-VRAM **layer-streamed** LoRA (siltstream vendor): frozen base streamed one layer at a time, peft LoRA on device | **parity is the admission bar** — unverified → `parity_verified=false`; fail → `DeepApplyBlocked` wrapping `ParityError`, before Gate 2 |
 | `zeroforge` | `ZeroForgeBackend` (`backends/zeroforge.py`) | forward-only **zeroth-order** LoRA (central-difference SPSA / MeZO-spirit), `backward_passes == 0` | runs a forward-parity check; fail → `DeepApplyBlocked` |
 
 The vendored first-party `siltstream` package (Apache-2.0, v0.1.0) lives at
@@ -518,7 +543,7 @@ parity, the SpringModel, the real-HF bridge (`hf_real.py`), and the quantizer.
 Do **not** edit the vendor in-place; fixes belong in the standalone siltstream
 first, then re-vendor.
 
-### SiltSpring — compression + certification (`src/asea/spring/`)
+### SiltSpring — compress for constrained hardware, certify what survives (`src/asea/spring/`)
 
 `CompressionCertifier` (`spring/certifier.py`) is the third SILT surface. It
 quantizes a model to **int8 / int4 / int2** and certifies each compressed
@@ -675,11 +700,12 @@ on the trained adapter before admission.
 
 ---
 
-## What AI / "engine" does SILT run on?
+## Bring the model you want to use — SILT is model-agnostic
 
-**SILT ships no model of its own — it is model-agnostic.** SILT's "brain" is
-the *gate* (pure Python + pydantic), not a model. You bring the models; SILT
-connects to them through real connectors in `src/asea/modules/real/`:
+**SILT ships no model of its own.** Its core is the skill-interchange protocol,
+evaluation harness, gates and audit — not a foundation model. You bring the
+models; SILT connects to them through real connectors in
+`src/asea/modules/real/`:
 
 | Connector | Talks to | Deps |
 |---|---|---|
@@ -695,7 +721,7 @@ NLLB-200, and GLM on RTX 5050 and CPU.
 
 The **heavy-compute engine** — only for the optional deep-apply trainer
 (`[deep]` extra) — is **PyTorch + PEFT + accelerate** training LoRA adapters,
-exposed through three backends (see [Optional surfaces](#optional-surfaces)):
+exposed through three backends (see [Beyond packet transfer](#beyond-packet-transfer--deep-apply-hardware-adaptation-and-verification)):
 
 | Backend | Compute shape | When |
 |---|---|---|
@@ -703,10 +729,10 @@ exposed through three backends (see [Optional surfaces](#optional-surfaces)):
 | `streamed` | layer-streamed LoRA (vendored `siltstream`): frozen base streamed one layer at a time | low-VRAM GPUs |
 | `zeroforge` | forward-only zeroth-order (SPSA / MeZO-spirit), `backward_passes == 0` | no backprop available / wanted |
 
-The **gate / protocol / audit core** (`asea.core`) needs only pydantic — no
-model, no torch. The real connectors and the vendored trainer are the only
-places that pull heavy ML deps, and only under their extras. To add a genuinely
-new backend, subclass `ModuleAdapter` (`core/interfaces.py:23`) — see
+The **protocol / evaluation / gate / audit core** (`asea.core`) needs only
+pydantic — no model, no torch. The real connectors and the vendored trainer are
+the only places that pull heavy ML deps, and only under their extras. To add a
+genuinely new backend, subclass `ModuleAdapter` (`core/interfaces.py:23`) — see
 [`docs/connector_authoring.md`](docs/connector_authoring.md).
 
 ---
@@ -742,16 +768,17 @@ high-risk domains). To insert one and run it through the full pipeline:
 7. **Verify integrity.** `GET /api/transfers/<id>/audit` → `integrity.ok: true`.
 8. **Inspect the buckets.** `GET /api/transfers/<id>/packets` →
    approved/candidate/rejected + snapshots.
-9. **Download the result.** see [below](#downloading-the-trained-model).
+9. **Download the result.** see [below](#downloading-the-approved-skill-bundle).
 
 ---
 
-## Downloading the trained model
+## Downloading the approved skill bundle
 
-The "trained model" is the approved skill packet(s). Download them as a single
-bundle — a zip of the approved packet JSON(s) + a flattened dataset + a manifest
-+ the audit chain + an honest README, refusing non-PROMOTED and mock-derived
-packets by default (`src/asea/distill/export.py:export_artifact_bundle`).
+The default downloadable result is the approved skill packet(s). Download them
+as a single bundle — a zip of the approved packet JSON(s) + a flattened dataset
++ a manifest + the audit chain + an honest README, refusing non-PROMOTED and
+mock-derived packets by default
+(`src/asea/distill/export.py:export_artifact_bundle`).
 
 ```bash
 # From the Studio (the download button):
@@ -775,7 +802,7 @@ The bundle contains:
   `NOT_EXECUTED` L4/L5 training job spec (LoRA / sequence KD) to run in an
   external trainer. Omitted for L0–L3 so no fake "training job" is implied.
 - `audit.jsonl` — the hash-chained audit trail, if available.
-- `README.txt` — the honest usage note (SILT trains no weights).
+- `README.txt` — the honest usage note (SILT trains no weights by default).
 
 To **use** an L0–L3 packet at inference time, inject it through the same path the
 gate measured: `receiver.infer_with_skills(capability, prompt,
