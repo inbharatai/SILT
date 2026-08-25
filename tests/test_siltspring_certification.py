@@ -16,6 +16,12 @@ from pathlib import Path
 
 import pytest
 
+# The SiltSpring certifier exercises the vendored SpringModel (a torch model,
+# random-init, no weights downloaded). Skip the whole module when torch is not
+# installed so `pip install -e ".[dev,studio]"` + `pytest` stays green without
+# the heavy [deep] extras. Locally (torch present) these run exactly as before.
+pytest.importorskip("torch")
+
 from asea.audit.logger import AuditLog
 from asea.benchmarks.harness import BenchmarkCase, BenchmarkSuite
 from asea.core.protocol import Domain, Modality

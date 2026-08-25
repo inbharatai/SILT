@@ -1234,6 +1234,10 @@ def test_spring_reaches_model_load_not_importerror_for_hf_receiver(monkeypatch, 
     fail with DeepApplyBlocked at the LOAD ("could not load ..."), NOT an
     ImportError from a wrong vendor import path. Hermetic + fast: no real
     weights load (HF_HUB_OFFLINE makes from_pretrained fail at cache lookup)."""
+    # The spring path reaches the torch-backed model load; skip when torch is
+    # absent so `pip install -e ".[dev,studio]"` + `pytest` stays green without
+    # the [deep] extras. Locally (torch present) this runs exactly as before.
+    pytest.importorskip("torch")
     from asea.modules.real import HFCausalConnector
     from asea.studio import catalog
     from asea.studio.spring_jobs import SpringJob

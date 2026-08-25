@@ -36,7 +36,9 @@ jobs:
         env:
           # Never set ASEA_RUN_REAL in CI — keeps runs offline and deterministic.
           ASEA_RUN_REAL: ""
-        run: pytest -q
+        # `python -m pytest` (not bare `pytest`) so the `tests` package is
+        # importable for cross-test fixtures (e.g. tests.conftest, tests.test_promotion_gate).
+        run: python -m pytest -q
 
   lint-check:
     name: sanity (imports clean, no real-weight escape)

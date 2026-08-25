@@ -1,10 +1,12 @@
 <p align="center">
-  <img src="docs/logo.svg" width="220" alt="SILT wordmark: the gate slit in the T, with a particle passing through">
+  <img src="docs/logo.svg" width="240" alt="SILT wordmark: the gate slit in the T, with a particle passing through">
 </p>
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
-<p align="center"><strong>Your AI learns.<br>Nobody checks its homework.<br>SILT does.</strong></p>
+<p align="center"><em>The trust gate for AI training.</em></p>
+
+<p align="center"><strong>Your AI trains.<br>Nobody checks its homework.<br>SILT does.</strong></p>
 
 <p align="center">
   <a href="https://github.com/inbharatai/SILT/actions/workflows/ci.yml"><img src="https://github.com/inbharatai/SILT/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -15,6 +17,7 @@
   <img src="https://img.shields.io/badge/built%20in-Assam%20%F0%9F%87%AE%F0%9F%87%B3-ff8a65" alt="Built in Assam, India">
 </p>
 
+> [!NOTE]
 > 🛡️ **Patent pending (India).** Indian Provisional Application No.
 > **202631101454** (ref `TEMP/E-1/111242/2026-KOL`, docket 25537), filed
 > **2026-08-21** by Reeturaj Goswami, assignee **Uni Guru Technologies LLP**.
@@ -36,17 +39,36 @@
 
 ---
 
+> [!IMPORTANT]
+> **Measured admission, not blind training.** A skill crosses the gate only
+> after it proves itself on cases the teacher never saw — through a
+> **non-bypassable all-or-nothing gate**, **structural human sign-off** for
+> medical / legal / finance, a **tamper-evident audit trail**, and
+> **one-command rollback**. Local-first — **₹0 cloud**.
+
+### 🧱 The six guarantees
+
+| | Guarantee | What it means |
+| :-- | :-- | :-- |
+| 🎯 | **Measured admission** | A skill is admitted only after held-out proof it helps; the asymmetric SPRT early-rejects, never early-promotes. |
+| 🔒 | **All-or-nothing gate** | Gate 1 runs 16 checks as one verdict — no bypass argument, no partial pass, no silent skip. |
+| 🩺 | **Human sign-off** | High-risk domains (medical / legal / finance) require a *named* human in the audit log — structurally non-bypassable. |
+| 📜 | **Tamper-evident audit** | Every decision lands in a hash-chained, append-only log — the single source of truth. |
+| ↩️ | **One-command rollback** | Each admitted skill carries a rollback token bound to a pre-admission snapshot; undo is one command. |
+| 🏠 | **Local-first** | Keys, weights and audit stay on your host — nothing is uploaded. Runs on consumer hardware, ₹0 cloud. |
+
 A local-first adapter that connects two AI modules — one acting as
 **Sender/Teacher**, one as **Receiver/Learner** — and moves *inspectable
 skill packets* between them under an evaluation gate. A skill crosses only
 after it proves itself on cases the teacher never saw. SILT is a **trust
-layer, not a trainer**: it decides whether a learned skill may be *admitted*
+layer, not a trainer**: it decides whether a trained skill may be *admitted*
 to a receiver, with held-out proof, a non-bypassable gate, and a
 hash-chained audit trail.
 
-*Like river silt, skills here are deposited only after filtration — settling in
-layers, enriching what they reach, with the sediment that failed the gate left
-behind.*
+> [!TIP]
+> *Like river silt, skills here are deposited only after filtration — settling
+> in layers, enriching what they reach, with the sediment that failed the
+> gate left behind.*
 
 > **Naming.** SILT is the project brand; the Python package imports as `asea`
 > (Adaptive Skill Extraction Adapter, the working name it was built under) —

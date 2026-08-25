@@ -19,6 +19,13 @@ from typing import Any, Dict, List
 
 import pytest
 
+# The streamed backend exercises the vendored StreamedCausalLM / siltstream
+# contract, which is a torch model (random-init, no weights downloaded). Skip
+# the whole module when torch is not installed so
+# `pip install -e ".[dev,studio]"` + `pytest` stays green without the heavy
+# [deep] extras. Locally (torch present) these run exactly as before.
+pytest.importorskip("torch")
+
 from asea.audit.logger import AuditLog
 from asea.benchmarks.harness import BenchmarkCase, BenchmarkHarness, BenchmarkSuite
 from asea.core.protocol import (

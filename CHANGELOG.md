@@ -42,11 +42,29 @@ assignee Uni Guru Technologies LLP). See `PATENT.md`.
   public. The architectural guarantees they carried ("local only",
   "never uploaded", "B1b portable attestation is not built") are preserved
   unchanged — only the publication-confidentiality posture changed.
+- README redesigned: coloured GitHub callout blocks (patent NOTE, measured-
+  admission IMPORTANT, river-silt TIP), a six-guarantees emoji table, larger
+  logo. Prose uses "training" (not "learning") for the AI-acquisition concept;
+  the `LearningLevel` enum and `applicable_learning_level` field keep their
+  code names. `docs/teaser.html` tagline/body aligned to "training" for
+  consistency.
 
 ### Fixed
 - The "deliberately not built until the patent is filed" wording on the B1b
-  portable asymmetric attestation feature is reworded to "out of scope of this
+  portable asymmetric attestation is reworded to "out of scope of this
   release" to reflect that the provisional is now filed.
+- **CI green without the heavy `[deep]` extras.** The test job now invokes
+  `python -m pytest -q` (not bare `pytest`) so the `tests` package is
+  importable for cross-test fixtures (`tests.conftest`, `tests.test_promotion_gate`).
+  Torch-dependent modules (`test_siltspring_certification`, `test_streamed_backend`)
+  and the torch-reached Studio spring test skip via `pytest.importorskip("torch")`
+  — the same pattern `test_studio` already uses for `fastapi` — so
+  `pip install -e ".[dev,studio]"` + `pytest` is green without installing torch.
+  Verified: 397 passed / 8 skipped with torch absent (the CI state); 420 passed
+  / 8 skipped with torch present (no regression).
+- `HFSeq2SeqTranslator.infer` now validates the `src->tgt` language tag **before**
+  loading the torch backend, so the bad-capability rejection path is torch-free
+  and fails fast (a caller bug shouldn't need the model on the host to reject).
 
 ### Known limitations (unchanged, by design)
 - B1b portable asymmetric third-party attestation is not built; Capability

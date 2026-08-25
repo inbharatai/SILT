@@ -148,8 +148,9 @@ class HFSeq2SeqTranslator(ModuleAdapter):
             )
 
     def infer(self, capability: CapabilityKey, prompt: Any) -> Any:
-        self.load()
-        torch = self._torch
+        # Validate the language pair BEFORE loading the heavy backend: a bad
+        # capability tag is a caller bug and must fail fast without needing
+        # torch/transformers on the host (keeps the validation path torch-free).
         src, tgt = split_pair(capability.language)
         if not src or not tgt:
             raise ValueError(
@@ -157,6 +158,8 @@ class HFSeq2SeqTranslator(ModuleAdapter):
                     capability.language
                 )
             )
+        self.load()
+        torch = self._torch
 
         self._tokenizer.src_lang = self._code(src)
         inputs = self._tokenizer(str(prompt), return_tensors="pt").to(self._model.device)
