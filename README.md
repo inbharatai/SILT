@@ -94,7 +94,7 @@ are in [Quick start](#quick-start) below.
 [`docs/teaser.html`](docs/teaser.html).
 
 <p align="center">
-  <a href="#architecture--transfer--prove--adapt">Architecture</a> ·
+  <a href="#architecture-at-a-glance--transfer--prove--adapt">Architecture</a> ·
   <a href="architecture.md">Design</a> ·
   <a href="risk_report.md">Risk report</a> ·
   <a href="#silt-studio--the-web-platform">Studio</a> ·
@@ -146,7 +146,7 @@ keeps those transitions from silently declaring success.**
 
 ---
 
-## Architecture — transfer → prove → adapt
+## Architecture at a glance — transfer → prove → adapt
 
 ```
         ┌────────────────────────────────  SILT  ────────────────────────────────┐
@@ -417,7 +417,7 @@ tested class:
 | Audited storage | `memory/store.py` `MemoryStore` + `audit/logger.py` `AuditLog` | physically separate `candidate/`/`approved/`/`rejected/`/`snapshots/`; approved is the **only** dir the receiver reads; hash-chained append-only audit log (thread-locked, fsync) |
 | Rollback | `memory/store.py` `RollbackLayer.rollback` | restore the approved set from a snapshot token |
 | Human-in-the-loop | `core/pipeline.py` `approve_pending` | re-runs the **full** gate; human approval satisfies exactly one check, never waives others |
-| L4/L5 export (spur) | `distill/export.py` `export_dataset` + `build_job_spec` + `export_artifact_bundle` | emit a validated JSONL dataset + a `NOT_EXECUTED` job spec + a downloadable skill-packet bundle; the gate refuses L4/L5 to a live receiver, so export is their only path |
+| L4/L5 export (spur) | `distill/export.py` `export_dataset` + `build_job_spec` + `export_artifact_bundle` | emit a validated JSONL dataset + a `NOT_EXECUTED` training job spec + a downloadable skill-packet bundle; the gate refuses L4/L5 to a live receiver, so export is their only path |
 
 ---
 
@@ -533,7 +533,7 @@ identically (zero backend-conditional branches — `backends/__init__.py:18`):
 
 | Backend | Class | How it trains | Parity? |
 |---|---|---|---|
-| `standard` | `StandardTrainerBackend` (`trainer.py:297`) | model resident on device; CPU-graceful for small models | no parity probe — Gate 2's all-or-nothing checks are the bar |
+| `standard` | `StandardTrainerBackend` (`trainer.py:297`) | model resident on device; full backprop | small models, CPU-graceful |
 | `streamed` | `SiltStreamBackend` (`backends/streamed.py`) | low-VRAM **layer-streamed** LoRA (siltstream vendor): frozen base streamed one layer at a time, peft LoRA on device | **parity is the admission bar** — unverified → `parity_verified=false`; fail → `DeepApplyBlocked` wrapping `ParityError`, before Gate 2 |
 | `zeroforge` | `ZeroForgeBackend` (`backends/zeroforge.py`) | forward-only **zeroth-order** LoRA (central-difference SPSA / MeZO-spirit), `backward_passes == 0` | runs a forward-parity check; fail → `DeepApplyBlocked` |
 
