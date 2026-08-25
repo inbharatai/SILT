@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adaptive-skill-extraction-adapter"
+version = "0.1.0"
+description = "SILT (Skill Interchange Layer with Trust-gating): a universal, local-first adapter for controlled AI-to-AI skill transfer with evaluation-gated promotion. Imports as asea."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Development Status :: 3 - Pre-Alpha",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pydantic>=2.0,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "httpx>=0.24"]
+studio = ["fastapi>=0.100", "uvicorn>=0.23"]
+# Not installed here and not required by the MVP. These are what a real
+# connector would need; see docs/connector_authoring.md.
+connectors = [
+    "transformers>=4.40",
+    "torch>=2.0",
+    "sentence-transformers>=2.2",
+]
+# Deep-apply (native gated LoRA trainer). Optional and heavy -- the deepapply
+# package imports without it; the real trainer backends raise a named
+# DeepApplyBlocked error naming this extra if it is absent. Small models
+# (e.g. SmolLM2-135M) train on CPU; larger models need CUDA.
+deep = [
+    "torch>=2.0",
+    "transformers>=4.40",
+    "peft>=0.10",
+    "accelerate>=0.25",
+    "sentencepiece>=0.1.99",
+]
+
+[project.urls]
+Homepage = "https://github.com/inbharatai/SILT"
+Documentation = "https://github.com/inbharatai/SILT#readme"
+Source = "https://github.com/inbharatai/SILT"
+Issues = "https://github.com/inbharatai/SILT/issues"
+"Patent notice" = "https://github.com/inbharatai/SILT/blob/main/PATENT.md"
+"Public teaser" = "https://github.com/inbharatai/SILT/blob/main/docs/teaser.html"
+
+[project.scripts]
+asea = "asea.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,5 @@
+run_id,arm,stage,clip_id,prompt_assamese,prompt_english,pronunciation_1to5,naturalness_1to5,intelligibility_1to5,accent_assamese_1to5,prosody_1to5,emotion_match_1to5,grammar_assamese_1to5,genuinely_assamese_1to5,bengali_or_hindi_influence_1to5,reviewer_id,reviewer_native_assamese_speaker,free_comment
+INSTRUCTIONS,,,No MiniCPM-o TTS/STS clip is rated until (a) the checkpoint has actually run on a GPU box and (b) the reviewer is a native Assamese speaker. Fill one row per clip per reviewer. 1=bad 5=excellent. A low genuinely_assamese or high bengali_or_hindi_influence invalidates an Assamese-quality claim.,,,,,,,,,,,,,,
+PENDING-B,PENDING,B,C-tts,,,,,,,,,,,,,,,,,
+PENDING-C,PENDING,C,C-tts,,,,,,,,,,,,,,,,,
+PENDING-A,PENDING,A,C-tts (baseline reference),,,,,,,,,,,,,,,,

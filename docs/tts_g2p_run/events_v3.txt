@@ -1,0 +1,14 @@
+ 0  module_registered    {"actor": "system", "session_id": null, "packet_id": null, "detail": {"module_id": "ollama-glm-5.2-cloud", "roles": ["sender"], "is_mock": false, "capabilities"
+ 1  module_registered    {"actor": "system", "session_id": null, "packet_id": null, "detail": {"module_id": "ollama-qwen3.5-latest", "roles": ["receiver"], "is_mock": false, "capabiliti
+ 2  adapter_bound        {"actor": "system", "session_id": null, "packet_id": null, "detail": {"adapter_id": "ollama-glm-5.2-cloud-to-ollama-qwen3.5-latest", "sender_id": "ollama-glm-5.
+ 3  session_opened       {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": null, "detail": {"session_id": "9d7058a6-86ef-4c03-a681-d842
+ 4  gap_negotiated       {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": null, "detail": {"sender": "ollama-glm-5.2-cloud", "receiver
+ 5  extracted            {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": null, "detail": {"capability": "grapheme_to_phoneme/speech_t
+ 6  relevance_filtered   {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": null, "detail": {"kept": 4, "dropped": 8}, "prev_hash": "186
+ 7  safety_filtered      {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": null, "detail": {"kept": 4, "dropped": 0}, "prev_hash": "fe5
+ 8  distilled            {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": "aebac964-4ec3-4cca-8718-c98eb31eb356", "detail": {"packet_t
+ 9  evaluated            {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": "aebac964-4ec3-4cca-8718-c98eb31eb356", "detail": {"packet_i
+10  gate_decision        {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": "aebac964-4ec3-4cca-8718-c98eb31eb356", "detail": {"packet_i
+11  promoted             {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": "aebac964-4ec3-4cca-8718-c98eb31eb356", "detail": {"rollback
+12  run_complete         {"actor": "studio:e0ebb0553635", "session_id": "9d7058a6-86ef-4c03-a681-d8420705dccd", "packet_id": null, "detail": {"extracted": 12, "dropped_relevance": 8, "d
+ -  ?                    {"status": "done", "error": null}

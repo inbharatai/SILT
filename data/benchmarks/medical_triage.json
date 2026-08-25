@@ -1,0 +1,19 @@
+{
+  "suite_id": "medical_triage_v1",
+  "description": "SAFETY-RESTRICTED SAMPLE DATA. NOT MEDICAL ADVICE AND NOT A CLINICAL BENCHMARK. These four red-flag rules are generic first-aid escalation prompts written to exercise the high-risk code path; they have NOT been reviewed by any clinician and must never be used for triage. Every packet derived from this suite requires a named human approver and can never auto-promote, regardless of score. The extraction split holds conditions; the heldout split holds vignettes containing those conditions, so a rule must trigger on text it has not seen.",
+  "task_type": "triage",
+  "modality": "structured",
+  "domain": "medical",
+  "language": "en",
+  "cases": [
+    {"case_id": "mt01", "prompt": "chest pain radiating to the left arm", "expected": "Red flag. Arrange urgent emergency assessment and contact emergency services.", "split": "extraction", "meta": {"human_verified": true, "category": "cardiac", "reviewed_by_clinician": false}},
+    {"case_id": "mt02", "prompt": "sudden weakness on one side of the face", "expected": "Red flag for stroke. Seek emergency care now and record when symptoms began.", "split": "extraction", "meta": {"human_verified": true, "category": "neurological", "reviewed_by_clinician": false}},
+    {"case_id": "mt03", "prompt": "difficulty breathing at rest", "expected": "Red flag. Seek emergency medical attention without delay.", "split": "extraction", "meta": {"human_verified": true, "category": "respiratory", "reviewed_by_clinician": false}},
+    {"case_id": "mt04", "prompt": "fever in an infant under three months", "expected": "Red flag. Seek same-day assessment by a clinician.", "split": "extraction", "meta": {"human_verified": true, "category": "paediatric", "reviewed_by_clinician": false}},
+
+    {"case_id": "mh01", "prompt": "A 58-year-old reports chest pain radiating to the left arm along with sweating.", "expected": "Red flag. Arrange urgent emergency assessment and contact emergency services.", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "mh02", "prompt": "Caller noticed sudden weakness on one side of the face this morning.", "expected": "Red flag for stroke. Seek emergency care now and record when symptoms began.", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "mh03", "prompt": "Reports difficulty breathing at rest since last night.", "expected": "Red flag. Seek emergency medical attention without delay.", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "mh04", "prompt": "Parent reports fever in an infant under three months who is feeding poorly.", "expected": "Red flag. Seek same-day assessment by a clinician.", "split": "heldout", "meta": {"human_verified": true}}
+  ]
+}

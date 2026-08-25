@@ -1,0 +1,29 @@
+{
+  "suite_id": "assamese_english_v1",
+  "description": "Assamese->English. SAMPLE DATA, NOT A VALIDATED BENCHMARK. Twelve items written for pipeline testing; they have not been reviewed by a native Assamese speaker and must not be used to make any claim about model quality. The 'extraction' split is deliberately word/term level and the 'heldout' split is sentence level, so a glossary packet must generalise compositionally rather than memorise.",
+  "task_type": "translate",
+  "modality": "text",
+  "domain": "translation",
+  "language": "as->en",
+  "cases": [
+    {"case_id": "as_w01", "prompt": "মই", "expected": "I", "split": "extraction", "meta": {"human_verified": true, "kind": "pronoun"}},
+    {"case_id": "as_w02", "prompt": "মোৰ", "expected": "my", "split": "extraction", "meta": {"human_verified": true, "kind": "pronoun"}},
+    {"case_id": "as_w03", "prompt": "ভাত", "expected": "rice", "split": "extraction", "meta": {"human_verified": true, "kind": "noun"}},
+    {"case_id": "as_w04", "prompt": "পানী", "expected": "water", "split": "extraction", "meta": {"human_verified": true, "kind": "noun"}},
+    {"case_id": "as_w05", "prompt": "ঘৰ", "expected": "house", "split": "extraction", "meta": {"human_verified": true, "kind": "noun"}},
+    {"case_id": "as_w06", "prompt": "কিতাপ", "expected": "book", "split": "extraction", "meta": {"human_verified": true, "kind": "noun"}},
+    {"case_id": "as_w07", "prompt": "খাওঁ", "expected": "eat", "split": "extraction", "meta": {"human_verified": true, "kind": "verb"}},
+    {"case_id": "as_w08", "prompt": "পঢ়োঁ", "expected": "read", "split": "extraction", "meta": {"human_verified": true, "kind": "verb"}},
+    {"case_id": "as_w09", "prompt": "আজি", "expected": "today", "split": "extraction", "meta": {"human_verified": true, "kind": "adverb"}},
+    {"case_id": "as_w10", "prompt": "ৰাম", "expected": "Ram", "split": "extraction", "meta": {"human_verified": true, "kind": "proper_noun"}},
+    {"case_id": "as_w11", "prompt": "ভাল", "expected": "good", "split": "extraction", "meta": {"human_verified": true, "kind": "adjective", "note": "receiver already knows this; expect a receiver_competent drop"}},
+    {"case_id": "as_w12", "prompt": "চাহ", "expected": "tea", "split": "extraction", "meta": {"human_verified": true, "kind": "noun", "note": "sender mock is seeded with a wrong answer here; expect a sender_incorrect drop"}},
+
+    {"case_id": "as_s01", "prompt": "মই ভাত খাওঁ", "expected": "I eat rice", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "as_s02", "prompt": "মোৰ নাম ৰাম", "expected": "My name is Ram", "split": "heldout", "meta": {"human_verified": true, "note": "নাম is absent from the glossary on purpose: partial coverage"}},
+    {"case_id": "as_s03", "prompt": "মই কিতাপ পঢ়োঁ", "expected": "I read a book", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "as_s04", "prompt": "মোৰ ঘৰ", "expected": "My house", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "as_s05", "prompt": "আজি ভাত ভাল", "expected": "Today the rice is good", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "as_s06", "prompt": "মই পানী খাওঁ", "expected": "I drink water", "split": "heldout", "meta": {"human_verified": true, "note": "খাওঁ glosses as 'eat'; correct English needs 'drink'. Composition cannot know this."}}
+  ]
+}

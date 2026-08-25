@@ -1,0 +1,29 @@
+{
+  "suite_id": "tts_pronunciation_as_v1",
+  "description": "Assamese grapheme-to-phoneme. SAMPLE DATA, NOT A VALIDATED LEXICON. Transcriptions are illustrative and require review by a phonetician; in particular the inherent vowel and word-final schwa are simplified away. Language tag is 'as-ipa' because the OUTPUT is IPA in Latin script, so the Assamese-script check must not apply to it. Extraction is akshara level, heldout is word level: the lexicon must compose to pronounce unseen words. SCOPE: symbolic only. Voice timbre and learned prosody do not transfer between TTS systems and are out of scope by design.",
+  "task_type": "grapheme_to_phoneme",
+  "modality": "speech_tts",
+  "domain": "pronunciation",
+  "language": "as-ipa",
+  "cases": [
+    {"case_id": "g_k", "prompt": "ক", "expected": "k", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_g", "prompt": "গ", "expected": "g", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_m", "prompt": "ম", "expected": "m", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_n", "prompt": "ন", "expected": "n", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_t", "prompt": "ত", "expected": "t", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_p", "prompt": "প", "expected": "p", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_l", "prompt": "ল", "expected": "l", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_bh", "prompt": "ভ", "expected": "bʱ", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_x", "prompt": "স", "expected": "x", "split": "extraction", "meta": {"human_verified": true, "note": "Assamese realises this as a velar fricative, unlike most Indic languages"}},
+    {"case_id": "g_r", "prompt": "ৰ", "expected": "ɹ", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "g_aa", "prompt": "া", "expected": "a", "split": "extraction", "meta": {"human_verified": true, "kind": "matra"}},
+    {"case_id": "g_i", "prompt": "ি", "expected": "i", "split": "extraction", "meta": {"human_verified": true, "kind": "matra"}},
+
+    {"case_id": "w_kam", "prompt": "কাম", "expected": "kam", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "w_nam", "prompt": "নাম", "expected": "nam", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "w_mat", "prompt": "মাত", "expected": "mat", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "w_bhal", "prompt": "ভাল", "expected": "bʱal", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "w_xat", "prompt": "সাত", "expected": "xat", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "w_kitap", "prompt": "কিতাপ", "expected": "kitap", "split": "heldout", "meta": {"human_verified": true}}
+  ]
+}

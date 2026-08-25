@@ -1,0 +1,32 @@
+SILT (adaptive-skill-extraction-adapter)
+=========================================
+
+Third-party work used by this project, with attribution.
+
+Layer-streamed low-VRAM LoRA training (deep-apply streamed backend)
+------------------------------------------------------------------
+The streamed training backend (src/asea/deepapply/trainer.py,
+``StreamedTrainerBackend``) implements the layer-streaming / offloading
+technique published as **Soup** by MakazhanAlpamys:
+
+    Repository : github.com/MakazhanAlpamys/Soup
+    License    : Apache-2.0
+    Demonstrated: training an 8B-parameter LoRA adapter in ~3.3 GB of VRAM by
+                  keeping the frozen base in host RAM and streaming decoder
+                  layers to the GPU one at a time, with LoRA params resident
+                  on device.
+
+This technique is third-party published work and is credited here, in the
+backend's module docstring, and in docs/deep_apply_design.md. It is NOT claimed
+as original work of this project. The backend name and version are recorded in
+every AdapterPacket that the streamed backend produces, so the prior-art
+provenance of a trained adapter is inspectable.
+
+Deep-apply's standard backend (``StandardTrainerBackend``) is a conventional
+PEFT/LoRA fine-tune (HuggingFace transformers + PEFT, Apache-2.0) and does not
+use the Soup technique.
+
+HuggingFace transformers, PEFT, accelerate, torch, sentencepiece
+-----------------------------------------------------------------
+Optional, installed via the ``[deep]`` extra. Each is under its own license
+(Apache-2.0 / BSD-style); see upstream for terms.

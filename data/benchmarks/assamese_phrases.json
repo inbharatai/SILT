@@ -1,0 +1,22 @@
+{
+  "suite_id": "assamese_phrases_v1",
+  "description": "English->Assamese generation. SAMPLE DATA, NOT A VALIDATED BENCHMARK. Purpose: exercise the language_preservation metric. The receiver mock's fallback answers in English, which is the real and very common low-resource failure mode of answering in the wrong language while looking fluent. A packet that fixes the vocabulary but leaves word order wrong will still score imperfectly here, which is correct.",
+  "task_type": "generate",
+  "modality": "text",
+  "domain": "language",
+  "language": "en->as",
+  "cases": [
+    {"case_id": "ap_w01", "prompt": "water", "expected": "পানী", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "ap_w02", "prompt": "rice", "expected": "ভাত", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "ap_w03", "prompt": "book", "expected": "কিতাপ", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "ap_w04", "prompt": "house", "expected": "ঘৰ", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "ap_w05", "prompt": "good", "expected": "ভাল", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "ap_w06", "prompt": "today", "expected": "আজি", "split": "extraction", "meta": {"human_verified": true}},
+    {"case_id": "ap_w07", "prompt": "my", "expected": "মোৰ", "split": "extraction", "meta": {"human_verified": true}},
+
+    {"case_id": "ap_s01", "prompt": "good water", "expected": "ভাল পানী", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "ap_s02", "prompt": "good book", "expected": "ভাল কিতাপ", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "ap_s03", "prompt": "my house", "expected": "মোৰ ঘৰ", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "ap_s04", "prompt": "today rice", "expected": "আজি ভাত", "split": "heldout", "meta": {"human_verified": true}}
+  ]
+}

@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use SILT in your research, please cite this software and the accompanying patent application."
+title: "SILT: Skill Interchange Layer with Trust-gating — a trust gate for AI learning"
+abstract: >-
+  SILT is a local-first adapter that moves inspectable skill packets between two
+  AI modules under an evaluation gate: a skill is admitted to the receiver only
+  after it proves itself on cases the teacher never saw, with a non-bypassable
+  all-or-nothing gate, structural human sign-off for high-risk domains, a
+  hash-chained tamper-evident audit trail, and per-skill rollback. Patent pending (India).
+authors:
+  - family-names: Goswami
+    given-names: Reeturaj
+    affiliation: "Uni Guru Technologies LLP"
+keywords:
+  - ai
+  - machine-learning
+  - trust-gate
+  - skill-transfer
+  - fine-tuning
+  - llm
+  - ai-safety
+  - quantization
+  - local-first
+license: Apache-2.0
+type: software
+version: "0.1.0"
+date-released: "2026-08-25"
+repository-code: "https://github.com/inbharatai/SILT"
+preferred-citation:
+  type: generic
+  title: "Indian Provisional Patent Application No. 202631101454: Trust-Gated Skill Packet Transfer and Hardware-Aware Adaptation Across Heterogeneous Artificial Intelligence Systems"
+  authors:
+    - family-names: Goswami
+      given-names: Reeturaj
+      affiliation: "Uni Guru Technologies LLP"
+  date: "2026-08-21"
+  notes: "Filed 2026-08-21, IPO (Kolkata). Ref no TEMP/E-1/111242/2026-KOL."

@@ -1,0 +1,12 @@
+{"input": "ক", "output": "k", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "গ", "output": "g", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ম", "output": "m", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ন", "output": "n", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ত", "output": "t", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "প", "output": "p", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ল", "output": "l", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ভ", "output": "bʱ", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "স", "output": "x", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ৰ", "output": "ɹ", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "া", "output": "a", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}
+{"input": "ি", "output": "i", "arm": "B", "suite": "tts_pronunciation_as_v1", "note": "raw extraction pair; no SILT relevance/safety/gate filter"}

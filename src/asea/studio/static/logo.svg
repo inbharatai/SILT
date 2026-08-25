@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 84" role="img" aria-label="SILT wordmark">
+  <!--
+    SILT wordmark (Direction 2, hand-drawn vector).
+    Geometric stencil letterforms in slate. One intervention: the T's crossbar
+    is broken by a narrow gate slit, and a single teal particle is caught
+    mid-passage through it. The hairline teal underline is the settled deposit.
+    Ink: light (for the dark Studio UI). See studio/static/logo.svg for the
+    light-ink variant used on the dark Studio UI.
+  -->
+  <g fill="#e2e8f0">
+    <!-- S -->
+    <rect x="8"  y="8"  width="44" height="12" rx="1"/>
+    <rect x="8"  y="20" width="12" height="14"/>
+    <rect x="8"  y="34" width="44" height="12" rx="1"/>
+    <rect x="40" y="46" width="12" height="14"/>
+    <rect x="8"  y="60" width="44" height="12" rx="1"/>
+    <!-- I -->
+    <rect x="66" y="8"  width="12" height="64" rx="1"/>
+    <!-- L -->
+    <rect x="92" y="8"  width="12" height="64" rx="1"/>
+    <rect x="92" y="60" width="38" height="12" rx="1"/>
+    <!-- T: crossbar broken by the gate slit -->
+    <rect x="144" y="8" width="20" height="12" rx="1"/>
+    <rect x="172" y="8" width="20" height="12" rx="1"/>
+    <rect x="162" y="20" width="12" height="52" rx="1"/>
+  </g>
+  <!-- the particle, caught mid-passage through the T's gate -->
+  <rect x="164" y="10" width="8" height="8" rx="1.5" fill="#14b8a6"/>
+  <!-- the settled deposit -->
+  <rect x="8" y="78" width="184" height="2.5" rx="1.25" fill="#14b8a6"/>
+</svg>

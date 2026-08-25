@@ -1,0 +1,22 @@
+{
+  "base_model": "openbmb/MiniCPM-o-2_6",
+  "source_run": "real SILT G2P run .studio/e0ebb0553635/ (PROMOTED, candidate 0.7359)",
+  "B_conventional": {
+    "rows": 12,
+    "epochs": 1,
+    "row_epochs": 12,
+    "dataset": "C:\\Users\\reetu\\Desktop\\adaptive-skill-extraction-adapter\\experiments\\minicpmo45_assamese\\handoff\\B_conventional.jsonl",
+    "gating": "none"
+  },
+  "C_silt_gated": {
+    "rows": 4,
+    "epochs": 3,
+    "row_epochs": 12,
+    "dataset": "C:\\Users\\reetu\\Desktop\\adaptive-skill-extraction-adapter\\experiments\\minicpmo45_assamese\\handoff\\C_silt_gated.jsonl",
+    "bundle": "C:\\Users\\reetu\\Desktop\\adaptive-skill-extraction-adapter\\experiments\\minicpmo45_assamese\\handoff\\C_silt_gated.zip",
+    "gating": "relevance+safety+trust+regression (8 dropped as receiver_competent)"
+  },
+  "budget_match": "B row-epochs == C row-epochs == 12 (equal training tokens)",
+  "status": "NOT_EXECUTED — run on a GPU box via train_lora.py",
+  "scale_note": "shape demonstration on the real G2P run; GPU box regenerates B/C at IndicVoices scale via the same path"
+}

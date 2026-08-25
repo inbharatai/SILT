@@ -1,0 +1,146 @@
+{
+  "experiment": "minicpmo45_assamese_silt_proxy",
+  "captured_at": "2026-08-13",
+  "framing": "SILT-on-Assamese validation (real), NOT a MiniCPM-o result. MiniCPM-o arms A/B/C are PENDING a GPU box (see hardware.json).",
+  "g2p_replay": {
+    "packet_id": "aebac964-4ec3-4cca-8718-c98eb31eb356",
+    "suite_id": "tts_pronunciation_as_v1",
+    "module": "ollama-qwen3.5-latest",
+    "is_mock": false,
+    "skills_active": 1,
+    "similarity_is_semantic": true,
+    "baseline": {
+      "score": 0.6023,
+      "task_success": 0.0,
+      "case_count": 6
+    },
+    "candidate": {
+      "score": 0.7359,
+      "task_success": 0.3333,
+      "case_count": 6
+    },
+    "improvement": 0.1336,
+    "cases": [
+      {
+        "case_id": "w_kam",
+        "expected": "kam",
+        "baseline_output": "kaam",
+        "candidate_output": "kʰam",
+        "baseline_score": 0.6424,
+        "candidate_score": 0.5871,
+        "delta": -0.0554,
+        "regressed": true
+      },
+      {
+        "case_id": "w_nam",
+        "expected": "nam",
+        "baseline_output": "naam",
+        "candidate_output": "namx",
+        "baseline_score": 0.5541,
+        "candidate_score": 0.5568,
+        "delta": 0.0027,
+        "regressed": false
+      },
+      {
+        "case_id": "w_mat",
+        "expected": "mat",
+        "baseline_output": "mat̪o",
+        "candidate_output": "mɑt",
+        "baseline_score": 0.6669,
+        "candidate_score": 0.6464,
+        "delta": -0.0206,
+        "regressed": true
+      },
+      {
+        "case_id": "w_bhal",
+        "expected": "bʱal",
+        "baseline_output": "baal",
+        "candidate_output": "bhal",
+        "baseline_score": 0.6279,
+        "candidate_score": 0.6251,
+        "delta": -0.0028,
+        "regressed": true
+      },
+      {
+        "case_id": "w_xat",
+        "expected": "xat",
+        "baseline_output": "sat",
+        "candidate_output": "xat",
+        "baseline_score": 0.523,
+        "candidate_score": 1.0,
+        "delta": 0.477,
+        "regressed": false
+      },
+      {
+        "case_id": "w_kitap",
+        "expected": "kitap",
+        "baseline_output": "kitaap",
+        "candidate_output": "kitap",
+        "baseline_score": 0.5996,
+        "candidate_score": 1.0,
+        "delta": 0.4004,
+        "regressed": false
+      }
+    ],
+    "reference_doc": "docs/SILT_TTS_G2P_TEST.md §5.6 (baseline 0.6023, candidate 0.7359, improvement +0.1336)"
+  },
+  "text_transfer": {
+    "job_id": "15b87dae3279",
+    "status": "done",
+    "elapsed_seconds": 90.0,
+    "error": null,
+    "config": {
+      "sender": "nllb-teacher",
+      "receiver": "qwen2.5-1.5b-instruct-runtime",
+      "suites": [
+        "assamese_english"
+      ],
+      "similarity": "lexical",
+      "relevance_floor": 0.3,
+      "description": "SILT-proxy Assamese text transfer (exp/minicpmo45_assamese)"
+    },
+    "report": {
+      "session": {
+        "session_id": "73557b80-c0d0-43c5-8816-1c1286286794",
+        "adapter_id": "nllb-teacher-to-ollama-qwen2.5-1.5b-instruct",
+        "sender": "nllb-teacher",
+        "receiver": "ollama-qwen2.5-1.5b-instruct",
+        "shared_modalities": [
+          "text"
+        ],
+        "negotiated_level": 0,
+        "involves_mock": false,
+        "opened_at": "2026-08-13T08:43:48.150095+00:00"
+      },
+      "negotiation": {
+        "sender": "nllb-teacher",
+        "receiver": "ollama-qwen2.5-1.5b-instruct",
+        "declared_gaps": [
+          "translate/text/translation/hi->en"
+        ],
+        "measured_gaps": [],
+        "actionable": 0
+      },
+      "counts": {
+        "extracted": 0,
+        "dropped_relevance": 0,
+        "dropped_safety": 0,
+        "distilled": 0,
+        "promoted": 0,
+        "pending_human": 0,
+        "rejected": 0
+      },
+      "dropped_relevance": [],
+      "dropped_safety": [],
+      "evaluations": [],
+      "decisions": [],
+      "promoted": [],
+      "pending_human": [],
+      "rejected": [],
+      "mock_warning": null
+    },
+    "promoted_count": 0,
+    "pending_human_count": 0,
+    "rejected_count": 0
+  }
+}

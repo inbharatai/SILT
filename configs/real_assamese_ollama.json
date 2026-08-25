@@ -1,0 +1,38 @@
+{
+  "name": "real_assamese_nllb_to_qwen_ollama",
+  "description": "REAL MODELS, NO MOCKS. Sender is NLLB-200-distilled-600M loaded in-process (it genuinely covers Assamese). Receiver is Qwen2.5 7B served by a local Ollama daemon, so the 7B weights never enter this process. Requires: ollama serve && ollama pull qwen2.5:7b-instruct. The promotion policy is left at its strict default because nothing here is mocked.",
+  "suites": ["assamese_english", "hindi_english"],
+  "promotion_policy": {
+    "min_evaluator_score": 0.6,
+    "min_safety_score": 0.7,
+    "min_improvement": 0.01,
+    "max_synthetic_depth": 2
+  },
+  "modules": [
+    {
+      "preset": "nllb_translator",
+      "args": {
+        "pairs": ["as->en", "hi->en"],
+        "dtype": "float32"
+      }
+    },
+    {
+      "preset": "qwen_ollama",
+      "args": {
+        "model": "qwen2.5:7b-instruct",
+        "host": "http://localhost:11434",
+        "max_new_tokens": 64
+      },
+      "capabilities": [
+        {"task_type": "translate", "modality": "text", "domain": "translation", "language": "as->en"},
+        {"task_type": "translate", "modality": "text", "domain": "translation", "language": "hi->en"}
+      ]
+    }
+  ],
+  "adapter": {
+    "id": "nllb-to-qwen",
+    "sender": "nllb-teacher",
+    "receiver": "qwen-ollama",
+    "description": "REAL Assamese glossary transfer, NLLB teacher -> Qwen student"
+  }
+}

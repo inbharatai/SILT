@@ -1,0 +1,43 @@
+{
+  "name": "assamese_glossary_to_qwen",
+  "description": "Flow A as a declarative config. ALL MODULES ARE MOCKS. promotion_policy.strict_no_mock is false so the run can complete end to end in an environment with no model weights; do not copy this setting into a real deployment.",
+  "suites": ["assamese_english", "hindi_english"],
+  "promotion_policy": {
+    "strict_no_mock": false,
+    "min_evaluator_score": 0.6,
+    "min_safety_score": 0.7,
+    "min_improvement": 0.01,
+    "max_synthetic_depth": 2
+  },
+  "modules": [
+    {
+      "id": "assamese-corpus-mock",
+      "name": "Curated Assamese source (MOCK)",
+      "roles": ["sender"],
+      "consumes_skills": false,
+      "fallback": "unknown",
+      "capabilities": [
+        {"task_type": "translate", "modality": "text", "domain": "translation", "language": "as->en"}
+      ],
+      "knowledge": {
+        "suites": ["assamese_english"],
+        "splits": ["extraction"],
+        "overrides": {"চাহ": "coffee"}
+      }
+    },
+    {
+      "preset": "qwen_mock",
+      "fallback": "echo",
+      "knowledge": {
+        "suites": ["hindi_english"],
+        "splits": ["regression"]
+      }
+    }
+  ],
+  "adapter": {
+    "id": "assamese-to-qwen",
+    "sender": "assamese-corpus-mock",
+    "receiver": "qwen-mock",
+    "description": "Assamese glossary transfer into a general instruct model"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "suite_id": "coding_bugfix_v1",
+  "description": "Python bug-fix patterns. SAMPLE DATA. The extraction split holds minimal buggy->fixed FRAGMENTS; the heldout split holds full lines that contain those fragments in contexts never seen during extraction. One heldout case (hd04) is deliberately not covered by any extracted pattern, so the report shows honest partial coverage rather than a suspicious 100%. NOTE: scoring is textual comparison, not test execution. Running model-authored code is out of scope here for safety reasons; see CodeMetric in evaluator/metrics_plugins.py.",
+  "task_type": "bug_fix",
+  "modality": "code",
+  "domain": "software",
+  "language": "python",
+  "cases": [
+    {"case_id": "bf01", "prompt": "== None", "expected": "is None", "split": "extraction", "meta": {"human_verified": true, "rule": "identity comparison with None"}},
+    {"case_id": "bf02", "prompt": "!= None", "expected": "is not None", "split": "extraction", "meta": {"human_verified": true, "rule": "identity comparison with None"}},
+    {"case_id": "bf03", "prompt": "except:", "expected": "except Exception:", "split": "extraction", "meta": {"human_verified": true, "rule": "bare except swallows BaseException"}},
+    {"case_id": "bf04", "prompt": "if len(items) == 0:", "expected": "if not items:", "split": "extraction", "meta": {"human_verified": true, "rule": "truthiness over length check"}},
+
+    {"case_id": "hd01", "prompt": "if result == None:", "expected": "if result is None:", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "hd02", "prompt": "if config != None: apply(config)", "expected": "if config is not None: apply(config)", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "hd03", "prompt": "try: run() except: pass", "expected": "try: run() except Exception: pass", "split": "heldout", "meta": {"human_verified": true}},
+    {"case_id": "hd04", "prompt": "for i in range(len(rows)): print(rows[i])", "expected": "for row in rows: print(row)", "split": "heldout", "meta": {"human_verified": true, "note": "no extracted pattern covers this; expected to remain unfixed"}}
+  ]
+}

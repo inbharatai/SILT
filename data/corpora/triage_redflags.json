@@ -1,0 +1,11 @@
+{
+  "corpus_id": "triage-redflags-v1",
+  "reviewed_by": null,
+  "note": "SAMPLE DATA. NOT reviewed by a clinician. NOT medical advice. Exists to exercise the high-risk pipeline path; the reviewed_by field is null precisely because no clinician has signed it.",
+  "records": [
+    {"prompt": "chest pain radiating to the left arm", "answer": "Red flag. Arrange urgent emergency assessment and contact emergency services.", "confidence": 0.95},
+    {"prompt": "sudden weakness on one side of the face", "answer": "Red flag for stroke. Seek emergency care now and record when symptoms began.", "confidence": 0.95},
+    {"prompt": "difficulty breathing at rest", "answer": "Red flag. Seek emergency medical attention without delay.", "confidence": 0.95},
+    {"prompt": "fever in an infant under three months", "answer": "Red flag. Seek same-day assessment by a clinician.", "confidence": 0.95}
+  ]
+}

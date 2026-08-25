@@ -1,0 +1,198 @@
+{
+  "captured_at": "2026-08-13",
+  "sentences": 8,
+  "note": "Qwen2.5 BPE = MiniCPM-o 2.6 backbone tokenizer family. Re-verify exact tokenizer.json from the MiniCPM-o 4.5 checkpoint on GPU box.",
+  "primary_tokenizer": "Qwen/Qwen2.5-0.5B (Qwen2.5 BPE = MiniCPM-o backbone family)",
+  "primary": {
+    "rows": [
+      {
+        "as": {
+          "chars": 25,
+          "tokens": 33,
+          "tokens_per_char": 1.32,
+          "text": "আজি বুধবাৰ আৰু বতৰ বৰষুণৰ"
+        },
+        "en": {
+          "chars": 43,
+          "tokens": 8,
+          "tokens_per_char": 0.186,
+          "text": "Today is Wednesday and the weather is rainy"
+        },
+        "hi": {
+          "chars": 30,
+          "tokens": 30,
+          "tokens_per_char": 1.0,
+          "text": "आज बुधवार है और मौसम बारिशी है"
+        },
+        "as_over_en": 7.095,
+        "as_over_hi": 1.32
+      },
+      {
+        "as": {
+          "chars": 18,
+          "tokens": 23,
+          "tokens_per_char": 1.278,
+          "text": "মই গুৱাহাটীলৈ যাওঁ"
+        },
+        "en": {
+          "chars": 22,
+          "tokens": 8,
+          "tokens_per_char": 0.364,
+          "text": "I am going to Guwahati"
+        },
+        "hi": {
+          "chars": 23,
+          "tokens": 25,
+          "tokens_per_char": 1.087,
+          "text": "मैं गुवाहाटी जा रहा हूँ"
+        },
+        "as_over_en": 3.514,
+        "as_over_hi": 1.176
+      },
+      {
+        "as": {
+          "chars": 38,
+          "tokens": 47,
+          "tokens_per_char": 1.237,
+          "text": "তেওঁৰ নাম ৰাম আৰু তেওঁ ডিব্ৰুগড়ত থাকে"
+        },
+        "en": {
+          "chars": 41,
+          "tokens": 12,
+          "tokens_per_char": 0.293,
+          "text": "His name is Ram and he lives in Dibrugarh"
+        },
+        "hi": {
+          "chars": 44,
+          "tokens": 44,
+          "tokens_per_char": 1.0,
+          "text": "उनका नाम राम है और वे डिब्रूगढ़ में रहते हैं"
+        },
+        "as_over_en": 4.226,
+        "as_over_hi": 1.237
+      },
+      {
+        "as": {
+          "chars": 21,
+          "tokens": 23,
+          "tokens_per_char": 1.095,
+          "text": "এই কিতাপৰ দাম দুশ টকা"
+        },
+        "en": {
+          "chars": 34,
+          "tokens": 7,
+          "tokens_per_char": 0.206,
+          "text": "This book costs two hundred rupees"
+        },
+        "hi": {
+          "chars": 31,
+          "tokens": 28,
+          "tokens_per_char": 0.903,
+          "text": "इस किताब की कीमत दो सौ रुपये है"
+        },
+        "as_over_en": 5.32,
+        "as_over_hi": 1.213
+      },
+      {
+        "as": {
+          "chars": 12,
+          "tokens": 14,
+          "tokens_per_char": 1.167,
+          "text": "মই পানী খাওঁ"
+        },
+        "en": {
+          "chars": 13,
+          "tokens": 3,
+          "tokens_per_char": 0.231,
+          "text": "I drink water"
+        },
+        "hi": {
+          "chars": 17,
+          "tokens": 17,
+          "tokens_per_char": 1.0,
+          "text": "मैं पानी पीता हूँ"
+        },
+        "as_over_en": 5.056,
+        "as_over_hi": 1.167
+      },
+      {
+        "as": {
+          "chars": 25,
+          "tokens": 28,
+          "tokens_per_char": 1.12,
+          "text": "সোমাল একেটা প্ৰশ্ন কৰিছিল"
+        },
+        "en": {
+          "chars": 29,
+          "tokens": 6,
+          "tokens_per_char": 0.207,
+          "text": "Somal asked the same question"
+        },
+        "hi": {
+          "chars": 24,
+          "tokens": 23,
+          "tokens_per_char": 0.958,
+          "text": "सोमल ने वही सवाल पूछा था"
+        },
+        "as_over_en": 5.413,
+        "as_over_hi": 1.169
+      },
+      {
+        "as": {
+          "chars": 28,
+          "tokens": 33,
+          "tokens_per_char": 1.179,
+          "text": "বিহাৰে স্কুলৰ বাবে গাড়ী লওক"
+        },
+        "en": {
+          "chars": 32,
+          "tokens": 6,
+          "tokens_per_char": 0.188,
+          "text": "Tomorrow take the bus for school"
+        },
+        "hi": {
+          "chars": 21,
+          "tokens": 20,
+          "tokens_per_char": 0.952,
+          "text": "कल स्कूल के लिए बस लो"
+        },
+        "as_over_en": 6.286,
+        "as_over_hi": 1.238
+      },
+      {
+        "as": {
+          "chars": 31,
+          "tokens": 38,
+          "tokens_per_char": 1.226,
+          "text": "জনপ্ৰতিনিধি সভাৰ বৈঠক শুক্ৰবাৰে"
+        },
+        "en": {
+          "chars": 33,
+          "tokens": 6,
+          "tokens_per_char": 0.182,
+          "text": "The assembly meeting is on Friday"
+        },
+        "hi": {
+          "chars": 32,
+          "tokens": 29,
+          "tokens_per_char": 0.906,
+          "text": "विधान सभा की बैठक शुक्रवार को है"
+        },
+        "as_over_en": 6.742,
+        "as_over_hi": 1.353
+      }
+    ],
+    "summary": {
+      "as_tokens_per_char_avg": 1.203,
+      "en_tokens_per_char_avg": 0.232,
+      "hi_tokens_per_char_avg": 0.976,
+      "as_over_en_avg": 5.457,
+      "as_over_hi_avg": 1.234
+    }
+  },
+  "reference_nllb": {
+    "as_tokens_per_char_avg": 0.442,
+    "en_tokens_per_char_avg": 0.31,
+    "hi_tokens_per_char_avg": 0.371
+  }
+}

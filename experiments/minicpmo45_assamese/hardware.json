@@ -1,0 +1,62 @@
+{
+  "captured_at": "2026-08-13",
+  "machine": "Windows 11 Home Single Language, MSYS/Git Bash",
+  "python": "3.12.10",
+  "torch": {
+    "version": "2.10.0+cpu",
+    "cuda_available": false,
+    "note": "CPU-only wheel; the 8 GB dGPU is not addressable from this build."
+  },
+  "gpu": {
+    "name": "NVIDIA RTX 5050 Laptop",
+    "vram_mib": 8151,
+    "driver": "592.82",
+    "cuda_toolkit_nvcc": false
+  },
+  "disk_free_gb_on_c": 351,
+  "training_stack": {
+    "present": ["transformers==5.2.0", "sentencepiece"],
+    "missing": [
+      "peft", "bitsandbytes", "accelerate", "datasets", "trl",
+      "torchaudio", "soundfile", "librosa",
+      "llamafactory", "ms_swift", "tensorboard"
+    ]
+  },
+  "minicpmo_checkpoint": {
+    "present": false,
+    "note": "Not in HF cache, not in repo, not in ollama. Would need a multi-GB download, and even 4-bit omni inference is VRAM-tight on 8 GB."
+  },
+  "ollama_up": true,
+  "ollama_tags": [
+    "qwen2.5:1.5b-instruct", "qwen2.5:0.5b", "gemma2:9b",
+    "thirdeyeai/deepseek-r1-distill-qwen-7b-uncensored:latest",
+    "qwen3.6:latest", "glm-5.2:cloud", "qwen3.5:latest", "kimi-k2.6:cloud"
+  ],
+  "git_repo": false,
+  "blockers": [
+    {
+      "id": "B1",
+      "blocks": "all MiniCPM-o weight training + omni baseline inference",
+      "cause": "torch is CPU-only (cuda.is_available()==False) and VRAM is 8 GB, below the ~14-18 GB fp16 floor to LoRA an 8B backbone, let alone the full omni model.",
+      "resolution": "Re-run on a CUDA torch build with >=16 GB VRAM (>=24 GB preferred for the omni model). See training_plan.md."
+    },
+    {
+      "id": "B2",
+      "blocks": "any local SFT/LoRA/audio pipeline",
+      "cause": "peft/bitsandbytes/accelerate/datasets/trl/torchaudio/soundfile/librosa/llamafactory/ms_swift all absent.",
+      "resolution": "Install on the GPU box; versions pinned in training_plan.md."
+    },
+    {
+      "id": "B3",
+      "blocks": "MiniCPM-o baseline + training without a large download",
+      "cause": "checkpoint absent locally.",
+      "resolution": "huggingface-cli download openbmb/MiniCPM-o-2_6 (verify the current 4.5 id against OpenBMB docs at execution time) on the GPU box."
+    },
+    {
+      "id": "B4",
+      "blocks": "git branch exp/minicpmo45-assamese",
+      "cause": "this directory is not a git repository.",
+      "resolution": "Work lives in experiments/minicpmo45_assamese/ only; production code under src/asea is untouched."
+    }
+  ]
+}

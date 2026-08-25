@@ -1,0 +1,14 @@
+include LICENSE
+include NOTICE
+include PATENT.md
+include SECURITY.md
+include CHANGELOG.md
+include CITATION.cff
+include README.md
+include LOCAL_SETUP.md
+include architecture.md
+include risk_report.md
+recursive-include docs *
+recursive-include configs *
+recursive-include data *
+recursive-include examples *.py *.md

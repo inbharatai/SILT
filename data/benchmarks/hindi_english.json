@@ -1,0 +1,15 @@
+{
+  "suite_id": "hindi_english_v1",
+  "description": "Hindi->English REGRESSION suite. SAMPLE DATA, NOT A VALIDATED BENCHMARK. This suite exists to answer one question: does teaching the receiver Assamese damage a capability it already had? It contains only a 'regression' split, so the gap engine ignores it as a transfer target and the evaluator uses it as a control.",
+  "task_type": "translate",
+  "modality": "text",
+  "domain": "translation",
+  "language": "hi->en",
+  "cases": [
+    {"case_id": "hi_r01", "prompt": "मैं चावल खाता हूँ", "expected": "I eat rice", "split": "regression", "meta": {"human_verified": true}},
+    {"case_id": "hi_r02", "prompt": "मेरा नाम राम है", "expected": "My name is Ram", "split": "regression", "meta": {"human_verified": true}},
+    {"case_id": "hi_r03", "prompt": "मुझे पानी चाहिए", "expected": "I need water", "split": "regression", "meta": {"human_verified": true}},
+    {"case_id": "hi_r04", "prompt": "यह किताब अच्छी है", "expected": "This book is good", "split": "regression", "meta": {"human_verified": true}},
+    {"case_id": "hi_r05", "prompt": "आज मौसम अच्छा है", "expected": "The weather is good today", "split": "regression", "meta": {"human_verified": true}}
+  ]
+}

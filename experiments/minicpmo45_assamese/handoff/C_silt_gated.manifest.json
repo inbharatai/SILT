@@ -1,0 +1,8 @@
+{
+  "dataset_path": "C:\\Users\\reetu\\Desktop\\adaptive-skill-extraction-adapter\\experiments\\minicpmo45_assamese\\handoff\\C_silt_gated.jsonl",
+  "row_count": 4,
+  "packet_count": 1,
+  "skipped": [],
+  "contains_mock_data": false,
+  "created_at": "2026-08-13T08:47:00.691852+00:00"
+}

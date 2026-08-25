@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SILT Studio — Start here</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b1120; --panel:#111a2e; --panel2:#0e1626; --line:#1e293b;
+    --ink:#e2e8f0; --dim:#94a3b8; --faint:#64748b;
+    --teal:#14b8a6; --teal-dim:#0d9488; --sand:#d6a35c; --red:#f87171; --green:#4ade80; --amber:#fbbf24;
+    --mono:"SF Mono",Consolas,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,sans-serif;padding:0 5%}
+  /* ---- header ---- */
+  header{display:flex;align-items:center;gap:14px;padding:18px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  header .brand{display:flex;align-items:center;gap:14px;min-width:0}
+  header img.logo{height:42px;width:auto;flex:0 0 auto}
+  header .brand-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+  header .brand-title{font:600 16px Inter,system-ui,sans-serif;color:var(--ink);letter-spacing:.01em;line-height:1.25;border-bottom:2px solid var(--teal);padding-bottom:2px}
+  header .brand-sub{color:var(--dim);font-size:12px;line-height:1.4;max-width:64ch}
+  header .brand-badge{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#04211d;background:var(--teal);padding:3px 9px;border-radius:20px;flex:0 0 auto}
+  header .skip{margin-left:auto}
+  .headlink{font:12px var(--mono);color:var(--teal);text-decoration:none;border:1px solid var(--line);padding:5px 10px;border-radius:8px}
+  .headlink:hover{border-color:var(--teal)}
+
+  /* ---- onboarding ---- */
+  .onboard{margin:18px 0 4px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px 24px}
+  .onboard.hidden{display:none}
+  .onboard-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .onboard-head .pill{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#04211d;background:var(--teal);padding:4px 10px;border-radius:20px}
+  .onboard-head h2{font-size:17px;font-weight:600}
+  .onboard-head .lead{color:var(--dim);font-size:13px;flex-basis:100%;margin-top:4px}
+  .onboard-head .toggle{margin-left:auto}
+  /* collapsible landing sections (About / Differentiation as dropdowns so the
+     tool leads and the landing stays clean). A <details.onboard> reuses the
+     panel chrome; its summary is the clickable header. */
+  details.onboard{padding:0;overflow:hidden}
+  details.onboard>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 22px;margin:0}
+  details.onboard>summary::-webkit-details-marker{display:none}
+  details.onboard>summary>.pill{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#04211d;background:var(--teal);padding:4px 10px;border-radius:20px}
+  details.onboard>summary>h2{font-size:17px;font-weight:600}
+  details.onboard>summary>.chev{margin-left:auto;color:var(--faint);font-size:13px;transition:transform .15s ease}
+  details.onboard[open]>summary>.chev{transform:rotate(180deg)}
+  details.onboard>summary:hover{background:var(--panel2)}
+  details.onboard>.ob-body{padding:0 22px 22px}
+  /* ---- README dropdown: rendered markdown view (live from /api/readme) ---- */
+  .readme-note{color:var(--dim);font-size:12px;margin:6px 0 10px}
+  .readme-body{max-height:72vh;overflow:auto;padding:14px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font:13px/1.6 Inter,system-ui,sans-serif;color:var(--ink)}
+  .readme-body h1{font-size:22px;font-weight:700;margin:18px 0 8px;border-bottom:2px solid var(--teal);padding-bottom:4px}
+  .readme-body h2{font-size:18px;font-weight:700;color:var(--teal);margin:20px 0 8px}
+  .readme-body h3{font-size:15px;font-weight:600;margin:16px 0 6px}
+  .readme-body h4{font-size:14px;font-weight:600;margin:14px 0 4px}
+  .readme-body h5,.readme-body h6{font-size:13px;font-weight:600;margin:12px 0 4px}
+  .readme-body p{margin:.5em 0}
+  .readme-body ul,.readme-body ol{margin:.5em 0;padding-left:1.5em}
+  .readme-body li{margin:.25em 0}
+  .readme-body li>ul,.readme-body li>ol{margin:.2em 0}
+  .readme-body table{border-collapse:collapse;width:100%;font-size:12px;margin:.7em 0}
+  .readme-body th,.readme-body td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+  .readme-body th{background:var(--panel2);font-weight:600}
+  .readme-body pre{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow:auto;font:12px/1.5 var(--mono);white-space:pre;color:var(--ink)}
+  .readme-body :not(pre)>code{font:12px var(--mono);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--teal)}
+  .readme-body pre code{font:12px var(--mono);background:none;border:0;padding:0;color:inherit}
+  .readme-body blockquote{border-left:3px solid var(--teal);margin:.6em 0;padding:.3em 1em;color:var(--dim);background:rgba(20,184,166,.05);border-radius:0 6px 6px 0}
+  .readme-body blockquote p{margin:.3em 0}
+  .readme-body hr{border:0;border-top:1px solid var(--line);margin:1em 0}
+  .readme-body a{color:var(--teal);text-decoration:none}
+  .readme-body a:hover{text-decoration:underline}
+  .readme-body .md-link-off{color:var(--teal);text-decoration:underline dotted;cursor:default}
+  .readme-body img{display:none}            /* README's logo line; the header already shows it */
+  .readme-body code{font:12px var(--mono)}
+  /* tight hero strip shown above the dropdowns so the landing opens on the tool */
+  .hero-strip{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 4px}
+  .hero-strip .hero-tag{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#04211d;background:var(--teal);padding:4px 10px;border-radius:20px}
+  .hero-strip .hero-line{color:var(--dim);font-size:13px;max-width:70ch}
+  .hero-strip .hero-line b{color:var(--ink)}
+  /* ---- landing hero: plain-English intro, always visible above the dropdowns ---- */
+  .landing-hero{background:linear-gradient(180deg,rgba(20,184,166,.07),transparent 60%),var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:14px 0 6px}
+  .lh-tag{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#04211d;background:var(--teal);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:12px}
+  .lh-lead{font-size:14.5px;line-height:1.62;color:var(--ink);max-width:80ch;margin:0 0 18px}
+  .lh-lead b{color:var(--ink)}
+  .lh-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .lh-step{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 15px;display:flex;flex-direction:column;gap:6px}
+  .lh-num{font:600 12px var(--mono);color:var(--teal);letter-spacing:.04em}
+  .lh-tabs{font-weight:600;color:var(--ink);font-size:13px}
+  .lh-do{color:var(--dim);font-size:12.5px;line-height:1.5}
+  .lh-cta{display:flex;gap:10px;flex-wrap:wrap}
+  .lh-cta .headlink{padding:8px 14px;font-size:12px}
+  @media (max-width:780px){.lh-flow{grid-template-columns:1fr}}
+  .lead{color:var(--dim);font-size:13px;margin:6px 0 12px;max-width:78ch}
+  .lead b{color:var(--ink)}
+
+  /* honesty invariants — 4 crisp lines */
+  .invariants{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:6px 0 14px}
+  .invariant{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;padding:8px 12px;font-size:12.5px;color:var(--dim);line-height:1.4}
+  .invariant b{color:var(--ink);font-weight:600}
+
+  .legend{font:11px var(--mono);color:var(--faint);margin:2px 0 10px}
+  .legend .live{color:var(--teal)} .legend .cli{color:var(--sand)} .legend .library{color:var(--amber)}
+
+  /* vertical numbered steps */
+  .steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+  .step{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--panel2);scroll-margin-top:8px}
+  .step:target{box-shadow:0 0 0 2px var(--teal) inset}
+  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .step-num{font:700 14px var(--mono);color:#04211d;background:var(--teal);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+  .step-head h3{font-size:15px;font-weight:600}
+  .step-head .tag{margin-left:auto;font:10px var(--mono);color:var(--faint);border:1px solid var(--line);border-radius:10px;padding:2px 8px;white-space:nowrap}
+  .step-head .tag.live{color:var(--teal);border-color:var(--teal-dim)}
+  .step-head .tag.cli{color:var(--sand);border-color:#3a2f1c}
+  .step-head .tag.library{color:var(--amber);border-color:#3a3215}
+  .step .do{color:var(--ink);font-size:13px;margin:6px 0}
+  .step .do b{color:var(--teal)}
+  .step .label{font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin:8px 0 3px}
+
+  .cmd{position:relative;background:#0a1322;border:1px solid var(--line);border-radius:8px;margin:4px 0}
+  .cmd pre{font:12.5px var(--mono);color:var(--ink);padding:10px 38px 10px 12px;white-space:pre;overflow-x:auto;margin:0}
+  .cmd .copy{position:absolute;top:6px;right:6px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--teal);cursor:pointer;font:10px var(--mono);padding:4px 8px}
+  .cmd .copy:hover{border-color:var(--teal)}
+  .cmd .copy:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+  .cmd .copy.copied{color:var(--green);border-color:var(--green)}
+
+  /* one-line expectation (replaces big green boxes where there's no failure signal) */
+  .expect{background:rgba(74,222,128,.06);border:1px solid #1c3a2a;border-radius:8px;padding:8px 10px;font:12.5px var(--mono);color:var(--green);margin:6px 0;white-space:pre-wrap}
+  .expect.one{display:block;white-space:normal;font-size:12px;padding:6px 10px}
+  .expect.bad{background:rgba(248,113,113,.06);border-color:#3a1c1c;color:var(--red)}
+  .note{color:var(--faint);font-size:11.5px;margin:6px 0}
+  .note code,.do code{font:11.5px var(--mono);color:var(--teal);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+  .callout{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--sand);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--dim);margin:8px 0}
+  .callout b{color:var(--sand)}
+  .callout.quiet{border-left-color:var(--faint);font-size:11.5px;color:var(--faint)}
+  .callout.warn{border-left-color:var(--amber)}
+  .callout.warn b{color:var(--amber)}
+  .callout ul{margin:6px 0 0 0;padding-left:16px}
+  .callout li{margin:2px 0}
+
+  /* progressive disclosure */
+  details{margin:6px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+  details summary{cursor:pointer;font:11px var(--mono);letter-spacing:.04em;color:var(--dim);padding:8px 10px;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--teal)}
+  details[open] summary::before{content:"▾ "}
+  details summary:hover{color:var(--ink)}
+  details summary:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:8px}
+  .details-body{padding:0 10px 10px}
+
+  .gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin:6px 0}
+  .gloss div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:11px var(--mono);color:var(--faint)}
+  .gloss div b{color:var(--teal);display:block;font-size:11px}
+
+  /* layman plain-English block at the top of the About dropdown */
+  .ob-h3{font-size:14px;font-weight:600;color:var(--ink);margin:16px 0 6px;letter-spacing:.02em}
+  .vocab{display:grid;grid-template-columns:158px 1fr;gap:8px 14px;margin:6px 0 16px;font-size:13px}
+  .vocab dt{color:var(--teal);font:600 12.5px var(--mono);padding-top:2px}
+  .vocab dd{color:var(--dim);line-height:1.55;margin:0}
+  .vocab dd b{color:var(--ink);font-weight:600}
+  .vocab dd code{font-size:11.5px}
+  .vocab ul{margin:5px 0 0 0;padding-left:18px}
+  .vocab li{margin:2px 0}
+  @media (max-width:620px){.vocab{grid-template-columns:1fr}}
+
+  .trouble{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0}
+  .trouble th,.trouble td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .trouble th{color:var(--faint);font-weight:500;font:11px var(--mono);text-transform:uppercase;letter-spacing:.06em}
+  .trouble td.fix{color:var(--teal);font-family:var(--mono);font-size:12px}
+
+  /* ---- existing app ---- */
+  .tabs{display:flex;gap:4px;margin:16px 0}
+  .tab{padding:8px 16px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--dim);cursor:pointer;font:inherit}
+  .tab.active{background:var(--panel);color:var(--ink);border-color:var(--teal)}
+  .tab:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+  /* ---- current-run context bar + grouped tabs ---- */
+  /* The run-driven tabs (Packets/Test/Train) all act on ONE transfer run.
+     Instead of four separate job dropdowns, a single pinned bar names that
+     run (id · teacher→learner · suite · status) and carries it across tabs. */
+  .runbar{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:13px;position:relative}
+  .runbar-empty{color:var(--dim)}
+  .runbar-main{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .runbar-main.hidden,.runbar-picker.hidden{display:none} /* beat the flex rule below when hidden */
+  .runbar-label{font:600 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .runbar-id{font:600 13px var(--mono);color:var(--teal);background:none;border:1px solid var(--teal-dim);border-radius:8px;padding:3px 10px;cursor:pointer}
+  .runbar-id:hover{background:rgba(20,184,166,.1)}
+  .runbar-sep{color:var(--faint)}
+  .runbar-pair,.runbar-suite{color:var(--dim);font-family:var(--mono);font-size:12px}
+  .runbar-suite b{color:var(--ink);font-weight:600}
+  .runbar-status{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:10px;padding:2px 10px;border:1px solid var(--line);color:var(--dim)}
+  .runbar-status.s-promoted{color:var(--green);border-color:#1c3a2a;background:rgba(74,222,128,.06)}
+  .runbar-status.s-pending{color:var(--amber);border-color:#3a3215;background:rgba(251,191,36,.06)}
+  .runbar-status.s-rejected,.runbar-status.s-failed{color:var(--red);border-color:#3a1c1c;background:rgba(248,113,113,.06)}
+  .runbar-status.s-running,.runbar-status.s-loading,.runbar-status.s-queued,.runbar-status.s-done{color:var(--teal);border-color:var(--teal-dim);background:rgba(20,184,166,.06)}
+  .runbar-picker{position:absolute;top:calc(100% + 4px);left:14px;z-index:20;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px;max-height:260px;overflow-y:auto;min-width:300px;box-shadow:0 10px 28px rgba(0,0,0,.45)}
+  .runbar-picker .pk-row{display:flex;align-items:center;gap:8px;padding:6px 6px;border-bottom:1px solid var(--line);cursor:pointer;font:12px var(--mono);color:var(--dim)}
+  .runbar-picker .pk-row:last-child{border-bottom:none}
+  .runbar-picker .pk-row:hover{color:var(--ink);background:var(--panel)}
+  .runbar-picker .pk-row .pk-id{color:var(--teal)}
+  .runbar-picker .pk-row .pk-meta{margin-left:auto;color:var(--faint);font-size:11px}
+  .tabgroups{display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabgroup{display:flex;flex-direction:column;gap:5px}
+  .tabgroup-label{font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .tabgroup .tab{margin:0}
+  /* per-tab "Using current run" line shown on the run-driven tabs */
+  .currun{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 12px;padding:8px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;font-size:12.5px;color:var(--dim)}
+  .currun .cr-label{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .currun .cr-id{font-family:var(--mono);color:var(--teal)}
+  .currun .cr-empty{color:var(--faint)}
+  .currun .cr-empty a{color:var(--teal)}
+  details.advanced{margin:12px 0 0}
+  /* ---- Suites tab: full-width library + author + support-check ---- */
+  .suites-wrap{display:flex;flex-direction:column;gap:16px;padding-bottom:48px}
+  .suites-wrap .card{margin:0}
+  .suites-wrap .section-intro{color:var(--dim);font-size:13px;max-width:86ch;margin:4px 0 12px;line-height:1.5}
+  .suites-wrap .section-intro b{color:var(--ink)}
+  .suite-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .suite-card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .suite-card .sc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .suite-card .sc-id{font:600 14px var(--mono);color:var(--ink)}
+  .suite-card .sc-risk{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber);border:1px solid #3a3215;background:rgba(251,191,36,.08);border-radius:10px;padding:2px 8px}
+  .suite-card .sc-cap{font:11.5px var(--mono);color:var(--teal);background:#0a1322;border:1px solid var(--line);border-radius:6px;padding:4px 8px;word-break:break-all}
+  .suite-card .sc-splits{display:flex;gap:6px;flex-wrap:wrap}
+  .suite-card .split-pill{font:10.5px var(--mono);color:var(--dim);border:1px solid var(--line);border-radius:10px;padding:2px 8px;white-space:nowrap}
+  .suite-card .split-pill b{color:var(--ink);font-weight:600}
+  .suite-card .split-pill.zero{opacity:.45}
+  .suite-card .sc-desc{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .st-section{display:flex;flex-direction:column;gap:10px}
+
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:16px;padding-bottom:48px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .card h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  label{display:block;font-size:12px;color:var(--dim);margin:10px 0 4px}
+  .formrow{margin:8px 0}
+  .formrow label{margin:0 0 4px}
+  .formrow input,.formrow select{margin:0}
+  select,input,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px;font:inherit}
+  button.primary{width:100%;margin-top:14px;padding:10px;border:none;border-radius:8px;background:var(--teal);color:#04221d;font-weight:600;cursor:pointer;font:inherit}
+  button.primary:disabled{opacity:.4;cursor:not-allowed}
+  button.mini{padding:4px 10px;border:1px solid var(--line);border-radius:6px;background:none;color:var(--teal);cursor:pointer;font:12px var(--mono)}
+  .stations{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .station{flex:1;min-width:86px;text-align:center;padding:8px 4px;border:1px solid var(--line);border-radius:8px;color:var(--faint);font-size:11px}
+  .station.on{border-color:var(--teal);color:var(--ink);background:rgba(20,184,166,.08)}
+  .station.bad{border-color:var(--red);color:var(--red)}
+  .station .n{display:block;font:600 15px var(--mono);margin-top:2px}
+  .log{font:12px var(--mono);max-height:200px;overflow-y:auto;background:var(--panel2);border-radius:8px;padding:10px;white-space:pre-wrap}
+  .drop{border-left:3px solid var(--amber);background:var(--panel2);border-radius:6px;padding:8px 10px;margin:6px 0;font:12px var(--mono);color:var(--dim)}
+  .addslot{margin:10px 0 4px;padding:10px;border:1px dashed var(--line);border-radius:8px;background:var(--panel2)}
+  .addslot .footnote{display:block;margin:0 0 6px}
+  .addrow{display:flex;gap:8px;flex-wrap:wrap}
+  .nextsteps{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .nextsteps .mini{border-color:var(--teal-dim);color:var(--teal)}
+  .runrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid var(--line)}
+  .runrow .runid{font-family:var(--mono);color:var(--teal);border-color:var(--teal-dim)}
+  .runactions{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+  .badge.v-promoted{color:var(--green);border:1px solid #1c3a2a;background:rgba(74,222,128,.06);border-radius:10px;padding:1px 8px}
+  .badge.v-pending{color:var(--amber);border:1px solid #3a3215;background:rgba(251,191,36,.06);border-radius:10px;padding:1px 8px}
+  .badge.v-rejected{color:var(--red);border:1px solid #3a1c1c;background:rgba(248,113,113,.06);border-radius:10px;padding:1px 8px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{color:var(--faint);text-align:left;font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line)}
+  td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  .delta-up{color:var(--green)} .delta-down{color:var(--red)} .delta-flat{color:var(--faint)}
+  .check{display:flex;gap:8px;font:12px var(--mono);padding:3px 0}
+  .check .dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex:none}
+  .pass .dot{background:var(--green)} .fail .dot{background:var(--red)}
+  .verdict{font:600 16px var(--mono);padding:10px;border-radius:8px;text-align:center;margin:10px 0}
+  .v-promoted{background:rgba(74,222,128,.12);color:var(--green)}
+  .v-rejected{background:rgba(248,113,113,.12);color:var(--red)}
+  .v-pending{background:rgba(251,191,36,.12);color:var(--amber)}
+  .badge{display:inline-block;font:10px var(--mono);padding:2px 8px;border-radius:10px;border:1px solid var(--line);color:var(--dim);margin-left:6px}
+  .badge.warn{border-color:var(--amber);color:var(--amber)}
+  .funnel{display:flex;gap:6px;margin:8px 0}
+  .fstep{flex:1;text-align:center;background:var(--panel2);border-radius:8px;padding:8px}
+  .fstep .n{font:600 20px var(--mono);color:var(--teal)} .fstep .l{font-size:10px;color:var(--faint)}
+  .bars{display:flex;align-items:flex-end;gap:20px;height:110px;padding:8px 4px}
+  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}
+  .bar .fill{width:60%;border-radius:6px 6px 0 0;min-height:3px}
+  .bar .v{font:12px var(--mono)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .outbox{background:var(--panel2);border-radius:8px;padding:10px;min-height:80px;font-size:13px;white-space:pre-wrap}
+  .footnote{color:var(--faint);font-size:11px;margin-top:10px}
+  .hidden{display:none}
+  a{color:var(--teal)}
+  code{font:12px var(--mono);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--teal)}
+  @media (max-width:780px){
+    body{padding:0 3%}
+    .grid{grid-template-columns:1fr}
+    header .brand-badge{display:none}
+    header .brand-sub{max-width:none}
+    .cmd pre{white-space:pre-wrap}
+  }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+</style>
+</head>
+<body>
+<a href="#app" class="sr-only" aria-label="Skip to the Studio app">Skip to app</a>
+
+<header>
+  <div class="brand">
+    <img class="logo" src="/logo.svg" alt="SILT wordmark — slate letters S I L T with a teal gate slit in the T and a teal underline">
+    <div class="brand-text">
+      <span class="brand-title">Skill Interchange Layer with Trust-gating</span>
+      <span class="brand-sub">move a skill from a teacher AI to a learner AI &mdash; but only after it proves itself on unseen tests. Local-first &middot; patent pending (India).</span>
+    </div>
+    <span class="brand-badge">Studio</span>
+  </div>
+  <a href="#app" class="headlink skip" id="skipToApp">Skip to app</a>
+  <button class="headlink" id="showGuide" hidden>Show start-here guide</button>
+</header>
+
+<!-- ===================== LANDING HERO — plain English, always visible ===================== -->
+<section class="landing-hero" aria-label="What SILT is and how to use this Studio">
+  <span class="lh-tag">What this is &mdash; in plain English</span>
+  <p class="lh-lead">
+    SILT moves a <b>skill</b> from one AI (the <b>teacher</b>) to another (the <b>learner</b>) &mdash; but only
+    after it proves itself on test cases the teacher never saw. The skill is a <b>packet of instructions</b>
+    (not weights), and <b>you approve it by name</b>. A skill that fails the gate is <b>rejected, with reasons</b>
+    &mdash; nothing is faked, nothing silently degrades.
+  </p>
+
+  <div class="lh-flow" aria-label="How to use this Studio, in three groups">
+    <div class="lh-step">
+      <span class="lh-num">1 &middot; Set up</span>
+      <span class="lh-tabs">Skills &middot; Suites &middot; Transfer</span>
+      <span class="lh-do">Add your teacher &amp; learner models, pick a test (suite), and run a transfer to extract &amp; gate the skill.</span>
+    </div>
+    <div class="lh-step">
+      <span class="lh-num">2 &middot; Act on run</span>
+      <span class="lh-tabs">Packets &amp; Approval &middot; Test &middot; Train</span>
+      <span class="lh-do">Approve / download the skill, check its accuracy, or (optional) train a real LoRA adapter &amp; re-gate it.</span>
+    </div>
+    <div class="lh-step">
+      <span class="lh-num">3 &middot; Probe</span>
+      <span class="lh-tabs">Playground &middot; Compress</span>
+      <span class="lh-do">Ask a model a question live (base vs. with-skills), or compress + certify a model with SiltSpring.</span>
+    </div>
+  </div>
+
+  <div class="lh-cta">
+    <a class="headlink" href="#app">Skip to the Studio &darr;</a>
+    <a class="headlink" href="#about">Full vocabulary &amp; technical steps &darr;</a>
+    <a class="headlink" href="#onboarding">Step-by-step install guide &darr;</a>
+  </div>
+</section>
+
+<!-- ===================== ABOUT SILT — the first part ===================== -->
+<details class="onboard" id="about">
+  <summary>
+    <span class="pill">About</span>
+    <h2 id="aboutTitle">The vocabulary, then the six honest steps (technical)</h2>
+    <span class="chev">▾</span>
+  </summary>
+  <div class="ob-body">
+
+  <h3 class="ob-h3">The vocabulary, plainly</h3>
+  <dl class="vocab">
+    <dt>Teacher (sender)</dt>
+    <dd>the AI that <b>already has</b> the skill (e.g. an NLLB translator).</dd>
+    <dt>Learner (receiver)</dt>
+    <dd>the AI <b>receiving</b> it (e.g. a small Qwen model).</dd>
+    <dt>Suite</dt>
+    <dd>a <b>test paper</b>. It defines a <b>capability</b> (<code>task/modality/domain/language</code>,
+      e.g. <code>translate/text/translation/as-&gt;en</code> = Assamese→English) plus two sets of questions:
+      <ul>
+        <li><b>extraction</b> — questions the teacher is shown (to pull the skill out)</li>
+        <li><b>heldout</b> — unseen questions the learner is scored on (the real test)</li>
+      </ul></dd>
+    <dt>Skill / packet</dt>
+    <dd>the thing transferred. A JSON packet of instructions, <b>no weights</b>. This is what you
+      "download" as the trained model.</dd>
+    <dt>Gate</dt>
+    <dd>the pass/fail decision: <b>PROMOTED</b> (every check passed), <b>REJECTED</b> (named reasons —
+      the system caught something that wouldn't help), or <b>PENDING_HUMAN</b> (high-risk domain like
+      medical / legal / finance → needs your name).</dd>
+    <dt>deep-apply</dt>
+    <dd>optional: train a real <b>LoRA adapter</b> on the learner's weights from the approved packets,
+      then re-gate (<b>Gate 2</b>). Needs the <code>[deep]</code> install + an in-process HuggingFace
+      model. Lives in the <b>Train</b> tab.</dd>
+    <dt>SiltSpring</dt>
+    <dd>the compression + certification surface: compress a model to <b>int8 / int4 / int2</b> and
+      certify each compressed state still passes the skill. Lives in the <b>Compress</b> tab.</dd>
+  </dl>
+
+  <div class="callout quiet" style="margin-top:18px">
+  <b>For the technically curious</b> — the same idea, in six honest steps. Read this if you want to know
+  exactly what the gate checks and why a REJECTED verdict is the system working.
+  </div>
+
+  <p class="lead">SILT = <b>Skill Interchange Layer with Trust-gating</b>. A protocol that moves
+  an <b>inspectable skill packet</b> from a teacher AI to a learner AI — but the skill only
+  crosses after it proves itself on cases the teacher never saw. <b>SILT trains no weights by
+  default.</b> The promoted artefact is something you can open and read, not a blob of weights.</p>
+
+  <div class="invariants" aria-label="What makes SILT different">
+    <div class="invariant"><b>A trust layer, not a trainer.</b> Unsloth/PEFT make training fast; SILT decides whether a learned skill may be admitted.</div>
+    <div class="invariant"><b>Parity is the streamed admission bar.</b> A streamed parity fail → blocked; standard/zeroforge gate on the all-or-nothing checks. Never a warning, never a fallback.</div>
+    <div class="invariant"><b>High-risk never auto-promotes.</b> medical / legal / finance need a named human — not a config knob.</div>
+    <div class="invariant"><b>No “% transferred.”</b> Held-out benchmark evidence, not a gauge. No such measurement exists.</div>
+  </div>
+
+  <ol class="steps" role="list">
+
+    <li class="step" tabindex="-1">
+      <div class="step-head"><span class="step-num">1</span><h3>Two models, one skill</h3></div>
+      <p class="do">A <b>Sender (teacher)</b> has a capability a <b>Receiver (learner)</b> lacks — translate a language, triage a symptom, fix a bug. The goal is to move that <b>capability</b>, not the teacher's weights. The receiver stays its own model; it gains a skill, not a brain transplant.</p>
+    </li>
+
+    <li class="step" tabindex="-1">
+      <div class="step-head"><span class="step-num">2</span><h3>Extract, don’t copy</h3></div>
+      <p class="do">SILT probes the sender on a benchmark, then drops everything that would not help: <b>sender_incorrect</b>, <b>receiver_competent</b>, <b>no_delta</b> (relevance), and anything a rule-based safety tripwire catches. What survives is compressed into an <b>inspectable skill packet</b> — JSON with the capability, distilled examples, provenance, and a gate verdict. Raw teacher output is discarded.</p>
+    </li>
+
+    <li class="step" tabindex="-1">
+      <div class="step-head"><span class="step-num">3</span><h3>Prove it on held-out data</h3></div>
+      <p class="do">Before anything is admitted, the receiver is scored <b>alone</b> vs. <b>receiver + packet</b> on a held-out split the sender never saw. No held-out improvement → no admission. This is why the product shows <b>no “% of knowledge transferred”</b> anywhere: that number does not exist, and showing it would be a lie. What you get instead is a before/after score and a per-case diff.</p>
+    </li>
+
+    <li class="step" tabindex="-1">
+      <div class="step-head"><span class="step-num">4</span><h3>The double gate</h3></div>
+      <p class="do"><b>Gate 1</b> judges the packet: relevance, safety, held-out lift, regression on the receiver’s other skills, and high-risk parking. The <b>optional</b> deep-apply stage trains a <b>removable LoRA adapter</b> from <i>only the packets that already passed Gate 1</i> — then <b>Gate 2</b> judges the <i>trained adapter</i> again. The gate is <b>all-or-nothing</b>: every check must pass. <b>Gate 2 never trusts the trainer</b> — it has zero trainer-conditional branches; streamed and standard adapters are judged identically.</p>
+      <p class="callout quiet"><b>For the streamed backend, parity is the admission bar.</b> Parity <b>unverified</b> → the packet records <code>parity_verified=false</code>. Parity <b>fails</b> → <code>DeepApplyBlocked</code> wrapping <code>ParityError</code>, raised <i>before</i> Gate 2. Standard/zeroforge run no parity probe — for them Gate 2's all-or-nothing checks are the bar. Never a warning, never a fallback.</p>
+    </li>
+
+    <li class="step" tabindex="-1">
+      <div class="step-head"><span class="step-num">5</span><h3>Honest refusal</h3></div>
+      <p class="do">Anything that would degrade, fabricate, or silently serve a worse result raises a <b>typed, named error</b> instead: <code>DeepApplyBlocked</code>, <code>ParityError</code>, <code>StateNotCertifiedError</code>, <code>StaleCertificateError</code>, <code>BudgetError</code>. A 7B model on a CPU-only host is blocked by name — never a fabricated training log. A non-CausalLM architecture is blocked by name — never a silent fallback. The Studio is structurally unable to serve a mock (<code>is_mock</code> is re-checked at build).</p>
+    </li>
+
+    <li class="step" tabindex="-1">
+      <div class="step-head"><span class="step-num">6</span><h3>Provenance &amp; rollback</h3></div>
+      <p class="do">Every transition is a <b>hash-chained, append-only audit event</b> — tamper-evident, and the single source of truth when something looks wrong. Adapters are <b>removable by construction</b>; v1 never merges LoRA into base weights. <b>Rollback</b> restores the pre-admission state. <b>SiltSpring</b> extends this to compression: a quantized state is certified per (state, skill) against the same held-out suites the gate uses, and a <b>stale</b> certificate (the model changed since certification) refuses to serve.</p>
+    </li>
+
+  </ol>
+
+  <div class="callout" style="border-left-color:var(--teal);font-size:14px;color:var(--ink)">
+  <b style="color:var(--teal)">The one-liner:</b> Trainers make a model <i>able</i>. SILT decides whether the
+  result <i>deserves to exist</i> in the receiver — with held-out proof, a non-bypassable gate, and a
+  hash-chained audit trail. <b>SILT could run Unsloth as the trainer behind its Gate 2.</b>
+  </div>
+  <p class="note">Local-first &middot; patent pending (India). The guide below turns each of these steps into a live action in this Studio.</p>
+  </div>
+</details>
+
+<!-- ===================== START HERE — GUIDED ONBOARDING ===================== -->
+<details class="onboard" id="onboarding">
+  <summary>
+    <span class="pill">Start here</span>
+    <h2 id="obTitle">Zero to a gated skill-transfer run, end to end</h2>
+    <span class="chev">▾</span>
+  </summary>
+  <div class="ob-body">
+  <p class="lead">A <b>Sender/Teacher</b> and a <b>Receiver/Learner</b> AI module, with inspectable knowledge
+  artefacts moving between them under an evaluation gate. Knowledge crosses only after it proves itself.
+  SILT trains no weights by default — the promoted artefact is an <b>inspectable skill packet</b>.</p>
+
+  <div class="invariants" aria-label="Honesty invariants">
+    <div class="invariant"><b>Gate 2 never trusts the trainer.</b> It measures the artifact's outcome.</div>
+    <div class="invariant"><b>High-risk never auto-promotes.</b> medical / legal / finance → PENDING_HUMAN.</div>
+    <div class="invariant"><b>No “% transferred.”</b> Benchmark evidence, not a gauge.</div>
+    <div class="invariant"><b>Every pixel traces to an audit event.</b> Hash-chained, append-only.</div>
+  </div>
+
+  <p class="legend"><span class="live">● live in this Studio</span> &nbsp; <span class="cli">● CLI / test</span> &nbsp; <span class="library">● library surface</span></p>
+
+  <ol class="steps" role="list">
+
+    <!-- STEP 1 -->
+    <li class="step" id="step-1" tabindex="-1">
+      <div class="step-head"><span class="step-num">1</span><h3>Install</h3><span class="tag cli">CLI</span></div>
+      <p class="do">Python 3.10+. <b>Packet mode</b> (default — no weights, instant inference-time skills) needs only the Studio extra. <b>Weights mode</b> (optional deep-apply, Step 6) adds torch / transformers / peft / accelerate / sentencepiece.</p>
+      <div class="label">Packet mode (default)</div>
+      <div class="cmd"><pre><code>python -m pip install -e ".[studio]"</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <div class="label">Weights / deep-apply mode (optional)</div>
+      <div class="cmd"><pre><code>python -m pip install -e ".[deep]"</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <p class="expect one">✓ <code>Successfully installed asea ... fastapi uvicorn</code></p>
+      <details><summary>Windows / PowerShell gotchas</summary><div class="details-body">
+        <div class="callout quiet">
+        • <code>python3</code> is usually just <code>python</code> on Windows.
+        <br>• A <code>PYTHONPATH=src</code> prefix does <i>not</i> work in PowerShell — set it as an env var first (Step 2).
+        <br>• Use forward slashes in paths; avoid backslashes or MSYS <code>/c/</code> forms in <code>local.properties</code>-style files.
+        <br>• On CPU-only hosts, large-model deep-apply raises a named <code>DeepApplyBlocked</code> (never a silent CPU fallback). Small models (e.g. SmolLM2-135M) train on CPU for real.</div>
+      </div></details>
+    </li>
+
+    <!-- STEP 2 -->
+    <li class="step" id="step-2" tabindex="-1">
+      <div class="step-head"><span class="step-num">2</span><h3>Start the Studio</h3><span class="tag cli">CLI</span></div>
+      <p class="do">FastAPI + uvicorn on port <b>8377</b>. Set <code>PYTHONPATH=src</code> so <code>asea</code> resolves without an installed editable build.</p>
+      <div class="label">macOS / Linux</div>
+      <div class="cmd"><pre><code>PYTHONPATH=src python -m uvicorn asea.studio.server:app --port 8377</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <div class="label">Windows PowerShell</div>
+      <div class="cmd"><pre><code>$env:PYTHONPATH="src"; python -m uvicorn asea.studio.server:app --port 8377</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <p class="do">Then open <a href="http://127.0.0.1:8377">http://127.0.0.1:8377</a>.</p>
+      <p class="expect one">✓ Uvicorn running on 8377 · <code>GET /api/health</code> → <code>{"ok":true,"mock_free":true}</code></p>
+      <p class="callout quiet"><b>Patent pending (India).</b> The Studio is local-only. Do not expose port 8377 publicly.</p>
+    </li>
+
+    <!-- STEP 3 -->
+    <li class="step" id="step-3" tabindex="-1">
+      <div class="step-head"><span class="step-num">3</span><h3>Add your AI models</h3><span class="tag live">LIVE · Skills tab</span></div>
+      <p class="do">Go to <b>Skills → Load an AI model</b>. Register a sender (teacher) and a receiver (learner) by Ollama tag. The capability is derived from the benchmark <code>suite</code> you pick. The preflight probes <code>ollama tags</code> and refuses a missing model with the pull hint — it never starts a run that would fail 30s later.</p>
+      <div class="cmd"><pre><code>ollama pull qwen2.5:0.5b   # if the tag isn't pulled yet</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <p class="expect one">✓ <code>ADDED — qwen-learner → qwen2.5:0.5b (translate/text/translation/as-&gt;en)</code></p>
+      <p class="note">Endpoint <code>POST /api/catalog</code>. The new module appears in Transfer / Playground / Test immediately. Built-in module ids cannot be overwritten.</p>
+      <details><summary>Fields &amp; the think flag</summary><div class="details-body">
+        <div class="gloss">
+          <div><b>module_id</b>new, lowercase, e.g. <code>qwen-learner</code></div>
+          <div><b>ollama_tag</b>e.g. <code>qwen2.5:0.5b</code></div>
+          <div><b>role</b>sender or receiver</div>
+          <div><b>suite</b>defines the capability</div>
+          <div><b>think=False</b>for reasoning models</div>
+        </div>
+        <div class="callout"><b>think=False</b> — check this for reasoning models that emit <code>&lt;think&gt;</code> blocks (GLM, Qwen3, Nemotron). It disables chain-of-thought so the receiver emits a direct answer the evaluator can score.</div>
+        <p class="note">If missing: <code>400 "module 'qwen-learner' backing model 'qwen2.5:0.5b' is not installed. ollama pull qwen2.5:0.5b"</code></p>
+      </div></details>
+    </li>
+
+    <!-- STEP 4 -->
+    <li class="step" id="step-4" tabindex="-1">
+      <div class="step-head"><span class="step-num">4</span><h3>Run a transfer</h3><span class="tag live">LIVE · Transfer tab</span></div>
+      <p class="do">On the <b>Transfer</b> tab, pick Teacher, Learner, one or more Benchmark suites, a Similarity metric, an optional Relevance floor, and a Named approver (required to ever promote high-risk domains). Click <b>Run transfer</b>. The audit stream (SSE) replays every station as it happens — no element is invented state.</p>
+      <div class="cmd"><pre><code>embedding  → semantic (loads a sentence-transformer; needs network/weights)
+lexical    → proxy only, scores are directional; stays fully offline</code></pre><button class="copy" aria-label="Copy">copy</button></div>
+      <div class="expect">GATE: PROMOTED          — every gate check passed (all-or-nothing)
+GATE: REJECTED          — named reasons, e.g. "evaluator_threshold: 0.42 (need >= 0.60)"
+GATE: PENDING_HUMAN     — high-risk domain; parked for a named approver</div>
+      <div class="expect bad">A REJECTED verdict with named reasons is the system working — the filter chain caught a signal that would not have helped the receiver.</div>
+      <p class="note">Endpoint <code>POST /api/transfers</code> · live tail <code>GET /api/transfers/{id}/events</code> (SSE). Duplicate suites are rejected; self-transfer is refused; missing models fail fast at POST time.</p>
+      <details><summary>The live pipeline stations (what the dots mean)</summary><div class="details-body">
+        <div class="gloss">
+          <div><b>handshake</b>manifests, modality + level OK, no self-transfer</div>
+          <div><b>gap</b>measured deficiency vs receiver &lt; 0.85 ceiling</div>
+          <div><b>extract</b>probe sender on the extraction split</div>
+          <div><b>relevance</b>drop sender_incorrect / receiver_competent / no_delta</div>
+          <div><b>safety</b>rule-based tripwire: credentials, dosage, PII…</div>
+          <div><b>distil</b>compress to an inspectable payload; raw output dropped</div>
+          <div><b>evaluate</b>held-out A/B + regression sweep</div>
+          <div><b>gate</b>all-or-nothing decision (every check must pass)</div>
+          <div><b>store</b>approved / candidate / rejected, physically separated</div>
+        </div>
+      </div></details>
+    </li>
+
+    <!-- STEP 5 -->
+    <li class="step" id="step-5" tabindex="-1">
+      <div class="step-head"><span class="step-num">5</span><h3>Approve / rollback</h3><span class="tag live">LIVE · Packets tab</span></div>
+      <p class="do">On the <b>Packets &amp; Approval</b> tab, load a run's buckets. A <b>named approval</b> re-runs the FULL all-or-nothing gate — a human satisfies exactly one check and can waive none of the others. <b>Rollback</b> restores the pre-promotion snapshot. <b>Download approved bundle</b> emits the “trained model” = the approved skill packet(s), no weights.</p>
+      <p class="expect one">✓ <code>gate says: promoted</code> (approval + every other check passed) · <code>rollback: removed 1, restored 1</code></p>
+      <p class="note">Endpoints: <code>POST /api/transfers/{id}/approve</code> (body: <code>packet_id</code>, <code>approver</code>) · <code>POST /api/transfers/{id}/rollback</code> (body: <code>token</code>) · <code>GET /api/transfers/{id}/export</code> (zip bundle).</p>
+      <details><summary>High-risk domains can never auto-promote</summary><div class="details-body">
+        <div class="callout">medical / legal / finance park at <code>PENDING_HUMAN</code> regardless of scores. This is a module constant, not a config knob: a test constructs a maximally permissive policy and asserts a medical packet still stops at PENDING_HUMAN.</div>
+      </div></details>
+    </li>
+
+    <!-- STEP 6 -->
+    <li class="step" id="step-6" tabindex="-1">
+      <div class="step-head"><span class="step-num">6</span><h3>Optional deep-apply — streamed &amp; zeroforge</h3><span class="tag cli">CLI / test</span></div>
+      <p class="do">The <b>siltstream</b> integration: an optional, separately-installed stage where SILT itself trains a <b>removable LoRA adapter</b> on the receiver, using <i>only packets that already passed Gate 1</i>, then gates the trained adapter <b>again (Gate 2)</b> before admission. Invoked explicitly — never an automatic side effect of a transfer. The core install works without it.</p>
+      <div class="label">Install the weights extra</div>
+      <div class="cmd"><pre><code>python -m pip install -e ".[deep]"</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <div class="label">Real-AI opt-in test (asserts the mechanism, not a promotion)</div>
+      <div class="cmd"><pre><code>ASEA_RUN_REAL=1 python -m pytest tests/test_streamed_backend.py -q -k real</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
+      <p class="do">Downloads <code>HuggingFaceTB/SmolLM2-135M</code>, banks it to disk, trains a streamed LoRA on CPU for a few steps, verifies parity (forward + backward), then runs Gate 2. Takes minutes on CPU.</p>
+      <div class="expect">1 passed (~61s)
+  adapter.backend         = "streamed"
+  adapter.parity_verified = true
+  adapter.trainable_param_count = 230400   # real LoRA optimization ran
+  adapter.training_loss   = 7.464          # finite (training_loss_finite check passes)
+  gate2.status            = "rejected"     # evaluator_threshold + benchmark_improvement
+  audit.verify()          = {ok: true, entries: ...}</div>
+      <div class="expect bad">A REJECTED verdict on a tiny CPU run is the system working — a 3-step streamed LoRA on a 135M English-centric model does not learn Assamese→English. The test asserts the MECHANISM (parity verified, finite loss, intact audit, rollback works), not a promotion.</div>
+      <p class="callout"><b>Studio surface — Train tab.</b> Deep-apply is now drivable from the Studio <b>Train</b> tab: pick a source transfer job, an in-process HF receiver, the held-out target suite, and a backend (<code>standard</code> / <code>streamed</code> / <code>zeroforge</code>), and the run trains a LoRA on the approved packets then re-runs Gate 2 — streaming a REAL per-step loss curve and parity flag (streamed/standard backends; zeroforge emits phase-level telemetry only and runs no parity probe), and a gate2 verdict as SSE. It can also still be driven from Python / pytest / CLI. The packets it consumes are exactly the ones in your approved store after Step 5.</p>
+      <details><summary>The two backends &amp; the parity gate</summary><div class="details-body">
+        <div class="cmd"><pre><code>backend="streamed"    # layer-streamed backprop LoRA: peft + streaming,
+                       #   frozen base in host RAM, decoder layers streamed to
+                       #   the GPU one at a time via forward hooks, LoRA params
+                       #   resident on device. Low-VRAM, disk-banked. (Soup-spirit,
+                       #   Apache-2.0 credited, never claimed as ours.)
+
+backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-difference
+                       #   SPSA, no autograd graph, no optimizer moments,
+                       #   backward_passes=0. Runs on any forward-only engine.</code></pre><button class="copy" aria-label="Copy">copy</button></div>
+        <div class="callout"><b>For the streamed backend, parity is the admission bar (run before Gate 2).</b>
+        <ul>
+          <li>Parity <b>unverified</b> → the packet records <code>parity_verified=false</code>.</li>
+          <li>Parity <b>FAILS</b> → <code>DeepApplyBlocked</code> wrapping <code>ParityError</code>. <b>Never a warning, never a fallback.</b></li>
+          <li><b>Gate 2 never trusts the trainer</b> — <code>gate2.py</code> contains zero backend-conditional branches; streamed and standard adapters are judged identically.</li>
+          <li>Adapters are removable by construction; <b>v1 never merges LoRA into base weights</b>. Rollback restores the pre-admission approved-adapter set.</li>
+        </ul></div>
+        <div class="callout"><b>Honest hardware ladder.</b> No CUDA + a model above the CPU ceiling (~1.5B params) → named <code>DeepApplyBlocked</code> naming the CUDA requirement — never a fabricated training log. A non-CausalLM architecture → <code>DeepApplyBlocked</code> suggesting the standard backend — never a silent fallback. Mock-contaminated dataset → <code>DeepApplyBlocked</code> (defense-in-depth beside Gate 1).</div>
+      </div></details>
+    </li>
+
+    <!-- STEP 7 -->
+    <li class="step" id="step-7" tabindex="-1">
+      <div class="step-head"><span class="step-num">7</span><h3>SiltSpring compression certification</h3><span class="tag library">LIBRARY</span></div>
+      <p class="do">The <b>third SILT surface</b> (beside transfer and deep-apply). A model <b>rests compressed</b> (int2 / int4 — small enough for weak hardware) and <b>expands</b> to higher precision when memory allows. What makes it a trust component rather than a serving trick: per-(state, skill) capability certificates, honest refusal, and staleness-bound certificates.</p>
+      <p class="callout"><b>Studio surface — Compress tab.</b> SiltSpring is drivable from the Studio <b>Compress</b> tab: pick an in-process HF model, the held-out suites to certify against, the quantization levels (int8 / int4 / int2), a tolerance, and a device. The run measures the full-precision reference loss, then each quantized state's loss, and streams per-state <code>bytes_packed</code>, per-skill <code>degradation</code>, certified/revoked skill sets, and peak VRAM as SSE. The library surface in <code>src/asea/spring/</code> remains the Python API. Certification reuses SILT's held-out split machinery via <code>suites_from_benchmark</code> — the same held-out cases Gate 2 uses become the suites spring states are certified against.</p>
+      <details><summary>Library surface (Python) &amp; named refusals</summary><div class="details-body">
+        <div class="cmd"><pre><code>from asea.spring import CompressionCertifier, suites_from_benchmark
+# suites = suites_from_benchmark(held_out_suites, tokenizer)
+# cert = CompressionCertifier(spring_model, audit=audit_log)
+# cert.certify(suites)                 # bind certs to the current LoRA fingerprint
+# state = cert.choose_state(budget, required_skills=["as_en"])
+# cert.serve(state, "as_en")           # raises StateNotCertifiedError / StaleCertificateError
+# cert.admit_skill("new_skill")        # invalidates certs → StaleCertificateError until re-certify</code></pre><button class="copy" aria-label="Copy">copy</button></div>
+        <div class="gloss">
+          <div><b>certify(suites)</b>per-(state,skill) vs full-precision reference</div>
+          <div><b>serve(state, skill)</b>refuses a revoked pair</div>
+          <div><b>choose_state(budget, required_skills)</b>honest refusal</div>
+          <div><b>admit_skill(name)</b>invalidates prior certs</div>
+        </div>
+        <div class="callout"><b>Three named refusals (never silent degraded output):</b>
+        <ul>
+          <li><code>StateNotCertifiedError</code> — a (state, skill) pair is revoked or never certified; <code>serve</code> refuses.</li>
+          <li><code>StaleCertificateError</code> — a new skill was admitted since certification (the LoRA fingerprint changed); every prior certificate is stale until <code>certify()</code> re-runs. A certificate for yesterday's model must never authorize today's.</li>
+          <li><code>BudgetError</code> — <code>choose_state(budget, required_skills)</code> cannot find a state that both fits the budget AND is certified for the required skills; it raises rather than serves degraded output.</li>
+        </ul></div>
+      </div></details>
+    </li>
+
+    <!-- STEP 8 -->
+    <li class="step" id="step-8" tabindex="-1">
+      <div class="step-head"><span class="step-num">8</span><h3>Test before download</h3><span class="tag live">LIVE · Test tab</span></div>
+      <p class="do">On the <b>Test</b> tab, run a <b>read-only accuracy A/B</b> on the suite's held-out split: receiver alone vs receiver conditioned on its approved skill packet(s). It uses the same harness the gate used, but <b>never</b> calls <code>Evaluator.evaluate</code> (which mutates the packet) and <b>never</b> the gate — the approved store is unchanged. Then <b>Download</b> the approved bundle.</p>
+      <p class="expect one">✓ <code>baseline 0.420 · candidate 0.580 · improvement +0.1600</code> → per-case rows → <code>bundle.zip</code> (approved/&lt;packet_id&gt;.json + manifest.json + &lt;name&gt;.jsonl + audit.jsonl + README.txt)</p>
+      <p class="note">Endpoint <code>POST /api/skills/test</code> (read-only) · download <code>GET /api/transfers/{id}/export</code>. The bundle refuses non-PROMOTED and mock-derived packets by default. Pass <code>?base_model=…</code> to also emit a <code>NOT_EXECUTED</code> L4/L5 training job spec for an external trainer — a recipe, not a trained adapter.</p>
+    </li>
+
+  </ol>
+
+  <!-- TROUBLESHOOTING — collapsed, doesn't dominate -->
+  <details style="margin-top:14px">
+    <summary>Troubleshooting — every failure below is the system refusing to fabricate a result</summary>
+    <div class="details-body">
+      <table class="trouble">
+        <thead><tr><th>Symptom</th><th>Why</th><th class="fix">Exact fix</th></tr></thead>
+        <tbody>
+          <tr><td>400 “backing model … is not installed”</td><td>Preflight <code>ollama tags</code> didn't find the tag</td><td class="fix">ollama pull &lt;tag&gt;</td></tr>
+          <tr><td>GATE: PENDING_HUMAN (medical / legal / finance)</td><td>High-risk domain; human-approval is not a knob</td><td class="fix">Approve by name in the Packets tab (re-runs full gate)</td></tr>
+          <tr><td>400 “duplicate suites” / “self-transfer”</td><td>Adversarial guard: no amplification, no model-collapse loop</td><td class="fix">Use distinct suites; pick a different receiver</td></tr>
+          <tr><td><code>DeepApplyBlocked</code> naming CUDA</td><td>Big model on a CPU-only host; no silent fallback</td><td class="fix">Use a CUDA GPU, a smaller model (e.g. SmolLM2-135M), or packet mode</td></tr>
+          <tr><td><code>DeepApplyBlocked</code> naming UnsupportedModelError</td><td>Non-CausalLM architecture; streaming targets CausalLM stacks</td><td class="fix">Use backend="standard", or a model with <code>model.layers</code>/<code>transformer.h</code></td></tr>
+          <tr><td><code>DeepApplyBlocked</code> “mock”</td><td>Mock-contaminated dataset (defense-in-depth beside Gate 1)</td><td class="fix">Use a real sender; never feed mock packets into deep-apply</td></tr>
+          <tr><td><code>DeepApplyBlocked</code> wrapping <code>ParityError</code></td><td>Parity FAILS — the admission bar; never a warning, never a fallback</td><td class="fix">Abort. Fix the streamed config; do not weaken parity</td></tr>
+          <tr><td><code>StateNotCertifiedError</code> at serve</td><td>(state, skill) revoked or never certified</td><td class="fix">Re-run certify(); pick a state certified for that skill</td></tr>
+          <tr><td><code>StaleCertificateError</code></td><td>A new skill was admitted since certification (fingerprint changed)</td><td class="fix">Re-run certify() with the new skill's suite included</td></tr>
+          <tr><td><code>BudgetError</code> from choose_state</td><td>No state fits the budget AND is certified for the required skills</td><td class="fix">Raise the budget, or drop a required skill, or retrain</td></tr>
+          <tr><td>Transfer button stays disabled, no verdict</td><td>A POST error was surfaced in the checklist panel</td><td class="fix">Read the red “TRANSFER NOT STARTED” reason; it names the exact guard</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b>If something else breaks:</b> the audit log is the single source of truth. Open
+      <code>GET /api/transfers/{id}/audit</code> — <code>integrity.ok: true</code> with a broken-at index means
+      tampering; otherwise the entries explain every transition. Every live element on this page is a replay of
+      that hash-chained stream, never invented state.</div>
+    </div>
+  </details>
+  </div>
+</details>
+
+<!-- ===================== HOW SILT DIFFERS ===================== -->
+<details class="onboard" id="differs">
+  <summary>
+    <span class="pill">Differentiation</span>
+    <h2 id="diffTitle">How SILT differs from Unsloth, PEFT, axolotl &amp; trl</h2>
+    <span class="chev">▾</span>
+  </summary>
+  <div class="ob-body">
+  <p class="lead">Those are excellent <b>trainer accelerators</b> — they make LoRA fine-tuning faster
+  and lighter. SILT is a different layer: a <b>trust-gated skill-transfer protocol</b> that decides whether
+  a learned skill may be <b>admitted</b> to a receiver. They answer different questions, so they are
+  <b>complementary</b>, not competitors — SILT could run Unsloth as the trainer behind its Gate 2.</p>
+
+  <table class="trouble">
+    <thead><tr><th>Question</th><th>Unsloth / PEFT / axolotl / trl</th><th class="fix">SILT</th></tr></thead>
+    <tbody>
+      <tr><td>Core question</td><td>How fast / cheap can I fine-tune?</td><td class="fix">May this learned skill be admitted to a receiver?</td></tr>
+      <tr><td>Gating</td><td>None — the human decides what to ship</td><td class="fix">Double-gate: Gate 1 on packets, Gate 2 (all-or-nothing) on the trained adapter</td></tr>
+      <tr><td>Admission bar</td><td>None — ship what you trained</td><td class="fix"><b>Parity</b> is the bar; a fail → <code>DeepApplyBlocked</code> — never a warning, never a fallback</td></tr>
+      <tr><td>Failure mode</td><td>Best-effort; warnings; proceed anyway</td><td class="fix">Honest refusal: typed named errors; nothing silently degrades</td></tr>
+      <tr><td>High-risk domains</td><td>No concept</td><td class="fix">medical / legal / finance → a named human approver; no policy knob can disable it</td></tr>
+      <tr><td>Mocks</td><td>N/A</td><td class="fix">Studio is structurally unable to serve a mock (<code>is_mock</code> re-checked at build)</td></tr>
+      <tr><td>Provenance</td><td>None</td><td class="fix">Hash-chained, append-only audit; tamper-evident; every transition recorded</td></tr>
+      <tr><td>Rollback</td><td>Manual</td><td class="fix">Snapshots + rollback layer; adapters are removable, never merged into base weights in v1</td></tr>
+      <tr><td>Quantization</td><td>“make it smaller / faster”</td><td class="fix">SiltSpring certifies per (state, skill); a state that degrades a skill has that skill revoked; stale certs refuse to serve</td></tr>
+      <tr><td>Memory discipline</td><td>“use gradient checkpointing”</td><td class="fix">Measured: one 4-bit 7B = 5.58 GB; two can’t co-reside on 8 GB → sequential evaluator, score-equivalent under deterministic decoding</td></tr>
+      <tr><td>Where it wins</td><td><b>Training throughput</b> (≈2× faster LoRA, less memory)</td><td class="fix"><b>Trust</b> — whether the result is safe to admit, with proof</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>Every claim above traces to code:</b>
+  <code>deepapply/gate2.py</code> (Gate 2), <code>promotion/gate.py</code> (Gate 1),
+  <code>deepapply/errors.py</code> (named errors), <code>deepapply/evaluator.py</code> (sequential A/B),
+  <code>spring/certifier.py</code> (SiltSpring), <code>audit/logger.py</code> (hash chain),
+  <code>studio/catalog.py</code> (mock-refusal). <b>And to tests:</b>
+  <code>tests/test_deep_apply.py</code>, <code>tests/test_streamed_backend.py</code> (parity gate),
+  <code>tests/test_siltspring_certification.py</code>, <code>tests/test_adversarial.py</code>.
+  Credit where it’s due: Unsloth genuinely wins on training throughput — that is its strength, plainly stated.</div>
+
+  <div class="callout" style="border-left-color:var(--teal);font-size:14px;color:var(--ink)">
+  <b style="color:var(--teal)">The one-liner:</b> Unsloth makes training fast. SILT decides whether the result
+  deserves to exist in the receiver.</div>
+  </div>
+</details>
+
+<!-- ===================== README — live, single source of truth ===================== -->
+<details class="onboard" id="readme">
+  <summary>
+    <span class="pill">README</span>
+    <h2>Full technical reference (README.md, live)</h2>
+    <span class="chev">▾</span>
+  </summary>
+  <div class="ob-body">
+    <p class="readme-note">Served verbatim from <code>README.md</code> on disk &mdash; the single source of truth. What you read here is exactly the repo README; it can never drift.</p>
+    <div id="readme-body" class="readme-body" aria-live="polite">Open to load the README…</div>
+  </div>
+</details>
+
+<!-- ============================ THE APP ============================ -->
+<div id="app">
+<div id="runbar" class="runbar">
+  <span class="runbar-empty" id="rb-empty">No current run — run a Transfer or pick one below.</span>
+  <span class="runbar-main hidden" id="rb-main">
+    <span class="runbar-label">Current run</span>
+    <button class="runbar-id" id="rb-id" type="button" title="Open this run on the Transfer tab">—</button>
+    <span class="runbar-sep">·</span>
+    <span class="runbar-pair" id="rb-pair">— → —</span>
+    <span class="runbar-sep">·</span>
+    <span class="runbar-suite" id="rb-suite">—</span>
+    <span class="runbar-sep">·</span>
+    <span class="runbar-status" id="rb-status">—</span>
+    <button class="mini" id="rb-switch" type="button">change run…</button>
+  </span>
+  <div id="rb-picker" class="runbar-picker hidden"></div>
+</div>
+<div class="hero-strip"><span class="hero-line">Running a Transfer makes it the <b>current run</b> pinned above. The <b>Act on run</b> tabs (Packets · Test · Train) then operate on that run — pick another with <b>change run…</b>.</span></div>
+<div class="tabgroups" role="tablist" aria-label="Studio sections">
+  <div class="tabgroup"><span class="tabgroup-label">Set up</span>
+    <button class="tab" data-tab="suites" role="tab" aria-selected="false">Suites</button>
+    <button class="tab" data-tab="skills" role="tab" aria-selected="false">Skills</button>
+    <button class="tab active" data-tab="transfer" role="tab" aria-selected="true">Transfer</button>
+  </div>
+  <div class="tabgroup"><span class="tabgroup-label">Act on run</span>
+    <button class="tab" data-tab="packets" role="tab" aria-selected="false">Packets &amp; Approval</button>
+    <button class="tab" data-tab="test" role="tab" aria-selected="false">Test</button>
+    <button class="tab" data-tab="train" role="tab" aria-selected="false">Train</button>
+  </div>
+  <div class="tabgroup"><span class="tabgroup-label">Probe</span>
+    <button class="tab" data-tab="playground" role="tab" aria-selected="false">Playground</button>
+    <button class="tab" data-tab="compress" role="tab" aria-selected="false">Compress</button>
+  </div>
+</div>
+
+<!-- ============================ TRANSFER ============================ -->
+<div id="tab-transfer" class="grid">
+  <div>
+    <div class="card">
+      <h2>New transfer</h2>
+      <label>Teacher (sender)</label><select id="sender"></select>
+      <label>Learner (receiver)</label><select id="receiver"></select>
+      <div class="addslot">
+        <span class="footnote">Don’t see your model? Add a new one here:</span>
+        <div class="addrow">
+          <button class="mini" type="button" data-addmodel="sender">＋ Add a teacher</button>
+          <button class="mini" type="button" data-addmodel="receiver">＋ Add a learner</button>
+        </div>
+      </div>
+      <label>Benchmark suites</label><select id="suites" multiple size="5"></select>
+      <label>Similarity metric</label>
+      <select id="similarity">
+        <option value="embedding">embedding (semantic)</option>
+        <option value="lexical">lexical (proxy — scores are directional only)</option>
+      </select>
+      <label>Relevance floor (blank = default 0.75)</label>
+      <input id="floor" type="number" step="0.05" min="0" max="1" placeholder="e.g. 0.35 for free-form advice">
+      <label>Named approver (required to promote high-risk domains)</label>
+      <input id="approver" placeholder="you@example.org">
+      <button class="primary" id="run">Run transfer</button>
+      <div class="footnote">The gate runs at its strict default. High-risk domains
+      (medical/legal/finance) can never auto-promote. A rejection with named
+      reasons is the system working.</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Runs</h2><div id="runs" class="log">no runs yet</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>Live pipeline <span id="jobstate" class="badge">idle</span>
+          <span id="metricbadge" class="badge hidden"></span></h2>
+      <div class="stations" id="stations"></div>
+      <div id="verdict"></div>
+      <div class="cols">
+        <div>
+          <h2>Dropped signals (click-through honesty)</h2>
+          <div id="drops"><div class="footnote">nothing dropped yet</div></div>
+        </div>
+        <div>
+          <h2>Gate checklist</h2>
+          <div id="checks"><div class="footnote">Run a transfer to populate the gate checklist.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>Learning report card</h2>
+      <div class="cols">
+        <div>
+          <div class="footnote">THROUGHPUT — how much moved</div>
+          <div class="funnel" id="funnel"></div>
+        </div>
+        <div>
+          <div class="footnote">SKILL LIFT — held-out score, before vs after</div>
+          <div class="bars" id="bars"></div>
+        </div>
+      </div>
+      <div class="footnote">No “% of knowledge transferred” is shown anywhere in this
+      product, because no such measurement exists. These panels are benchmark
+      evidence, not a gauge.</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>Per-case held-out diff</h2>
+      <table id="cases"><thead><tr>
+        <th>expected</th><th>baseline</th><th>with packet</th><th>Δ</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>Audit stream</h2><div class="log" id="events">—</div>
+      <button class="mini" type="button" id="audit-verify" style="margin-top:10px">Verify audit integrity</button>
+      <div id="audit-result" style="margin-top:8px"></div>
+      <div class="footnote">Fetches <code>GET /api/transfers/{id}/audit</code> and shows the hash-chain
+      integrity result — the single source of truth when something looks wrong.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ PACKETS ============================ -->
+<div id="tab-packets" class="grid hidden">
+  <div class="card">
+    <h2>Packets &amp; approval</h2>
+    <div class="currun"><span class="cr-empty" id="pk-crempty">No current run — <a href="#" id="pk-pickrun">run or select a Transfer</a> first.</span><span class="hidden" id="pk-crset"><span class="cr-label">Using run</span> <span class="cr-id" id="pk-crid">—</span></span></div>
+    <select id="pk-job" class="hidden" aria-hidden="true"></select>
+    <button class="primary" id="pk-load">Load packets</button>
+    <button class="primary" id="pk-download" style="margin-top:8px">Download approved bundle</button>
+    <label style="margin-top:10px">External trainer base model (optional — emit a NOT_EXECUTED L4/L5 training-job recipe for an external trainer, instead of the approved packet bundle)</label>
+    <input id="pk-base-model" placeholder="e.g. Qwen/Qwen2.5-7B-Instruct">
+    <button class="mini" type="button" id="pk-train" style="margin-top:10px">→ Train a LoRA from these approved packets</button>
+    <div class="footnote">Approval requires a typed name and re-runs the FULL
+    gate — a human satisfies exactly one check and can waive none of the
+    others. Rollback restores the pre-promotion snapshot. The download is the
+    "trained model": the approved skill packet(s), no weights.</div>
+  </div>
+  <div>
+    <div class="card"><h2>Pending human approval</h2><div id="pk-pending">—</div></div>
+    <div class="card" style="margin-top:12px"><h2>Approved</h2><div id="pk-approved">—</div></div>
+    <div class="card" style="margin-top:12px"><h2>Rejected (kept for audit)</h2><div id="pk-rejected">—</div></div>
+  </div>
+</div>
+
+<!-- =========================== PLAYGROUND =========================== -->
+<div id="tab-playground" class="grid hidden">
+  <div class="card">
+    <h2>Setup</h2>
+    <label>Run (source of approved packets)</label><select id="pg-job"></select>
+    <label>Learner module</label><select id="pg-module"></select>
+    <label>Capability</label>
+    <select id="pg-cap">
+      <option value='{"task_type":"translate","modality":"text","domain":"translation","language":"as->en"}'>translate as→en</option>
+      <option value='{"task_type":"triage","modality":"structured","domain":"medical","language":"en"}'>medical triage (high-risk)</option>
+      <option value='{"task_type":"translate","modality":"text","domain":"translation","language":"hi->en"}'>translate hi→en</option>
+    </select>
+    <label>Prompt</label><textarea id="pg-prompt" rows="3">মই ভাত খাওঁ</textarea>
+    <button class="primary" id="pg-run">Ask both</button>
+    <div class="footnote">The playground is read-only with respect to learning:
+    there is no path from here into the memory store. Both columns use the
+    identical inference path the evaluator measured.</div>
+  </div>
+  <div>
+    <div id="pg-banner"></div>
+    <div class="cols">
+      <div class="card"><h2>Baseline (no packets)</h2><div class="outbox" id="pg-base">—</div></div>
+      <div class="card"><h2>With approved packets <span id="pg-n" class="badge"></span></h2><div class="outbox" id="pg-cond">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= SKILLS ============================= -->
+<div id="tab-skills" class="grid hidden">
+  <div class="card">
+    <h2>Load an AI model</h2>
+    <label>Module id (new)</label><input id="am-id" placeholder="e.g. medical-expert">
+    <label>Ollama tag</label><input id="am-tag" placeholder="e.g. nemotron-3.5-lightning">
+    <label>Role</label><select id="am-role">
+      <option value="sender">sender (teacher)</option>
+      <option value="receiver">receiver (learner)</option>
+    </select>
+    <label>Benchmark suite (defines the capability)</label><select id="am-suite"></select>
+    <label>Description (optional)</label><input id="am-desc" placeholder="what this model is for">
+    <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="am-think" style="width:auto"> think=False (reasoning models: GLM / Qwen3 / Nemotron)</label>
+    <button class="primary" id="am-add">Add to catalog</button>
+    <div id="am-result" style="margin-top:10px"></div>
+    <div class="footnote">Real connectors only. The preflight probes
+    <code>ollama tags</code>; a missing model is reported with the
+    <code>ollama pull &lt;tag&gt;</code> hint instead of starting a run that
+    fails 30s later. The new module appears in Transfer / Playground / Test
+    immediately. <b>This form adds an Ollama-backed model only.</b> Train and
+    Compress need an in-process HuggingFace receiver; the built-in HF modules
+    (e.g. <code>qwen2.5-0.5b</code>, <code>smollm2-360m-hf</code>) already cover
+    those tabs — registering a new HF receiver currently needs the Python
+    catalog API. The <b>Benchmark suite</b> dropdown lists every suite that
+    exists, including ones you author yourself on the <b>Suites</b> tab. A model
+    is tied to an existing capability; to target a brand-new capability, author
+    the suite on the <b>Suites</b> tab first, then bind a model to it here. A
+    model that does not support a suite's capability is refused with an
+    explanation naming what it does support — at run time, not just here.</div>
+  </div>
+  <div class="card">
+    <h2>Approved skill library <span id="sk-count" class="badge"></span></h2>
+    <button class="primary" id="sk-load">Refresh library</button>
+    <div id="sk-list" style="margin-top:12px"><div class="footnote">Click Refresh library to load approved skills (none exist until a transfer is promoted).</div></div>
+    <div class="footnote">Every packet below passed the full promotion gate.
+    <b>Load</b> selects its run as the source for a new transfer or test;
+    <b>Test</b> runs an accuracy A/B before you download; <b>Download</b>
+    saves the approved skill bundle (the trained model = receiver + packet,
+    no weights).</div>
+  </div>
+</div>
+
+<!-- ============================== TEST ============================== -->
+<div id="tab-test" class="grid hidden">
+  <div class="card">
+    <h2>Test accuracy (before download)</h2>
+    <div class="currun"><span class="cr-empty" id="tt-crempty">No current run — <a href="#" id="tt-pickrun">run or select a Transfer</a> first.</span><span class="hidden" id="tt-crset"><span class="cr-label">Using run</span> <span class="cr-id" id="tt-crid">—</span></span></div>
+    <select id="tt-job" class="hidden" aria-hidden="true"></select>
+    <label>One packet (blank = all approved for this receiver)</label>
+    <select id="tt-packet"><option value="">all approved</option></select>
+    <label>Similarity metric</label>
+    <select id="tt-sim">
+      <option value="embedding">embedding (semantic)</option>
+      <option value="lexical">lexical (proxy — directional only)</option>
+    </select>
+    <button class="primary" id="tt-run">Run A/B</button>
+    <details class="advanced"><summary>Advanced: override receiver module / suite</summary>
+      <div class="details-body">
+        <label>Receiver module</label><select id="tt-module"></select>
+        <label>Benchmark suite</label><select id="tt-suite"></select>
+        <div class="footnote">The receiver and suite default to the current run's
+        learner and suite. Override here only to test a different combo.</div>
+      </div>
+    </details>
+    <div class="footnote">Read-only: the gate is never called and the approved
+    store is never written. Baseline = receiver alone; candidate = receiver
+    conditioned on its approved skill packet(s). Same harness the gate used.</div>
+  </div>
+  <div>
+    <div id="tt-banner"></div>
+    <div class="card">
+      <h2>Result</h2>
+      <div class="cols">
+        <div><div class="footnote">BASELINE (no packets)</div><div class="outbox" id="tt-base">—</div></div>
+        <div><div class="footnote">CANDIDATE (with skills)</div><div class="outbox" id="tt-cand">—</div></div>
+      </div>
+      <div class="footnote" id="tt-improvement">improvement: —</div>
+      <div class="bars" id="tt-bars" style="margin-top:8px"></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Per-case accuracy</h2>
+      <table id="tt-cases"><thead><tr>
+        <th>expected</th><th>baseline</th><th>with packet</th><th>Δ</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TRAIN ============================= -->
+<div id="tab-train" class="grid hidden">
+  <div class="card">
+    <h2>Deep-apply (train a removable LoRA, then re-gate it)</h2>
+    <div class="currun"><span class="cr-empty" id="tr-crempty">No current run — <a href="#" id="tr-pickrun">run or select a Transfer</a> first.</span><span class="hidden" id="tr-crset"><span class="cr-label">Using run</span> <span class="cr-id" id="tr-crid">—</span></span></div>
+    <select id="tr-job" class="hidden" aria-hidden="true"></select>
+    <div id="tr-receiver-note" class="footnote"></div>
+    <label>Backend</label>
+    <select id="tr-backend">
+      <option value="streamed">streamed — layer-streamed LoRA, low-VRAM (soup-spirit)</option>
+      <option value="standard">standard — resident LoRA, needs the model to fit VRAM</option>
+      <option value="zeroforge">zeroforge — forward-only zeroth-order, phase-level telemetry</option>
+    </select>
+    <label>Overrides (optional — DeepApplyConfig knobs; none weaken a gate)</label>
+    <div class="cols" style="gap:8px">
+      <div><label style="font-size:12px">LoRA rank</label><input id="tr-rank" type="number" step="1" min="1" placeholder="e.g. 8"></div>
+      <div><label style="font-size:12px">Learning rate</label><input id="tr-lr" type="number" step="0.0001" min="0" placeholder="e.g. 0.0002"></div>
+      <div><label style="font-size:12px">Max steps</label><input id="tr-steps" type="number" step="1" min="1" placeholder="e.g. 64"></div>
+    </div>
+    <button class="primary" id="tr-run">Train + re-gate</button>
+    <details class="advanced"><summary>Advanced: override HF receiver / held-out suite</summary>
+      <div class="details-body">
+        <label>Receiver (in-process HF only — Ollama is refused)</label><select id="tr-receiver"></select>
+        <label>Held-out target suite</label><select id="tr-suite"></select>
+        <div class="footnote">Deep-apply loads weights the process owns, so the
+        receiver must be an in-process HF module — the current run's learner is
+        used only if it is one. Pick an HF receiver here otherwise.</div>
+      </div>
+    </details>
+    <div class="footnote">Trains a LoRA on the receiver from packets that ALREADY passed
+    Gate 1, then Gate 2 measures the trained adapter on held-out data before
+    admission. For the streamed backend, parity is the admission bar (a parity
+    fail → <code>DeepApplyBlocked</code>, never a warning or fallback); standard
+    and zeroforge run no parity probe and gate on Gate 2's all-or-nothing checks.
+    Requires the <code>[deep]</code> extra (<code>pip install -e ".[deep]"</code>);
+    without it the run fails with a typed error before any weights load. The
+    telemetry is REAL — per-step loss read from the backend's own loop;
+    <code>zeroforge</code> (vendored loop) emits phase-level only, so the loss
+    curve stays flat between phases by design. High-risk domains still park at
+    PENDING_HUMAN.</div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>Live training <span id="tr-state" class="badge">idle</span></h2>
+      <div class="cols">
+        <div>
+          <div class="footnote">LOSS CURVE — real per-step loss (streamed/standard)</div>
+          <canvas id="tr-canvas" width="360" height="160" style="border:1px solid var(--line);border-radius:6px;background:var(--bg)"></canvas>
+        </div>
+        <div>
+          <div class="footnote">PROGRESS</div>
+          <div id="tr-gauge" class="log">—</div>
+          <div class="footnote" style="margin-top:8px">PARITY (admission bar)</div>
+          <div id="tr-parity" class="log">—</div>
+          <div class="footnote" style="margin-top:8px">GATE 2 VERDICT</div>
+          <div id="tr-verdict"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Phase stream</h2><div class="log" id="tr-events">—</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Past deep-apply runs</h2>
+      <button class="mini" type="button" id="tr-history">Refresh</button>
+      <div id="tr-history-list" style="margin-top:10px"><div class="footnote">click Refresh to list deep-apply jobs from this session.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ COMPRESS ============================ -->
+<div id="tab-compress" class="grid hidden">
+  <div class="card">
+    <h2>SiltSpring compression certification</h2>
+    <label>Model (in-process HF only — Ollama is refused)</label><select id="cp-module"></select>
+    <div id="cp-receiver-note" class="footnote"></div>
+    <label>Held-out suites to certify against (1–8)</label><select id="cp-suites" multiple size="5"></select>
+    <label>Quantization states</label>
+    <select id="cp-levels" multiple size="3">
+      <option value="int8" selected>int8</option>
+      <option value="int4" selected>int4</option>
+      <option value="int2" selected>int2</option>
+    </select>
+    <div class="cols" style="gap:8px">
+      <div><label style="font-size:12px">Tolerance (degradation ≤ tol = certified)</label><input id="cp-tol" type="number" step="0.01" min="0" max="1" value="0.05"></div>
+      <div><label style="font-size:12px">Device</label>
+        <select id="cp-device"><option value="auto">auto</option><option value="cpu">cpu</option><option value="cuda">cuda</option></select></div>
+      <div><label style="font-size:12px">Max len</label><input id="cp-maxlen" type="number" step="8" min="8" max="512" value="96"></div>
+    </div>
+    <button class="primary" id="cp-run">Certify states</button>
+    <div class="footnote">Measures the full-precision reference loss on the held-out
+    suites, then each quantized state's loss, and marks a state
+    <b>certified</b> for a skill when degradation ≤ tolerance (directional — only a
+    WORSE loss revokes). Requires the <code>[deep]</code> extra
+    (<code>pip install -e ".[deep]"</code>); without it the run fails with a
+    typed error before any weights load. A 7B model needs the ~14 GB fp16
+    reference resident and will not fit an 8 GB GPU; pick a model that fits
+    (e.g. SmolLM2-360M / Qwen2.5-0.5B) or use CPU. An OOM load fails with a typed
+    error — never a silent pass. Per-state <code>bytes_packed</code>, per-skill
+    <code>degradation</code>, certified/revoked skill sets, and peak VRAM are
+    REAL, streamed from the vendor <code>certify_hf_states</code>. If a state's
+    loss is non-finite (a degenerate quantization on an out-of-distribution
+    model, e.g. int2 on a tiny model) its degradation cannot be computed and the
+    state is marked <b>UNMEASURED</b>, not certified — a non-finite loss is never
+    rounded to a fake number or silently passed.</div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>Certification <span id="cp-state" class="badge">idle</span></h2>
+      <div class="footnote">PEAK VRAM (cuda only)</div>
+      <div id="cp-vram" class="log">—</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Per-state results</h2>
+      <table id="cp-table"><thead><tr>
+        <th>state</th><th>bytes packed</th><th>degradation (worst skill)</th>
+        <th>certified</th><th>revoked</th><th>unmeasured</th><th>overall</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Phase stream</h2><div class="log" id="cp-events">—</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Past SiltSpring runs</h2>
+      <button class="mini" type="button" id="cp-history">Refresh</button>
+      <div id="cp-history-list" style="margin-top:10px"><div class="footnote">click Refresh to list SiltSpring jobs from this session.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ SUITES (author a new benchmark suite / capability) ============================ -->
+<div id="tab-suites" class="suites-wrap hidden">
+  <div class="card">
+    <h2>Benchmark suites <span id="st-count" class="badge"></span></h2>
+    <p class="section-intro">A <b>suite defines a capability</b> — <code>task_type / modality / domain / language</code> —
+    plus the cases a teacher is probed on (<code>extraction</code>) and the held-out cases a learner is scored on
+    (<code>heldout</code>). Author a new one below to target your own task; it is picked up by every other tab
+    immediately. A run that asks a model for a capability it never declares is <b>refused with an explanation</b>
+    naming what that model does support.</p>
+    <div id="st-list" class="suite-grid"><div class="footnote">loading suites…</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Author a new suite</h2>
+    <p class="section-intro">Writes <code>data/benchmarks/&lt;suite_id&gt;.json</code> locally (local-only; patent pending India).
+    Needs ≥1 <code>extraction</code> AND ≥1 <code>heldout</code> case. A high-risk domain
+    (medical / legal / finance) keeps the human-approval gate — authoring data never weakens a gate.</p>
+    <div class="st-section">
+      <div class="formrow"><label>Suite id (filename stem)</label><input id="st-id" placeholder="e.g. fr-en-legal" autocomplete="off"></div>
+      <div class="formrow"><label>Description</label><input id="st-desc" placeholder="one line, no &lt; or &gt;" autocomplete="off"></div>
+      <div class="formrow" style="display:flex;gap:12px">
+        <div style="flex:1"><label>task_type</label><input id="st-task" placeholder="e.g. translate" autocomplete="off"></div>
+        <div style="flex:1"><label>modality</label>
+          <select id="st-modality">
+            <option value="text">text</option><option value="audio_asr">audio_asr</option>
+            <option value="speech_tts">speech_tts</option><option value="ocr">ocr</option>
+            <option value="code">code</option><option value="structured">structured</option>
+          </select></div>
+        <div style="flex:1"><label>domain</label>
+          <select id="st-domain">
+            <option value="general">general</option><option value="language">language</option>
+            <option value="translation">translation</option><option value="pronunciation">pronunciation</option>
+            <option value="software">software</option><option value="education">education</option>
+            <option value="medical">medical ⚠</option><option value="legal">legal ⚠</option>
+            <option value="finance">finance ⚠</option>
+          </select></div>
+        <div style="flex:1"><label>language (optional)</label><input id="st-lang" placeholder="e.g. fr" autocomplete="off"></div>
+      </div>
+      <label style="margin-top:4px">Cases</label>
+      <table class="trouble" id="st-cases" style="margin-top:4px">
+        <thead><tr><th>case_id</th><th>split</th><th>prompt</th><th>expected</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="mini" type="button" id="st-addrow">+ Add case</button>
+        <button class="primary" type="button" id="st-create" style="width:auto;margin-top:0">Create suite</button>
+        <span id="st-result" class="footnote"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Capability support check</h2>
+    <p class="section-intro">The live preview of the SAME check that hard-rejects at run time. Pick a sender (trainer),
+    a receiver (learner), and a suite — see whether each model supports the suite's capability, and what each
+    actually supports. An unsupported combo is explained, never silently run.</p>
+    <div class="formrow" style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:160px"><label>Sender (trainer)</label><select id="st-sender"></select></div>
+      <div style="flex:1;min-width:160px"><label>Receiver (learner)</label><select id="st-receiver"></select></div>
+      <div style="flex:1;min-width:160px"><label>Suite</label><select id="st-suite"></select></div>
+      <div style="align-self:flex-end"><button class="primary" type="button" id="st-check" style="width:auto;margin-top:0">Check</button></div>
+    </div>
+    <div id="st-verdict" style="margin-top:12px"><div class="footnote">Pick a sender, receiver, and suite, then click Check.</div></div>
+  </div>
+</div>
+</div><!-- /#app -->
+
+<script>
+const $=q=>document.querySelector(q);
+const $$=q=>Array.from(document.querySelectorAll(q));
+const api=(p,opt)=>fetch(p,opt).then(r=>r.json());
+const STAGES=["session_opened","gap_negotiated","extracted","relevance_filtered",
+              "safety_filtered","distilled","evaluated","gate_decision","run_complete"];
+const NAMES={session_opened:"handshake",gap_negotiated:"gap",extracted:"extract",
+             relevance_filtered:"relevance",safety_filtered:"safety",distilled:"distil",
+             evaluated:"evaluate",gate_decision:"gate",run_complete:"store"};
+
+/* ---- onboarding: copy buttons, dismiss/restore, localStorage ---- */
+const OB_KEY="silt_onboarding_done";
+function copyCmd(btn){
+  const code=btn.parentNode.querySelector("code");
+  if(!code)return;
+  const text=code.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add("copied"); btn.textContent="copied";
+    setTimeout(()=>{btn.classList.remove("copied");btn.textContent="copy";},1200);
+  }).catch(()=>{
+    // Fallback for non-secure contexts: select + execCommand
+    const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);
+    ta.select();try{document.execCommand("copy");btn.classList.add("copied");btn.textContent="copied";
+    setTimeout(()=>{btn.classList.remove("copied");btn.textContent="copy";},1200);}catch(e){}
+    ta.remove();
+  });
+}
+$$(".cmd .copy").forEach(b=>b.addEventListener("click",()=>copyCmd(b)));
+
+/* dismiss / restore with localStorage. The guide is now a collapsed <details>
+   (clean landing); show/dismiss open/close it instead of hiding the section. */
+const ob=$("#onboarding"), showBtn=$("#showGuide");
+function dismissOnboard(){ob.open=false;showBtn.hidden=false;localStorage.setItem(OB_KEY,"1");}
+function showOnboard(){ob.open=true;showBtn.hidden=true;localStorage.removeItem(OB_KEY);ob.scrollIntoView({behavior:"smooth",block:"start"});}
+showBtn.addEventListener("click",showOnboard);
+$("#skipToApp").addEventListener("click",e=>{
+  e.preventDefault();
+  document.querySelector('.tab[data-tab="transfer"]').click();
+  $("#tab-transfer").scrollIntoView({behavior:"smooth",block:"start"});
+});
+/* clean landing: the guide starts CLOSED. If the user previously dismissed it,
+   OB_KEY keeps it closed; otherwise it is closed by default and opens on demand
+   via the header's "Show start-here guide" button. */
+ob.open=false; showBtn.hidden=false;
+if(localStorage.getItem(OB_KEY)){ob.open=false;showBtn.hidden=false;}
+function markOnboardingDone(){
+  // Auto-close the guide after a transfer completes (the user has run their first one).
+  if(!localStorage.getItem(OB_KEY)){dismissOnboard();}
+}
+
+/* ---- current-run context bar ----------------------------------------------
+   The run-driven tabs (Packets / Test / Train) all act on ONE transfer run.
+   Instead of four scattered job dropdowns, a single pinned #runbar names that
+   run and carries it across tabs. setCurrentRun is the ONLY writer of that
+   context; it also sets the existing #pk-job/#pg-job/#tt-job/#tr-job selects
+   so every existing handler (#pk-load, refreshTtPackets, watchTrain, …) keeps
+   working untouched. The bar's status badge reuses the REAL gate verdict
+   (full.report.decisions[0].status) / job status — nothing is fabricated. */
+let currentRun=null;          // {id,sender,receiver,suites:[...],status,label,userOverride}
+let lastRuns=[];              // most recent /api/transfers listing, for the picker
+const RB_STAT_CLS={
+  promoted:"s-promoted",pending_human_approval:"s-pending",pending_human:"s-pending",
+  rejected:"s-rejected",failed:"s-failed",running:"s-running",loading:"s-loading",
+  queued:"s-queued",done:"s-done"
+};
+// Derive a human verdict label for the badge. For a finished run the gate
+// decision lives in full.report.decisions[0].status (promoted|pending_human_approval
+// |rejected); in-flight runs use the real job status verbatim.
+function statusLabel(full){
+  if(!full)return "?";
+  const st=full.status;
+  if(st==="done"&&full.report){
+    const dec=(full.report.decisions||[])[0];
+    if(dec&&dec.status)return dec.status;
+    return "done";
+  }
+  return st;
+}
+// Set selects synchronously first (downstream handlers read them immediately),
+// then fetch the run to render the bar + auto-derive the redundant selectors.
+// `full` may be passed in to skip the fetch (watch() already has it).
+function setCurrentRun(id,opts,full){
+  opts=opts||{};
+  if(!id)return;
+  ["#pg-job","#pk-job","#tt-job","#tr-job"].forEach(s=>{const el=$(s);if(el)el.value=id;});
+  const apply=(f)=>{
+    const cfg=(f&&f.config)||{};
+    const label=statusLabel(f);
+    const prevOv=(currentRun&&currentRun.userOverride)||{};
+    currentRun={id,sender:cfg.sender||"?",receiver:cfg.receiver||"?",
+      suites:Array.isArray(cfg.suites)?cfg.suites.slice():[],
+      status:f?f.status:"?",label,userOverride:prevOv};
+    autoFillFromRun();
+    renderRunbar(); renderCurRunLines();
+    refreshTtPackets(id);
+    if(opts.switchTo){
+      const t=document.querySelector(`.tab[data-tab="${opts.switchTo}"]`); if(t)t.click();
+      if(opts.switchTo==="packets")$("#pk-load").click();
+      else if(opts.switchTo==="test")refreshTtPackets(id);
+    }
+  };
+  if(full){apply(full);return Promise.resolve();}
+  return api(`/api/transfers/${id}`).then(apply).catch(()=>{});
+}
+// Auto-fill the redundant selectors from the run — but NEVER clobber a manual
+// override (tracked in currentRun.userOverride), and only when the option
+// actually exists (e.g. #tr-receiver is HF-only, so an Ollama learner is skipped).
+function autoFillFromRun(){
+  if(!currentRun)return;
+  const ov=currentRun.userOverride||{};
+  const setIf=(sel,val)=>{
+    if(!val||ov[sel])return;
+    const el=$(sel); if(!el)return;
+    if([...el.options].some(o=>o.value===val))el.value=val;
+  };
+  setIf("#tt-module",currentRun.receiver);
+  setIf("#tt-suite",currentRun.suites[0]);
+  setIf("#tr-suite",currentRun.suites[0]);
+  setIf("#tr-receiver",currentRun.receiver); // only sticks for an HF learner
+}
+function renderRunbar(){
+  if(!currentRun){
+    $("#rb-empty").classList.remove("hidden");
+    $("#rb-main").classList.add("hidden");
+    return;
+  }
+  $("#rb-empty").classList.add("hidden");
+  $("#rb-main").classList.remove("hidden");
+  $("#rb-id").textContent=currentRun.id;
+  $("#rb-pair").textContent=`${currentRun.sender} → ${currentRun.receiver}`;
+  $("#rb-suite").innerHTML=currentRun.suites.length
+    ? `<b>${esc(currentRun.suites.join(", "))}</b>` : "—";
+  renderRunbarStatus();
+}
+function renderRunbarStatus(){
+  if(!currentRun)return;
+  const el=$("#rb-status"), lbl=currentRun.label||currentRun.status||"—";
+  el.textContent=lbl==="pending_human_approval"?"PENDING_HUMAN":lbl.toUpperCase();
+  el.className="runbar-status "+(RB_STAT_CLS[lbl]||"");
+}
+// "Using current run <id>" line + empty-state on each run-driven tab.
+function renderCurRunLines(){
+  const set=(setEl,idEl,emptyEl)=>{
+    const s=$(setEl),e=$(emptyEl); if(!s||!e)return;
+    if(currentRun){e.classList.add("hidden");s.classList.remove("hidden");$(idEl).textContent=currentRun.id;}
+    else{e.classList.remove("hidden");s.classList.add("hidden");}
+  };
+  set("#pk-crset","#pk-crid","#pk-crempty");
+  set("#tt-crset","#tt-crid","#tt-crempty");
+  set("#tr-crset","#tr-crid","#tr-crempty");
+}
+function openRunPicker(){
+  const p=$("#rb-picker");
+  p.innerHTML=lastRuns.length?lastRuns.map(j=>{
+    const id=j.job_id, cfg=j.config||{};
+    return `<div class="pk-row" data-pkpick="${esc(id)}"><span class="pk-id">${esc(id)}</span><span class="pk-meta">${esc(j.status)} · ${esc(cfg.sender||"?")}→${esc(cfg.receiver||"?")}</span></div>`;
+  }).join(""):'<div class="footnote" style="padding:8px">no runs yet — run a Transfer first.</div>';
+  p.classList.remove("hidden");
+  p.querySelectorAll("[data-pkpick]").forEach(r=>r.onclick=()=>{
+    p.classList.add("hidden"); setCurrentRun(r.dataset.pkpick);
+  });
+}
+$("#rb-id").onclick=()=>{const t=document.querySelector('.tab[data-tab="transfer"]');if(t)t.click();};
+$("#rb-switch").onclick=()=>{const p=$("#rb-picker");if(p.classList.contains("hidden"))openRunPicker();else p.classList.add("hidden");};
+// Close the picker when clicking outside it.
+document.addEventListener("click",e=>{const p=$("#rb-picker");if(!p||p.classList.contains("hidden"))return;if(!p.contains(e.target)&&e.target!==$("#rb-switch"))p.classList.add("hidden");});
+// "run or select a Transfer" empty-state links on Packets/Test/Train → Transfer tab.
+["#pk-pickrun","#tt-pickrun","#tr-pickrun"].forEach(s=>{const el=$(s);if(el)el.onclick=e=>{e.preventDefault();const t=document.querySelector('.tab[data-tab="transfer"]');if(t)t.click();};});
+// A manual change to an Advanced selector is a deliberate override — record it
+// so a later bar re-render (e.g. on run completion) does NOT clobber it.
+["#tt-module","#tt-suite","#tr-receiver","#tr-suite"].forEach(s=>{
+  const el=$(s); if(el)el.addEventListener("change",()=>{
+    if(!currentRun)return;
+    currentRun.userOverride=currentRun.userOverride||{};
+    currentRun.userOverride[s]=true;
+  });
+});
+
+/* tabs — toggle .active + .hidden over EVERY #tab-* panel. Iterating the
+   DOM (not a hard-coded list) so every tab is hideable; the old list omitted
+   "suites", leaving #tab-suites stranded (latent bug, fixed here). */
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>{
+    const on=x===b;
+    x.classList.toggle("active",on);
+    x.setAttribute("aria-selected",on?"true":"false");
+  });
+  document.querySelectorAll("[id^='tab-']").forEach(p=>{
+    p.classList.toggle("hidden",b.dataset.tab!==p.id.slice(4));
+  });
+});
+/* "＋ Add a teacher / learner" on the Transfer tab → jump to the Skills
+   add-model form, pre-set the role, focus the module-id field. The buttons are
+   the visible slot the user asked for; without this handler they were a dead
+   affordance (adversarial audit 2026-08-18). */
+document.querySelectorAll("[data-addmodel]").forEach(b=>b.onclick=()=>{
+  const t=document.querySelector('.tab[data-tab="skills"]'); if(t)t.click();
+  const r=b.dataset.addmodel, sel=$("#am-role");
+  if(sel){[...sel.options].forEach(o=>o.selected=(o.value===r));}
+  const id=$("#am-id"); if(id){setTimeout(()=>{id.focus();id.scrollIntoView({block:"center"});},30);}
+});
+
+/* init */
+async function populateDropdowns(){
+  // Re-fetch catalog + suites and repopulate EVERY model/suite/capability
+  // dropdown across all tabs. Called on init AND after a new suite is authored
+  // (so the new capability is bindable in Add-Model / runnable in Transfer /
+  // certifiable in Compress without a page reload).
+  const cat=await api("/api/catalog"), suites=await api("/api/suites");
+  const senders=cat.modules.filter(m=>m.roles.includes("sender"));
+  const receivers=cat.modules.filter(m=>m.roles.includes("receiver"));
+  // In-process HF receivers (deep-apply + SiltSpring load weights the process
+  // owns; Ollama holds weights externally and is refused up front). Filter by
+  // the catalog's `requires` note, which names torch/transformers for HF and
+  // ollama for external-weights receivers.
+  const hfRecv=cat.modules.filter(m=>m.roles.includes("receiver")
+    && /transformers|torch/i.test(m.requires||"") && !/ollama/i.test(m.requires||""));
+  const recvOpts=m=>`<option value="${m.id}">${m.id}</option>`;
+  const hfOpts=m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`;
+  const suiteOpts=Object.entries(suites).map(([id,s])=>
+    `<option value="${id}">${id} — ${s.language||s.domain}${s.high_risk?" ⚠ high-risk":""}</option>`).join("");
+  // Playground capability is driven by the SAME suites the catalog/transfer use
+  // (was hardcoded to 3 — a model added for any other suite was unreachable in
+  // Playground). Each option's value is the JSON CapabilityKey /api/playground
+  // expects.
+  const capOpts=Object.entries(suites).map(([id,s])=>{
+    const cap=JSON.stringify({task_type:s.task_type,modality:s.modality,domain:s.domain,language:s.language});
+    return `<option value='${cap}'>${id} — ${s.language||s.domain}${s.high_risk?" ⚠ high-risk":""}</option>`;
+  }).join("");
+  $("#sender").innerHTML=senders.map(m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`).join("");
+  $("#receiver").innerHTML=receivers.map(m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`).join("");
+  $("#pg-module").innerHTML=receivers.map(recvOpts).join("");
+  $("#tt-module").innerHTML=receivers.map(recvOpts).join("");
+  $("#suites").innerHTML=suiteOpts;
+  $("#am-suite").innerHTML=suiteOpts;
+  $("#tt-suite").innerHTML=suiteOpts;
+  $("#tr-receiver").innerHTML=hfRecv.map(hfOpts).join("");
+  $("#tr-suite").innerHTML=suiteOpts;
+  $("#cp-module").innerHTML=hfRecv.map(hfOpts).join("");
+  $("#cp-suites").innerHTML=suiteOpts;
+  $("#pg-cap").innerHTML=capOpts;
+  // Honest empty-receiver state: if no in-process HF module is registered the
+  // Train/Compress dropdowns are empty. Say WHY (Ollama is refused — these
+  // stages load weights the process owns) and how to get one, instead of a
+  // bare blank select. (On a normal install the built-in HF receivers populate
+  // these, so the note stays empty.)
+  const hfNote = hfRecv.length ? "" :
+    "No in-process HuggingFace receiver is registered. Deep-apply and SiltSpring " +
+    "load weights the process owns, so Ollama (external weights) is refused up " +
+    "front. Use a built-in HF module (e.g. qwen2.5-0.5b, smollm2-360m-hf) or " +
+    "register a new HF receiver via the Python catalog API.";
+  $("#tr-receiver-note").textContent = hfNote;
+  $("#cp-receiver-note").textContent = hfNote;
+  return {cat, suites};
+}
+async function init(){
+  await populateDropdowns();
+  drawStations([]);
+  refreshRuns();
+  refreshSkills();
+  refreshSuites();
+  renderRunbar();
+  renderCurRunLines();
+}
+function drawStations(seen,failed){
+  $("#stations").innerHTML=STAGES.map(s=>{
+    const on=seen.includes(s), bad=failed&&s==="gate_decision"&&failed;
+    return `<div class="station ${on?"on":""} ${bad?"bad":""}">${NAMES[s]}<span class="n">${on?"✓":"·"}</span></div>`;
+  }).join("");
+}
+async function refreshRuns(){
+  const d=await api("/api/transfers");
+  lastRuns=d.jobs||[];   // feed the runbar picker
+  // Runs are actionable, not plain text (audit 2026-08-18: clicking a run id
+  // re-opens its live audit stream; the per-run buttons load it into the tab
+  // that acts on it). Empty state names the next action instead of "no runs yet".
+  if(!d.jobs.length){
+    $("#runs").innerHTML='<div class="footnote">no runs yet — pick a teacher, learner, and suites above, then Run transfer.</div>';
+  } else {
+    $("#runs").innerHTML=d.jobs.map(j=>{
+      const id=j.job_id, st=j.status;
+      const cls=st==="promoted"?"v-promoted":st==="pending_human_approval"?"v-pending":st==="failed"?"v-rejected":"";
+      return `<div class="runrow">`+
+        `<button class="mini runid" type="button" data-open="${esc(id)}">${esc(id)}</button>`+
+        (cls?` <span class="badge ${cls}">${esc(st)}</span>`:` <span class="footnote">${esc(st)}</span>`)+
+        ` <span class="footnote">${esc(j.config.sender)}→${esc(j.config.receiver)}</span>`+
+        `<span class="runactions">`+
+        `<button class="mini" type="button" data-goto="packets" data-job="${esc(id)}">Packets</button>`+
+        `<button class="mini" type="button" data-goto="test" data-job="${esc(id)}">Test</button>`+
+        `<button class="mini" type="button" data-goto="train" data-job="${esc(id)}">Train</button>`+
+        `</span></div>`;
+    }).join("");
+    $("#runs").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{
+      setCurrentRun(b.dataset.open);   // pin the run in the bar + set all four selects
+      watch(b.dataset.open);
+    });
+    $("#runs").querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>selectRun(b.dataset.job,b.dataset.goto));
+  }
+  const opts=d.jobs.map(j=>`<option value="${j.job_id}">${j.job_id} (${j.status})</option>`).join("");
+  $("#pk-job").innerHTML=opts; $("#pg-job").innerHTML=opts; $("#tt-job").innerHTML=opts; $("#tr-job").innerHTML=opts;
+}
+
+/* run a transfer + live SSE */
+$("#run").onclick=async()=>{
+  const body={sender:$("#sender").value,receiver:$("#receiver").value,
+    suites:[...$("#suites").selectedOptions].map(o=>o.value),
+    similarity:$("#similarity").value};
+  if($("#floor").value) body.relevance_floor=parseFloat($("#floor").value);
+  if($("#approver").value) body.approver=$("#approver").value;
+  if(!body.suites.length){alert("pick at least one suite");return;}
+  $("#run").disabled=true;
+  try{
+    const r=await fetch("/api/transfers",{method:"POST",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!r.ok){const detail=(await r.json()).detail;throw new Error(detail||("HTTP "+r.status));}
+    const job=await r.json();
+    refreshRuns(); watch(job.job_id);
+    setCurrentRun(job.job_id);   // the run just started becomes the current run
+    $("#metricbadge").className="badge"+(body.similarity==="lexical"?" warn":"");
+    $("#metricbadge").classList.remove("hidden");
+    $("#metricbadge").textContent=body.similarity==="lexical"?"lexical proxy metric":"semantic metric";
+  }catch(err){
+    // A rejected POST (e.g. pre-flight model-presence check, unknown suite,
+    // self-transfer) must be shown to the user, not swallowed as an unhandled
+    // promise rejection that leaves the button disabled with no explanation.
+    $("#run").disabled=false;
+    $("#jobstate").textContent="not started";
+    $("#verdict").innerHTML=`<div class="verdict v-rejected">TRANSFER NOT STARTED</div>`;
+    $("#checks").innerHTML=`<div class="check fail"><span class="dot"></span><span>${esc(err.message||err)}</span></div>`;
+  }
+};
+let currentJob=null;
+function watch(id){
+  currentJob=id;
+  const seen=[]; $("#events").textContent=""; $("#drops").innerHTML="";
+  $("#checks").innerHTML=""; $("#verdict").innerHTML="";
+  $("#jobstate").textContent="running";
+  const es=new EventSource(`/api/transfers/${id}/events`);
+  es.addEventListener("audit",e=>{
+    const ev=JSON.parse(e.data);
+    if(!seen.includes(ev.event))seen.push(ev.event);
+    drawStations(seen);
+    $("#events").textContent+=`${String(ev.index).padStart(3)} ${ev.event}\n`;
+    $("#events").scrollTop=1e9;
+    if(ev.event==="rejected"||ev.event==="relevance_filtered")showDropsLater(id);
+    if(ev.event==="gate_decision")showGate(ev.detail,id);
+    if(ev.event==="evaluated")showEval(ev.detail);
+  });
+  es.addEventListener("status",async e=>{
+    es.close(); const st=JSON.parse(e.data);
+    $("#jobstate").textContent=st.status; $("#run").disabled=false;
+    const full=await api(`/api/transfers/${id}`);
+    if(st.status==="failed"||(full&&full.status==="failed")){
+      // A failed job has no report; surface the real reason instead of a bare
+      // "failed" badge. The error comes from the SSE status frame (st.error)
+      // and is backed up by the job record (full.error).
+      const err=esc(st.error||(full&&full.error)||"transfer failed (no error detail)");
+      $("#verdict").innerHTML=`<div class="verdict v-rejected">TRANSFER FAILED</div>`;
+      $("#checks").innerHTML=`<div class="check fail"><span class="dot"></span><span>${err}</span></div>`;
+    } else if(full&&full.report){showReport(full.report,id);}
+    refreshRuns();
+    // The just-finished run is the current run; pin it in the bar with its
+    // real final verdict (full already fetched above — reuse it, no refetch).
+    setCurrentRun(id,{},full);
+    // The user has run a transfer to completion; the start-here guide can be
+    // auto-dismissed so returning users land on the app. localStorage remembers.
+    if(st.status!=="failed") markOnboardingDone();
+  });
+}
+async function showDropsLater(id){
+  const full=await api(`/api/transfers/${id}`); if(!full.report)return;
+  showDrops(full.report);
+}
+function showDrops(r){
+  const drops=[...(r.dropped_relevance||[]),...(r.dropped_safety||[])];
+  $("#drops").innerHTML=drops.length? drops.map(d=>
+    `<div class="drop">✂ ${d.reason}</div>`).join("")
+    :'<div class="footnote">nothing dropped</div>';
+}
+function showGate(d,job){
+  const cls=d.status==="promoted"?"v-promoted":d.status==="pending_human_approval"?"v-pending":"v-rejected";
+  // Normalize the internal enum to the documented verdict text (Gate 2's
+  // watchTrain already does this; showGate must match, else a high-risk
+  // transfer renders "PENDING_HUMAN_APPROVAL" while the docs say PENDING_HUMAN).
+  const tag=d.status==="pending_human_approval"?"PENDING_HUMAN":d.status.toUpperCase();
+  $("#verdict").innerHTML=`<div class="verdict ${cls}">GATE: ${tag}</div>`;
+  $("#checks").innerHTML=(d.checks||[]).map(c=>
+    `<div class="check ${c.passed?"pass":"fail"}"><span class="dot"></span>
+     <span>${c.name} — ${c.detail}</span></div>`).join("");
+  if(d.status==="rejected")drawStations(STAGES,true);
+  // Next-step pointer so the flow doesn't dead-end at the verdict. The job id
+  // is threaded from watch(); the tab-switch links pre-select the run on the
+  // target tab via selectRun(job,tab).
+  if(job){
+    const link=(tab,label)=>`<button class="mini" type="button" data-goto="${tab}" data-job="${job}">${label}</button>`;
+    let next="";
+    if(d.status==="promoted")
+      next=`<div class="nextsteps">${link("packets","→ Approve &amp; download (Packets)")} ${link("test","→ Test before download")} ${link("train","→ Train a LoRA from these")}</div>`;
+    else if(d.status==="pending_human_approval")
+      next=`<div class="nextsteps">${link("packets","→ Approve by name (Packets)")}</div>`;
+    else if(d.status==="rejected")
+      next=`<div class="footnote">Rejected — the audit stream above names every failed check. Re-run on Transfer with a different suite, a stronger receiver, or a lower relevance floor.</div>`;
+    if(next){
+      $("#verdict").insertAdjacentHTML("beforeend",next);
+      $("#verdict").querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>selectRun(b.dataset.job,b.dataset.goto));
+    }
+  }
+}
+function showEval(d){
+  const rows=(d.case_diff||[]).map(r=>{
+    const cls=r.delta>0?"delta-up":r.delta<0?"delta-down":"delta-flat";
+    return `<tr><td>${esc(r.expected)}</td><td>${esc(trim(r.baseline_output))}</td>
+      <td>${esc(trim(r.candidate_output))}</td>
+      <td class="${cls}">${r.delta>0?"+":""}${(+r.delta).toFixed(3)}</td></tr>`;
+  }).join("");
+  $("#cases tbody").innerHTML=rows;
+  const b=d.baseline?.score??d.scores?.baseline_score, c=d.candidate?.score??d.scores?.candidate_score;
+  if(b!=null&&c!=null)drawBars(b,c);
+}
+function showReport(r,id){
+  showDrops(r);
+  const c=r.counts||{};
+  $("#funnel").innerHTML=[["extracted",c.extracted],["kept",(c.extracted||0)-(c.dropped_relevance||0)-(c.dropped_safety||0)],
+    ["packets",c.distilled],["promoted",c.promoted]].map(([l,n])=>
+    `<div class="fstep"><div class="n">${n??0}</div><div class="l">${l}</div></div>`).join("");
+  if(r.evaluations&&r.evaluations[0]){
+    const ev=r.evaluations[0];
+    drawBars(ev.baseline.score,ev.candidate.score);
+    showEval(ev);
+  }
+  if(r.decisions&&r.decisions[0])showGate(r.decisions[0],id);
+}
+function drawBars(b,c){
+  const h=v=>Math.max(3,Math.round(v*90));
+  $("#bars").innerHTML=`
+   <div class="bar"><div class="v">${(+b).toFixed(3)}</div><div class="fill" style="height:${h(b)}px;background:var(--faint)"></div><div class="v">before</div></div>
+   <div class="bar"><div class="v">${(+c).toFixed(3)}</div><div class="fill" style="height:${h(c)}px;background:var(--teal)"></div><div class="v">after</div></div>`;
+}
+const esc=s=>String(s??"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+const trim=s=>{s=String(s??"");return s.length>70?s.slice(0,70)+"…":s};
+
+/* packets tab */
+$("#pk-load").onclick=async()=>{
+  const id=$("#pk-job").value; if(!id){alert("Run or select a Transfer first — it becomes the current run pinned above.");return;}
+  const d=await api(`/api/transfers/${id}/packets`);
+  const card=(p,actions)=>`<div class="drop" style="border-color:var(--teal)">
+    <b>${p.packet_type||"packet"}</b> ${p.packet_id.slice(0,8)} — ${p.sender_capability.task_type}/${p.domain}
+    ${p.provenance.is_mock?'<span class="badge warn">MOCK — should be impossible</span>':""}
+    <br>eval=${p.evaluator_score?.toFixed(3)??"—"} safety=${p.safety_score?.toFixed(3)??"—"}
+    ${p.human_approved_by?` · approved by ${esc(p.human_approved_by)}`:""}
+    ${p.rejection_reason?`<br>✂ ${esc(p.rejection_reason)}`:""}
+    <br>${actions||""}</div>`;
+  const pending=d.candidate.filter(p=>p.promotion_status==="pending_human_approval");
+  $("#pk-pending").innerHTML=pending.length? pending.map(p=>card(p,
+    `<input placeholder="your name (recorded forever)" id="ap-${p.packet_id}" style="width:60%">
+     <button class="mini" onclick="approvePk('${id}','${p.packet_id}')">Approve</button>`)).join("")
+    :'<div class="footnote">none pending</div>';
+  $("#pk-approved").innerHTML=d.approved.length? d.approved.map(p=>card(p,
+    `<button class="mini" onclick="rollbackPk('${id}','${p.rollback_token}')">Rollback</button>`)).join("")
+    :'<div class="footnote">no approved packets for this run — run a transfer on the Transfer tab and get a PROMOTED gate first.</div>';
+  $("#pk-rejected").innerHTML=d.rejected.length? d.rejected.slice(0,10).map(p=>card(p)).join("")
+    :'<div class="footnote">none</div>';
+};
+window.approvePk=async(job,pk)=>{
+  const name=$("#ap-"+pk).value;
+  if(!name||name.length<3){alert("named approval requires a real name");return;}
+  const r=await fetch(`/api/transfers/${job}/approve`,{method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({packet_id:pk,approver:name})}).then(r=>r.json());
+  alert("gate says: "+(r.status||r.detail)); $("#pk-load").click();
+};
+window.rollbackPk=async(job,token)=>{
+  const r=await fetch(`/api/transfers/${job}/rollback`,{method:"POST",
+    headers:{"Content-Type":"application/json"},body:JSON.stringify({token})}).then(r=>r.json());
+  alert(`rollback: removed ${r.removed}, restored ${r.restored}`); $("#pk-load").click();
+};
+
+/* playground */
+$("#pg-run").onclick=async()=>{
+  const cap=JSON.parse($("#pg-cap").value);
+  const base={job_id:$("#pg-job").value,module:$("#pg-module").value,
+              prompt:$("#pg-prompt").value,capability:cap};
+  $("#pg-base").textContent="…"; $("#pg-cond").textContent="…";
+  const [a,b]=await Promise.all([
+    fetch("/api/playground",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({...base,use_skills:false})}).then(r=>r.json()),
+    fetch("/api/playground",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({...base,use_skills:true})}).then(r=>r.json()),
+  ]);
+  $("#pg-base").textContent=a.output??a.detail;
+  $("#pg-cond").textContent=b.output??b.detail;
+  $("#pg-n").textContent=(b.skills_active??0)+" packet(s)";
+  $("#pg-banner").innerHTML=b.high_risk?
+    `<div class="verdict v-pending">HIGH-RISK DOMAIN — outputs are not professional advice</div>`:"";
+};
+
+/* ---- skills library + load-a-model ---- */
+async function refreshSkills(){
+  const d=await api("/api/skills");
+  $("#sk-count").textContent=d.count? d.count+" approved":"";
+  if(!d.count){
+    $("#sk-list").innerHTML='<div class="footnote">no approved skills yet — run a transfer, then approve a packet through the gate</div>';
+    return;
+  }
+  $("#sk-list").innerHTML=d.skills.map(s=>{
+    const evalS=s.evaluator_score!=null?(+s.evaluator_score).toFixed(3):"—";
+    return `<div class="drop" style="border-color:var(--teal)">
+      <b>${s.packet_type||"packet"}</b> ${s.packet_id.slice(0,8)} — ${esc(s.capability)}
+      ${s.is_mock?'<span class="badge warn">MOCK — should be impossible</span>':""}
+      <br>eval=${evalS} · target=${esc(s.target_module)} · job ${s.job_id}
+      ${s.human_approved_by?` · approved by ${esc(s.human_approved_by)}`:""}
+      <br><button class="mini" onclick="loadSkill('${s.job_id}','${s.target_module}','${s.packet_id}')">Load</button>
+      <button class="mini" onclick="testSkillFromLibrary('${s.job_id}','${s.target_module}','${s.packet_id}')">Test</button>
+      <button class="mini" onclick="downloadBundle('${s.job_id}')">Download</button>
+    </div>`;
+  }).join("");
+}
+$("#sk-load").onclick=refreshSkills;
+
+$("#am-add").onclick=async()=>{
+  const body={module_id:$("#am-id").value.trim(),ollama_tag:$("#am-tag").value.trim(),
+    role:$("#am-role").value,suite_id:$("#am-suite").value,description:$("#am-desc").value.trim()};
+  if($("#am-think").checked) body.think=false;
+  if(!body.module_id||!body.ollama_tag){alert("module id and ollama tag are required");return;}
+  $("#am-result").innerHTML='<div class="footnote">adding… (probing ollama)</div>';
+  try{
+    const r=await fetch("/api/catalog",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok){
+      $("#am-result").innerHTML=`<div class="verdict v-rejected">${esc(j.detail||("HTTP "+r.status))}</div>`;
+      return;
+    }
+    $("#am-result").innerHTML=`<div class="verdict v-promoted">ADDED — ${esc(body.module_id)} → ${esc(body.ollama_tag)} (${esc(j.capability)})</div>`;
+    // refresh catalog-driven selects so the new module is immediately usable.
+    // (adversarial audit 2026-08-18: the old handler only refreshed RECEIVER
+    // selects, so a newly-added SENDER never appeared in the Transfer Teacher
+    // dropdown until a full page reload — breaking the "appears immediately"
+    // promise. Now every catalog-driven select is rebuilt, preserving the
+    // current selection so a live run's chosen model isn't yanked.)
+    const cat=await api("/api/catalog");
+    const recv=cat.modules.filter(m=>m.roles.includes("receiver"));
+    const snd=cat.modules.filter(m=>m.roles.includes("sender"));
+    const hf=recv.filter(m=>/transformers|torch/i.test(m.requires||"") && !/ollama/i.test(m.requires||""));
+    const opt=m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`;
+    const optPlain=m=>`<option value="${m.id}">${m.id}</option>`;
+    const keep=(el,html)=>{const v=el.value;el.innerHTML=html;if([...el.options].some(o=>o.value===v))el.value=v;};
+    keep($("#sender"),snd.map(opt).join(""));
+    keep($("#receiver"),recv.map(opt).join(""));
+    keep($("#pg-module"),recv.map(optPlain).join(""));
+    keep($("#tt-module"),recv.map(optPlain).join(""));
+    keep($("#tr-receiver"),hf.map(opt).join(""));
+    keep($("#cp-module"),hf.map(opt).join(""));
+  }catch(err){
+    $("#am-result").innerHTML=`<div class="verdict v-rejected">${esc(err.message||err)}</div>`;
+  }
+};
+
+/* ============================ SUITES TAB ============================ */
+/* Author a new benchmark suite (define a new capability) + live capability
+   support verdict. The support verdict is the UI preview of the SAME
+   _assert_support the backend hard-rejects with at run creation. */
+const ST_BODY=$("#st-cases tbody");
+function stRow(c){
+  c=c||{case_id:"",split:"extraction",prompt:"",expected:""};
+  const tr=document.createElement("tr");
+  tr.innerHTML=
+    `<td><input class="st-cid" value="${esc(c.case_id)}" placeholder="c1" autocomplete="off"></td>`+
+    `<td><select class="st-split"><option value="extraction">extraction</option>`+
+    `<option value="heldout">heldout</option><option value="regression">regression</option></select></td>`+
+    `<td><input class="st-prompt" value="${esc(c.prompt)}" placeholder="prompt the model" autocomplete="off"></td>`+
+    `<td><input class="st-expected" value="${esc(c.expected)}" placeholder="expected output" autocomplete="off"></td>`+
+    `<td><button class="mini" type="button">remove</button></td>`;
+  tr.querySelector(".st-split").value=c.split;
+  tr.querySelector("button").onclick=()=>{tr.remove();};
+  return tr;
+}
+function stSeedRows(){
+  ST_BODY.innerHTML="";
+  ST_BODY.appendChild(stRow({case_id:"extract-1",split:"extraction",prompt:"",expected:""}));
+  ST_BODY.appendChild(stRow({case_id:"heldout-1",split:"heldout",prompt:"",expected:""}));
+}
+$("#st-addrow").onclick=()=>ST_BODY.appendChild(stRow());
+
+async function refreshSuites(){
+  // Render the suite list as cards + populate the support-check dropdowns.
+  let suites={}, cat={modules:[]};
+  try{suites=await api("/api/suites");}catch(e){$("#st-list").innerHTML='<div class="footnote">could not load suites: '+esc(e.message||e)+'</div>';return;}
+  try{cat=await api("/api/catalog");}catch(e){/* catalog optional for the list */}
+  const ids=Object.keys(suites).sort();
+  $("#st-count").textContent=ids.length;
+  $("#st-list").innerHTML=ids.length?ids.map(id=>{
+    const s=suites[id];
+    const cap=`${s.task_type}/${s.modality}/${s.domain}${s.language?"/"+s.language:""}`;
+    const sp=s.splits||{};
+    const pill=(label,n)=>`<span class="split-pill ${n?"":'zero'}">${label} <b>${n||0}</b></span>`;
+    return `<div class="suite-card">`+
+      `<div class="sc-head"><span class="sc-id">${esc(id)}</span>`+
+      (s.high_risk?`<span class="sc-risk">high-risk</span>`:"")+`</div>`+
+      `<span class="sc-cap">${esc(cap)}</span>`+
+      `<div class="sc-splits">${pill("extract",sp.extraction)}${pill("heldout",sp.heldout)}${pill("regression",sp.regression)}</div>`+
+      (s.description?`<div class="sc-desc">${esc(s.description)}</div>`:"")+
+      `</div>`;
+  }).join(""):'<div class="footnote">no suites yet — author one below.</div>';
+  // support-check dropdowns (sender + receiver from catalog, suite from suites)
+  const all=cat.modules||[];
+  const opt=m=>`<option value="${m.id}">${m.id}</option>`;
+  const keep=(el,html)=>{const v=el.value;el.innerHTML=html;if([...el.options].some(o=>o.value===v))el.value=v;};
+  keep($("#st-sender"),all.filter(m=>m.roles.includes("sender")).map(opt).join(""));
+  keep($("#st-receiver"),all.filter(m=>m.roles.includes("receiver")).map(opt).join(""));
+  keep($("#st-suite"),ids.map(id=>`<option value="${id}">${esc(id)}</option>`).join(""));
+}
+
+$("#st-create").onclick=async()=>{
+  const sid=$("#st-id").value.trim();
+  const cases=[...ST_BODY.querySelectorAll("tr")].map((tr,i)=>({
+    case_id:tr.querySelector(".st-cid").value.trim()||("case-"+(i+1)),
+    split:tr.querySelector(".st-split").value,
+    prompt:tr.querySelector(".st-prompt").value,
+    expected:tr.querySelector(".st-expected").value,
+  }));
+  if(!sid){$("#st-result").innerHTML='<span class="verdict v-rejected">suite id is required</span>';return;}
+  if(cases.length<2){$("#st-result").innerHTML='<span class="verdict v-rejected">need at least 2 cases</span>';return;}
+  const body={
+    suite_id:sid, description:$("#st-desc").value.trim(),
+    task_type:$("#st-task").value.trim(), modality:$("#st-modality").value,
+    domain:$("#st-domain").value, language:$("#st-lang").value.trim()||null, cases,
+  };
+  if(!body.task_type){$("#st-result").innerHTML='<span class="verdict v-rejected">task_type is required</span>';return;}
+  $("#st-result").innerHTML='<span class="footnote">creating…</span>';
+  try{
+    const r=await fetch("/api/suites",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok){$("#st-result").innerHTML=`<span class="verdict v-rejected">${esc(j.detail||("HTTP "+r.status))}</span>`;return;}
+    $("#st-result").innerHTML=`<span class="verdict v-promoted">CREATED — ${esc(j.suite_id)}${j.high_risk_notice?" · "+esc(j.high_risk_notice):""}</span>`;
+    $("#st-id").value="";$("#st-desc").value="";$("#st-task").value="";$("#st-lang").value="";
+    stSeedRows();
+    // the new capability is now bindable/runnable everywhere: rebuild every
+    // suite dropdown across tabs + this tab's list, without a reload.
+    await populateDropdowns();
+    await refreshSuites();
+  }catch(err){
+    $("#st-result").innerHTML=`<span class="verdict v-rejected">${esc(err.message||err)}</span>`;
+  }
+};
+
+$("#st-check").onclick=async()=>{
+  const s=$("#st-sender").value, r=$("#st-receiver").value, su=$("#st-suite").value;
+  if(!s||!r||!su){$("#st-verdict").innerHTML='<div class="footnote">Pick a sender, receiver, and suite, then click Check.</div>';return;}
+  $("#st-verdict").innerHTML='<div class="footnote">Checking…</div>';
+  try{
+    const v=await api(`/api/suites/${encodeURIComponent(su)}/support?sender=${encodeURIComponent(s)}&receiver=${encodeURIComponent(r)}`);
+    const cap=esc(v.suite_capability||"?");
+    const row=(label,m)=>{if(!m)return"";
+      const ok=!!m.supports;
+      return `<div class="check ${ok?"pass":"fail"}"><span class="dot"></span>`+
+        `<span><b>${esc(label)}</b> ${esc(m.id)} — ${ok?`declares <b>${cap}</b>`:`does <b>not</b> declare <b>${cap}</b> (it supports: ${esc((m.capabilities||[]).join(", ")||"(nothing)")})`}</span></div>`;
+    };
+    const breakdown=`<div style="margin:8px 0">${row("Sender",v.sender)}${row("Receiver",v.receiver)}</div>`;
+    if(v.ok){
+      $("#st-verdict").innerHTML=`<div class="verdict v-promoted">✓ SUPPORTED — both models declare <b>${cap}</b></div>${breakdown}`+
+        `<div class="footnote">This combo will run. The same check hard-rejects an unsupported one at run creation (HTTP 400, no job spawned).</div>`;
+    }else{
+      $("#st-verdict").innerHTML=`<div class="verdict v-rejected">✗ NOT SUPPORTED — refused at run time (HTTP 400, no job spawned)</div>${breakdown}`;
+    }
+  }catch(err){
+    $("#st-verdict").innerHTML=`<div class="verdict v-rejected">${esc(err.message||err)}</div>`;
+  }
+};
+stSeedRows();
+
+window.downloadBundle=async(job,baseModel)=>{
+  const qs=baseModel?`?base_model=${encodeURIComponent(baseModel)}`:"";
+  const r=await fetch(`/api/transfers/${job}/export${qs}`);
+  if(!r.ok){const j=await r.json().catch(()=>({}));alert("download failed: "+(j.detail||r.status));return;}
+  const blob=await r.blob();
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;
+  a.download=baseModel?`${job}_training_recipe.zip`:`${job}_skill_bundle.zip`;
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+};
+$("#pk-download").onclick=()=>{const id=$("#pk-job").value;if(id)downloadBundle(id,$("#pk-base-model").value.trim());};
+$("#pk-train").onclick=()=>{const id=$("#pk-job").value; if(!id){alert("load a run first");return;} setCurrentRun(id,{switchTo:"train"});};
+$("#audit-verify").onclick=async()=>{
+  const id=currentJob||$("#pk-job").value;
+  if(!id){$("#audit-result").innerHTML='<div class="footnote">open or run a transfer first.</div>';return;}
+  $("#audit-result").innerHTML='<div class="footnote">verifying…</div>';
+  try{
+    const r=await fetch(`/api/transfers/${id}/audit`);
+    const j=await r.json();
+    if(!r.ok){$("#audit-result").innerHTML=`<div class="verdict v-rejected">${esc(j.detail||("HTTP "+r.status))}</div>`;return;}
+    const ok=j.integrity&&j.integrity.ok;
+    const n=(j.integrity&&j.integrity.entries!=null)?j.integrity.entries:(Array.isArray(j.entries)?j.entries.length:0);
+    const broken=j.integrity&&j.integrity.broken_at;
+    const reason=j.integrity&&j.integrity.reason;
+    $("#audit-result").innerHTML=`<div class="verdict ${ok?"v-promoted":"v-rejected"}">${ok?"AUDIT INTACT":("AUDIT BROKEN @ index "+broken)}</div>`+
+      `<div class="footnote">${n} hash-chained entries · ${ok?"tamper-evident, chain unbroken":("the chain is broken"+(reason?": "+esc(reason):"")+" — possible tampering; the broken-at index names the first unverifiable entry")}.</div>`;
+  }catch(err){$("#audit-result").innerHTML=`<div class="verdict v-rejected">${esc(err.message||err)}</div>`;}
+};
+
+window.loadSkill=(job,module,packet)=>{
+  // "Load" = make this run the active source for Playground / Packets / Test.
+  // Approved packets are conditioned in automatically via approved_skills().
+  // Route through setCurrentRun so the runbar pins this run too; the explicit
+  // module (if any) is applied AFTER the autofill so it wins, and flagged as an
+  // override so a later bar re-render cannot clobber it.
+  setCurrentRun(job).then(()=>{
+    if(module){$("#pg-module").value=module;$("#tt-module").value=module;
+      if(currentRun){currentRun.userOverride=currentRun.userOverride||{};currentRun.userOverride["#tt-module"]=true;}}
+  });
+  document.querySelector('.tab[data-tab="test"]').click();
+  refreshTtPackets(job,packet);
+};
+window.testSkillFromLibrary=(job,module,packet)=>{
+  setCurrentRun(job).then(()=>{
+    if(module){$("#tt-module").value=module;
+      if(currentRun){currentRun.userOverride=currentRun.userOverride||{};currentRun.userOverride["#tt-module"]=true;}}
+  });
+  document.querySelector('.tab[data-tab="test"]').click();
+  refreshTtPackets(job,packet);
+};
+// Next-step pointer target: pin the run in the bar, switch to the destination
+// tab, and (for Packets/Test) fire that tab's load. A verdict is never a
+// dead-end (PROMOTED → approve/test/train; PENDING_HUMAN → approve by name).
+// Thin alias over setCurrentRun so injected data-goto buttons need no rework.
+window.selectRun=(job,tab)=>setCurrentRun(job,{switchTo:tab});
+
+/* ---- test accuracy (before download) ---- */
+async function refreshTtPackets(job,selPacket){
+  if(!job){$("#tt-packet").innerHTML='<option value="">all approved</option>';return;}
+  let approved=[];
+  try{const d=await api(`/api/transfers/${job}/packets`);approved=d.approved||[];}catch(e){}
+  const opts=['<option value="">all approved</option>']
+    .concat(approved.map(p=>`<option value="${p.packet_id}">${p.packet_id.slice(0,8)} — ${p.sender_capability.task_type}/${p.domain}</option>`));
+  $("#tt-packet").innerHTML=opts.join("");
+  if(selPacket)$("#tt-packet").value=selPacket;
+}
+$("#tt-job").onchange=()=>refreshTtPackets($("#tt-job").value);
+
+$("#tt-run").onclick=async()=>{
+  const body={job_id:$("#tt-job").value,module:$("#tt-module").value,
+    suite_id:$("#tt-suite").value,similarity:$("#tt-sim").value};
+  if($("#tt-packet").value) body.packet_id=$("#tt-packet").value;
+  if(!body.job_id||!body.module||!body.suite_id){alert("pick a run, a module and a suite");return;}
+  $("#tt-base").textContent="…"; $("#tt-cand").textContent="…";
+  $("#tt-improvement").textContent="improvement: …";
+  $("#tt-cases tbody").innerHTML=""; $("#tt-bars").innerHTML=""; $("#tt-banner").innerHTML="";
+  try{
+    const r=await fetch("/api/skills/test",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!r.ok){$("#tt-banner").innerHTML=`<div class="verdict v-rejected">${esc(d.detail||("HTTP "+r.status))}</div>`;return;}
+    $("#tt-base").textContent="score "+(+d.baseline.score).toFixed(4)+"\ntask_success "+(+d.baseline.task_success).toFixed(4)+"\n"+d.baseline.case_count+" cases";
+    $("#tt-cand").textContent="score "+(+d.candidate.score).toFixed(4)+"\ntask_success "+(+d.candidate.task_success).toFixed(4)+"\n"+d.candidate.case_count+" cases";
+    const imp=+d.improvement;
+    $("#tt-improvement").textContent=`improvement: ${imp>=0?"+":""}${imp.toFixed(4)} (${d.skills_active} packet(s) active)`;
+    $("#tt-improvement").className="footnote "+(imp>0?"delta-up":imp<0?"delta-down":"delta-flat");
+    const rows=(d.cases||[]).map(c=>{
+      const cls=c.delta>0?"delta-up":c.delta<0?"delta-down":"delta-flat";
+      return `<tr><td>${esc(c.expected)}</td><td>${esc(trim(c.baseline_output))}</td>
+        <td>${esc(trim(c.candidate_output))}</td><td class="${cls}">${c.delta>0?"+":""}${(+c.delta).toFixed(3)}</td></tr>`;
+    }).join("");
+    $("#tt-cases tbody").innerHTML=rows;
+    const h=v=>Math.max(3,Math.round(v*90));
+    $("#tt-bars").innerHTML=`
+      <div class="bar"><div class="v">${(+d.baseline.score).toFixed(3)}</div><div class="fill" style="height:${h(d.baseline.score)}px;background:var(--faint)"></div><div class="v">before</div></div>
+      <div class="bar"><div class="v">${(+d.candidate.score).toFixed(3)}</div><div class="fill" style="height:${h(d.candidate.score)}px;background:var(--teal)"></div><div class="v">after</div></div>`;
+    $("#tt-banner").innerHTML=d.high_risk?`<div class="verdict v-pending">HIGH-RISK DOMAIN — outputs are not professional advice</div>`:"";
+  }catch(err){
+    $("#tt-banner").innerHTML=`<div class="verdict v-rejected">${esc(err.message||err)}</div>`;
+  }
+};
+
+/* ---- train (deep-apply) ---- a REAL per-step loss curve + parity/gate2 ---- */
+function drawLoss(canvas,pts,maxSteps){
+  const ctx=canvas.getContext("2d");
+  const W=canvas.width,H=canvas.height,pad=6;
+  // Canvas does not resolve CSS var() strings -- read the computed values.
+  const cs=getComputedStyle(document.documentElement);
+  const teal=cs.getPropertyValue("--teal").trim()||"#2bb3a3";
+  const faint=cs.getPropertyValue("--faint").trim()||"#7a8a99";
+  const bg=cs.getPropertyValue("--bg").trim()||"#0e1620";
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // grid baseline
+  ctx.strokeStyle="rgba(127,127,127,0.25)";
+  ctx.beginPath();ctx.moveTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
+  if(!pts.length){
+    ctx.fillStyle=faint;ctx.font="12px ui-monospace,monospace";
+    ctx.fillText("waiting for train_step events…",pad+4,H/2);return;
+  }
+  const losses=pts.map(p=>p.loss);
+  let lo=Math.min(...losses),hi=Math.max(...losses);
+  if(hi-lo<1e-9){hi=lo+1;} lo=lo-(hi-lo)*0.1; hi=hi+(hi-lo)*0.1;
+  const xFor=i=>pad+(pts.length<=1?0:(i/(Math.max(1,maxSteps||pts.length)-1))*(W-2*pad));
+  const yFor=v=>H-pad-((v-lo)/(hi-lo))*(H-2*pad);
+  // line
+  ctx.strokeStyle=teal;ctx.lineWidth=2;ctx.beginPath();
+  pts.forEach((p,i)=>{const x=xFor(p.step),y=yFor(p.loss);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.stroke();
+  // points
+  ctx.fillStyle=teal;
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(xFor(p.step),yFor(p.loss),2,0,2*Math.PI);ctx.fill();});
+  // y labels
+  ctx.fillStyle=faint;ctx.font="10px ui-monospace,monospace";
+  ctx.fillText(hi.toFixed(3),pad+2,pad+8);
+  ctx.fillText(lo.toFixed(3),pad+2,H-pad-2);
+}
+$("#tr-run").onclick=async()=>{
+  const body={job_id:$("#tr-job").value,receiver_id:$("#tr-receiver").value,
+    suite_id:$("#tr-suite").value,backend:$("#tr-backend").value};
+  const ov={};
+  if($("#tr-rank").value) ov.lora_rank=parseInt($("#tr-rank").value,10);
+  if($("#tr-lr").value) ov.learning_rate=parseFloat($("#tr-lr").value);
+  if($("#tr-steps").value) ov.max_steps=parseInt($("#tr-steps").value,10);
+  if(Object.keys(ov).length) body.overrides=ov;
+  if(!body.job_id||!body.receiver_id||!body.suite_id){
+    alert("pick a source job, an HF receiver, and a target suite");return;}
+  $("#tr-run").disabled=true; $("#tr-state").textContent="starting";
+  $("#tr-events").textContent=""; $("#tr-verdict").innerHTML="";
+  $("#tr-parity").textContent="—"; $("#tr-gauge").textContent="—";
+  drawLoss($("#tr-canvas"),[],0);
+  try{
+    const r=await fetch("/api/deepapply",{method:"POST",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok){throw new Error(j.detail||("HTTP "+r.status));}
+    refreshRuns();
+    watchTrain(j.deepapply_id);
+  }catch(err){
+    $("#tr-run").disabled=false; $("#tr-state").textContent="not started";
+    $("#tr-verdict").innerHTML=`<div class="verdict v-rejected">NOT STARTED</div>`;
+    $("#tr-events").textContent=esc(err.message||err);
+  }
+};
+function watchTrain(id){
+  const pts=[]; let maxSteps=0, backend=null;
+  // Reset EVERY artifact a prior run populated (adversarial review 2026-08-19
+  // finding 1): the Past-runs list calls watchTrain directly, bypassing the
+  // tr-run button's reset, so a REJECTED run re-opened after a PROMOTED one
+  // would inherit the prior verdict/parity/gauge/canvas/events -- a false
+  // promise. Reset here so both the live path and the history-reopen path
+  // start from a clean slate; the late-join guards then always re-render from
+  // the fetched report.
+  $("#tr-state").textContent="running";
+  $("#tr-events").textContent="";
+  $("#tr-verdict").innerHTML="";
+  $("#tr-parity").textContent="—";
+  $("#tr-gauge").textContent="—";
+  drawLoss($("#tr-canvas"),[],0);
+  const es=new EventSource(`/api/deepapply/${id}/telemetry`);
+  es.addEventListener("telemetry",e=>{
+    const ev=JSON.parse(e.data);
+    $("#tr-events").textContent+=`${ev.phase}\n`;
+    $("#tr-events").scrollTop=1e9;
+    if(ev.phase==="train_started"&&ev.max_steps){maxSteps=ev.max_steps; if(ev.backend)backend=ev.backend;}
+    if(ev.phase==="train_step"){
+      pts.push({step:ev.step,loss:ev.loss});
+      drawLoss($("#tr-canvas"),pts,maxSteps||ev.max_steps||pts.length);
+      $("#tr-gauge").textContent=`step ${ev.step}/${ev.max_steps||maxSteps||"?"} · loss ${(+ev.loss).toFixed(4)}`;
+    }
+    if(ev.phase==="train_completed"){
+      if(ev.backend)backend=ev.backend;
+      $("#tr-gauge").textContent+=`\nfinal loss ${(+ev.training_loss).toFixed(4)} · ${ev.trainable_param_count} trainable params`;
+      renderTrainParity(ev.parity_verified, backend);
+    }
+    if(ev.phase==="gate2_evaluated"){
+      const b=ev.baseline_score,c=ev.candidate_score;
+      if(b!=null&&c!=null) $("#tr-gauge").textContent+=`\nheld-out baseline ${(+b).toFixed(3)} · candidate ${(+c).toFixed(3)}`;
+    }
+    if(ev.phase==="gate2_decision"){
+      renderTrainVerdict(ev.status, $("#tr-job").value, backend, ev.parity_verified);
+    }
+  });
+  es.addEventListener("status",async e=>{
+    es.close(); const st=JSON.parse(e.data);
+    $("#tr-state").textContent=st.status; $("#tr-run").disabled=false;
+    const full=await api(`/api/deepapply/${id}`);
+    if(st.errored){
+      $("#tr-verdict").innerHTML=`<div class="verdict v-rejected">${esc((full&&full.error)||"deep-apply failed")}</div>`;
+    } else if(full && full.report){
+      // Late-join / Past-runs re-open: the SSE telemetry queue has already
+      // drained, so the live train_completed + gate2_decision events did NOT
+      // fire here. Reconstruct the verdict + parity + gauge from the persisted
+      // report so a finished run shows its real outcome, not a blank verdict.
+      // (adversarial review 2026-08-19: this was a half-measure -- a promoted
+      // run re-opened from Past runs showed an empty GATE 2 box.)
+      const rep = full.report;
+      const bk = rep.backend || backend || null;
+      if($("#tr-verdict").innerHTML.trim()==="" && rep.gate2 && rep.gate2.status){
+        renderTrainVerdict(rep.gate2.status, $("#tr-job").value, bk, rep.parity_verified);
+      }
+      if($("#tr-parity").textContent.trim()==="—" || $("#tr-parity").textContent.trim()===""){
+        renderTrainParity(rep.parity_verified, bk);
+      }
+      if(rep.training_loss!=null){
+        $("#tr-gauge").textContent=`final loss ${(+rep.training_loss).toFixed(4)} · ${rep.trainable_param_count||"?"} trainable params`+
+          (rep.improvement!=null?`\nheld-out improvement ${rep.improvement>=0?"+":""}${(+rep.improvement).toFixed(4)} · evaluator ${rep.evaluator_score!=null?(+rep.evaluator_score).toFixed(3):"—"}`:"");
+      }
+    }
+    refreshRuns();
+    refreshDeepapplyHistory();
+  });
+}
+// Parity is the STREAMED backend's admission bar; standard/zeroforge do not run a
+// parity probe (Gate 2 has zero backend-conditional branches). A streamed parity
+// FAIL raises DeepApplyBlocked BEFORE train_completed, so we never claim "admission
+// blocked" here -- the real verdict comes from gate2_decision. (adversarial review
+// 2026-08-18: the old text fabricated an "admission blocked" verdict for standard
+// runs that were in fact PROMOTED.) Shared by the live SSE handler + the late-join
+// status handler so a re-opened finished run shows the same honest parity line.
+function renderTrainParity(parityVerified, backend){
+  if(backend==="streamed"){
+    // (adversarial review 2026-08-19 finding 2): parityVerified can be
+    // undefined for a streamed run whose persisted report omitted it (older
+    // payload / mid-parity error). Asserting "NOT verified" on undefined is a
+    // FABRICATED negative -- the UI would claim a parity failure it never
+    // measured. Only assert verified/NOT when it is a real boolean; otherwise
+    // say honestly that no parity was recorded for this run.
+    if(parityVerified===true){
+      $("#tr-parity").textContent="✓ parity verified (streamed admission bar met)";
+      $("#tr-parity").className="log delta-up";
+    } else if(parityVerified===false){
+      $("#tr-parity").textContent="parity NOT verified";
+      $("#tr-parity").className="log delta-down";
+    } else {
+      $("#tr-parity").textContent="parity: not recorded for this run";
+      $("#tr-parity").className="log";
+    }
+  } else {
+    $("#tr-parity").textContent="parity probe: not run by the "+(backend||"standard")+" backend (only the streamed backend gates on parity)";
+    $("#tr-parity").className="log";
+  }
+}
+// Render the GATE 2 verdict box + next-step pointers. Shared by the live
+// gate2_decision SSE event and the late-join status handler (which pulls
+// rep.gate2.status from the persisted report) so both paths show the same
+// honest verdict + next steps.
+function renderTrainVerdict(status, srcJob, backend, parityVerified){
+  const cls=status==="promoted"?"v-promoted":status==="pending_human_approval"?"v-pending":"v-rejected";
+  const tag=status==="pending_human_approval"?"PENDING_HUMAN":(status||"").toUpperCase();
+  let next="";
+  if(status==="promoted")
+    next=`<div class="footnote">The trained adapter is now in the receiver's approved store.</div>`+
+         `<div class="nextsteps"><button class="mini" type="button" data-goto="test" data-job="${esc(srcJob)}">→ Test it (Test tab)</button>`+
+         `<button class="mini" type="button" data-goto="packets" data-job="${esc(srcJob)}">→ Download (Packets tab)</button></div>`;
+  else if(status==="pending_human_approval")
+    next=`<div class="footnote">high-risk domain — a named human must approve.</div>`+
+         `<div class="nextsteps"><button class="mini" type="button" data-goto="packets" data-job="${esc(srcJob)}">→ Approve by name (Packets)</button></div>`;
+  else if(status==="rejected")
+    next=`<div class="footnote">Rejected — Gate 2 measured the trained adapter on held-out data and it did not clear the bar. Re-train with more steps, a higher rank, or a stronger receiver; the run is not promoted.</div>`;
+  $("#tr-verdict").innerHTML=`<div class="verdict ${cls}">GATE 2: ${tag}</div>`+next;
+  // Only the streamed backend's parity is meaningful as an admission signal;
+  // for standard/zeroforge parity is not a gate, so don't append a misleading
+  // "NOT verified" line next to a real PROMOTED verdict. And only append the
+  // verified/NOT line when parityVerified is a real boolean (adversarial review
+  // 2026-08-19 finding 2): undefined must NOT fabricate "NOT verified".
+  if(backend==="streamed" && (parityVerified===true||parityVerified===false)){
+    const pv=$("#tr-parity").textContent;
+    $("#tr-parity").textContent+=`${pv&&pv!=="—"&&pv!==""?"\n":""}parity ${parityVerified?"verified":"NOT verified"}`;
+  }
+  $("#tr-verdict").querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>selectRun(b.dataset.job,b.dataset.goto));
+}
+
+/* ---- compress (SiltSpring) ---- per-state bytes/degradation/certified ---- */
+function cpRow(s){
+  const degRaw=s.degradation||{};
+  const cert=s.certified_skills||[];
+  const revk=s.revoked_skills||[];
+  const unmeas=s.unmeasured_skills||[];
+  // (adversarial review 2026-08-19 finding 3): the source is supposed to put only
+  // FINITE values in `degradation`, but don't trust the payload -- a null/NaN
+  // element would make Math.max coerce it to 0 and print a fake "0.0000". Filter
+  // to real finite numbers; if deg had entries but none finite, the state is
+  // effectively unmeasured (every skill non-finite), NOT "degradation 0".
+  const finVals=Object.values(degRaw).filter(v=>typeof v==="number"&&isFinite(v));
+  const worst=finVals.length?Math.max(...finVals):null;
+  const degHadEntries=Object.keys(degRaw).length>0;
+  const allUnmeasured=degHadEntries && finVals.length===0;
+  const isFull=s.state==="full";
+  // Honest verdict: a quantized state is CERTIFIED only if no skill was revoked
+  // AND none was unmeasured. REVOKED = a skill degraded past tolerance. UNMEASURED
+  // = a skill's loss was non-finite (degenerate state) so degradation could not be
+  // computed -- that is NOT "revoked" (a false promise) and NOT "certified".
+  // (finding 4): a quantized state with NO skills at all (cert/revk/unmeas all
+  // empty, e.g. empty suite) must NOT read "CERTIFIED" -- it certified nothing.
+  let vcls,vtxt;
+  if(isFull){vcls="";vtxt="REFERENCE";}
+  else if(revk.length){vcls="v-rejected";vtxt="REVOKED";}
+  else if(unmeas.length||allUnmeasured){vcls="v-pending";vtxt="UNMEASURED";}
+  else if(cert.length){vcls="v-promoted";vtxt="CERTIFIED";}
+  else {vcls="";vtxt="— (no skills)";}
+  return `<tr>
+    <td><b>${esc(s.state)}</b></td>
+    <td>${(typeof s.bytes_packed==="number"&&isFinite(s.bytes_packed))?((+s.bytes_packed)/1e6).toFixed(2)+" MB":"— (full precision)"}</td>
+    <td>${worst!=null?(+worst).toFixed(4):((unmeas.length||allUnmeasured)?"— (unmeasured)":"—")}</td>
+    <td>${cert.map(esc).join(", ")||"—"}</td>
+    <td>${revk.map(esc).join(", ")||"—"}</td>
+    <td>${unmeas.map(esc).join(", ")||"—"}</td>
+    <td><span class="badge ${vcls}">${vtxt}</span></td>
+  </tr>`;
+}
+$("#cp-run").onclick=async()=>{
+  const suite_ids=[...$("#cp-suites").selectedOptions].map(o=>o.value);
+  const levels=[...$("#cp-levels").selectedOptions].map(o=>o.value);
+  const body={module_id:$("#cp-module").value,suite_ids,levels,
+    tolerance:parseFloat($("#cp-tol").value),device:$("#cp-device").value,
+    max_len:parseInt($("#cp-maxlen").value,10)};
+  if(!body.module_id){alert("pick an HF model");return;}
+  if(!suite_ids.length){alert("pick at least one held-out suite");return;}
+  if(!levels.length){alert("pick at least one quantization state");return;}
+  $("#cp-run").disabled=true; $("#cp-state").textContent="starting";
+  $("#cp-events").textContent=""; $("#cp-vram").textContent="—";
+  $("#cp-table tbody").innerHTML="";
+  try{
+    const r=await fetch("/api/spring",{method:"POST",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok){throw new Error(j.detail||("HTTP "+r.status));}
+    watchCompress(j.spring_id);
+  }catch(err){
+    $("#cp-run").disabled=false; $("#cp-state").textContent="not started";
+    $("#cp-events").textContent=esc(err.message||err);
+  }
+};
+function watchCompress(id){
+  // Reset every artifact a prior run populated (adversarial review 2026-08-19
+  // finding 1/5): the Past-runs list calls watchCompress directly, bypassing
+  // the cp-run button's reset, so #cp-events would accumulate across runs and
+  // a stale table/vram could persist. Start from a clean slate on both paths.
+  $("#cp-state").textContent="running";
+  $("#cp-events").textContent="";
+  $("#cp-vram").textContent="—";
+  $("#cp-table tbody").innerHTML="";
+  const es=new EventSource(`/api/spring/${id}/telemetry`);
+  es.addEventListener("telemetry",e=>{
+    const ev=JSON.parse(e.data);
+    $("#cp-events").textContent+=`${ev.phase}\n`;
+    $("#cp-events").scrollTop=1e9;
+    if(ev.phase==="model_loading"){
+      $("#cp-events").textContent+=`  loading ${ev.model_id} on ${ev.device}\n`;
+    }
+    if(ev.phase==="certify_started"){
+      $("#cp-events").textContent+=`  levels [${(ev.levels||[]).join(", ")}] tol ${ev.tolerance} · skills ${(ev.skills||[]).join(", ")}\n`;
+    }
+    if(ev.phase==="spring_state"){
+      $("#cp-table tbody").insertAdjacentHTML("beforeend",cpRow(ev));
+    }
+  });
+  es.addEventListener("status",async e=>{
+    es.close(); const st=JSON.parse(e.data);
+    $("#cp-state").textContent=st.status; $("#cp-run").disabled=false;
+    const full=await api(`/api/spring/${id}`);
+    if(full&&full.report&&full.report.vram_peak_gb!=null){
+      $("#cp-vram").textContent=`${full.report.vram_peak_gb} GB peak (${full.report.device})`;
+    } else if(full&&full.report){
+      $("#cp-vram").textContent=`— (${full.report.device}, no VRAM meter on CPU)`;
+    }
+    // Repopulate the table from the final report so the outcome shows even on a
+    // late SSE join / page refresh (the SSE may have already drained). Idempotent
+    // for a normal run: clears + re-renders the authoritative states.
+    // (adversarial review 2026-08-19 finding 5): only REPLACE when states is a
+    // NON-EMPTY array -- an empty `states` (a run that certified nothing, or a
+    // report whose states weren't persisted) must NOT silently wipe rows the
+    // SSE already streamed. If the report truly has zero states and nothing was
+    // streamed, show an honest "no states" row instead of a blank table.
+    if(full&&full.report&&Array.isArray(full.report.states)&&full.report.states.length){
+      $("#cp-table tbody").innerHTML=full.report.states.map(cpRow).join("");
+    } else if(!$("#cp-table tbody").children.length){
+      $("#cp-table tbody").innerHTML=`<tr><td colspan="7" class="footnote">no quantization states in this run's report</td></tr>`;
+    }
+    if(st.errored){
+      $("#cp-events").textContent+=`\nFAILED: ${esc(full&&full.error||"spring failed")}`;
+    } else if(st.status==="done"){
+      // The Studio certifies states; serving a certified state is the Python
+      // library surface (asea.spring) — there is no Studio serving endpoint,
+      // so say so honestly rather than imply a "deploy" button that doesn't exist.
+      $("#cp-events").textContent+=`\nDONE. The table above shows which (state, skill) pairs are certified. `+
+        `To SERVE a compressed state use the library: from asea.spring import CompressionCertifier; `+
+        `cert.serve(state, skill) (raises StateNotCertifiedError / StaleCertificateError on a revoked or stale pair).`;
+    }
+    refreshSpringHistory();
+  });
+}
+
+/* ---- past runs (deep-apply + SiltSpring history) ---- list endpoints that
+   existed but had no UI surface (audit 2026-08-18): each past job is visible
+   with its status and re-openable. */
+function renderHistory(listElId, jobs, viewFn){
+  const el=$("#"+listElId);
+  if(!jobs.length){el.innerHTML='<div class="footnote">no jobs this session yet.</div>';return;}
+  el.innerHTML=jobs.map(j=>{
+    const st=j.status||"?", id=j.job_id||"";
+    const cls=st==="done"||st==="promoted"?"v-promoted":st==="failed"?"v-rejected":"v-pending";
+    const cfg=j.config||{};
+    const desc=("receiver_id" in cfg)?`${cfg.receiver_id||"?"}`:(`${cfg.module_id||"?"}`);
+    return `<div class="runrow"><button class="mini runid" type="button" data-view="${esc(id)}">${esc(id)}</button> `+
+      `<span class="badge ${cls}">${esc(st)}</span> <span class="footnote">${esc(desc)}</span>`+
+      (j.error?` <span class="footnote" style="color:var(--red)">${esc(j.error)}</span>`:"")+
+      `</div>`;
+  }).join("");
+  el.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>viewFn(b.dataset.view));
+}
+async function refreshDeepapplyHistory(){
+  try{const d=await api("/api/deepapply");renderHistory("tr-history-list",d.jobs,watchTrain);}catch(e){$("#tr-history-list").innerHTML='<div class="footnote">failed to load</div>';}
+}
+async function refreshSpringHistory(){
+  try{const d=await api("/api/spring");renderHistory("cp-history-list",d.jobs,watchCompress);}catch(e){$("#cp-history-list").innerHTML='<div class="footnote">failed to load</div>';}
+}
+$("#tr-history").onclick=refreshDeepapplyHistory;
+$("#cp-history").onclick=refreshSpringHistory;
+
+/* ---- README dropdown: render the live README.md (single source of truth) ----
+   renderMarkdown covers exactly the README's subset (fences, headings, tables,
+   blockquotes [recursive], lists w/ nesting, hr, paragraphs, inline code/bold/
+   links). All text is HTML-escaped first; external links open in a new tab,
+   repo-relative links (docs/…, #…) render as non-navigating styled spans so
+   nothing 404s on the Studio host. */
+function renderMarkdown(md){
+  const e=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  const isSep=ln=>{
+    if(!/\|/.test(ln)) return false;
+    const cells=ln.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|");
+    return cells.length>=1 && cells.every(c=>/^:?-+:?$/.test(c.trim())) && cells.some(c=>/-/.test(c));
+  };
+  const isBlock=ln=>/^\s*```/.test(ln)||/^#{1,6}\s/.test(ln)||/^\s*>/.test(ln)||/^\s*([-*])\s+/.test(ln)||/^\s*\d+\.\s+/.test(ln)||/^\s*(-{3,}|\*{3}|_{3})\s*$/.test(ln);
+  md=String(md??"").replace(/\r\n/g,"\n").replace(/^\s*<img\b[^>]*>\s*\n/i,""); // strip logo line (header shows it)
+  const lines=md.split("\n"), out=[]; let i=0;
+  const inline=s=>{
+    let t=e(s);
+    t=t.replace(/`([^`]+)`/g,(m,c)=>`<code>${c}</code>`);
+    t=t.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+    t=t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,(m,txt,url)=>{
+      if(/^https?:\/\//i.test(url)||/^mailto:/i.test(url))
+        return `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${txt}</a>`;
+      return `<span class="md-link-off" title="${e(url)} — open in the repo README">${txt}</span>`;
+    });
+    return t;
+  };
+  while(i<lines.length){
+    const line=lines[i];
+    if(/^\s*```/.test(line)){                       // fenced code
+      const buf=[]; i++;
+      while(i<lines.length && !/^\s*```/.test(lines[i])){ buf.push(lines[i]); i++; }
+      i++; out.push(`<pre><code>${e(buf.join("\n"))}</code></pre>`); continue;
+    }
+    if(/^\s*$/.test(line)){ i++; continue; }         // blank
+    const h=line.match(/^(#{1,6})\s+(.*)$/);         // heading
+    if(h){ const lvl=h[1].length; out.push(`<h${lvl}>${inline(h[2].trim())}</h${lvl}>`); i++; continue; }
+    if(/^\s*(-{3,}|\*{3}|_{3})\s*$/.test(line)){ out.push("<hr>"); i++; continue; } // hr
+    if(/\|/.test(line) && i+1<lines.length && isSep(lines[i+1])){ // table
+      const rows=[line]; i++; i++; // header + separator
+      while(i<lines.length && /\|/.test(lines[i]) && lines[i].trim()!==""){ rows.push(lines[i]); i++; }
+      const parse=r=>r.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|").map(c=>c.trim());
+      const head=parse(rows[0]);
+      let t=`<table><thead><tr>${head.map(c=>`<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>`;
+      for(let r=2;r<rows.length;r++){ const cells=parse(rows[r]); t+=`<tr>${cells.map(c=>`<td>${inline(c)}</td>`).join("")}</tr>`; }
+      out.push(t+"</tbody></table>"); continue;
+    }
+    if(/^\s*>/.test(line)){                          // blockquote (recursive)
+      const buf=[];
+      while(i<lines.length && /^\s*>/.test(lines[i])){ buf.push(lines[i].replace(/^\s*>\s?/,"")); i++; }
+      out.push(`<blockquote>${renderMarkdown(buf.join("\n"))}</blockquote>`); continue;
+    }
+    const ul=line.match(/^(\s*)([-*])\s+(.*)$/), ol=line.match(/^(\s*)(\d+)\.\s+(.*)$/);
+    if(ul||ol){                                      // list (flat; multi-line items gathered)
+      const baseIndent=(ul||ol)[1].length;
+      const items=[];
+      while(i<lines.length){
+        const ln=lines[i];
+        if(/^\s*$/.test(ln)) break;
+        const u=ln.match(/^(\s*)([-*])\s+(.*)$/), o=ln.match(/^(\s*)(\d+)\.\s+(.*)$/);
+        const m=u||o;
+        if(m && m[1].length<=baseIndent){            // a base-level item
+          items.push({ordered:!!o,text:m[3],cont:[]}); i++;
+          while(i<lines.length){                     // gather indented continuation lines
+            const cl=lines[i];
+            if(/^\s*$/.test(cl)) break;
+            if(cl.match(/^(\s*)([-*])\s+.*$/)||cl.match(/^(\s*)\d+\.\s+.*$/)) break; // next item
+            if(cl.match(/^(\s*)/)[1].length>baseIndent){ items[items.length-1].cont.push(cl.trimStart()); i++; }
+            else break;
+          }
+          continue;
+        }
+        break;
+      }
+      let html="", curOrdered=items.length?items[0].ordered:false;
+      html+=`<${curOrdered?"ol":"ul"}>`;
+      for(const it of items){
+        if(it.ordered!==curOrdered){ html+=`</${curOrdered?"ol":"ul"}><${it.ordered?"ol":"ul"}>`; curOrdered=it.ordered; }
+        const body=it.cont.length?renderMarkdown(it.text+"\n"+it.cont.join("\n")):inline(it.text);
+        html+=`<li>${body}</li>`;
+      }
+      html+=`</${curOrdered?"ol":"ul"}>`;
+      out.push(html); continue;
+    }
+    const buf=[line]; i++;                           // paragraph
+    while(i<lines.length && !/^\s*$/.test(lines[i]) && !isBlock(lines[i]) && !(/\|/.test(lines[i]) && i+1<lines.length && isSep(lines[i+1]))) buf.push(lines[i]), i++;
+    out.push(`<p>${inline(buf.join(" "))}</p>`);
+  }
+  return out.join("\n");
+}
+let _readmeLoaded=false;
+(function(){
+  const rm=$("#readme"); if(!rm) return;
+  rm.addEventListener("toggle",async ()=>{
+    if(!rm.open) return;
+    const body=$("#readme-body");
+    if(_readmeLoaded){ return; }
+    body.textContent="Loading README…";
+    try{
+      const r=await fetch("/api/readme");
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      body.innerHTML=renderMarkdown(await r.text());
+      _readmeLoaded=true;
+    }catch(err){
+      _readmeLoaded=false;
+      body.innerHTML='<p class="footnote" style="color:var(--red)">Failed to load README ('+esc(String(err&&err.message||err))+'). The file remains at README.md in the repo.</p>';
+    }
+  });
+})();
+
+init();
+</script>
+</body>
+</html>

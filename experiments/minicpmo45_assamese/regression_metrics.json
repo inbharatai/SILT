@@ -1,0 +1,9 @@
+{
+  "schema": "per-arm regression vs Arm A baseline on non-Assamese suites. A drop beyond regression_tolerance (0.02) REJECTS the adapter. Populated on the GPU box; never fabricated.",
+  "regression_tolerance": 0.02,
+  "arms": {
+    "A": {"status": "PENDING_GPU", "mmlu_en": null, "ceval_zh": null, "general_reasoning": null, "note": "the untouched baseline; written by baseline_eval.py on a GPU box"},
+    "B": {"status": "PENDING_GPU", "mmlu_en": null, "ceval_zh": null, "general_reasoning": null, "max_regression": null, "verdict": null},
+    "C": {"status": "PENDING_GPU", "mmlu_en": null, "ceval_zh": null, "general_reasoning": null, "max_regression": null, "verdict": null}
+  }
+}
