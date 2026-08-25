@@ -7,6 +7,7 @@
 <p align="center"><em>The trust gate for AI training.</em></p>
 
 <p align="center"><strong>Your AI trains.<br>Nobody checks its homework.<br>SILT does.</strong></p>
+<p align="center"><em>One principle — never trust the process, verify the outcome — and the portfolio of firsts it unlocks.</em></p>
 
 <p align="center">
   <a href="https://github.com/inbharatai/SILT/actions/workflows/ci.yml"><img src="https://github.com/inbharatai/SILT/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -24,6 +25,49 @@
 > Title: *Trust-Gated Skill Packet Transfer and Hardware-Aware Adaptation
 > Across Heterogeneous Artificial Intelligence Systems*. Full notice in
 > [`PATENT.md`](PATENT.md).
+
+### ⚡ What's new here — the innovation portfolio
+
+*Most of this repo is careful engineering. These parts, as far as we can tell
+from our prior-art sweeps, exist nowhere else — each one measured, tested, and
+honest about its limits.*
+
+| What it is | Why nothing else does this | Proof in this repo |
+| :-- | :-- | :-- |
+| 🛡️ **Double Gate** — Gate 1 (16 checks) admits a packet; Gate 2 (14 checks) re-examines the trained result before it sticks. Both all-or-nothing. | Fine-tuning ships what you train; SILT checks twice, and one hard failure at either gate rolls the model back. | [`gate2.py`](src/asea/deepapply/gate2.py) · [`gate.py`](src/asea/promotion/gate.py) · Gate 2 rejected a real run with named reasons — [`deep_apply_real_run_findings.md`](docs/deep_apply_real_run_findings.md) |
+| 🔒 **Trainer-independent admission** — Gate 2 has provably zero backend-conditional branches; standard, streamed and ZeroForge backends face the same checks. | The gate cannot quietly lower its bar for a weaker trainer — there is no `if backend == …` path. | static test `"backend" not in gate2.py` — [`test_streamed_backend.py`](tests/test_streamed_backend.py), [`test_deep_apply.py`](tests/test_deep_apply.py) · [`backends/__init__.py`](src/asea/deepapply/backends/__init__.py) |
+| 🌊 **SiltStream** — layer-streamed LoRA for low-VRAM cards, with parity as the admission bar; a parity failure aborts (`DeepApplyBlocked`), never a silent fallback. | Streaming trainers drift silently; SILT refuses to train unless streamed matches resident execution. | [`backends/__init__.py`](src/asea/deepapply/backends/__init__.py) · parity-abort covered in backend tests. *Honest limit: the CUDA streamed runtime was not verified on this machine — see "NOT VERIFIABLE HERE" in [`deep_apply_real_run_findings.md`](docs/deep_apply_real_run_findings.md).* |
+| 🔥 **ZeroForge** — forward-only, zeroth-order LoRA (SPSA / MeZO-spirit); `backward_passes == 0` is recorded to make the claim auditable. | Trains where backprop physically can't go (no GPU, quantized inference engine); designed to sit behind Gate 2. | [`zeroforge.py`](src/asea/deepapply/backends/zeroforge.py) · `assert backward_passes == 0` in [`test_streamed_backend.py`](tests/test_streamed_backend.py). *Honest limit: a stochastic method, exercised on the toy path — no real-HF ZeroForge run is recorded in-repo.* |
+| 🌀 **SiltSpring** — per-(state, skill) capability certificates for int8 / int4 / int2; a revoked or stale pair refuses to serve. | The industry quantizes and hopes; SILT certifies which skills survive each state and refuses to serve a skill its state lost. | [`certifier.py`](src/asea/spring/certifier.py) · [`test_siltspring_certification.py`](tests/test_siltspring_certification.py). *Honest limit: unit tests exercise the toy SpringModel path; real-HF state certification is opt-in only (it downloads a model).* |
+| ⚖️ **Asymmetric SPRT** — early-stop that can only REJECT early, never early-promote; `should_stop` is true only on a REJECT verdict. | A standard SPRT can stop early on a lucky streak and promote a skill that hasn't proven itself; SILT's cannot. | [`sprt.py`](src/asea/sprt.py) |
+| 🔏 **Signed Capability Diff** — a tamper-evident signature over what changed between two capability states, verifiable later. | Honest about scope: local HMAC-SHA256, tamper-evident to the local key holder only — *not* a portable third-party attestation (B1b is deliberately not built). | [`capability_diff.py`](src/asea/capability_diff.py) (`asea diff` / `asea diff-verify`) |
+| 🧹 **Verified Unlearning** — a signed report that the skill is absent from the approved set the receiver reads and held-out capability reverted to baseline within tolerance. | Verified at the skill layer, not the weight layer — SILT trains no weights, so it does not claim weight-level forgetting. | [`unlearning.py`](src/asea/unlearning.py) (`asea unlearn` / `asea unlearn-verify`) |
+| 🚫 **Honest refusal as architecture** — bad inputs, missing humans, stale certificates and parity failures raise typed, named errors — never warnings, never silent fallbacks. | A rejection with named reasons is the system working; refusal is the product, not an error to handle. | [`core/errors.py`](src/asea/core/errors.py) · the typed-error table in the "Honest refusal" section below |
+
+The combination of these mechanisms is patent-pending (India, app. no.
+**202631101454**) — see [`PATENT.md`](PATENT.md) for the inventive families.
+Two adversarial audits tried to break the gates:
+[`docs/loophole_audit.md`](docs/loophole_audit.md) and
+[`docs/audit_2026-08-13.md`](docs/audit_2026-08-13.md).
+
+### 🚀 Get started
+
+A 60-second path from clone to a gated skill transfer:
+
+```bash
+git clone https://github.com/inbharatai/SILT.git && cd SILT
+python -m pip install -r requirements.txt          # core: pydantic only, no torch
+PYTHONPATH=src python -m pytest tests/ -q           # 420+ passing, offline
+PYTHONPATH=src python -m asea.cli run --config configs/assamese_transfer.json --workspace .work
+PYTHONPATH=src python -m asea.cli report --workspace .work
+```
+
+Optional extras, the full CLI, the mock flows and Windows / PowerShell notes
+are in [Quick start](#quick-start) below.
+
+📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
+[`docs/teaser.html`](docs/teaser.html) in this repo, or open your local copy —
+<a href="file:///C:/Users/reetu/Downloads/silt-the-trust-gate-for-ai-learning-public-teaser%20(1).html">silt-the-trust-gate-for-ai-learning-public-teaser (1).html</a>.
 
 <p align="center">
   <a href="#architecture-at-a-glance">Architecture</a> ·
@@ -50,7 +94,7 @@
 
 | | Guarantee | What it means |
 | :-- | :-- | :-- |
-| 🎯 | **Measured admission** | A skill is admitted only after held-out proof it helps; the asymmetric SPRT early-rejects, never early-promotes. |
+| 🎯 | **Measured admission** | A skill is admitted only after held-out proof it helps — the [asymmetric SPRT](src/asea/sprt.py) early-rejects, never early-promotes (see the portfolio row above). |
 | 🔒 | **All-or-nothing gate** | Gate 1 runs 16 checks as one verdict — no bypass argument, no partial pass, no silent skip. |
 | 🩺 | **Human sign-off** | High-risk domains (medical / legal / finance) require a *named* human in the audit log — structurally non-bypassable. |
 | 📜 | **Tamper-evident audit** | Every decision lands in a hash-chained, append-only log — the single source of truth. |
@@ -74,25 +118,6 @@ hash-chained audit trail.
 > (Adaptive Skill Extraction Adapter, the working name it was built under) —
 > the same brand/import split as scikit-learn/`sklearn`. Existing code and
 > `ASEA_*` environment variables are unaffected.
-
-### 🚀 Get started
-
-A 60-second path from clone to a gated skill transfer:
-
-```bash
-git clone https://github.com/inbharatai/SILT.git && cd SILT
-python -m pip install -r requirements.txt          # core: pydantic only, no torch
-PYTHONPATH=src python -m pytest tests/ -q           # 420+ passing, offline
-PYTHONPATH=src python -m asea.cli run --config configs/assamese_transfer.json --workspace .work
-PYTHONPATH=src python -m asea.cli report --workspace .work
-```
-
-Optional extras, the full CLI, the mock flows and Windows / PowerShell notes
-are in [Quick start](#quick-start) below.
-
-📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
-[`docs/teaser.html`](docs/teaser.html) in this repo, or open your local copy —
-<a href="file:///C:/Users/reetu/Downloads/silt-the-trust-gate-for-ai-learning-public-teaser%20(1).html">silt-the-trust-gate-for-ai-learning-public-teaser (1).html</a>.
 
 ---
 

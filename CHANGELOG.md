@@ -48,6 +48,15 @@ assignee Uni Guru Technologies LLP). See `PATENT.md`.
   the `LearningLevel` enum and `applicable_learning_level` field keep their
   code names. `docs/teaser.html` tagline/body aligned to "training" for
   consistency.
+- README leads with an "innovation portfolio" table directly under the patent
+  notice — the eight mechanisms SILT claims as novel (double gate, trainer-
+  independent admission, SiltStream parity-gated streaming, ZeroForge,
+  SiltSpring, asymmetric SPRT, signed capability diff, verified unlearning)
+  plus honest refusal, each linked to its proof file/test/doc with on-repo
+  honest limits. "Get started" moved up so it stays within the first screens;
+  the six-guarantees table now sits after the portfolio and de-duplicates the
+  SPRT mention. No honesty artifact (mock warnings, "no % of knowledge
+  transferred", "what it is not", risk-report pointers) was removed.
 
 ### Fixed
 - The "deliberately not built until the patent is filed" wording on the B1b
