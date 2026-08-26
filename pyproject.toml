@@ -47,15 +47,16 @@ deep = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/inbharatai/SILT"
+Homepage = "https://silt.inbharat.ai"
 Documentation = "https://github.com/inbharatai/SILT#readme"
 Source = "https://github.com/inbharatai/SILT"
 Issues = "https://github.com/inbharatai/SILT/issues"
 "Patent notice" = "https://github.com/inbharatai/SILT/blob/main/PATENT.md"
-"Public teaser" = "https://github.com/inbharatai/SILT/blob/main/docs/teaser.html"
+"SILT Studio" = "https://silt.inbharat.ai/studio/"
 
 [project.scripts]
 asea = "asea.cli:main"
+silt-studio = "asea.studio.launcher:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
