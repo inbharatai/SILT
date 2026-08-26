@@ -7,6 +7,14 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/studio",
+      "destination": "/studio/index.html"
+    },
+    {
+      "source": "/studio/",
+      "destination": "/studio/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
