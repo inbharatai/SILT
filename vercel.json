@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "buildCommand": "python -c \"from pathlib import Path; import runpy, shutil; p=Path('scripts/build_vercel_site.py'); runpy.run_path(str(p), run_name='__main__') if p.exists() else (Path('dist-vercel').mkdir(parents=True, exist_ok=True), shutil.copy2('index.html', 'dist-vercel/index.html'))\"",
   "outputDirectory": "dist-vercel",
   "cleanUrls": true,
