@@ -2,7 +2,7 @@
 """Build the public SILT landing site for Vercel.
 
 Emits dist-vercel/ with:
-  - index.html            (from docs/teaser.html)
+  - index.html            (from docs/index.html)
   - studio/index.html     (from src/asea/studio/static/index.html + bridge injection)
   - web/studio-bridge.js
   - logo.svg, favicon.svg
@@ -45,11 +45,11 @@ def build() -> None:
     OUT.mkdir(parents=True)
 
     # Landing page
-    teaser = REPO / "docs" / "teaser.html"
-    if not teaser.exists():
-        print(f"ERROR: missing {teaser}", file=sys.stderr)
+    landing = REPO / "docs" / "index.html"
+    if not landing.exists():
+        print(f"ERROR: missing {landing}", file=sys.stderr)
         sys.exit(1)
-    shutil.copy2(teaser, OUT / "index.html")
+    shutil.copy2(landing, OUT / "index.html")
 
     # Studio page (local static UI + hosted bridge injection)
     studio_src = REPO / "src" / "asea" / "studio" / "static" / "index.html"
@@ -90,13 +90,13 @@ def build() -> None:
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>{CANONICAL}/</loc>
-    <lastmod>2026-08-25</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>{CANONICAL}/studio/</loc>
-    <lastmod>2026-08-25</lastmod>
+    <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
