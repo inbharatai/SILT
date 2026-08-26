@@ -53,7 +53,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       </svg>
     </a>
     <nav aria-label="Main navigation">
-      <a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="https://github.com/inbharatai/SILT">GitHub</a><a href="https://inbharat.ai">InBharat.ai</a>
+      <a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio/">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a><a href="https://inbharat.ai">InBharat.ai</a>
     </nav>
   </div>
 </header>
@@ -64,7 +64,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
     <div class="eyebrow">SILT · Skill Interchange Layer with Trust-gating</div>
     <h1>Transfer the skill. <span>Prove the gain.</span> Adapt for the hardware you have.</h1>
     <p class="sub">A powerful model can still be missing one specialist capability. Another AI may already have it. SILT is built to transfer that narrow capability — not copy the teacher — verify what the learner can actually use, and explore hardware-aware adaptation for constrained deployment.</p>
-    <div class="ctas"><a class="btn primary" href="https://github.com/inbharatai/SILT">View the open-source repo</a><a class="btn ghost" href="#architecture">See the architecture</a></div>
+    <div class="ctas"><a class="btn primary" href="/studio/">Open SILT Studio</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">View the open-source repo</a><a class="btn ghost" href="#architecture">See the architecture</a></div>
     <div class="patent">Indian Provisional Patent Application No. 202631101454 · Built in Assam, India 🇮🇳</div>
   </div>
 </section>
@@ -140,17 +140,29 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
   </div>
 </section>
 
+<section id="studio" class="problem">
+  <div class="wrap problem-grid">
+    <div>
+      <div class="kicker">SILT Studio</div>
+      <h2>Use the full Studio locally. Keep the models and data on your machine.</h2>
+      <p class="lead">SILT Studio is the interactive workspace for configuring teacher and learner systems, running transfers, inspecting gate decisions, testing approved skills, reviewing audit evidence, deep-apply runs, and SiltSpring certification flows. The engine runs locally on <code>127.0.0.1:8377</code>; the public site only provides the launch and setup experience.</p>
+      <div class="ctas"><a class="btn primary" href="/studio/">Open SILT Studio</a><a class="btn ghost" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Launch local engine</a></div>
+    </div>
+    <div class="quote"><strong>LOCAL-FIRST FLOW</strong><br><br>1. Install SILT locally<br>2. Start <span class="skill">SILT Studio</span><br>3. Browser opens at <span class="learner">127.0.0.1:8377</span><br>4. Teacher / learner models stay on the user's machine<br>5. Skill packets, benchmark results and audit state stay local<br><br><span class="teacher">Public site:</span> discovery + docs + launcher<br><span class="learner">Local Studio:</span> execution + models + evidence</div>
+  </div>
+</section>
+
 <section class="cta">
   <div class="wrap">
     <div class="kicker">Open source</div>
     <h2>Don't take the landing page at face value. Clone it, run it, test the gate, and challenge the assumptions.</h2>
     <p class="lead">The public repository contains the architecture, source, Studio, benchmark examples, tests, and recorded findings — including rejected runs.</p>
     <div class="repo"><a href="https://github.com/inbharatai/SILT">https://github.com/inbharatai/SILT</a></div>
-    <div class="ctas"><a class="btn primary" href="https://github.com/inbharatai/SILT">Open SILT on GitHub</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/architecture.md">Read the architecture</a></div>
+    <div class="ctas"><a class="btn primary" href="/studio/">Open SILT Studio</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">Open SILT on GitHub</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/architecture.md">Read the architecture</a></div>
   </div>
 </section>
 </main>
 
-<footer><div class="wrap"><div>SILT — Skill Interchange Layer with Trust-gating · © 2026 Uni Guru Technologies LLP</div><div>Indian Provisional Patent Application No. 202631101454 · Assam, India 🇮🇳 · <a href="https://inbharat.ai">InBharat.ai</a></div></div></footer>
+<footer><div class="wrap"><div>SILT — Skill Interchange Layer with Trust-gating · © 2026 Uni Guru Technologies LLP</div><div>Indian Provisional Patent Application No. 202631101454 · Assam, India 🇮🇳 · <a href="/studio/">SILT Studio</a> · <a href="https://inbharat.ai">InBharat.ai</a></div></div></footer>
 </body>
 </html>
