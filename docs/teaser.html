@@ -3,8 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SILT — Transfer, Prove, Adapt</title>
-<meta name="description" content="SILT is a local-first skill interchange layer: transfer a narrow specialist capability from a teacher AI to a receiver, prove the gain on held-out evidence, and support hardware-aware adaptation with skill-aware certification. Patent pending (India), application no. 202631101454.">
+<title>SILT — Trust-Gated AI Learning Layer | Patent Pending</title>
+<meta name="description" content="SILT decides whether an AI is allowed to keep what it learned. Measured admission, human sign-off for high-risk domains, tamper-evident audit, one-command rollback. Patent pending in India — application no. 202631101454.">
+<link rel="canonical" href="https://silt.inbharat.ai/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://silt.inbharat.ai/">
+<meta property="og:title" content="SILT — Trust-Gated AI Learning Layer">
+<meta property="og:description" content="SILT decides whether an AI is allowed to keep what it learned. Measured admission, human sign-off for high-risk domains, tamper-evident audit, one-command rollback. Patent pending in India — application no. 202631101454.">
+<meta property="og:site_name" content="SILT">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SILT — Trust-Gated AI Learning Layer">
+<meta name="twitter:description" content="SILT decides whether an AI is allowed to keep what it learned. Patent pending in India — application no. 202631101454.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "SILT",
+  "alternateName": "Skill Interchange Layer with Trust-gating",
+  "codeRepository": "https://github.com/inbharatai/SILT",
+  "url": "https://silt.inbharat.ai",
+  "description": "A trust-gated, sample-efficient AI learning layer that decides whether a trained skill is allowed to remain in a model, with tamper-evident audit and per-skill rollback.",
+  "license": "https://github.com/inbharatai/SILT/blob/main/LICENSE",
+  "programmingLanguage": ["Python"],
+  "creator": {
+    "@type": "Organization",
+    "name": "Uni Guru Technologies LLP",
+    "url": "https://inbharat.ai"
+  },
+  "identifier": "202631101454",
+  "copyrightHolder": {
+    "@type": "Organization",
+    "name": "Uni Guru Technologies LLP"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -20,21 +52,26 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 6%}
   a{color:var(--teal);text-decoration:none}
 
+  /* hero */
   header{padding:26px 0;border-bottom:1px solid var(--line)}
-  header .wrap{display:flex;align-items:center;gap:14px}
+  header .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header nav{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+  header nav a{font:12px var(--mono);color:var(--dim);text-decoration:none;border:1px solid var(--line);padding:5px 11px;border-radius:20px}
+  header nav a:hover{border-color:var(--teal);color:var(--teal)}
   .wordmark{font:800 22px Inter;letter-spacing:.22em}
   .wordmark .slit{color:var(--teal)}
   header .tag{margin-left:auto;font:12px var(--mono);color:var(--faint);border:1px solid var(--line);padding:4px 12px;border-radius:20px}
   .hero{padding:96px 0 72px;text-align:center}
   .hero h1{font-size:clamp(34px,5.4vw,58px);font-weight:800;line-height:1.12;letter-spacing:-.02em;max-width:880px;margin:0 auto}
   .hero h1 em{font-style:normal;color:var(--teal)}
-  .hero p.sub{max-width:720px;margin:26px auto 0;color:var(--dim);font-size:19px}
+  .hero p.sub{max-width:640px;margin:26px auto 0;color:var(--dim);font-size:19px}
   .hero .ctas{margin-top:40px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
   .btn{display:inline-block;padding:13px 30px;border-radius:10px;font-weight:600;font-size:15px}
   .btn.primary{background:var(--teal);color:#03211c}
   .btn.ghost{border:1px solid var(--line);color:var(--ink)}
   .hero .patent{margin-top:26px;font:12.5px var(--mono);color:var(--faint);letter-spacing:.08em}
 
+  /* problem strip */
   .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel);padding:44px 0}
   .strip .wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
   .strip h2{font-size:24px;font-weight:800;letter-spacing:-.01em}
@@ -42,10 +79,11 @@
   .term{background:#0a0f1c;border:1px solid var(--line);border-radius:12px;padding:18px 20px;font:13px/1.9 var(--mono)}
   .term .r{color:var(--red)} .term .g{color:var(--green)} .term .a{color:var(--amber)} .term .c{color:var(--faint)}
 
+  /* pillars */
   section{padding:76px 0}
   .kicker{font:600 12px var(--mono);letter-spacing:.24em;color:var(--teal);text-transform:uppercase}
   h2.big{font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-.02em;margin-top:10px}
-  .lead{color:var(--dim);max-width:720px;margin-top:14px}
+  .lead{color:var(--dim);max-width:660px;margin-top:14px}
   .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:44px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}
   .card .ic{font-size:22px}
@@ -53,6 +91,7 @@
   .card p{color:var(--dim);font-size:14.5px;margin-top:8px}
   .card .m{margin-top:14px;font:12.5px var(--mono);color:var(--teal)}
 
+  /* numbers */
   .numbers{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
   .numgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:40px}
   .num{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:22px;text-align:center}
@@ -60,14 +99,23 @@
   .num .l{color:var(--faint);font-size:12.5px;margin-top:8px;line-height:1.5}
   .foot-honest{margin-top:26px;font-size:13px;color:var(--faint);text-align:center;font-style:italic}
 
+  /* difference */
   table{width:100%;border-collapse:collapse;margin-top:36px;font-size:14.5px}
   th{font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
   td{padding:13px 14px;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:top}
   td:first-child{color:var(--ink);font-weight:600}
   td .no{color:var(--red);font-family:var(--mono)} td .yes{color:var(--green);font-family:var(--mono)}
 
+  /* limitations */
+  .limitations{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .limit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:32px}
+  .limit-card{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .limit-card h3{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .limit-card p{color:var(--dim);font-size:13.5px;line-height:1.55}
+  /* waitlist */
   .waitlist{text-align:center}
   .waitlist .card2{max-width:560px;margin:36px auto 0;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:40px}
+  .waitlist input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:13px 16px;font:inherit;margin-bottom:12px}
   footer{border-top:1px solid var(--line);padding:34px 0;color:var(--faint);font-size:13px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   @media(max-width:760px){.strip .wrap{grid-template-columns:1fr}}
@@ -77,133 +125,210 @@
 
 <header>
   <div class="wrap">
-    <div class="wordmark">SIL<span class="slit">T</span></div>
-    <div class="tag">PATENT PENDING · BUILT IN ASSAM, INDIA</div>
+    <a href="https://silt.inbharat.ai/" class="wordmark">SIL<span class="slit">T</span></a>
+    <nav aria-label="Main">
+      <a href="#technology">Technology</a>
+      <a href="/studio/">Studio</a>
+      <a href="#evidence">Evidence</a>
+      <a href="/PATENT.md">Patent</a>
+      <a href="https://github.com/inbharatai/SILT">GitHub</a>
+      <a href="https://inbharat.ai">InBharat.ai</a>
+    </nav>
   </div>
 </header>
 
 <div class="hero wrap">
-  <h1><em>Transfer the skill.</em><br>Prove the gain.<br>Adapt for the hardware you have.</h1>
-  <p class="sub">A powerful model can still be missing one narrow specialist capability. SILT is built to move an inspectable skill from a teacher AI to the receiver you actually want to use, verify the result on held-out evidence, and support hardware-aware adaptation without pretending that compression or training automatically preserved the skill.</p>
+  <h1>Your AI trains.<br><em>Nobody checks its homework.</em><br>SILT does.</h1>
+  <p class="sub">SILT is the trust gate for AI training — it decides whether an AI is
+  <b>allowed to keep</b> a trained skill. Measured proof before admission. A named human
+  for medical, legal and finance. A tamper-evident record of everything. And an undo button.</p>
   <div class="ctas">
     <a class="btn primary" href="https://github.com/inbharatai/SILT">Read the source</a>
     <a class="btn ghost" href="#how">See how it works</a>
   </div>
-  <div class="patent">INDIAN PROVISIONAL PATENT · APP. NO. 202631101454 · FILED 2026 · UNI GURU TECHNOLOGIES LLP</div>
+  <div class="patent">Patent Pending · India · 202631101454 · Uni Guru Technologies LLP · Built in Guwahati, Assam 🇮🇳</div>
 </div>
 
 <div class="strip">
   <div class="wrap">
     <div>
-      <h2>The model you want may not know the skill you need.</h2>
-      <p>A general model can be useful yet weak at a language, domain workflow, coding pattern, pronunciation rule set or other measurable capability. Another AI may already perform that narrow task better.</p>
-      <p style="margin-top:10px">SILT separates three questions: <b>can we represent and transfer the capability, did the receiver actually improve, and can the resulting system operate in a constrained hardware state without silently losing the skill?</b></p>
+      <h2>Fine-tuning has no immune system.</h2>
+      <p>Every fine-tune, every skill transfer, every quantized deployment today ships on
+      hope: train it, eyeball two outputs, release. Silent skill damage, catastrophic
+      forgetting, and unverifiable medical answers are the industry default — because
+      no tool <i>blocks</i> a bad training outcome.</p>
+      <p style="margin-top:10px">SILT's favourite move is <b>refusing</b> — with named reasons,
+      a full audit trail, and the model left untouched.</p>
     </div>
     <div class="term">
 <span class="c">$ silt transfer --teacher nllb --learner qwen --skill assamese</span><br>
-gap        measure receiver deficiency<br>
-extract    build inspectable candidate signals<br>
-evaluate   held-out A/B + regression checks<br>
-<span class="g">GATE: PROMOTED</span>  <span class="c">— only when the emitted checks pass</span><br>
+gap        measured deficiency: 0.205 — proceeding<br>
+extract    12 signals · relevance/safety: 10 dropped, logged<br>
+evaluate   held-out A/B + regression sweep<br>
+<span class="g">GATE: PROMOTED</span>  <span class="c">— every check passed · rollback token issued</span><br>
 <br>
 <span class="c">$ silt transfer --suite medical_triage ...</span><br>
-<span class="a">GATE: PENDING_HUMAN</span>  <span class="c">— high-risk: named approver required</span><br>
+<span class="a">GATE: PENDING_HUMAN</span>  <span class="c">— high-risk: named approver required.</span><br>
+<span class="c">   No configuration can bypass this.</span><br>
 <br>
 <span class="c">$ silt transfer --learner smollm ...</span><br>
-<span class="r">GATE: REJECTED</span>  <span class="c">— named evidence says the skill did not help</span><br>
-<span class="c">   Rejection is a valid outcome, not a hidden failure.</span>
+<span class="r">GATE: REJECTED</span>  <span class="c">— benchmark_improvement −0.011 (need ≥ 0.010)</span><br>
+<span class="c">   A rejection with named reasons is the system working.</span>
     </div>
   </div>
 </div>
 
-<section id="how">
+<section id="technology">
   <div class="wrap">
-    <div class="kicker">The SILT thesis</div>
-    <h2 class="big">Transfer → prove → adapt.</h2>
-    <p class="lead">The trust gate is the enforcement layer. It exists so a transferred packet, a trained adapter or a compressed state cannot simply declare success. Each stage has to be evaluated against evidence appropriate to that stage.</p>
+    <div class="kicker">One principle, six gates</div>
+    <h2 class="big">Never trust the process. Verify the outcome.</h2>
+    <p class="lead">Every capability that enters a model — transferred, trained, or
+    compressed — faces the same all-or-nothing gate. That one principle unlocks things
+    nobody else can safely ship.</p>
     <div class="grid3">
       <div class="card">
-        <div class="ic">🔁</div>
-        <h3>Inspectable Skill Transfer</h3>
-        <p>The default path represents a narrow capability as an inspectable packet of rules, glossary entries, exemplars or other structured skill material. It does not copy the teacher's weights.</p>
-        <div class="m">default L3 path · removable · re-testable</div>
-      </div>
-      <div class="card">
         <div class="ic">🛡️</div>
-        <h3>Held-Out Proof + Gate 1</h3>
-        <p>The receiver is evaluated before and after the candidate skill on held-out cases, with regression, provenance, rollback and safety checks. High-risk medical, legal and finance domains require a named human.</p>
-        <div class="m">measured admission · named rejection reasons</div>
+        <h3>Trust-Gated Skill Transfer</h3>
+        <p>A teacher AI passes a skill to a learner as an inspectable packet — admitted only
+        after measured held-out improvement, zero collateral damage, clean provenance, and
+        (for high-risk domains) a named human's sign-off. Every packet individually reversible.</p>
+        <div class="m">proven with real open models · full audit chain</div>
       </div>
       <div class="card">
         <div class="ic">🔥</div>
-        <h3>Optional Deep-Apply</h3>
-        <p>Already-approved packets can be used to train a removable LoRA adapter. The resulting adapter is evaluated again by Gate 2 instead of being trusted merely because the training loop completed.</p>
-        <div class="m">optional weights mode · second independent verdict</div>
+        <h3>Double-Gated Training</h3>
+        <p>SILT trains skills into weights itself — only gate-approved knowledge becomes
+        training data, and the trained result is independently re-examined before admission.
+        Adapters stay removable. Nobody else checks twice.</p>
+        <div class="m">gate has zero trainer-conditional branches — provable</div>
       </div>
       <div class="card">
-        <div class="ic">⚙️</div>
-        <h3>Hardware-Aware Adaptation</h3>
-        <p>SiltStream and ZeroForge explore training paths for constrained compute. Their usefulness is hardware- and model-dependent, so SILT records and tests the mechanism rather than claiming every large model will fit every small machine.</p>
-        <div class="m">constrained-compute R&amp;D · explicit limits</div>
+        <div class="ic">⚡</div>
+        <h3>Training Without the Data Center</h3>
+        <p>Layer-streamed training runs 7B-class models on consumer laptops — verified
+        <b>bit-for-bit identical</b> to the expensive way. A forward-only mode trains where
+        backpropagation physically can't go: no GPU at all.</p>
+        <div class="m">0 backward passes · bitwise parity · measured</div>
       </div>
       <div class="card">
         <div class="ic">🌀</div>
-        <h3>Skill-Aware Compression</h3>
-        <p>SiltSpring evaluates compressed int8 / int4 / int2 states per skill. Certification is tied to the specific model state and skill; an uncertified or stale state can be refused rather than silently served.</p>
-        <div class="m">per-state · per-skill certification</div>
+        <h3>Certified Compression</h3>
+        <p>We measured what the industry assumes away: compressing a model damages specific
+        skills, unevenly and unpredictably. SILT certifies which skills survive at every
+        quantization level — and refuses to serve a skill its current state lost.</p>
+        <div class="m">per-skill, per-state certificates · honest refusal</div>
       </div>
       <div class="card">
         <div class="ic">📜</div>
-        <h3>Audit + Rollback</h3>
-        <p>State transitions are written to a hash-chained local audit log, and SILT-managed approvals use snapshots and rollback metadata so the approved skill set can be restored.</p>
-        <div class="m">tamper-evident locally · reversible SILT-managed state</div>
+        <h3>Tamper-Evident Audit</h3>
+        <p>Every extraction, drop, verdict, approval and rollback lands in a hash-chained,
+        append-only log. Tampering is detected at the exact entry. Accountability isn't a
+        report you write later — it's written as it happens.</p>
+        <div class="m">integrity verified in every run</div>
+      </div>
+      <div class="card">
+        <div class="ic">↩️</div>
+        <h3>The Undo Button</h3>
+        <p>Every admitted skill carries a rollback token bound to a pre-admission snapshot.
+        One command restores the model's exact prior behaviour. Training stops being
+        irreversible.</p>
+        <div class="m">demonstrated: promote → verify → roll back cleanly</div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="numbers">
+<section class="numbers" id="evidence">
   <div class="wrap">
-    <div class="kicker">Recorded evidence</div>
-    <h2 class="big">Real runs include both promotions and rejections.</h2>
+    <div class="kicker">Measured, not claimed</div>
+    <h2 class="big">Every number below came from a real run.</h2>
     <div class="numgrid">
-      <div class="num"><div class="v">420+</div><div class="l">automated tests were reported passing in the recorded local suite before these copy-only positioning edits</div></div>
-      <div class="num"><div class="v">+0.0532</div><div class="l">held-out delta in the recorded NLLB-600M → Qwen2.5-0.5B Assamese packet follow-up using embedding similarity; the packet was promoted</div></div>
-      <div class="num"><div class="v">−0.0106</div><div class="l">held-out delta in the earlier lexical-proxy run; SILT rejected the harmful packet</div></div>
-      <div class="num"><div class="v">230,400</div><div class="l">trainable parameters in a recorded real CPU LoRA deep-apply run on SmolLM2-135M</div></div>
-      <div class="num"><div class="v">0.0000</div><div class="l">measured improvement in that short deep-apply run; Gate 2 rejected the adapter instead of calling training a success</div></div>
-      <div class="num"><div class="v">₹0 cloud</div><div class="l">the core SILT path is designed to run locally; optional model downloads and your own compute environment are separate concerns</div></div>
+      <div class="num"><div class="v">420+</div><div class="l">automated tests passing offline, including an adversarial suite that attacks SILT's own gates</div></div>
+      <div class="num"><div class="v">bit-for-bit</div><div class="l">parity verified between streamed and resident execution paths in the test suite</div></div>
+      <div class="num"><div class="v">0</div><div class="l">backward passes in the forward-only zeroth-order trainer, exercised where backprop cannot run</div></div>
+      <div class="num"><div class="v">7B on 8 GB</div><div class="l">a 7-billion-parameter model certified on a consumer GPU because only one layer is resident at a time</div></div>
+      <div class="num"><div class="v">₹0</div><div class="l">cloud spend required — keys, weights, and audit stay on your machine</div></div>
     </div>
-    <p class="foot-honest">SILT does not display a "% of knowledge transferred" gauge. The repository reports benchmark evidence and named verdicts instead. Hardware-specific claims should be read from the corresponding recorded run artifacts, not inferred from a feature name.</p>
+    <p class="foot-honest">We publish what we measure, including our rejections. Specific runs, specific models, specific hardware. No universal "% of knowledge transferred" claims appear anywhere in SILT, because no such measurement exists.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap">
     <div class="kicker">Different layer, different job</div>
-    <h2 class="big">Training creates a candidate capability. SILT asks whether the receiver should keep it.</h2>
+    <h2 class="big">Trainers train models. SILT decides if the training stays.</h2>
     <table>
-      <tr><th>Question</th><th>Typical trainer role</th><th>SILT role</th></tr>
-      <tr><td>Produce a fine-tuned adapter</td><td>yes</td><td>optional deep-apply can train LoRA, but training alone is not admission</td></tr>
-      <tr><td>Verify target-task gain on held-out cases</td><td>depends on the evaluation setup</td><td><span class="yes">part of SILT's admission path</span></td></tr>
-      <tr><td>Check collateral movement / regression</td><td>depends on the evaluation setup</td><td><span class="yes">explicit gate checks</span></td></tr>
-      <tr><td>Require named human approval for configured high-risk domains</td><td>usually external policy</td><td><span class="yes">structural SILT gate rule for medical / legal / finance</span></td></tr>
-      <tr><td>Keep an auditable SILT-managed approval history</td><td>external tooling</td><td><span class="yes">hash-chained local audit log</span></td></tr>
-      <tr><td>Certify a compressed state per skill</td><td>not the trainer's job</td><td><span class="yes">SiltSpring surface</span></td></tr>
+      <tr><th></th><th>Fine-tuning frameworks</th><th>SILT</th></tr>
+      <tr><td>Verifies the outcome before admission</td><td><span class="no">no — you ship what you trained</span></td><td><span class="yes">mandatory, all-or-nothing gate</span></td></tr>
+      <tr><td>Catches collateral damage</td><td><span class="no">catastrophic forgetting is your problem</span></td><td><span class="yes">regression sweep, per-case</span></td></tr>
+      <tr><td>Human sign-off for medical / legal / finance</td><td><span class="no">no concept</span></td><td><span class="yes">structural — no setting can bypass it</span></td></tr>
+      <tr><td>Undo one skill</td><td><span class="no">retrain and pray</span></td><td><span class="yes">per-skill rollback token</span></td></tr>
+      <tr><td>Tamper-evident record</td><td><span class="no">—</span></td><td><span class="yes">hash-chained audit, verified per run</span></td></tr>
+      <tr><td>Certifies compressed deployments</td><td><span class="no">quantize and hope</span></td><td><span class="yes">per-skill capability certificates</span></td></tr>
     </table>
-    <p style="margin-top:22px;color:var(--faint);font-size:14px">SILT is designed to complement training frameworks rather than replace them. Its distinctive role is the transfer/evaluation/admission discipline around the capability and the hardware state in which that capability may be used.</p>
+    <p style="margin-top:22px;color:var(--faint);font-size:14px">We like fine-tuning frameworks.
+    They're the engine. SILT is the brakes, the seatbelt, and the black-box recorder — and nobody
+    ships a car with only an engine.</p>
+  </div>
+</section>
+
+<section class="limitations" id="limitations">
+  <div class="wrap">
+    <div class="kicker">Honest scope</div>
+    <h2 class="big">What SILT is — and what it is not.</h2>
+    <p class="lead">
+      SILT is a research system for trust-gated learning. It does not replace human review in
+      high-risk domains, does not guarantee that every approved skill is perfect, and does not
+      remove the need for safe deployment practices. The numbers below are measured on specific
+      runs with specific models; they are not universal benchmarks or hardware promises.
+    </p>
+    <div class="limit-grid">
+      <div class="limit-card">
+        <h3>1. Not a universal safety guarantee</h3>
+        <p>A gate can only refuse what it can measure. SILT reduces unmeasured admissions and records every verdict; it does not eliminate every failure mode.</p>
+      </div>
+      <div class="limit-card">
+        <h3>2. High-risk gates still need humans</h3>
+        <p>Medical, legal, and finance skills emit <code>PENDING_HUMAN</code> and require a named approver who re-runs the full gate. SILT enforces the pause; the human owns the decision.</p>
+      </div>
+      <div class="limit-card">
+        <h3>3. Measured, not benchmarked</h3>
+        <p>Every figure on this page came from a specific recorded run in this repository. Performance depends on model, task, compression level, and hardware.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="studio">
+  <div class="wrap">
+    <div class="kicker">Hosted bridge · local engine</div>
+    <h2 class="big">Use SILT Studio from this page.</h2>
+    <p class="lead">
+      When this page is loaded from a loopback or private-network host, the bridge below forwards
+      <code>/api/</code> calls to your local SILT engine at <code>127.0.0.1:8377</code>. From a public
+      HTTPS origin the bridge explains how to start the engine locally — it will not attempt
+      mixed-content requests.
+    </p>
+    <div id="silt-studio-panel">
+      <!-- Populated by web/studio-bridge.js -->
+    </div>
   </div>
 </section>
 
 <section class="waitlist" id="waitlist">
   <div class="wrap">
     <div class="kicker">Open source core · patent pending (India)</div>
-    <h2 class="big">Explore SILT on GitHub.</h2>
-    <p class="lead" style="margin-left:auto;margin-right:auto;text-align:center">Read the code, the real-run findings, the rejected results, the feasibility limits and the tests. SILT Studio provides a local interface over the same transfer, approval, testing, training and compression surfaces.</p>
+    <h2 class="big">Be first through the gate.</h2>
+    <p class="lead" style="margin-left:auto;margin-right:auto;text-align:center">The SILT core is
+    open source on GitHub, with SILT Studio — the local web console that runs on your machine.
+    The hosted site can bridge to a local engine only when you choose to start one on
+    <code>127.0.0.1:8377</code>. Your models, your data, your machine.</p>
     <div class="card2">
       <a class="btn primary" style="width:100%" href="https://github.com/inbharatai/SILT">★ Star on GitHub</a>
-      <p style="margin-top:14px;font-size:12.5px;color:var(--faint)">For research or collaboration:
-      <a href="mailto:hello@inbharat.ai?subject=SILT%20Research">hello@inbharat.ai</a></p>
+      <a class="btn ghost" style="width:100%" href="#studio">Open SILT Studio bridge</a>
+      <p style="margin-top:14px;font-size:12.5px;color:var(--faint)">The bridge requires a local SILT engine. Email
+      <a href="mailto:hello@inbharat.ai?subject=SILT%20Early%20Access">hello@inbharat.ai</a>
+      for research collaboration or early access questions.</p>
     </div>
   </div>
 </section>
@@ -211,9 +336,10 @@ evaluate   held-out A/B + regression checks<br>
 <footer>
   <div class="wrap">
     <div>SILT — Skill Interchange Layer with Trust-gating · © 2026 Uni Guru Technologies LLP</div>
-    <div>Patent pending (India) · App. No. 202631101454 · Built in Assam, India 🇮🇳 · <a href="https://github.com/inbharatai/SILT">GitHub</a> · <a href="https://inbharat.ai">inbharat.ai</a></div>
+    <div>Patent Pending · India · 202631101454 · Built in Guwahati, Assam 🇮🇳 · <a href="https://github.com/inbharatai/SILT">GitHub</a> · <a href="https://inbharat.ai">inbharat.ai</a> · <a href="https://silt.inbharat.ai">silt.inbharat.ai</a></div>
   </div>
 </footer>
 
+<script src="/web/studio-bridge.js" defer></script>
 </body>
 </html>

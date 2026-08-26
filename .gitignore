@@ -23,6 +23,7 @@ env/
 # --- SILT runtime artifacts (never source) ---
 .studio/
 .work/
+dist-vercel/
 silt_server.log
 silt_server.err.log
 silt_server*.log

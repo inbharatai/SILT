@@ -15,12 +15,14 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import tempfile
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
@@ -49,6 +51,78 @@ STATIC = Path(__file__).resolve().parent / "static"
 README_PATH = Path(__file__).resolve().parents[3] / "README.md"
 WORKSPACES = ROOT / ".studio"
 
+# Public origins that may bridge to this local engine via the hosted SILT Studio.
+# Defaults to the production landing site; comma-separated env override available.
+_PUBLIC_STUDIO_ORIGINS = [
+    o.strip()
+    for o in os.environ.get("SILT_STUDIO_ALLOWED_ORIGINS", "https://silt.inbharat.ai").split(",")
+    if o.strip()
+]
+
+_LOOPBACK_ORIGIN_REGEX = re.compile(
+    r"^https?://("
+    r"localhost|"
+    r"127\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+    r"\[::1\]|"
+    r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+    r"172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}|"
+    r"192\.168\.\d{1,3}\.\d{1,3}"
+    r")(?::\d+)?$"
+)
+
+
+class LoopbackCORSMiddleware(CORSMiddleware):
+    """CORS middleware for the local SILT Studio engine.
+
+    The engine is local-first and must never be exposed on 0.0.0.0 with a
+    wildcard allow-origin. This middleware allows the configured public
+    SILT landing origin(s) plus loopback / private-network origins, and answers
+    the Private-Network-Access preflight header when the browser requests it
+    for a allowed origin.
+
+    Credentials are not reflected: the engine owns its own session and the bridge
+    does not forward cookies.
+    """
+
+    def _is_allowed_origin(self, origin: str) -> bool:
+        if not origin:
+            return False
+        if origin in _PUBLIC_STUDIO_ORIGINS:
+            return True
+        return bool(_LOOPBACK_ORIGIN_REGEX.match(origin))
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await super().__call__(scope, receive, send)
+            return
+
+        headers = dict(scope.get("headers") or [])
+        request_origin = headers.get(b"origin", b"").decode("latin-1") or ""
+        is_options = scope.get("method") == "OPTIONS"
+        wants_private_network = (
+            headers.get(b"access-control-request-private-network", b"").decode("latin-1").lower()
+            == "true"
+        )
+
+        add_private_network_header = (
+            is_options and wants_private_network and self._is_allowed_origin(request_origin)
+        )
+
+        if add_private_network_header:
+
+            async def wrapped_send(message):
+                if message["type"] == "http.response.start":
+                    message_headers = list(message.get("headers") or [])
+                    message_headers.append((b"access-control-allow-private-network", b"true"))
+                    message["headers"] = message_headers
+                await send(message)
+
+            await super().__call__(scope, receive, wrapped_send)
+            return
+
+        await super().__call__(scope, receive, send)
+
+
 app = FastAPI(
     title="SILT Studio",
     description="Skill Interchange Layer with Trust-gating -- web platform. "
@@ -56,6 +130,20 @@ app = FastAPI(
                 "or a benchmark case.",
     version="0.1.0",
 )
+
+# Local-only CORS: the engine binds to 127.0.0.1 by design; this middleware mirrors
+# the same policy at the HTTP layer. No wildcard origins, no public 0.0.0.0 exposure,
+# no reflected credentials.
+app.add_middleware(
+    LoopbackCORSMiddleware,
+    allow_origins=_PUBLIC_STUDIO_ORIGINS,
+    allow_origin_regex=_LOOPBACK_ORIGIN_REGEX.pattern,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Accept", "X-SILT-Bridge-Origin"],
+    expose_headers=["Content-Disposition"],
+)
+
 manager = JobManager(WORKSPACES)
 deepapply_manager = DeepApplyManager()
 spring_manager = SpringManager()

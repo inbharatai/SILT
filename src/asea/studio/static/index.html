@@ -26,6 +26,17 @@
   .headlink{font:12px var(--mono);color:var(--teal);text-decoration:none;border:1px solid var(--line);padding:5px 10px;border-radius:8px}
   .headlink:hover{border-color:var(--teal)}
 
+  /* ---- connection bar ---- */
+  .conn-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0;padding:10px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:12px;color:var(--dim)}
+  .conn-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+  .conn-bar .ok{background:var(--green)}
+  .conn-bar .err{background:var(--red)}
+  .conn-bar .warn{background:var(--amber)}
+  .conn-bar .status{font:12px var(--mono);color:var(--ink)}
+  .conn-bar .msg{flex:1 1 auto}
+  .conn-bar button{background:transparent;border:1px solid var(--line);color:var(--teal);border-radius:6px;padding:4px 10px;font:inherit;cursor:pointer}
+  .conn-bar button:hover{border-color:var(--teal)}
+
   /* ---- onboarding ---- */
   .onboard{margin:18px 0 4px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px 24px}
   .onboard.hidden{display:none}
@@ -307,6 +318,13 @@
   <a href="#app" class="headlink skip" id="skipToApp">Skip to app</a>
   <button class="headlink" id="showGuide" hidden>Show start-here guide</button>
 </header>
+
+<div class="conn-bar" id="connBar" role="status" aria-live="polite">
+  <span class="dot" id="connDot"></span>
+  <span class="status" id="connStatus">Checking engine…</span>
+  <span class="msg" id="connMsg">SILT Studio runs locally on <code>127.0.0.1:8377</code>. The UI below talks to the same origin.</span>
+  <button id="connCheck">Check health</button>
+</div>
 
 <!-- ===================== LANDING HERO — plain English, always visible ===================== -->
 <section class="landing-hero" aria-label="What SILT is and how to use this Studio">
@@ -2397,5 +2415,38 @@ let _readmeLoaded=false;
 
 init();
 </script>
+
+<script>
+(function(){
+  const dot = document.getElementById('connDot');
+  const status = document.getElementById('connStatus');
+  const msg = document.getElementById('connMsg');
+  const btn = document.getElementById('connCheck');
+
+  function set(ok, text, detail){
+    dot.className = 'dot ' + (ok === null ? '' : ok ? 'ok' : 'err');
+    status.textContent = text;
+    if(detail) msg.textContent = detail;
+  }
+
+  async function check(){
+    set(null, 'Checking…', 'Sending a health probe to /api/health on the same origin.');
+    try{
+      const r = await fetch('/api/health', { method: 'GET', headers: { 'Accept': 'application/json' } });
+      if(r.ok){
+        set(true, 'Engine reachable', 'The local SILT engine responded. You can use the Studio tabs below.');
+      } else {
+        set(false, 'Engine returned '+r.status, 'The engine is running but /api/health did not return 200. Check the server logs.');
+      }
+    } catch(e){
+      set(false, 'Engine unreachable', 'Could not reach /api/health. Start the engine with the README command, then refresh.');
+    }
+  }
+
+  if(btn) btn.addEventListener('click', check);
+  check();
+})();
+</script>
+
 </body>
 </html>
