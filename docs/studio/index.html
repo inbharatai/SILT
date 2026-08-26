@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SILT Studio — Run locally</title>
+<meta name="description" content="Launch SILT Studio locally on your own machine. Models, skills, benchmark data and audit state remain local.">
+<link rel="canonical" href="https://silt.inbharat.ai/studio">
+<style>
+:root{--bg:#071019;--panel:#0c1723;--line:#203244;--ink:#eff7f7;--dim:#a4b5c3;--faint:#708597;--teal:#21d4bd;--green:#6ee7a8;--amber:#f6c85f;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans)}a{color:var(--teal);text-decoration:none}.wrap{max-width:980px;margin:auto;padding:0 6%}header{border-bottom:1px solid var(--line)}header .wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:800;letter-spacing:.16em;color:var(--ink)}.back{font:12px var(--mono)}main{padding:76px 0 90px}.eyebrow{font:600 12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}h1{font-size:clamp(38px,6vw,64px);line-height:1.05;letter-spacing:-.04em;margin:14px 0 0}.lead{max-width:780px;color:var(--dim);font-size:19px;margin-top:22px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-block;padding:13px 20px;border-radius:10px;border:1px solid var(--line);font-weight:750;cursor:pointer;background:transparent;color:var(--ink);font:inherit}.btn.primary{background:var(--teal);border-color:var(--teal);color:#04231f}.notice{margin-top:26px;padding:18px 20px;border:1px solid #315e58;background:#0a181c;border-radius:12px;color:var(--dim)}.notice strong{color:var(--green)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:38px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}.card .n{font:700 12px var(--mono);color:var(--teal)}.card h2{font-size:18px;margin:8px 0 0}.card p{font-size:14px;color:var(--dim)}section{margin-top:46px}h2{font-size:28px;letter-spacing:-.02em}.code{position:relative;background:#040b11;border:1px solid var(--line);border-radius:12px;padding:20px;overflow:auto;color:#c9d8df;font:13px/1.8 var(--mono);white-space:pre-wrap}.copy{margin-top:10px}.small{font-size:13px;color:var(--faint)}.status{margin-top:18px;font:13px var(--mono);color:var(--amber)}footer{border-top:1px solid var(--line);padding:30px 0;color:var(--faint);font-size:13px}@media(max-width:780px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="/">SILT</a><a class="back" href="/">← Back to SILT</a></div></header>
+<main><div class="wrap">
+<div class="eyebrow">Local-first Studio</div>
+<h1>Run SILT Studio on your machine.</h1>
+<p class="lead">The public SILT site is the documentation and launch surface. The actual Studio runs on <strong>your own computer</strong> at <code>127.0.0.1:8377</code>, so your local models, skill packets, benchmarks and audit state do not need to pass through Vercel.</p>
+<div class="actions">
+<a class="btn primary" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Open Local Studio</a>
+<a class="btn" href="https://github.com/inbharatai/SILT" target="_blank" rel="noopener">View GitHub</a>
+</div>
+<div class="status">If “Open Local Studio” cannot connect, start the local engine using the steps below.</div>
+<div class="notice"><strong>Privacy boundary:</strong> <code>127.0.0.1</code> always means the visitor's own machine. This page does not expose your Studio to the internet and does not proxy private model traffic through the hosted SILT website.</div>
+
+<div class="grid">
+<div class="card"><div class="n">01</div><h2>Install SILT</h2><p>Clone the open-source repository and install the Studio dependencies locally.</p></div>
+<div class="card"><div class="n">02</div><h2>Start the engine</h2><p>Bind SILT Studio to loopback on port 8377. Keep it local; do not expose it on <code>0.0.0.0</code>.</p></div>
+<div class="card"><div class="n">03</div><h2>Open Studio</h2><p>Return here and click <strong>Open Local Studio</strong>, or browse directly to <code>http://127.0.0.1:8377/</code>.</p></div>
+</div>
+
+<section>
+<h2>Quick start</h2>
+<div class="code" id="setup">git clone https://github.com/inbharatai/SILT.git
+cd SILT
+python -m pip install -e ".[studio]"
+python -m uvicorn asea.studio.server:app --host 127.0.0.1 --port 8377</div>
+<button class="btn copy" type="button" onclick="copySetup()">Copy commands</button>
+<p class="small">Requires Python 3.9 or newer. Optional real-model connectors and deep-apply dependencies can be installed separately from the repository when needed.</p>
+</section>
+
+<section>
+<h2>Then open</h2>
+<div class="code">http://127.0.0.1:8377/</div>
+<div class="actions"><a class="btn primary" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Launch SILT Studio</a></div>
+</section>
+
+<section>
+<h2>Why not host the whole Studio on Vercel?</h2>
+<p class="lead">SILT Studio is designed around local model runtimes, local files, local audit state and potentially large model weights. Hosting the control page is easy; moving every user's private model workload into a public cloud service would change SILT's security and privacy model. The local-engine architecture keeps the compute and data where the user chooses to run them.</p>
+</section>
+</div></main>
+<footer><div class="wrap">SILT — Skill Interchange Layer with Trust-gating · <a href="https://github.com/inbharatai/SILT">GitHub</a> · <a href="https://inbharat.ai">InBharat.ai</a></div></footer>
+<script>
+async function copySetup(){const text=document.getElementById('setup').innerText;try{await navigator.clipboard.writeText(text);event.currentTarget.textContent='Copied';setTimeout(()=>event.currentTarget.textContent='Copy commands',1500)}catch(e){alert('Copy the commands from the box above.')}}
+</script>
+</body>
+</html>
