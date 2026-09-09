@@ -1067,10 +1067,36 @@ def assert_process_dead(pid):
         try:
             if status.read_text().split(") ", 1)[1].split()[0] == "Z":
                 return  # Reparented zombies await init, but execute no code.
-        except FileNotFoundError:
+        except (FileNotFoundError, ProcessLookupError):
+            # /proc may disappear before open (ENOENT) or during read (ESRCH).
+            # Both mean the process is gone; other read errors must still fail.
             return
         time.sleep(0.01)
     pytest.fail(f"process {pid} remains live")
+
+
+@pytest.mark.parametrize("error", [FileNotFoundError(2, "gone before open"),
+                                  ProcessLookupError(3, "gone during read")])
+def test_process_dead_helper_accepts_proc_disappearance(monkeypatch, error):
+    # Test-only /proc read double: no process is launched or signalled here.
+    import sys
+    class GoneStatus:
+        def read_text(self):
+            raise error
+    monkeypatch.setattr(sys.modules[__name__], "Path", lambda path: GoneStatus())
+    assert_process_dead(123456789)
+
+
+@pytest.mark.parametrize("error", [PermissionError(13, "denied"), OSError(5, "I/O error")])
+def test_process_dead_helper_preserves_unexpected_read_errors(monkeypatch, error):
+    import sys
+    class UnreadableStatus:
+        def read_text(self):
+            raise error
+    monkeypatch.setattr(sys.modules[__name__], "Path", lambda path: UnreadableStatus())
+    with pytest.raises(type(error)) as caught:
+        assert_process_dead(123456789)
+    assert caught.value is error
 
 
 @pytest.mark.parametrize("mode", ["descendant", "leader_exit", "closed_pipes"])
