@@ -1,0 +1,826 @@
+{
+  "purpose": "final_locked",
+  "tasks": [
+    {
+      "id": "mbpp_602",
+      "function_cases": [
+        {
+          "function": "first_repeated_char",
+          "args": [
+            "abcabc"
+          ],
+          "kwargs": {},
+          "expected": "a",
+          "id": "io_1",
+          "upstream_assertion": "assert first_repeated_char(\"abcabc\") == \"a\""
+        },
+        {
+          "function": "first_repeated_char",
+          "args": [
+            "abc"
+          ],
+          "kwargs": {},
+          "expected": null,
+          "id": "io_2",
+          "upstream_assertion": "assert first_repeated_char(\"abc\") == None"
+        },
+        {
+          "function": "first_repeated_char",
+          "args": [
+            "123123"
+          ],
+          "kwargs": {},
+          "expected": "1",
+          "id": "io_3",
+          "upstream_assertion": "assert first_repeated_char(\"123123\") == \"1\""
+        }
+      ]
+    },
+    {
+      "id": "he_22",
+      "function_cases": [
+        {
+          "function": "filter_integers",
+          "args": [
+            []
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_1",
+          "upstream_assertion": "assert candidate([]) == []"
+        },
+        {
+          "function": "filter_integers",
+          "args": [
+            [
+              3,
+              "c",
+              3,
+              3,
+              "a",
+              "b"
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            3,
+            3,
+            3
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate([3, 'c', 3, 3, 'a', 'b']) == [3, 3, 3]"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_459",
+      "function_cases": [
+        {
+          "function": "remove_uppercase",
+          "args": [
+            "cAstyoUrFavoRitETVshoWs"
+          ],
+          "kwargs": {},
+          "expected": "cstyoravoitshos",
+          "id": "io_1",
+          "upstream_assertion": "assert remove_uppercase('cAstyoUrFavoRitETVshoWs') == 'cstyoravoitshos'"
+        },
+        {
+          "function": "remove_uppercase",
+          "args": [
+            "wAtchTheinTernEtrAdIo"
+          ],
+          "kwargs": {},
+          "expected": "wtchheinerntrdo",
+          "id": "io_2",
+          "upstream_assertion": "assert remove_uppercase('wAtchTheinTernEtrAdIo') == 'wtchheinerntrdo'"
+        },
+        {
+          "function": "remove_uppercase",
+          "args": [
+            "VoicESeaRchAndreComMendaTionS"
+          ],
+          "kwargs": {},
+          "expected": "oiceachndreomendaion",
+          "id": "io_3",
+          "upstream_assertion": "assert remove_uppercase('VoicESeaRchAndreComMendaTionS') == 'oiceachndreomendaion'"
+        }
+      ]
+    },
+    {
+      "id": "he_98",
+      "function_cases": [
+        {
+          "function": "count_upper",
+          "args": [
+            "aBCdEf"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate('aBCdEf')  == 1"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "abcdefg"
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate('abcdefg') == 0"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "dBBE"
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_3",
+          "upstream_assertion": "assert candidate('dBBE') == 0"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "B"
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate('B')  == 0"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "U"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate('U')  == 1"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_6",
+          "upstream_assertion": "assert candidate('') == 0"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "EEEE"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_7",
+          "upstream_assertion": "assert candidate('EEEE') == 2"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_172",
+      "function_cases": [
+        {
+          "function": "count_occurance",
+          "args": [
+            "letstdlenstdporstd"
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1",
+          "upstream_assertion": "assert count_occurance(\"letstdlenstdporstd\") == 3"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            "truststdsolensporsd"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_2",
+          "upstream_assertion": "assert count_occurance(\"truststdsolensporsd\") == 1"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            "makestdsostdworthit"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_3",
+          "upstream_assertion": "assert count_occurance(\"makestdsostdworthit\") == 2"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            "stds"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_4",
+          "upstream_assertion": "assert count_occurance(\"stds\") == 1"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_5",
+          "upstream_assertion": "assert count_occurance(\"\") == 0"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_294",
+      "function_cases": [
+        {
+          "function": "max_val",
+          "args": [
+            [
+              "Python",
+              3,
+              2,
+              4,
+              5,
+              "version"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_1",
+          "upstream_assertion": "assert max_val(['Python', 3, 2, 4, 5, 'version'])==5"
+        },
+        {
+          "function": "max_val",
+          "args": [
+            [
+              "Python",
+              15,
+              20,
+              25
+            ]
+          ],
+          "kwargs": {},
+          "expected": 25,
+          "id": "io_2",
+          "upstream_assertion": "assert max_val(['Python', 15, 20, 25])==25"
+        },
+        {
+          "function": "max_val",
+          "args": [
+            [
+              "Python",
+              30,
+              20,
+              40,
+              50,
+              "version"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 50,
+          "id": "io_3",
+          "upstream_assertion": "assert max_val(['Python', 30, 20, 40, 50, 'version'])==50"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_227",
+      "function_cases": [
+        {
+          "function": "min_of_three",
+          "args": [
+            10,
+            20,
+            0
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_1",
+          "upstream_assertion": "assert min_of_three(10,20,0)==0"
+        },
+        {
+          "function": "min_of_three",
+          "args": [
+            19,
+            15,
+            18
+          ],
+          "kwargs": {},
+          "expected": 15,
+          "id": "io_2",
+          "upstream_assertion": "assert min_of_three(19,15,18)==15"
+        },
+        {
+          "function": "min_of_three",
+          "args": [
+            -10,
+            -20,
+            -30
+          ],
+          "kwargs": {},
+          "expected": -30,
+          "id": "io_3",
+          "upstream_assertion": "assert min_of_three(-10,-20,-30)==-30"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_426",
+      "function_cases": [
+        {
+          "function": "filter_oddnumbers",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            3,
+            5,
+            7,
+            9
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert filter_oddnumbers([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])==[1,3,5,7,9]"
+        },
+        {
+          "function": "filter_oddnumbers",
+          "args": [
+            [
+              10,
+              20,
+              45,
+              67,
+              84,
+              93
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            45,
+            67,
+            93
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert filter_oddnumbers([10,20,45,67,84,93])==[45,67,93]"
+        },
+        {
+          "function": "filter_oddnumbers",
+          "args": [
+            [
+              5,
+              7,
+              9,
+              8,
+              6,
+              4,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            5,
+            7,
+            9,
+            3
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert filter_oddnumbers([5,7,9,8,6,4,3])==[5,7,9,3]"
+        }
+      ]
+    },
+    {
+      "id": "he_16",
+      "function_cases": [
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate('') == 0"
+        },
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            "abcde"
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate('abcde') == 5"
+        },
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            "aaaaAAAAaaaa"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate('aaaaAAAAaaaa') == 1"
+        },
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            "Jerry jERRY JeRRRY"
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate('Jerry jERRY JeRRRY') == 5"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_801",
+      "function_cases": [
+        {
+          "function": "test_three_equal",
+          "args": [
+            1,
+            1,
+            1
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1",
+          "upstream_assertion": "assert test_three_equal(1,1,1) == 3"
+        },
+        {
+          "function": "test_three_equal",
+          "args": [
+            -1,
+            -2,
+            -3
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_2",
+          "upstream_assertion": "assert test_three_equal(-1,-2,-3) == 0"
+        },
+        {
+          "function": "test_three_equal",
+          "args": [
+            1,
+            2,
+            2
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_3",
+          "upstream_assertion": "assert test_three_equal(1,2,2) == 2"
+        }
+      ]
+    },
+    {
+      "id": "he_60",
+      "function_cases": [
+        {
+          "function": "sum_to_n",
+          "args": [
+            1
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(1) == 1"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            6
+          ],
+          "kwargs": {},
+          "expected": 21,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(6) == 21"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            11
+          ],
+          "kwargs": {},
+          "expected": 66,
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(11) == 66"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            30
+          ],
+          "kwargs": {},
+          "expected": 465,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate(30) == 465"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            100
+          ],
+          "kwargs": {},
+          "expected": 5050,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate(100) == 5050"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_725",
+      "function_cases": [
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Cortex \"A53\" Based \"multi\" tasking \"Processor\""
+          ],
+          "kwargs": {},
+          "expected": [
+            "A53",
+            "multi",
+            "Processor"
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert extract_quotation('Cortex \"A53\" Based \"multi\" tasking \"Processor\"') == ['A53', 'multi', 'Processor']"
+        },
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Cast your \"favorite\" entertainment \"apps\""
+          ],
+          "kwargs": {},
+          "expected": [
+            "favorite",
+            "apps"
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert extract_quotation('Cast your \"favorite\" entertainment \"apps\"') == ['favorite', 'apps']"
+        },
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Watch content \"4k Ultra HD\" resolution with \"HDR 10\" Support"
+          ],
+          "kwargs": {},
+          "expected": [
+            "4k Ultra HD",
+            "HDR 10"
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert extract_quotation('Watch content \"4k Ultra HD\" resolution with \"HDR 10\" Support') == ['4k Ultra HD', 'HDR 10']"
+        },
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Watch content '4k Ultra HD' resolution with 'HDR 10' Support"
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_4",
+          "upstream_assertion": "assert extract_quotation(\"Watch content '4k Ultra HD' resolution with 'HDR 10' Support\") == []"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_130",
+      "function_cases": [
+        {
+          "function": "max_occurrences",
+          "args": [
+            [
+              2,
+              3,
+              8,
+              4,
+              7,
+              9,
+              8,
+              2,
+              6,
+              5,
+              1,
+              6,
+              1,
+              2,
+              3,
+              2,
+              4,
+              6,
+              9,
+              1,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_1",
+          "upstream_assertion": "assert max_occurrences([2,3,8,4,7,9,8,2,6,5,1,6,1,2,3,2,4,6,9,1,2])==2"
+        },
+        {
+          "function": "max_occurrences",
+          "args": [
+            [
+              2,
+              3,
+              8,
+              4,
+              7,
+              9,
+              8,
+              7,
+              9,
+              15,
+              14,
+              10,
+              12,
+              13,
+              16,
+              18
+            ]
+          ],
+          "kwargs": {},
+          "expected": 8,
+          "id": "io_2",
+          "upstream_assertion": "assert max_occurrences([2,3,8,4,7,9,8,7,9,15,14,10,12,13,16,18])==8"
+        },
+        {
+          "function": "max_occurrences",
+          "args": [
+            [
+              10,
+              20,
+              20,
+              30,
+              40,
+              90,
+              80,
+              50,
+              30,
+              20,
+              50,
+              10
+            ]
+          ],
+          "kwargs": {},
+          "expected": 20,
+          "id": "io_3",
+          "upstream_assertion": "assert max_occurrences([10,20,20,30,40,90,80,50,30,20,50,10])==20"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_800",
+      "function_cases": [
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "python  program"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogram",
+          "id": "io_1",
+          "upstream_assertion": "assert remove_all_spaces('python  program')==('pythonprogram')"
+        },
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "python   programming    language"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogramminglanguage",
+          "id": "io_2",
+          "upstream_assertion": "assert remove_all_spaces('python   programming    language')==('pythonprogramminglanguage')"
+        },
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "python                     program"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogram",
+          "id": "io_3",
+          "upstream_assertion": "assert remove_all_spaces('python                     program')==('pythonprogram')"
+        },
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "   python                     program"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogram",
+          "id": "io_4",
+          "upstream_assertion": "assert remove_all_spaces('   python                     program')=='pythonprogram'"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_435",
+      "function_cases": [
+        {
+          "function": "last_Digit",
+          "args": [
+            123
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1",
+          "upstream_assertion": "assert last_Digit(123) == 3"
+        },
+        {
+          "function": "last_Digit",
+          "args": [
+            25
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_2",
+          "upstream_assertion": "assert last_Digit(25) == 5"
+        },
+        {
+          "function": "last_Digit",
+          "args": [
+            30
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_3",
+          "upstream_assertion": "assert last_Digit(30) == 0"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_439",
+      "function_cases": [
+        {
+          "function": "multiple_to_single",
+          "args": [
+            [
+              11,
+              33,
+              50
+            ]
+          ],
+          "kwargs": {},
+          "expected": 113350,
+          "id": "io_1",
+          "upstream_assertion": "assert multiple_to_single([11, 33, 50])==113350"
+        },
+        {
+          "function": "multiple_to_single",
+          "args": [
+            [
+              -1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ]
+          ],
+          "kwargs": {},
+          "expected": -123456,
+          "id": "io_2",
+          "upstream_assertion": "assert multiple_to_single([-1,2,3,4,5,6])==-123456"
+        },
+        {
+          "function": "multiple_to_single",
+          "args": [
+            [
+              10,
+              15,
+              20,
+              25
+            ]
+          ],
+          "kwargs": {},
+          "expected": 10152025,
+          "id": "io_3",
+          "upstream_assertion": "assert multiple_to_single([10,15,20,25])==10152025"
+        }
+      ]
+    }
+  ]
+}
