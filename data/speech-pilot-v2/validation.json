@@ -1,0 +1,8 @@
+{
+  "status": "check_passed_no_inference",
+  "actual_count": 60,
+  "target_count": 48,
+  "control_count": 12,
+  "selection_sha256": "4c749163be603e74ad1afdfe833014e7194cfbea86e352be1b82699821785295",
+  "pcm_audio_sha256": "9a4b4c2cb9bfe59e20f60a4fd912efa19698a1a9a62856440af3734c8e28e00b"
+}
