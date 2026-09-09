@@ -1,0 +1,384 @@
+{
+  "tasks": [
+    {
+      "id": "mbpp_229",
+      "function_cases": [
+        {
+          "function": "re_arrange_array",
+          "args": [
+            [
+              -1,
+              2,
+              -3,
+              4,
+              5,
+              6,
+              -7,
+              8,
+              9
+            ],
+            9
+          ],
+          "kwargs": {},
+          "expected": [
+            -1,
+            -3,
+            -7,
+            4,
+            5,
+            6,
+            2,
+            8,
+            9
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert re_arrange_array([-1, 2, -3, 4, 5, 6, -7, 8, 9], 9) == [-1, -3, -7, 4, 5, 6, 2, 8, 9]"
+        },
+        {
+          "function": "re_arrange_array",
+          "args": [
+            [
+              12,
+              -14,
+              -26,
+              13,
+              15
+            ],
+            5
+          ],
+          "kwargs": {},
+          "expected": [
+            -14,
+            -26,
+            12,
+            13,
+            15
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert re_arrange_array([12, -14, -26, 13, 15], 5) == [-14, -26, 12, 13, 15]"
+        },
+        {
+          "function": "re_arrange_array",
+          "args": [
+            [
+              10,
+              24,
+              36,
+              -42,
+              -39,
+              -78,
+              85
+            ],
+            7
+          ],
+          "kwargs": {},
+          "expected": [
+            -42,
+            -39,
+            -78,
+            10,
+            24,
+            36,
+            85
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert re_arrange_array([10, 24, 36, -42, -39, -78, 85], 7) == [-42, -39, -78, 10, 24, 36, 85]"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_90",
+      "function_cases": [
+        {
+          "function": "len_log",
+          "args": [
+            [
+              "python",
+              "PHP",
+              "bigdata"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 7,
+          "id": "io_1",
+          "upstream_assertion": "assert len_log([\"python\",\"PHP\",\"bigdata\"]) == 7"
+        },
+        {
+          "function": "len_log",
+          "args": [
+            [
+              "a",
+              "ab",
+              "abc"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_2",
+          "upstream_assertion": "assert len_log([\"a\",\"ab\",\"abc\"]) == 3"
+        },
+        {
+          "function": "len_log",
+          "args": [
+            [
+              "small",
+              "big",
+              "tall"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_3",
+          "upstream_assertion": "assert len_log([\"small\",\"big\",\"tall\"]) == 5"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_748",
+      "function_cases": [
+        {
+          "function": "capital_words_spaces",
+          "args": [
+            "Python"
+          ],
+          "kwargs": {},
+          "expected": "Python",
+          "id": "io_1",
+          "upstream_assertion": "assert capital_words_spaces(\"Python\") == 'Python'"
+        },
+        {
+          "function": "capital_words_spaces",
+          "args": [
+            "PythonProgrammingExamples"
+          ],
+          "kwargs": {},
+          "expected": "Python Programming Examples",
+          "id": "io_2",
+          "upstream_assertion": "assert capital_words_spaces(\"PythonProgrammingExamples\") == 'Python Programming Examples'"
+        },
+        {
+          "function": "capital_words_spaces",
+          "args": [
+            "GetReadyToBeCodingFreak"
+          ],
+          "kwargs": {},
+          "expected": "Get Ready To Be Coding Freak",
+          "id": "io_3",
+          "upstream_assertion": "assert capital_words_spaces(\"GetReadyToBeCodingFreak\") == 'Get Ready To Be Coding Freak'"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_637",
+      "function_cases": [
+        {
+          "function": "noprofit_noloss",
+          "args": [
+            1500,
+            1200
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_1",
+          "upstream_assertion": "assert noprofit_noloss(1500,1200)==False"
+        },
+        {
+          "function": "noprofit_noloss",
+          "args": [
+            100,
+            100
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_2",
+          "upstream_assertion": "assert noprofit_noloss(100,100)==True"
+        },
+        {
+          "function": "noprofit_noloss",
+          "args": [
+            2000,
+            5000
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_3",
+          "upstream_assertion": "assert noprofit_noloss(2000,5000)==False"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_292",
+      "function_cases": [
+        {
+          "function": "find",
+          "args": [
+            10,
+            3
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1",
+          "upstream_assertion": "assert find(10,3) == 3"
+        },
+        {
+          "function": "find",
+          "args": [
+            4,
+            2
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_2",
+          "upstream_assertion": "assert find(4,2) == 2"
+        },
+        {
+          "function": "find",
+          "args": [
+            20,
+            5
+          ],
+          "kwargs": {},
+          "expected": 4,
+          "id": "io_3",
+          "upstream_assertion": "assert find(20,5) == 4"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_591",
+      "function_cases": [
+        {
+          "function": "swap_List",
+          "args": [
+            [
+              12,
+              35,
+              9,
+              56,
+              24
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            24,
+            35,
+            9,
+            56,
+            12
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert swap_List([12, 35, 9, 56, 24]) == [24, 35, 9, 56, 12]"
+        },
+        {
+          "function": "swap_List",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            3,
+            2,
+            1
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert swap_List([1, 2, 3]) == [3, 2, 1]"
+        },
+        {
+          "function": "swap_List",
+          "args": [
+            [
+              4,
+              5,
+              6
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            6,
+            5,
+            4
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert swap_List([4, 5, 6]) == [6, 5, 4]"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_11",
+      "function_cases": [
+        {
+          "function": "remove_Occ",
+          "args": [
+            "hello",
+            "l"
+          ],
+          "kwargs": {},
+          "expected": "heo",
+          "id": "io_1",
+          "upstream_assertion": "assert remove_Occ(\"hello\",\"l\") == \"heo\""
+        },
+        {
+          "function": "remove_Occ",
+          "args": [
+            "abcda",
+            "a"
+          ],
+          "kwargs": {},
+          "expected": "bcd",
+          "id": "io_2",
+          "upstream_assertion": "assert remove_Occ(\"abcda\",\"a\") == \"bcd\""
+        },
+        {
+          "function": "remove_Occ",
+          "args": [
+            "PHP",
+            "P"
+          ],
+          "kwargs": {},
+          "expected": "H",
+          "id": "io_3",
+          "upstream_assertion": "assert remove_Occ(\"PHP\",\"P\") == \"H\""
+        }
+      ]
+    },
+    {
+      "id": "mbpp_165",
+      "function_cases": [
+        {
+          "function": "count_char_position",
+          "args": [
+            "xbcefg"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_1",
+          "upstream_assertion": "assert count_char_position(\"xbcefg\") == 2"
+        },
+        {
+          "function": "count_char_position",
+          "args": [
+            "ABcED"
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_2",
+          "upstream_assertion": "assert count_char_position(\"ABcED\") == 3"
+        },
+        {
+          "function": "count_char_position",
+          "args": [
+            "AbgdeF"
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_3",
+          "upstream_assertion": "assert count_char_position(\"AbgdeF\") == 5"
+        }
+      ]
+    }
+  ]
+}

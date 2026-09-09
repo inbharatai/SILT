@@ -1,0 +1,12 @@
+{
+  "status": "acquired_no_inference",
+  "actual_count": 60,
+  "target_count": 48,
+  "control_count": 12,
+  "downloaded_archive_bytes": 289851356,
+  "archive_sha256": "d9c2e37b41aacd41bc283554a0a82b5476b36887049774ecb2819dcaaa55a356",
+  "source_audio_bytes": 40011160,
+  "pcm_audio_bytes": 20006480,
+  "archive_members": 648,
+  "archive_expanded_member_bytes": 408863126
+}

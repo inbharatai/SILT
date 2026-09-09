@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "name": "FLEURS en_us test real-recording 60-sentence pilot v2",
+  "reference_source": "https://huggingface.co/datasets/google/fleurs/resolve/4683b04af03d2d9549064c7d72060a9a94bb6046/data/en_us/test.tsv",
+  "policy_version": "composition-admission-v2",
+  "claims": [
+    "reference_text"
+  ],
+  "cases": [
+    {
+      "id": "fleurs_en_1671",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1671.wav",
+      "reference": "congress began funding the obscenity initiative in fiscal 2005 and specified that the fbi must devote 10 agents to adult pornography",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1838",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1838.wav",
+      "reference": "the great pyramid at giza is the only one of the seven wonders that is still standing today",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1870",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1870.wav",
+      "reference": "the scenes are displayed on the pyramids and the different pyramids are lit up",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1756",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1756.wav",
+      "reference": "late on sunday the united states president donald trump in a statement delivered via the press secretary announced us troops would be leaving syria",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1713",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1713.wav",
+      "reference": "while goma is reasonably safe any visits outside of goma should be researched to understand the state of the fighting that persists in the north kivu province",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1929",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1929.wav",
+      "reference": "del potro had the early advantage in the second set but this too required a tie break after reaching 6-6",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1711",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1711.wav",
+      "reference": "these theories look at what it is about certain people that make them want the things that they do and what things in their environment will make them do or not do certain things",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1670",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1670.wav",
+      "reference": "their thermal behavior is not as steady as large caves on earth that often maintain a fairly constant temperature but it is consistent with these being deep holes in the ground, said glen cushing of the united states geological survey usgs astrogeology team and of northern arizona university located in flagstaff arizona",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1872",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1872.wav",
+      "reference": "during the struggle for independence organised by the mau movement a peaceful gathering in the town resulted in the killing of the paramount chief tupua tamasese lealofi iii",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1683",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1683.wav",
+      "reference": "there are still many men and women alive who survived their time here and many more who had loved ones who were murdered or worked to death there jews and non-jews alike",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1984",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1984.wav",
+      "reference": "mass car ownership also leads to a higher incidence of accidents on the roads which leads to the invention of new techniques in healthcare for repairing damaged bodies",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1744",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1744.wav",
+      "reference": "the smaller the rossby number the less active the star with respect to magnetic reversals",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1769",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1769.wav",
+      "reference": "built by the egyptians in the third century bce the great pyramid is one of many large pyramid structures built to honor dead pharaoh",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1660",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1660.wav",
+      "reference": "romanticism had a large element of cultural determinism drawn from writers such as goethe fichte and schlegel",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1759",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1759.wav",
+      "reference": "dr malar balasubramanian 29 was found in blue ash ohio a suburb approximately 15 miles north of cincinnati lying on the ground beside the road in a t-shirt and underwear in an apparently heavily medicated state",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1851",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1851.wav",
+      "reference": "rip currents are the returning flow from waves breaking off the beach often at a reef or similar",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1938",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1938.wav",
+      "reference": "the hospital has followed protocol for infection control including separating the patient from others to prevent possible infection of others",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1960",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1960.wav",
+      "reference": "he was reportedly aged in his 20s. in a statement bieber said [w]hile i was not present nor directly involved with this tragic accident my thoughts and prayers are with the family of the victim.",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1753",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1753.wav",
+      "reference": "while this is often only an inaccurate stereotype the best way to get along in paris still is to be on your best behavior acting like someone who is bien élevé well brought up. it will make getting about considerably easier",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1699",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1699.wav",
+      "reference": "bishkek was described as sinking into a state of anarchy by one observer as gangs of people roamed the streets and plundered stores of consumer goods",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1797",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1797.wav",
+      "reference": "everyone participates in society and uses transportation systems almost everyone complains about transportation systems",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1767",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1767.wav",
+      "reference": "this offers a good opportunity to see the aurora borealis as the sky will be dark more or less around the clock",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_2005",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_2005.wav",
+      "reference": "but there are a lot of things about birds that still look like a dinosaur",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1662",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1662.wav",
+      "reference": "alloys are basically a mixture of two or more metals don't forget that there are many elements on the periodic table",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1958",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1958.wav",
+      "reference": "the city is in stark contrast to the rest of the country's cities because it has more of an arabic flair than of an african",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1845",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1845.wav",
+      "reference": "in a carriage they traveled back to paris surrounded by a mob of people screaming and shouting threats against the king and queen",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1970",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1970.wav",
+      "reference": "we don't know for sure but it may have had a forked tongue its diet included turtles large fish other mosasaurs and it may even have been a cannibal",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1709",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1709.wav",
+      "reference": "the report is highly critical of almost every aspect of the present policy of the executive towards iraq and it urges an immediate change of direction",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1684",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1684.wav",
+      "reference": "apia is the capital of samoa the town is on the island of upolu and has a population of just under 40,000",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1987",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1987.wav",
+      "reference": "the crash occurred high up in mountainous terrain and is believed to have been the result of hostile fire",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1785",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1785.wav",
+      "reference": "scaffolding is not a method of learning but rather an aid that provides support to individuals whom are undergoing a new learning experience such as using a new computer program or beginning a new project",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1985",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1985.wav",
+      "reference": "it is related to but usually not involving alpine style ski touring or mountaineering the latter ones done in steep terrain and requiring much stiffer skis and boots",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1712",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1712.wav",
+      "reference": "since 1966 the sundarbans have been a wildlife sanctuary and it is estimated that there are now 400 royal bengal tigers and about 30,000 spotted deer in the area",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1897",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1897.wav",
+      "reference": "in the north the region is bounded by the sahel and in the south and west by the atlantic ocean",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1974",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1974.wav",
+      "reference": "along the same line men are required to wear trousers covering the knees",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1951",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1951.wav",
+      "reference": "in 2002 goma was destroyed by lava from the nyiragongo volcano which buried most of the town's streets particularly the town centre",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1787",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1787.wav",
+      "reference": "blogging is a tool that inspires collaboration and encourages students to extend learning well beyond the traditional school day",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1901",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1901.wav",
+      "reference": "although ai has a strong connotation of science fiction ai forms a very important branch of computer science dealing with behavior learning and intelligent adaptation in a machine",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1724",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1724.wav",
+      "reference": "its renown for being an epicenter of luxury began in about 400 a.d. and lasted up until about 1100 a.d",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1859",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1859.wav",
+      "reference": "towards the end of the middle ages western europe began to develop their own style one of the biggest developments of the time as a result of the crusades people began to use buttons to fasten clothing",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1732",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1732.wav",
+      "reference": "the age where the events took place is commonly referred as the high middle ages the period of european history in the 11th 12th and 13th centuries ad 1000–1300",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1852",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1852.wav",
+      "reference": "appropriate use of blogs can empower students to become more analytical and critical; through actively responding to internet materials students can define their positions in the context of others' writings as well as outline their own perspectives on particular issues oravec 2002",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1853",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1853.wav",
+      "reference": "giancarlo fisichella lost control of his car and ended the race very soon after the start",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1788",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1788.wav",
+      "reference": "usa gymnastics supports the united states olympic committee's letter and accepts the absolute need of the olympic family to promote a safe environment for all of our athletes",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1700",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1700.wav",
+      "reference": "it is thinner under the maria and thicker under the highlands",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1949",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1949.wav",
+      "reference": "the term bug is used by entomologists in a formal sense for this group of insects",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1871",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1871.wav",
+      "reference": "in the warm climate of the middle east the house was not so important",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1770",
+      "group": "target",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1770.wav",
+      "reference": "this seems sensible because the earth doesn't feel as if it's moving does it",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1835",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1835.wav",
+      "reference": "no tsunami warning has been issued and according to the jakarta geophysics agency no tsunami warning will be issued because the quake did not meet the magnitude 6.5 requirement",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1848",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1848.wav",
+      "reference": "a car bomb detonated at police headquarters in gaziantep turkey yesterday morning killed two police officers and injured more than twenty other people",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1918",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1918.wav",
+      "reference": "the sundarbans has been declared a unesco world heritage site the part of the forest within indian territory is called sundarbans national park",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1893",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1893.wav",
+      "reference": "the sundarbans are the largest littoral mangrove belt in the world stretching 80 km 50 mi into the bangladeshi and indian hinterland from the coast",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1875",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1875.wav",
+      "reference": "a full 20% of the water that pours out of the planet's rivers into the oceans comes from the amazon",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1977",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1977.wav",
+      "reference": "prides are made up of one to three related adult males along with as many as thirty females and cubs",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1830",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1830.wav",
+      "reference": "the ruling party south west africa people's organisation swapo also retained a majority in the parliamentary elections",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1975",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1975.wav",
+      "reference": "vatican city's population is around 800 it is the smallest independent country in the world and the country with the lowest population",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1953",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1953.wav",
+      "reference": "he was subsequently relocated to addenbrooke's hospital in cambridge",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1962",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1962.wav",
+      "reference": "the ph level is indicated by the amount of hydrogen the h in ph ions in the tested chemical",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_1733",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_1733.wav",
+      "reference": "first among its 78 recommendations is that a new diplomatic initiative should be taken before the end of this year to secure iraq's borders against hostile interventions and to re-establish diplomatic relations with its neighbors",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    },
+    {
+      "id": "fleurs_en_2001",
+      "group": "control",
+      "input_file": "/agent/workspace/silt-pass2-data/fleurs-en/fleurs_en_2001.wav",
+      "reference": "travellers are strongly advised to be aware of any risk of severe weather affecting their area as they may affect any travel plans",
+      "metric": "word_error_rate",
+      "threshold": 0.5
+    }
+  ]
+}

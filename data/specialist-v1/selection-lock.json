@@ -1,0 +1,2108 @@
+{
+  "schema": "silt.specialist.selection-lock.v1",
+  "seed": "silt-specialist-v1-pure-sequences-20260908-before-any-generation",
+  "frozen_before_model_generation": true,
+  "model_outputs_consulted": false,
+  "selection": [
+    {
+      "id": "mbpp_602",
+      "source": "MBPP",
+      "source_task_id": "602",
+      "family": "family_759d01631720d266",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "72db1252c920ea75ad08bd1c924cc906e98173f587744a6725144866ccc93c6e",
+      "canonical_prompt_sha256": "74b0070671d4a03d02dbb079b95960a3377ebeb67028430f9bec57c204e5a7ea",
+      "canonical_source_sha256": "eea8678a5a6182b27ea5931b548fbc87feaf2469c5fd8955544e13b34efa22d9",
+      "alpha_source_sha256": "8223cea1ec585cd463b8ae4af134b71a324d54ca5510e2a74ce1113610da7c03",
+      "response_sha256": "5d056258ecc7de77c43f307e6dad8226a79126406f0649ae6aca7fd4d4790ae3",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 74,
+        "chat_tokens": 104,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 2
+      }
+    },
+    {
+      "id": "he_22",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/22",
+      "family": "family_c2b4f7199a3ed427",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "486652294b44881a5c500958c1075603327715bd669a0154fbe3bd14acf51ab5",
+      "canonical_prompt_sha256": "3402931e9218ee24d38de41433a9c5bc93e99f9912cf381cb79e1aab3f116e62",
+      "canonical_source_sha256": "ee911f20d2005ddc87c81a645c1db55079df4ca1e06572601646e735dad9d35c",
+      "alpha_source_sha256": "ad69e2c81fefb0191c9036005b0a9f345b11bc6134185b532534c4f53ddcc8bc",
+      "response_sha256": "f40d9490d41818b6e23ba51a94771abe1f0677aeb203e6923e5a400f0762ba30",
+      "token_lengths": {
+        "response_tokens": 100,
+        "flat_tokens_with_eos": 207,
+        "chat_tokens": 237,
+        "generation_prompt_tokens": 135
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 2,
+        "distinct_expected": 2,
+        "nonempty_expected": 1
+      }
+    },
+    {
+      "id": "mbpp_459",
+      "source": "MBPP",
+      "source_task_id": "459",
+      "family": "family_55f4b1ffb9c7d101",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "77be55a0e4c97d86a61300063be4e2470ae06c4391fbf2926a17afc2a77a0e94",
+      "canonical_prompt_sha256": "bd7c0a45359566c21a060af3a440b2a404709ed7b6882690c2208c639bb37a46",
+      "canonical_source_sha256": "9d90b8c9256e49628d1d9b7b314b7b4f9bda8f97d4ece5d381ddaf35da3428a8",
+      "alpha_source_sha256": "ce0fb9dc3fe649b240ce852f30c999cb0a4c64a05320aabc15cc7b339aef87eb",
+      "response_sha256": "8ad524c2eba29d6b0f93ea337cf223ab5c42e86306e46b5f0b1b06918b61a011",
+      "token_lengths": {
+        "response_tokens": 22,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [
+        "text_case_removal"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_98",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/98",
+      "family": "family_c5ff9e9041e28bf7",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "034d2b1ab96f61756a85dfa4dc960f8dedfa800db426c1d9e7de593d53c4983b",
+      "canonical_prompt_sha256": "d052d517ef461bf75e3dc25e67dd1e44ef19bb9cd4769cd9bf76d2ae97c63a1c",
+      "canonical_source_sha256": "fab1d089fdf0376de835de117b4463ef5e893a3ca86d3b9c6a440f9f469ea0d5",
+      "alpha_source_sha256": "1ddc99ce9a2e0ccffdebcaf223080d328ee259c251e360f4fc05106568f57b90",
+      "response_sha256": "11e595a2aae90f5bd3db9d5b0b25f8ecf7d7d5524a765b95acef9500fd88a64f",
+      "token_lengths": {
+        "response_tokens": 106,
+        "flat_tokens_with_eos": 192,
+        "chat_tokens": 221,
+        "generation_prompt_tokens": 114
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 7,
+        "distinct_expected": 3,
+        "nonempty_expected": 7
+      }
+    },
+    {
+      "id": "mbpp_172",
+      "source": "MBPP",
+      "source_task_id": "172",
+      "family": "family_a9360e14fa066c13",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "c5dee82738ed6c2726209f764e4ee9bc2205f5daa40a0d01a183a51b84d8bcb0",
+      "canonical_prompt_sha256": "43c2eef1d6485381a9e584c6ddf5682e8898ebb549e9cf44db17d6121b070e8f",
+      "canonical_source_sha256": "36dd4be0c09e2520229003c622b428c5b4db532eaab4f471e7a98f78b5adef5f",
+      "alpha_source_sha256": "9587e238e333b553538849cac4aa585a40c01d6426d23d79f61df5e653ae2c13",
+      "response_sha256": "a3266da18b9196462daad28d03c6feaf2ddd4089aa0a45b1a0148878fc1aef73",
+      "token_lengths": {
+        "response_tokens": 66,
+        "flat_tokens_with_eos": 109,
+        "chat_tokens": 139,
+        "generation_prompt_tokens": 71
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 5,
+        "distinct_expected": 4,
+        "nonempty_expected": 5
+      }
+    },
+    {
+      "id": "mbpp_294",
+      "source": "MBPP",
+      "source_task_id": "294",
+      "family": "family_11a021013611911b",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "43bcfa89846b0ccdef6588ffdfc57f63969ffba32d8f04c67c1156740a793e83",
+      "canonical_prompt_sha256": "09a111cd27b5934809f459e376f0353583406a49d625c813c270bae8d2a6ad8f",
+      "canonical_source_sha256": "dd7fc6b7d9808a67014dcae27a3868c2c593a3ed759593fd376d223ce2cce0ca",
+      "alpha_source_sha256": "705187f11404f67d4adb5f7eabf2e8e389be98afaed6f864e4cc49e536f1af9c",
+      "response_sha256": "d1779fccacc7fc9eeadc160ac11b40fec45709a74f4822af53408fe68bf319f8",
+      "token_lengths": {
+        "response_tokens": 29,
+        "flat_tokens_with_eos": 64,
+        "chat_tokens": 94,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_227",
+      "source": "MBPP",
+      "source_task_id": "227",
+      "family": "family_dc0b139f0bf4c6ec",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "final",
+      "source_record_sha256": "1907c23f5ddb7e08ef642f22083d0a7ddaa093e779f02f9bee3718ec53e0c58c",
+      "canonical_prompt_sha256": "626fb2b844b1fdd62a71997411db72a7b446cd0370e103974102d77c49ac5808",
+      "canonical_source_sha256": "ce2c0d2012d10a7f65f6f477e345aab06cb99ea5cc560b0a0d100ed65e539a2d",
+      "alpha_source_sha256": "c9b3a6f10937e86954bc50e5baf3768887bb4e77a6eb02870a1da3c998aa238b",
+      "response_sha256": "b9911d851626d4d63518b4a8298d7dec915c0b4c6ac9d417db77aef3e9579749",
+      "token_lengths": {
+        "response_tokens": 60,
+        "flat_tokens_with_eos": 95,
+        "chat_tokens": 125,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_426",
+      "source": "MBPP",
+      "source_task_id": "426",
+      "family": "family_d52fb95d0805f4ae",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "216e7ae90ded095a9ca92ca5d37c2b0abf8f962b3e6ba4f4e8f935bddf523717",
+      "canonical_prompt_sha256": "8bdaeeb93a037e9f07092078b3caa477bfffd7227b0d8cf0f92971fd3e01e90f",
+      "canonical_source_sha256": "9540d6a2b15f0819cd352ce85930983f8d70793801bfa4ff55fc7e4f96a7bce9",
+      "alpha_source_sha256": "3d4b653285c383e98ce6aa8990790440cd7591c71c4bb2cf88460f2c13520831",
+      "response_sha256": "7938814e3181a7571c0839861075cd00589582a87ddf6c9aee7b76a1e55c2505",
+      "token_lengths": {
+        "response_tokens": 26,
+        "flat_tokens_with_eos": 55,
+        "chat_tokens": 85,
+        "generation_prompt_tokens": 57
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_16",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/16",
+      "family": "family_c06de89a3d67c52b",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "4178c94452fa229e537c2dad339c3ba37d34b9e6610aed5b72edd9d40b514ef2",
+      "canonical_prompt_sha256": "898cd3f2ba16ada54d1f72c6a552f5f89afe78adc5a7e0ecfd5a1c5e087115b2",
+      "canonical_source_sha256": "f16f20b50db026dcb8f527b3b4b92a1b9f5dbe1994bdeacdbaef449827e92c54",
+      "alpha_source_sha256": "c06b172f26529797833226454068569ef893856e84f6d78d54db225b787e80a3",
+      "response_sha256": "b7f05bf0a6d10e8bb702baef920fb45bb68c347544c4e99502840e5fff06e93f",
+      "token_lengths": {
+        "response_tokens": 72,
+        "flat_tokens_with_eos": 158,
+        "chat_tokens": 187,
+        "generation_prompt_tokens": 114
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 3,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_801",
+      "source": "MBPP",
+      "source_task_id": "801",
+      "family": "family_b303ad64d9303534",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "final",
+      "source_record_sha256": "d62727fd06a9f65b42b3bd7160fd7819dfbee424b641829ff635fbfff7a7d0a2",
+      "canonical_prompt_sha256": "01da9f3326fcdfeb989e43c659cd455f421d34ba009fb8b5bd9dc80d6aca1ee0",
+      "canonical_source_sha256": "b2f396be3042ff1d542186ec8d0e6348629797eb82d77bb1c4d8655fa7a85160",
+      "alpha_source_sha256": "62c7e4ecb9b4529a4e4b50a3908ceffbda8cfa31db98edf7b27183d794294c2d",
+      "response_sha256": "4fed2bd589e7b7885237efd19baadaff8fff626687c87789b332f50127be86da",
+      "token_lengths": {
+        "response_tokens": 39,
+        "flat_tokens_with_eos": 80,
+        "chat_tokens": 110,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_60",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/60",
+      "family": "family_5859a50761854f7b",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "final",
+      "source_record_sha256": "73a337489bc8fff41264a51156acaff3ef330f9c758c473ac8d60bae37d9ed12",
+      "canonical_prompt_sha256": "b4a1a3ed9e561f9e223a380f133845a9d4f886d7c54854566a7224a88f58573f",
+      "canonical_source_sha256": "165e5579dbe351ad04ef375bfe940e379f5c98b1572756099cb33adaf86bfede",
+      "alpha_source_sha256": "924d22fad925245c5784faa23dcb3af81c5ef19423101e1dcc33a799f7c76ef5",
+      "response_sha256": "85d8cd7a6998176d12c44daec408e3c48c4a0b9b4bb2ea5c6b6533010eb46946",
+      "token_lengths": {
+        "response_tokens": 108,
+        "flat_tokens_with_eos": 227,
+        "chat_tokens": 256,
+        "generation_prompt_tokens": 147
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 5,
+        "distinct_expected": 5,
+        "nonempty_expected": 5
+      }
+    },
+    {
+      "id": "mbpp_725",
+      "source": "MBPP",
+      "source_task_id": "725",
+      "family": "family_4c69918c691c31e2",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "95e78f7fc5669ca70025e296951440c482ae1a243dfd5bdb58ec9533e3884128",
+      "canonical_prompt_sha256": "decfe3b4559d8d3eefbc3b5f0ffe5c5658a47caa0dea7b998aa9dce32a42826e",
+      "canonical_source_sha256": "7e32b696076d4ae4e3b8db407efdf5f7a53bd58a3ee63424b06103bda0a7692d",
+      "alpha_source_sha256": "8cf060ffc3177a370acc5e9cafb621efb5b878420b38c9ee10e4ccc7f90ed815",
+      "response_sha256": "3eaf7ccddd2b5ec8a8d801194db287556777a8e628f50c80d3c6e648cd5832f8",
+      "token_lengths": {
+        "response_tokens": 25,
+        "flat_tokens_with_eos": 63,
+        "chat_tokens": 93,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 4,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_130",
+      "source": "MBPP",
+      "source_task_id": "130",
+      "family": "family_eb2d79582978d2d6",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "c67e7b108fd33a055afc206fda4972ffc1c21437b4253fa7157da9fcb98e8fab",
+      "canonical_prompt_sha256": "24283be7c03eaa97329f6bc76dd2c3c914bd3e91121ed3ee1b20b1ce9ddbedf4",
+      "canonical_source_sha256": "78695c6931d6958a3d36c5f72864c89e5ea59bc965fab2868dc1c0b55adedd88",
+      "alpha_source_sha256": "986eefd04362601767cc3cc29ade97be9305b66c94846e206d3bfddcf1696557",
+      "response_sha256": "5e0d062a354767279867c42cd8256bc1148dab8141a89dc7e7542ee80926f743",
+      "token_lengths": {
+        "response_tokens": 53,
+        "flat_tokens_with_eos": 89,
+        "chat_tokens": 119,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_800",
+      "source": "MBPP",
+      "source_task_id": "800",
+      "family": "family_5455e2a95c8c8f71",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "3178a3f5b70d13445d746812edabffa3c87a24c835bd86d922037692b9aa5aa4",
+      "canonical_prompt_sha256": "d850ad247f142589524dd8c28852f53afbc28b5d4aee61abfcb4946c14ca2de6",
+      "canonical_source_sha256": "1132b6edf585f98c9f4724e44220bddd2cdce34a06dc8ff890349b113f8d5d4b",
+      "alpha_source_sha256": "4b82298220dffbca8f22e4c4e82e8ed975b05d7c32df32f9d46fc1b477b3b3b2",
+      "response_sha256": "48d7b16a714761c7262434625bfefff84db672f93a2c2c9d6f2f108fb2fa85f8",
+      "token_lengths": {
+        "response_tokens": 20,
+        "flat_tokens_with_eos": 53,
+        "chat_tokens": 83,
+        "generation_prompt_tokens": 61
+      },
+      "operation_tags": [
+        "text_whitespace_replacement"
+      ],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 2,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_435",
+      "source": "MBPP",
+      "source_task_id": "435",
+      "family": "family_7696dd36e8e3246a",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "final",
+      "source_record_sha256": "d376536843cd3f7ee9211f4731ff69b1bc37e1e5145a7868bed9a1500c6c384b",
+      "canonical_prompt_sha256": "301ecec040abd649c94be8ec2d72eedcc3340bcea2a2cdb1076a72fb77a66cb9",
+      "canonical_source_sha256": "f04915683a0eb3e4e382f073d97eccc2b75747a85cc3bc5cbcbcd1d82c675a76",
+      "alpha_source_sha256": "1303f3da658edb7c83c31bc58d133de51ab684c55b7652fda88013eb6c4a5263",
+      "response_sha256": "4f984e7ee7c97a46e7e611ac716c0635e65acae62208264e93950c29b65ea04f",
+      "token_lengths": {
+        "response_tokens": 17,
+        "flat_tokens_with_eos": 52,
+        "chat_tokens": 82,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_439",
+      "source": "MBPP",
+      "source_task_id": "439",
+      "family": "family_294f150de58d3ec9",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "final",
+      "source_record_sha256": "ab21bdf6fb2e2158a9c4c020fee2630d0505be0fad8daabd46f123b466606596",
+      "canonical_prompt_sha256": "6583017a0218396f3cc013c85c5d5db7a5ac66aa61fb1e9645cd6b882cdf3706",
+      "canonical_source_sha256": "72478fe9c1cf529573fb3f8c0555db1f6c23fda28cfefcee789d122494939ad2",
+      "alpha_source_sha256": "6ec337447848c4f05695356cda8934dbcc28833ed4fa891bdd6facb4f50f1fcb",
+      "response_sha256": "b49e7db07fa4ab970d21834d0772da76b3fdbcd4cd5a9e04b88f04513c37ff2f",
+      "token_lengths": {
+        "response_tokens": 21,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_640",
+      "source": "MBPP",
+      "source_task_id": "640",
+      "family": "family_196dd6848975d6b5",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "ca343dea2fb7567bcf630c4c3e25d7e03c4eef7f9e5d6b9dec7c292fdaae3f91",
+      "canonical_prompt_sha256": "864832da61fda103f858d0f246adaa8e1c1e1b919e139a3604112c38dc8fbd9a",
+      "canonical_source_sha256": "33561066f012b4927a17439b62c3d54dc13c4770e2bfc35c8cc2436cd0b73d46",
+      "alpha_source_sha256": "0890d8406f55d24665b8905597bace71af6aadaff5ba93de853b5a7ce0c67883",
+      "response_sha256": "5964a7e3857498099f198547e09dfcc9773fe77086f1f7f4c5cd4e66ec3ac011",
+      "token_lengths": {
+        "response_tokens": 31,
+        "flat_tokens_with_eos": 70,
+        "chat_tokens": 100,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_390",
+      "source": "MBPP",
+      "source_task_id": "390",
+      "family": "family_758e3bbd10fae71b",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "a200f80f86b95d18f8f1a5e990eb377eed3b57a334ed200363f3da78484ffddc",
+      "canonical_prompt_sha256": "0ae4608aad56896f430dc6e2257a18b60ef0748da8881624707282cf0ff762d2",
+      "canonical_source_sha256": "ae1b6da067178d820acc78578c7842dc54cdf4f30feeef8bcee5a42c502a67fc",
+      "alpha_source_sha256": "e818d9da10318f791a02c6ef2076b15e11c7f14fff96e6918c82f5f2a4244388",
+      "response_sha256": "ba4ef5f4f2b96673112b9aa69635fd96c7c0078d4d29baaed6e7d690dd5763fb",
+      "token_lengths": {
+        "response_tokens": 24,
+        "flat_tokens_with_eos": 64,
+        "chat_tokens": 94,
+        "generation_prompt_tokens": 68
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_755",
+      "source": "MBPP",
+      "source_task_id": "755",
+      "family": "family_5d6d93d2b0beefcb",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "e84ac9224d9d98dd721c44bcee7b412900525e35d0b7238c352c361c754708a7",
+      "canonical_prompt_sha256": "1129675df879a95d32c519504650e557ece0fe7caceee676b408cb6e536122e8",
+      "canonical_source_sha256": "b3e84f5dadbdfac9919dd086cf738df279730f69e1955221ed592cbc519d2d2d",
+      "alpha_source_sha256": "0e6a10b03dc6e15e4d34ec8cd62a01803f87f4ade3109c58815182ff56cf630c",
+      "response_sha256": "2119aa35e8998fc0e39e387698ca7d0ed41e1764222b0078ad16a0beaeb877c9",
+      "token_lengths": {
+        "response_tokens": 43,
+        "flat_tokens_with_eos": 77,
+        "chat_tokens": 107,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 1
+      }
+    },
+    {
+      "id": "mbpp_77",
+      "source": "MBPP",
+      "source_task_id": "77",
+      "family": "family_7fd7afa5ef1041aa",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "train",
+      "source_record_sha256": "c174503e78cd6520aa7b80a3eba8cff2b678841ff0e3ca465e5009cd1e5229b0",
+      "canonical_prompt_sha256": "c30ad3fa542dbd9da91810911663de2a41844f00e62227e6ce443743135de548",
+      "canonical_source_sha256": "5416fb9aea898ef90f1842cd1f2b05d087dc3d75166a0a404b6a6f27ffafb615",
+      "alpha_source_sha256": "feebd6f534f1c2352a89188b88ac09c854aa6b142f1c2b0f6111a4a689d34fbb",
+      "response_sha256": "a2ce2d780ebd85e99ecb16af50d1d98d4ed7d6bd494fcd05dd23dd2db2792678",
+      "token_lengths": {
+        "response_tokens": 20,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 65
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_282",
+      "source": "MBPP",
+      "source_task_id": "282",
+      "family": "family_8d371f6ead5da97e",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "a22d50557e183abb784740283e7d7c94567bf731aeeb07aad9b09507879a56a6",
+      "canonical_prompt_sha256": "4e96114355a424e238a1bad601dcf681d49985cb7d0c9fd171bfbf8c019d0f40",
+      "canonical_source_sha256": "e475a4ca91d2c00243eea8021b8833365ff4816c90d7ce59bdfa15f27c6eab45",
+      "alpha_source_sha256": "fe36b087fe829de624c66ff40ac5e53885ff37bf3d7dd492fa4755af3ee0f401",
+      "response_sha256": "8869fa4272759a06f6805ef1540ce843e732939e6f037bc6160736454088ecf4",
+      "token_lengths": {
+        "response_tokens": 33,
+        "flat_tokens_with_eos": 67,
+        "chat_tokens": 97,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_588",
+      "source": "MBPP",
+      "source_task_id": "588",
+      "family": "family_c33ef2977450286c",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "a455198cab6aee6300e20179b033fd8c2f20dbbc9242d749d46a9e1520c5feca",
+      "canonical_prompt_sha256": "7d35f2014dff06844eeaa8c21d1becc578c854c3dab76e01cadac5f025e884ae",
+      "canonical_source_sha256": "f345b4366fb7d2d4df15aeb921f1b491f6fe40020c995a0c8307298feca2c160",
+      "alpha_source_sha256": "5381845c4104ff4f28797b8ede157fa319001644f4c97ab53f33108601c35a03",
+      "response_sha256": "5bd8198f524848d14fc3679992a9d2e1755ab3e18a58602c29690fd7600384d4",
+      "token_lengths": {
+        "response_tokens": 17,
+        "flat_tokens_with_eos": 55,
+        "chat_tokens": 85,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [
+        "sequence_extrema_reduction"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_269",
+      "source": "MBPP",
+      "source_task_id": "269",
+      "family": "family_bbb974e94189a31f",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "37d75e060a16ff8a1ede53c793f0acaac5efe0e732f50a1029287c6fc756a7d6",
+      "canonical_prompt_sha256": "62de78f4cdf1a7ce6b8c9928ae0206101fdc465d82d9b787a03b1480c923243a",
+      "canonical_source_sha256": "139bef12d5361a93fe42e2834440297ab7cebccecbeafc622b802350bc3e9073",
+      "alpha_source_sha256": "c77fd110d2d4c2342d8c9945121a3312cb7e6220bea6b577185852666b9766b5",
+      "response_sha256": "c8a0176f2f517c66cabdacfb806656a0b1e075b3347bebe76966e6e28de7704d",
+      "token_lengths": {
+        "response_tokens": 14,
+        "flat_tokens_with_eos": 46,
+        "chat_tokens": 76,
+        "generation_prompt_tokens": 60
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_436",
+      "source": "MBPP",
+      "source_task_id": "436",
+      "family": "family_a9c230bd99786f8e",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "fdd88c3a9f4e090031cfe1edebe06ca60e86915cf1c379158d546f27d1484db2",
+      "canonical_prompt_sha256": "dcc5d017deb32ee5d62e424eb29613deae16ef6368081fe0ea8a0b44f8a15b67",
+      "canonical_source_sha256": "19dd95fc2cb4ac8eb9aa887c4c77f21f874037726c1841603ba8145ee7d561b9",
+      "alpha_source_sha256": "00aefb41166d67ec95fe24038cfde1dc1b3fa4f71ecca5f82706597e8cf61ebb",
+      "response_sha256": "0fe9929d77d5e056a185a354d42bd72bf049b7ead18cf0704a4d161534450d10",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 71,
+        "chat_tokens": 101,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_89",
+      "source": "MBPP",
+      "source_task_id": "89",
+      "family": "family_77f8c601c3b01ab1",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "train",
+      "source_record_sha256": "a9029f4f9d74d22bc750435766924fcb52d02ed237779f6034ac82a6759eee20",
+      "canonical_prompt_sha256": "43473456d28d2937c389e68b42f17ed614d1d53c853b25f022c338f40c4ff34c",
+      "canonical_source_sha256": "8997959ef6debc784e7050f11e5ac594eae0c307e64339ebc5cb6cf1ccea0b6c",
+      "alpha_source_sha256": "b5212042114eaadb4854e33cee5cb7d2c2fea5ea4b37ad351136d27ff0c53276",
+      "response_sha256": "d18aa0d7f0a7788a51819fb29689770d94058abd56b0f56582af7ab674586975",
+      "token_lengths": {
+        "response_tokens": 13,
+        "flat_tokens_with_eos": 45,
+        "chat_tokens": 75,
+        "generation_prompt_tokens": 60
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_113",
+      "source": "MBPP",
+      "source_task_id": "113",
+      "family": "family_05372ed524030f74",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "d33fcde9d9d8523f4bbf8321165bed3f688bdaf117ae4097a966d0d0e764e262",
+      "canonical_prompt_sha256": "86ff758435f88d7dd42d748d8f76bb20cf569e4244c3cd764e50380b673c670a",
+      "canonical_source_sha256": "4709da427ba9f5d32fce95f666447ba55e704968a28745b68b10cae736ce4b0c",
+      "alpha_source_sha256": "e80ed22a9af2ec6403e60ce3816ce5bc1adbf56b7ceff2920c95b2a76a01ce3c",
+      "response_sha256": "af6b95c86e8a20afb00d618f51db250543a66adae1ed0f6348c6394d89f6a7c5",
+      "token_lengths": {
+        "response_tokens": 104,
+        "flat_tokens_with_eos": 138,
+        "chat_tokens": 168,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [
+        "text_numeric_validation"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_133",
+      "source": "MBPP",
+      "source_task_id": "133",
+      "family": "family_9b3ede0fd2d6c011",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "2fc35c6f1028e1a1f3683f15f5d34806ffe81150535edb3ad0eb1d2f2666beca",
+      "canonical_prompt_sha256": "640a1e219fcc79fc2242f4a4f406d9b120c88a0e08ff3a61c3b03028fcc8414d",
+      "canonical_source_sha256": "b8958ac453d9bd9f2974ece9ff5f1f9eca0aaacb3e457c4a2d1d92d420e2ee81",
+      "alpha_source_sha256": "02a44dda1cbb93f70c492aa60c9c1d89f6fdebdf4194821e5293edf82f30c281",
+      "response_sha256": "fe240396d31c6a0c3cf9f1bf7077a8993c360ea6b75408c582338201b7eddd4e",
+      "token_lengths": {
+        "response_tokens": 35,
+        "flat_tokens_with_eos": 76,
+        "chat_tokens": 106,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_776",
+      "source": "MBPP",
+      "source_task_id": "776",
+      "family": "family_1cee2aa215ffad68",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "1eb766a8c6a5622f4cfc24efcbb1da6d8cf9652f98a5665aff43030b46e3a967",
+      "canonical_prompt_sha256": "a3ad521fa66fd9340007cdc5a8b310920f4e184ee01cff55e24ad2b78ce7933f",
+      "canonical_source_sha256": "579df98cfeccec0bbacb6b9b3fd8b5cd9618a42f2f074cffc2921559a88ffc87",
+      "alpha_source_sha256": "f62a9391826eb52be589409c092cb70d3f9a365573b18633c02bd93fa49a3c71",
+      "response_sha256": "f8c99e79647f393a5d2fc96bae64eaa7d5b3a6c6766509576b0777a6a1cdca15",
+      "token_lengths": {
+        "response_tokens": 149,
+        "flat_tokens_with_eos": 190,
+        "chat_tokens": 220,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_584",
+      "source": "MBPP",
+      "source_task_id": "584",
+      "family": "family_61cfdf2a26b42ce3",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "b23361537c717afdac977df7aae3269bb7ad6bc9a127bf86bc504e625d2fa2a9",
+      "canonical_prompt_sha256": "46195bc4f977df00c7a9e19ee28723e228fbafe5a52fced38fd1637c00703065",
+      "canonical_source_sha256": "04e2b4d56e395c57d85b210198cd26382b0e54bdf52019ff7eb52fa0fb28a076",
+      "alpha_source_sha256": "601db630bbfa7d47b008e789e1642aaf9f0344b2b667080bf710a8a13dc554c7",
+      "response_sha256": "e3ff6d089e13f7ebeab93bc0792a791fe94c568aa8ae1c8455b42f83d0445466",
+      "token_lengths": {
+        "response_tokens": 48,
+        "flat_tokens_with_eos": 89,
+        "chat_tokens": 119,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_471",
+      "source": "MBPP",
+      "source_task_id": "471",
+      "family": "family_8b3b87a937d9a791",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "63190140ce02ba2102ab5f2ee74ca76b362f582f65939a672498421c4b231848",
+      "canonical_prompt_sha256": "6ea86f6d7874db600d78f369819e39459a41f617c61b327fa6219b7722720d7b",
+      "canonical_source_sha256": "71db6f3a8eccea859037c1ee6a2d3ba95fd8c7861d1c565b55bea423098458ea",
+      "alpha_source_sha256": "d5527a88bb00b668e95920f8da5e3bd5a3c0fc67b9d42ec4323bc872b35c3ad3",
+      "response_sha256": "4764fecb650071b486167a18f9f962040df9fb925de6a62112b92c60cb224f69",
+      "token_lengths": {
+        "response_tokens": 46,
+        "flat_tokens_with_eos": 84,
+        "chat_tokens": 114,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_284",
+      "source": "MBPP",
+      "source_task_id": "284",
+      "family": "family_f6f492e806a4095e",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "fe81f1ccdbf62a44aee968d43d89b19b735972ce1f5bc1487534da4fee007955",
+      "canonical_prompt_sha256": "453bbb5b38181326fa476c4258e4fe8aef7a9a921f2d7f6170e16ba362611b4a",
+      "canonical_source_sha256": "7eb4bcadbd274d4500bc28d94b475b1a00eb6253bbaf743227319e0afe83524e",
+      "alpha_source_sha256": "d34dbcfe7429c036ca1bb148983d7c5ef808c055d9148053ffaf962f336646f4",
+      "response_sha256": "ea8d5e5d8b911b4c9869157f79f05eb74f97a1a5574d1e623e429a3bd5c18a0d",
+      "token_lengths": {
+        "response_tokens": 23,
+        "flat_tokens_with_eos": 70,
+        "chat_tokens": 100,
+        "generation_prompt_tokens": 75
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_101",
+      "source": "MBPP",
+      "source_task_id": "101",
+      "family": "family_e05f805cea3fa1f1",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "31299c38c755244aa11128c4a7b3dfa31a15e5fb45f8f5c07b21143d7fd77a31",
+      "canonical_prompt_sha256": "9174032124277400b50e5110c5c7d2cde20e376f1aed76fc7781721361cadc31",
+      "canonical_source_sha256": "1d4743c908b855c37eb66500a461ac86aaf558c69c1b1bd659760ad62cac8f99",
+      "alpha_source_sha256": "e1fa9c7f3cbb822af595935d1055b94e3eb4d0958ba32b570d6e7832d1d9faa8",
+      "response_sha256": "53a48ccf37022d54cf8e4c7e897d5f97d2ee4fcffc21840f03c21ed3d9605512",
+      "token_lengths": {
+        "response_tokens": 70,
+        "flat_tokens_with_eos": 112,
+        "chat_tokens": 142,
+        "generation_prompt_tokens": 70
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_270",
+      "source": "MBPP",
+      "source_task_id": "270",
+      "family": "family_250eb574c2bc1eb7",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "d08aee68e4f6b51e9b850a981fe2d1e821675084bc82cfb687fc0e36f7cb544a",
+      "canonical_prompt_sha256": "28698ad68f588f3bad39e9c881d8888a4decdfec51e9fd6c7a111d36fcef2e61",
+      "canonical_source_sha256": "4362eeb7148e2e539e28f2f98c2cf6545e86c40b8d3a099318878a436bd06703",
+      "alpha_source_sha256": "0a4a8137b7aab95134f31af6b53a19031c957bf3a65db5c8884a2b0fa857bf8b",
+      "response_sha256": "2ff18671976bdd6787ecb9c7764e73d2eebe50f447f6acfc0833caadd09291cd",
+      "token_lengths": {
+        "response_tokens": 60,
+        "flat_tokens_with_eos": 101,
+        "chat_tokens": 131,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_578",
+      "source": "MBPP",
+      "source_task_id": "578",
+      "family": "family_3861c0d8dfb116e5",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "2470646dc7a53bd659e85bf52f1403e67d2f7b9adc4b04b8aba1fb65ef668394",
+      "canonical_prompt_sha256": "2b81427196dac9c85436a9a66e198d98ecadad2aa91d9dd575b203358c3c3610",
+      "canonical_source_sha256": "f62bdbd804526a0385f96ee72d2a5d3829b0d141519696672b5f7a272c88b3c7",
+      "alpha_source_sha256": "3da536110a67df0221fe9f638119f96788d22dc3836483f38937e03087f818d5",
+      "response_sha256": "b588d9809a0b0a5988aa602e35a51447812926949984c2dca927f0d01e13b57c",
+      "token_lengths": {
+        "response_tokens": 37,
+        "flat_tokens_with_eos": 84,
+        "chat_tokens": 114,
+        "generation_prompt_tokens": 75
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_28",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/28",
+      "family": "family_62a73c3ea8b52b9c",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "5d2ed909691be8dd43e02b43f98ea6e0d46b492b95a511fd3c51a026b6d25514",
+      "canonical_prompt_sha256": "f8793ca1441e464b90177abde4a4a1d5b104469730e85514e654d6fc55cea8c8",
+      "canonical_source_sha256": "8aa3ac3a26b0b15be145daeeef72b1379db62b64e64559525c39eadfd08b9262",
+      "alpha_source_sha256": "bf4fdaaa3931385a96c2d199797d616b81a4e27cae7b526d1a414ed6d983ba0a",
+      "response_sha256": "6adee129d74e8fadb0bda08ffab73b5277437b7b98db5fd44b13a14a5dd74b79",
+      "token_lengths": {
+        "response_tokens": 57,
+        "flat_tokens_with_eos": 127,
+        "chat_tokens": 157,
+        "generation_prompt_tokens": 98
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 2
+      }
+    },
+    {
+      "id": "mbpp_784",
+      "source": "MBPP",
+      "source_task_id": "784",
+      "family": "family_b361f60ab8453181",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "4b5c4a3cea7caec25a44c16a2ed4b4f5317d448ba3e283b7a5410b3c12825862",
+      "canonical_prompt_sha256": "f7be3646866d6021f1173b171708cd511c97ffab276652d892e13fd785db5a38",
+      "canonical_source_sha256": "098c20a394f16d8d425b73a281e8309c04c65df5c5a1cad82e7f7f677c54f7cd",
+      "alpha_source_sha256": "136f7e4a45468c78350013fada225bbaad04eb037ad69b70cba2384f3bb51a80",
+      "response_sha256": "60c94145f0a61722954a2aaf2fff26e93dbfbf6352846ece9a12d9f8bd1bfc74",
+      "token_lengths": {
+        "response_tokens": 60,
+        "flat_tokens_with_eos": 100,
+        "chat_tokens": 130,
+        "generation_prompt_tokens": 68
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_226",
+      "source": "MBPP",
+      "source_task_id": "226",
+      "family": "family_5badd45d4f62d3d1",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "7de30abe86d587b67fea17f592fbf12a6be4660e8cc85fc08e9256918a7ed45b",
+      "canonical_prompt_sha256": "6ef4b61ca2be1f7f20e40dfac7cc9911297e0d9436f88fe240654fb9aec4f103",
+      "canonical_source_sha256": "ee819cb3402f74a4b84662c2c2709c0f4aab66b2e143a579ab7d578ded3a727c",
+      "alpha_source_sha256": "c2ba2fa263927e7e623a473d6129b4009caf544f951c1524ba3f80a6d9d8b1e6",
+      "response_sha256": "c11e13c75f1b900bc0dd63283d44931d30f00f44365f876732519eaa199ebcbd",
+      "token_lengths": {
+        "response_tokens": 40,
+        "flat_tokens_with_eos": 79,
+        "chat_tokens": 109,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 4,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_764",
+      "source": "MBPP",
+      "source_task_id": "764",
+      "family": "family_772ab74105187b7f",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "781788fc9a64894c719c709944a652463d8cd883f4bab7d9899223d51e8bfefc",
+      "canonical_prompt_sha256": "80eb295ce7838cb8762c067b6ef3313c371e3766f05e25f9c9b6a9c6bf9a0138",
+      "canonical_source_sha256": "6b322406311a39e32ac608213e4220c6a11cbf2ab1749547cf91c63f572ed75a",
+      "alpha_source_sha256": "5f7942de801bebe64edc636c1ce3b16f947fb18596c1ddf96a86df42d88801a5",
+      "response_sha256": "c37811905e38f61f2b0e76de9f789d0ec1ae47d4b631d247f4b61aa89a6c3ae4",
+      "token_lengths": {
+        "response_tokens": 48,
+        "flat_tokens_with_eos": 82,
+        "chat_tokens": 112,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 2,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_251",
+      "source": "MBPP",
+      "source_task_id": "251",
+      "family": "family_bbef894c7de1a508",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "4bba01f123e2a5b77d7493479e7d68dfab2ffcd5ce00e21eb5d3bc2f5781068a",
+      "canonical_prompt_sha256": "a8be3329370b8dd71f63f4ed5db55acef2fec5198d8cafb4acb553d80958c8de",
+      "canonical_source_sha256": "5724eb81df4db57fa0faa061176e9f24f4f4a3cdde20cff2abf5d6e33add0960",
+      "alpha_source_sha256": "8fad8864f6d177b5c8b3d7a990b5527e82c39e0f458809ad4d06c52791152f36",
+      "response_sha256": "174ea11a22a7c83e9618d8795a94f90d20de131d72082fe510a9e976f1afb85c",
+      "token_lengths": {
+        "response_tokens": 25,
+        "flat_tokens_with_eos": 75,
+        "chat_tokens": 105,
+        "generation_prompt_tokens": 78
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_807",
+      "source": "MBPP",
+      "source_task_id": "807",
+      "family": "family_874d6a97b1f855c2",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "9100afc4666e3c243b868dc6d4c8dbb82176e26abdc87494e81ea2081375fb62",
+      "canonical_prompt_sha256": "c67c2fec054bfb32a0fcf0047d6a77d93136d1f3440c8a84989f4439d20a3a47",
+      "canonical_source_sha256": "dbe3114c1bf0cf38debbb97b6d7222e12b763af0d954d9eadd8623830abfe4ad",
+      "alpha_source_sha256": "eb1b13f0bc6b8c9b18dc117e0a7effbc6608f56e6033af62764bef2d04d524b4",
+      "response_sha256": "79da95f2ff7e745af5d04867b9346834b17cbd6c7de8bb8aed6f31d1d15d1cac",
+      "token_lengths": {
+        "response_tokens": 30,
+        "flat_tokens_with_eos": 67,
+        "chat_tokens": 97,
+        "generation_prompt_tokens": 65
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_443",
+      "source": "MBPP",
+      "source_task_id": "443",
+      "family": "family_c312aa1bb368cfac",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "058924bd6563dbc6b4496b965b3ab57b12acd7ef5317fd81a4bf7a9358532b79",
+      "canonical_prompt_sha256": "5ea3462ce787b3578384dd3a292c63cf603439c980179f4dd520648d050981a0",
+      "canonical_source_sha256": "7ab25672f892c82cf157a64ef8162710a926fa351b3c0d24bf104d702ff3cbac",
+      "alpha_source_sha256": "4d1d4007e0a1fc5fcf03c858917dcf9004e2eee7f14a4d460e92c0ba7f6e5b49",
+      "response_sha256": "3de55d7c883bcdfa8bb9b4d409c4983fc2d89564e15d1cda808b66854c5acd94",
+      "token_lengths": {
+        "response_tokens": 39,
+        "flat_tokens_with_eos": 75,
+        "chat_tokens": 105,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_433",
+      "source": "MBPP",
+      "source_task_id": "433",
+      "family": "family_49b12f3bb4c88e45",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "4314db47ba9aa919f0a5c00fe531e73965af6b5813adb645616985965b3f78bb",
+      "canonical_prompt_sha256": "673c7aab59634e7752c186d7971b937c44e43f5d54333178b13b5e3a8a4a8a45",
+      "canonical_source_sha256": "8307bb99e04f19aabd90b334027f4b757fa10993d5cc7c420477c576f80f3527",
+      "alpha_source_sha256": "d6ce6883576341e4bbb09818bff903920bb1debb38defed6d2951aea44e0aedd",
+      "response_sha256": "f716b00d1c5693e57a536349d2698e0b71cc9c53fb3412378b6af9115802f492",
+      "token_lengths": {
+        "response_tokens": 19,
+        "flat_tokens_with_eos": 60,
+        "chat_tokens": 90,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_238",
+      "source": "MBPP",
+      "source_task_id": "238",
+      "family": "family_85de4e19bf463d87",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "99e87d0ef7373c9b310a9377b3df7f6b364a7e360f4b31640423c37cd0f9f464",
+      "canonical_prompt_sha256": "850ac7b9ef7fb04cd656550acab0099dae1bdedb0615615b72d1289b48772f01",
+      "canonical_source_sha256": "6d1015ff3153935a5be4b2bb02196f27744dd6bcddac182cfe38d02bae5fd91e",
+      "alpha_source_sha256": "49fcdf691548d3054f4b25e3887a33eb04f002bfd34caf344f6c0b3ca4b31f43",
+      "response_sha256": "4ed2db6f13d58b7931718ada288f4d0b17e7ff7ad72124d7287affdf1dce5b04",
+      "token_lengths": {
+        "response_tokens": 32,
+        "flat_tokens_with_eos": 72,
+        "chat_tokens": 102,
+        "generation_prompt_tokens": 68
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_242",
+      "source": "MBPP",
+      "source_task_id": "242",
+      "family": "family_b637f5989749fa12",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "7b94b6e11d48e209da1816045efc23ee3f1dff7b83e781b322d136f8ecac2ef0",
+      "canonical_prompt_sha256": "22b6ce05b550365bddb03d7484c8d017a28655693b5734ee13e3b6044cab4040",
+      "canonical_source_sha256": "f46a3d81617f22d33d9762dbc0733d472fefb5f16a67f4715ebd49a8261bc4a7",
+      "alpha_source_sha256": "0d4b096652252c6f2b9ac7e6cfe03f003953234763a70d09c9f988f9d3dddc1e",
+      "response_sha256": "b692acf6cd92abf8d7522c209391bb35af329c53ea49a09652b75f4edfc72478",
+      "token_lengths": {
+        "response_tokens": 28,
+        "flat_tokens_with_eos": 64,
+        "chat_tokens": 94,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_775",
+      "source": "MBPP",
+      "source_task_id": "775",
+      "family": "family_8213a844182cccca",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "1f7a4ccd50f8c679b45661d816c6c90c96d3fc4fee31b333e6adb9027fa82ea4",
+      "canonical_prompt_sha256": "e27369dd31c251337b33c9720e085b5ddb34460e350e09a6f3358410a60fa126",
+      "canonical_source_sha256": "b598fca48ebf4363421b3ed771122b82a2b38faede2e52ab89b0ac82116a7c88",
+      "alpha_source_sha256": "5994ac795c8ade28cb5ca741e67c9e4df8f6c033e794b44c8d7e1d36df1e25f2",
+      "response_sha256": "e676fe6af980ed92f55ba4407b56db58c6a5b1197e89ec5242c5e15684909d3b",
+      "token_lengths": {
+        "response_tokens": 22,
+        "flat_tokens_with_eos": 60,
+        "chat_tokens": 90,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_427",
+      "source": "MBPP",
+      "source_task_id": "427",
+      "family": "family_45b105e4d275741d",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "b097fe93c224f2433690b3f5e95f923e00e1bdd267a1ebddfe9634594cb900c3",
+      "canonical_prompt_sha256": "ae48f3a1bd2aff9464f980862556a225625d6784f946555cd2417145f9949c1f",
+      "canonical_source_sha256": "7ecfad0e3219890be241c10defed84d96aca83abda908fefcff2115fbb4c8071",
+      "alpha_source_sha256": "2db74d85fae3f712c4e87804ab2c19a63fb194f40e2609856fe9766f14d30c91",
+      "response_sha256": "838783f5682de35ee3e2caad094443e6dac4c02d3c8043755dfeecf2de39b09f",
+      "token_lengths": {
+        "response_tokens": 48,
+        "flat_tokens_with_eos": 87,
+        "chat_tokens": 117,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_741",
+      "source": "MBPP",
+      "source_task_id": "741",
+      "family": "family_3a2f1c5e17ef806d",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "477f83a0378ab84d473cb0fa6636278deaef7d55d3f8dae451c9e0983ca81088",
+      "canonical_prompt_sha256": "6fe1994f63c374de9cd7303632e3d9f7c95e7df676bdaf43936de7f79ed30a30",
+      "canonical_source_sha256": "3e5cbb27885e81abbbf37bfcee996d34b3f9b9128e8bc7b0113c3312286fb90f",
+      "alpha_source_sha256": "eacf209304f81a496d6d42ba8d74a199a17c9ddb0fb4c6529e01cd15e7d7acc6",
+      "response_sha256": "4cb15f6da61f92ee1137fd121e49c91591f895d9fe8ee5ef4a6c6d4e3750fb06",
+      "token_lengths": {
+        "response_tokens": 43,
+        "flat_tokens_with_eos": 81,
+        "chat_tokens": 111,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_474",
+      "source": "MBPP",
+      "source_task_id": "474",
+      "family": "family_063e00e9d1efffcf",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "67374bf1c22742fe87bc6424c265a91322d066ecd63695843d65e03fb05a5004",
+      "canonical_prompt_sha256": "54e4a01ace98b5e03cdf94d6907ac0b5fa015b116c92090aacbad1e29e744f1f",
+      "canonical_source_sha256": "b4de767456b75a544bb0d2da4ccf080f780c8843aa3b4dca7c9d3c7aa6372298",
+      "alpha_source_sha256": "da29b38439713fbd9b9e6f5744b6b50e59e84bd71bb473d4acb8e2ec630fc154",
+      "response_sha256": "df71ceaca60e410cff5f7982dd758713ed0d4706be6393d041b99e37c2e2f7c6",
+      "token_lengths": {
+        "response_tokens": 23,
+        "flat_tokens_with_eos": 59,
+        "chat_tokens": 89,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_16",
+      "source": "MBPP",
+      "source_task_id": "16",
+      "family": "family_05d1f928afc87909",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "7ee4af3e511b4d9faa18380e49e6d0b3e14ff0d6ce1221037e158e02059dee61",
+      "canonical_prompt_sha256": "05aaa996a76d4fb7d2b4319d7a3530d18afa29ffc1c45028884d18894bda5606",
+      "canonical_source_sha256": "817150846cfc62bff1ce4d32d15236e02b0a6d712dd8db60c2ffc7c228ae0a86",
+      "alpha_source_sha256": "f001aa2208b7038d3b3b96b7cceba16584879df49dddcc4a191abbe5716137c0",
+      "response_sha256": "4f6d10d88e7cefaa58bc7f9e91deaf9d779a34710bdf30cf82e890d581a47481",
+      "token_lengths": {
+        "response_tokens": 43,
+        "flat_tokens_with_eos": 89,
+        "chat_tokens": 119,
+        "generation_prompt_tokens": 74
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_806",
+      "source": "MBPP",
+      "source_task_id": "806",
+      "family": "family_ccc73f00bf49d153",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "25f3dbf05288148b31188902aa0680021611669059e2d83cc8585fe4cf20a1e5",
+      "canonical_prompt_sha256": "e124bb5cf111fdcbeec0725e204f2a9d4e6c7a835081f334af89fa73ebf87c38",
+      "canonical_source_sha256": "78cd6dfe1f41458f976d77a0667e00d18797e030d3451efa3a7453b66b9be87c",
+      "alpha_source_sha256": "1acb1f6bfd0a35b79ae9201c9565912d80e236270559ee7cb5ebf1f2359409f0",
+      "response_sha256": "af7fd5765ca0a2f63619fbcab747549e4167109fef80e49c3439c35a9a88eb7f",
+      "token_lengths": {
+        "response_tokens": 86,
+        "flat_tokens_with_eos": 124,
+        "chat_tokens": 154,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_83",
+      "source": "MBPP",
+      "source_task_id": "83",
+      "family": "family_4a10412ea90a04ec",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "ccf432a08b0058bdf77a493a2f3f0dff49a9a2c34abdbe96f6dbcce79e787707",
+      "canonical_prompt_sha256": "efbcab4a5279a5450ee2f5155a38c61f3243109571a8ecaae5c63b80f2a53c6d",
+      "canonical_source_sha256": "4af8c47f1daa66233075f200552ce33824f969c7410fb0ac7d30bd7e2c1e861f",
+      "alpha_source_sha256": "0d8e64dd3fcc0ca8a934e3ac7b5326d13ef6ff4f43f9d36381e41773fb9a4a74",
+      "response_sha256": "9d40cf45d03cd54d4071c8957cc3a70997a2d01063d1063931ff4cea9e76fb80",
+      "token_lengths": {
+        "response_tokens": 88,
+        "flat_tokens_with_eos": 136,
+        "chat_tokens": 166,
+        "generation_prompt_tokens": 76
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_461",
+      "source": "MBPP",
+      "source_task_id": "461",
+      "family": "family_fd5b29123fb80c04",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "1694773472a126fe1942e4dbf13afb788459ce37ab8f05d8d49e68d5f10f8fb1",
+      "canonical_prompt_sha256": "7cd513687b69eca8099f6751e0669267b243d74a7e6d360de88eb8125f7e788a",
+      "canonical_source_sha256": "cf380d5314a74c3ca7ce18fc4eddc841fc7274a9542a4d0f33326b1e959f9600",
+      "alpha_source_sha256": "733a6e25210711d351e3a4d3be53de7de2fe5603d210d1bf25b649c9d396571e",
+      "response_sha256": "38173aa9338fa543ae2b214d130c3e0950764fbabec20d09a4dc4cb3a0c0c751",
+      "token_lengths": {
+        "response_tokens": 47,
+        "flat_tokens_with_eos": 82,
+        "chat_tokens": 112,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_593",
+      "source": "MBPP",
+      "source_task_id": "593",
+      "family": "family_db05bb52eb4928d1",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "8035114c35d44dad0f2d7ab0cfc1b2edf6c53e33db379204060d6bb5b51d5283",
+      "canonical_prompt_sha256": "da712fbc2411862b123bdf96f2bdf1844087dab3cdbf4bf38608af5200e7b24d",
+      "canonical_source_sha256": "613f758cecf5e5116885d2d8b07cb5fa80471c9800f31ce882bb24fdaee32150",
+      "alpha_source_sha256": "cc914f34c2327ec7f81ba696a486b41880beb206b3a9d72fc0986e15ead7d07a",
+      "response_sha256": "f15d58356fb3686e6225a0b50afa5607758d03a0403e114ff719a73685c5438a",
+      "token_lengths": {
+        "response_tokens": 24,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 61
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_639",
+      "source": "MBPP",
+      "source_task_id": "639",
+      "family": "family_8e3af68a322b8e03",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "ea9be488965396367794c26fc911473ecb10868b9f5b1aae3d1a5d2dee36fc1f",
+      "canonical_prompt_sha256": "80f2c17aaa6dd9dc8aac32cec133e3af16c774f27309b376980bc6b74526c9c4",
+      "canonical_source_sha256": "53c860d30d95e93d2afc9c77d44d941d1bc1bbc15cc92cf98ba3e6ba9f69deea",
+      "alpha_source_sha256": "34bbcbb059c39c334e1e07788b5df159cdc09cf55a2d13d870465d5ec6a13382",
+      "response_sha256": "dd05deacc01a7bfa7f48b43788b23c9d7ed04b8bd0b7788a637affedf20431ea",
+      "token_lengths": {
+        "response_tokens": 42,
+        "flat_tokens_with_eos": 91,
+        "chat_tokens": 121,
+        "generation_prompt_tokens": 77
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_240",
+      "source": "MBPP",
+      "source_task_id": "240",
+      "family": "family_299ad40dc820a307",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "b03912e023953f3f71a828d36298337b42700f22088be4f9817190b598032c9e",
+      "canonical_prompt_sha256": "c87a745b9c31db909018c163c55f459d773f3679e768bafe80a79e592eee4986",
+      "canonical_source_sha256": "8e9a7703675d9da8ce97ad9ef496730f6b7cdd303deaf620f322e4f58dd3f083",
+      "alpha_source_sha256": "dca5dd32f032b003ac2d652694c7cef63b61be4e5c00829b4bcd06a383085c9a",
+      "response_sha256": "aa269c5b24b25aafe91a9196ac850baa499998d7cb64ce708bcb9a60b5d6d2af",
+      "token_lengths": {
+        "response_tokens": 26,
+        "flat_tokens_with_eos": 75,
+        "chat_tokens": 105,
+        "generation_prompt_tokens": 77
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_102",
+      "source": "MBPP",
+      "source_task_id": "102",
+      "family": "family_185cccc8bfb5c412",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "b6c3e48ed4449eef89af2d883560e14f6681af6fc7197720b65b31d6a3d9379b",
+      "canonical_prompt_sha256": "7dbb498196e14274f5b20c31249fd859bf49f5a16612fcdaab19f840cea2646e",
+      "canonical_source_sha256": "9a485b38ab115ca2cc95b320f7f7c42879b27d8dbdc62ae4fc089c11154b763a",
+      "alpha_source_sha256": "64d9a25da30cd313141f68703f4095679e1afa4d5288b7ae84a8237d28d21563",
+      "response_sha256": "4f3bcc9b7b3f034259284347dbac7f7fd39a455a175ec5b280244003ba6257c3",
+      "token_lengths": {
+        "response_tokens": 27,
+        "flat_tokens_with_eos": 63,
+        "chat_tokens": 93,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_749",
+      "source": "MBPP",
+      "source_task_id": "749",
+      "family": "family_e7b089afa54fad3e",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "14c7743eb5cf9027feda6da2786975c8d16b4bdf96b28920e162c555f46455bd",
+      "canonical_prompt_sha256": "9466cc1272fc70a9e1fdecf0fbf0bab7551e386aa739ae130d896f3f153fd5c3",
+      "canonical_source_sha256": "9597f0b462b3273113cb80fba915a389e3e06bfe965ce8882d4bd048825d90ad",
+      "alpha_source_sha256": "0e92ab5a19020ee765a406d7f56a87851ce1f14ca1be760e459e0caabce8dfa5",
+      "response_sha256": "2e8fa32f7d0b1265fb6c342338877e95d81a2f31d65387a19c5b522d40cd2e9c",
+      "token_lengths": {
+        "response_tokens": 27,
+        "flat_tokens_with_eos": 82,
+        "chat_tokens": 112,
+        "generation_prompt_tokens": 83
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_168",
+      "source": "MBPP",
+      "source_task_id": "168",
+      "family": "family_796c470885296912",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "train",
+      "source_record_sha256": "d4d4fae4e00be20129a13738f1cabe86d54df510e1dbd89508c8765740ef0914",
+      "canonical_prompt_sha256": "558a2b577fb0dd0f39318d3e6bb7390ca9af5ef6ed2bc5b9efb91d192775ebb5",
+      "canonical_source_sha256": "4f59342251703841fafcffe336fb1eacd2e08e7ec88eb785f3c945b2141c0379",
+      "alpha_source_sha256": "f60b0068a6b8c6e63a36216c32ae02145840fc8c25d8c5ef617f346bd7d3148d",
+      "response_sha256": "34382137bbbe286c8abf174bba6bec4b0ec648e6f144e846f4cd49a6ad6b5cec",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 74,
+        "chat_tokens": 104,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_229",
+      "source": "MBPP",
+      "source_task_id": "229",
+      "family": "family_fdf59a79bf44eb48",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "validation",
+      "source_record_sha256": "454aa1b9dff788c21c7406ff217d7a2c5f78961226d8ff1332407963cba6969d",
+      "canonical_prompt_sha256": "422037786d0ca0640ab49d4464646de327375d6d8cbb852bb81814b93c7ab55d",
+      "canonical_source_sha256": "8129478f8f3153fb895a6098d8b3bd933e80e30541f32171c5b42f11db87c57b",
+      "alpha_source_sha256": "f51f7321c0adde1839d3b185b07e8ea81e1c4bfa90508d7a8d3cf3a387f34d91",
+      "response_sha256": "3ec598f0b9eca6efd6203f628137abfa4730dd06c7dea96ff22b2cf140561d78",
+      "token_lengths": {
+        "response_tokens": 66,
+        "flat_tokens_with_eos": 139,
+        "chat_tokens": 169,
+        "generation_prompt_tokens": 101
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_90",
+      "source": "MBPP",
+      "source_task_id": "90",
+      "family": "family_05537c325c715c5d",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "validation",
+      "source_record_sha256": "95c56865c478808875d709d3c2ce29a30e0c84495326fe934a8eaf9ae141ad81",
+      "canonical_prompt_sha256": "40503cb52aa4d7f387aeff14b946afc58094602fb08269eaa667c4e3a93c87b0",
+      "canonical_source_sha256": "e4005ed04cb17fb051d13e3fa624c2f89702baa7a26a3dbad28dd663b8961e9c",
+      "alpha_source_sha256": "7220845c41c2cc2ae7dd8250c332694b2d141652dff6e15d22a31b5f79237d35",
+      "response_sha256": "c960bbc64db5753c8fcd361d4cf74ff3a967d027437213475213f8c5210cb685",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 70,
+        "chat_tokens": 100,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_748",
+      "source": "MBPP",
+      "source_task_id": "748",
+      "family": "family_9a7c8a73d742e915",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "validation",
+      "source_record_sha256": "c1c595aceaa17895fd8ea16c4a637725af1fa360ce08a2d9bc4523e1b90105ef",
+      "canonical_prompt_sha256": "866433899c72e26df4345eafb9fc2b69306dc6135c896112338b4fe2d86a335e",
+      "canonical_source_sha256": "ea2092735e1ddb96210d8d8928dce1929f1d54af517045a9daf72531617dbc6e",
+      "alpha_source_sha256": "2b9636f1f7c52778914c5a4aa4727ded72f7283fcdccd38647e512feea2d23e0",
+      "response_sha256": "632f475de7af8c50007ed5963ad3349567c18e177156143ed576af9325fa0d34",
+      "token_lengths": {
+        "response_tokens": 33,
+        "flat_tokens_with_eos": 72,
+        "chat_tokens": 102,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_637",
+      "source": "MBPP",
+      "source_task_id": "637",
+      "family": "family_d4588e7d640c1710",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "validation",
+      "source_record_sha256": "d7e880377ad955fb94c1a5f764a1049b6d8991456f9a4a1c184558de7e6d2568",
+      "canonical_prompt_sha256": "04789a7d76235bfd2a2482d2d962addf3b1b9a28302f39debf54f85094818f41",
+      "canonical_source_sha256": "d86f86e31e0d23e5b7c4ac79956526c42281f9de003a3da13fecbaaac1b9cf34",
+      "alpha_source_sha256": "84e711d04dd7c8b937a4fb59293f8ee2d24c09e3c9a86604004b8ba0b417774b",
+      "response_sha256": "32fc9196693e7d9ebdd7036bda2e735f7e03c175d150ddcdfb46520f25b37e13",
+      "token_lengths": {
+        "response_tokens": 33,
+        "flat_tokens_with_eos": 77,
+        "chat_tokens": 106,
+        "generation_prompt_tokens": 71
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_292",
+      "source": "MBPP",
+      "source_task_id": "292",
+      "family": "family_b0d229d3fa7f6443",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "split": "validation",
+      "source_record_sha256": "061a303cd4d5fdfeddb81e8f298a9894da6f65157609e38bc77abff865083371",
+      "canonical_prompt_sha256": "8ea3abada7608c286c028650423612bb8c752e92491eb5d81bdfe7da3f5f8541",
+      "canonical_source_sha256": "c492dea2dc283fa185cb593ebc415ba3689d490fa3ec5d29ff851cb4c8a2e691",
+      "alpha_source_sha256": "04d6892c71542f714ca53e637c8523cf14e5b2314f79d541f2101fd6842a53a6",
+      "response_sha256": "434a3a8fa67b42afddb02ce4e3fa4cbf6821d411d891560b0c0d5e59d735a28c",
+      "token_lengths": {
+        "response_tokens": 18,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_591",
+      "source": "MBPP",
+      "source_task_id": "591",
+      "family": "family_98b916b560f38fa7",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "validation",
+      "source_record_sha256": "491c21eda9e67c89f37fe89f8e28437637c8636169bee785b37bcb9e0e060a5c",
+      "canonical_prompt_sha256": "083fadf8ab2ce99be6d2a2f1d904f253b48bac23a4ae7b912407215f51d014cd",
+      "canonical_source_sha256": "d849b4cabcde34f51287452eb345073137384b29665a6654a9ca32c54e3f736c",
+      "alpha_source_sha256": "c583722ebff7760db2bbcc04a907983dd8467304fef0d66d13eb678ddd23fe8c",
+      "response_sha256": "2e927446bf5c56d37205973c8f76f32de8219269f04491a93deb9b527eadd837",
+      "token_lengths": {
+        "response_tokens": 50,
+        "flat_tokens_with_eos": 86,
+        "chat_tokens": 116,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [
+        "sequence_rotation_or_end_swap"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_11",
+      "source": "MBPP",
+      "source_task_id": "11",
+      "family": "family_c045889ddcfda516",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "validation",
+      "source_record_sha256": "184a38dea820560e7785a6dbb91c6d1859f9e7f7f616f9b93717f82ddcca7a03",
+      "canonical_prompt_sha256": "e49b5145babeb0c21f794db0f9f9f5f0b1cce87eee62d607df3f0e40838b5262",
+      "canonical_source_sha256": "5dc3114a22a6c236a58b7e1e40a5b33803d05528f9e5aa833a1b7387ac78072d",
+      "alpha_source_sha256": "c5d3e32dbce5bf3246dca82566d8c8a0ec39910326238dea015a3b3a2be15895",
+      "response_sha256": "40106cf3ba07e5e6a0eb9caa5c0626db1f59914ea2fb3c23b168eb6b2f649013",
+      "token_lengths": {
+        "response_tokens": 98,
+        "flat_tokens_with_eos": 139,
+        "chat_tokens": 169,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_165",
+      "source": "MBPP",
+      "source_task_id": "165",
+      "family": "family_ccb3e48f19c7d833",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "split": "validation",
+      "source_record_sha256": "a04a70b1f21d7efe1d79085a229f64db7a4bc77c40867e169bcffd5167cd1082",
+      "canonical_prompt_sha256": "f7359119dad6a5058c50826398b731e42f290afbd1b86428f41aa395f785ecdb",
+      "canonical_source_sha256": "af1ceba63067e4fe3afd1691d8dc2edc53cea305ef31f39ea10968e5e399b461",
+      "alpha_source_sha256": "6c88d9756448bc2d0728e014dccb29854a99a124151d588a59449c25eeb762d8",
+      "response_sha256": "b1f7b5258356381c771a85bd82abbf2bbe510ddbe47515665954f9c4f766371e",
+      "token_lengths": {
+        "response_tokens": 69,
+        "flat_tokens_with_eos": 121,
+        "chat_tokens": 151,
+        "generation_prompt_tokens": 80
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    }
+  ],
+  "calibration_ids": [
+    "mbpp_16",
+    "mbpp_588",
+    "mbpp_226",
+    "mbpp_461",
+    "mbpp_764",
+    "mbpp_436",
+    "mbpp_807",
+    "mbpp_242",
+    "mbpp_77",
+    "mbpp_240",
+    "mbpp_749",
+    "mbpp_640",
+    "mbpp_113",
+    "mbpp_775",
+    "mbpp_133",
+    "mbpp_639",
+    "mbpp_101",
+    "mbpp_474",
+    "mbpp_578",
+    "mbpp_593",
+    "mbpp_784",
+    "mbpp_168",
+    "mbpp_471",
+    "mbpp_776",
+    "mbpp_251",
+    "mbpp_270",
+    "mbpp_102",
+    "mbpp_433",
+    "he_28",
+    "mbpp_390",
+    "mbpp_269",
+    "mbpp_806"
+  ],
+  "requested_quotas": {
+    "validation": {
+      "target": 6,
+      "control": 2
+    },
+    "final": {
+      "target": 12,
+      "control": 4
+    },
+    "train": {
+      "target": 62,
+      "control": 2
+    }
+  },
+  "prior_consumed_selection": [
+    {
+      "id": "he_15",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/15",
+      "source_record_sha256": "9183c428bc04d2c388827a7e63cee5fc43521400d1f97cfe9f3ab175cd12e193",
+      "family": "family_ea6e385fce3f35cb",
+      "split": "development",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_100",
+      "source": "MBPP",
+      "source_task_id": "100",
+      "source_record_sha256": "d52e21686b60dc2eadf10c569d1a9dd430c1b311003e4eb21f31775c121d4d2b",
+      "family": "family_68b7c0619444461e",
+      "split": "development",
+      "group": "control"
+    },
+    {
+      "id": "he_69",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/69",
+      "source_record_sha256": "bda024130c6074a90dc77fd4127934edb8c96193aaffceacf335087ca6ffd6d3",
+      "family": "family_5d31828fa4420682",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "he_14",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/14",
+      "source_record_sha256": "68425558735fd2d857937e2bd518da18491f4b6c50c9b5ebac82d0ee6965e034",
+      "family": "family_35bdf830dd486e3b",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "he_125",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/125",
+      "source_record_sha256": "b04125c0faf9060b5e71fbbc9359d9af13788bfa8144b001e60c39e74310bd36",
+      "family": "family_f20d1bd1c843edad",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_434",
+      "source": "MBPP",
+      "source_task_id": "434",
+      "source_record_sha256": "f6e1fbe86c525f71763e372a308f142692e6298d62a12120c36713af8ebc700f",
+      "family": "family_697998fe02da1241",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_91",
+      "source": "MBPP",
+      "source_task_id": "91",
+      "source_record_sha256": "5eac0b4764a4ccdb4554b9e85d357d9fd7743697f980facd3bd960d7b6f0aeb4",
+      "family": "family_6e3c48f6fdaf586a",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_769",
+      "source": "MBPP",
+      "source_task_id": "769",
+      "source_record_sha256": "13d5a64b840c91921d4fc6e8dad723e72fdc0872eb5a19fba1ec796e87931d50",
+      "family": "family_eb938f27bcd106b4",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "he_150",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/150",
+      "source_record_sha256": "ede8a43bee97731b104c6241aebd61f3d72062a5a117cf009dabaa7b048b0920",
+      "family": "family_3fe8751e9ff5b5d0",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "he_79",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/79",
+      "source_record_sha256": "49e757b3e70c817b681583121788042381fd203d526502dcd30fb2ef34279db9",
+      "family": "family_30e3c132ff94ab7f",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "he_96",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/96",
+      "source_record_sha256": "a7c27ead86353a3740da919f4af0637c8f92407c2b8bb518617a363db60e0326",
+      "family": "family_dee3f9637dc51f9f",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_407",
+      "source": "MBPP",
+      "source_task_id": "407",
+      "source_record_sha256": "4d92a0157af73700505dc5ae4de53963f0e121db0ffd4c09166c686c7cbbd5c8",
+      "family": "family_3e470ec600e7ea8d",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_608",
+      "source": "MBPP",
+      "source_task_id": "608",
+      "source_record_sha256": "5f4ee730eee5daccaac0654737e5e753ed9edb5f5fa532d8b42d63c83e624105",
+      "family": "family_1421ba1bd333bbe7",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_455",
+      "source": "MBPP",
+      "source_task_id": "455",
+      "source_record_sha256": "418017b3c72effceca06d20fbed4ba79a8f8c7e485b0e328b7cea09c5171b946",
+      "family": "family_911b933cadcd2978",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "he_124",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/124",
+      "source_record_sha256": "b8e9f0a2af9e355cc2030e739eb0eefeb94328507c587167f237f6940a7f0f06",
+      "family": "family_20930e75871b2e3a",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_9",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/9",
+      "source_record_sha256": "7c2f4c0df94d082d752b376be12c48f9746d6795f98c439fcd5c6c7536381524",
+      "family": "family_ea1e6da2d4d9174e",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_129",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/129",
+      "source_record_sha256": "815ef6ca6ff5627b6e0b61aadfa2d38f3801036287908a7f2a908decffe0ab41",
+      "family": "family_73b05b25fc66ed9e",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_141",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/141",
+      "source_record_sha256": "95b4ede999c88ca4416320f3318bba75be660d49d981d1821af06ca95630f5e1",
+      "family": "family_e4f1bd715ad7280d",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_48",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/48",
+      "source_record_sha256": "8fea9de4fc0828f3c5512ff8b191c33b107c177a0790c4f476cdc38245f35505",
+      "family": "family_c626bafbc357e3eb",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_105",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/105",
+      "source_record_sha256": "355ecea7ff52b92fca4b1db4f9a96005ea2ce611dae9ae91480ac29ed046c255",
+      "family": "family_ff942a0389f23227",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_101",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/101",
+      "source_record_sha256": "ff36c837169254c91edbe55336ef7297e1847d1318a8617651e85542f3d69f98",
+      "family": "family_ca17639cfccb1375",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_27",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/27",
+      "source_record_sha256": "7ce9c6b2dbb728f107b894e5cfa6ecb3a74b6b54daf8ebfc3eba91f5f3714930",
+      "family": "family_8cda1a911193b5ed",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_145",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/145",
+      "source_record_sha256": "37b55d66cfa9602cb8d7ba771ae97d96442d37b19715825b3e6336a97ecd325f",
+      "family": "family_f471006ca02fc125",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_108",
+      "source": "MBPP",
+      "source_task_id": "108",
+      "source_record_sha256": "236d71f960cf7cceeaca596e5b24eb81c88f268489a280ad697eb1632304b716",
+      "family": "family_06d1dfe778be0c46",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_398",
+      "source": "MBPP",
+      "source_task_id": "398",
+      "source_record_sha256": "5fcf1b3403c78830e929022ada2c3e01e36fb7fa383794fd21a03d2c18dd0c64",
+      "family": "family_dc25977ce4b597d8",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_79",
+      "source": "MBPP",
+      "source_task_id": "79",
+      "source_record_sha256": "5767a546fa15120057e58c56b6a7abec7ba4bd80e0bdd1fbd5d4c836d9cb11bc",
+      "family": "family_794704fc84b11fdd",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_465",
+      "source": "MBPP",
+      "source_task_id": "465",
+      "source_record_sha256": "0c9bbc2d8daa9f5c1aea7a98e81e0e335546a49b0921e2357c71b06ddb2124bf",
+      "family": "family_4f10e8b9c2394c96",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_57",
+      "source": "MBPP",
+      "source_task_id": "57",
+      "source_record_sha256": "9a9409ae8b9d14e21dc30efb80cd40e0e8cab0990ba3e2a568d4664e9f036e7b",
+      "family": "family_be28230f42d4be01",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_301",
+      "source": "MBPP",
+      "source_task_id": "301",
+      "source_record_sha256": "4255e48034065b1b1741f337148c6f3304927a56fdb96d2809b295cca9b1da52",
+      "family": "family_868244da11610394",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_66",
+      "source": "MBPP",
+      "source_task_id": "66",
+      "source_record_sha256": "754c2cea47924cb66ba541532c51e61641c765ce920b4f52f9b5ff0287255fc4",
+      "family": "family_59ec33418fb7a72d",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_619",
+      "source": "MBPP",
+      "source_task_id": "619",
+      "source_record_sha256": "5fe705258f515f69caea8d5507a97ae288c92204c670850faf1aac470fc8cd67",
+      "family": "family_272927dcc99de53b",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_573",
+      "source": "MBPP",
+      "source_task_id": "573",
+      "source_record_sha256": "896380cdfb6a8b3018f18205812481abbf73a7d01358b04c6d02324447f5baa1",
+      "family": "family_69c8ed9662f21bb6",
+      "split": "final",
+      "group": "target"
+    }
+  ],
+  "initial_six_families": {
+    "add": "add(a, b): sum of two values",
+    "square": "square(x): x multiplied by itself",
+    "even": "is_even(n): even integer predicate",
+    "reverse": "reverse_text(s): reverse a string",
+    "maximum": "larger(a, b): larger of two values",
+    "absolute": "absolute_value(n): absolute value"
+  },
+  "ranking": "ascending SHA256(seed + ':' + purpose + ':' + source-prefixed task ID); one representative per connected family; heldouts allocated before train; purposes selection/ordering/calibration",
+  "family_contract": "transitive components over all 591 source rows: equal normalized prompt/source/alpha-source/record fingerprints OR normalized function name equal/SequenceMatcher >=0.86 (minimum length6) OR morphological description-token Jaccard >=0.60 OR shared conservative operation tag; exclude entire components touching consumed IDs/initial six including reverse/power/parity/inverse-extreme expansions; heuristic NOT perfect semantic dedup",
+  "scope": "pure stateless flat string/list transformations, predicates and reductions; controls basic straight-line integer arithmetic/predicates; no advanced math; <=2 loops, <=220 AST nodes, pure stdlib allowlist",
+  "token_contract": {
+    "max_combined_tokens": 256,
+    "max_response_tokens": 192,
+    "flat": "tokenizer.encode(prompt + '\\n' + response, add_special_tokens=False) + [eos_token_id]",
+    "chat": "apply_chat_template([user:prompt, assistant:response], tokenize=True, add_generation_prompt=False)",
+    "truncation": false,
+    "both_encodings_must_fit": true
+  },
+  "environment": {
+    "python": "3.9.25",
+    "transformers": "4.51.3",
+    "tokenizers": "0.21.4",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "eos_token_id": 151645,
+    "tokenizer_files_sha256": {
+      "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "tokenizer_config.json": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+    },
+    "tokenizer_local_path": "/agent/workspace/silt-models/Qwen2.5-Coder-0.5B-Instruct",
+    "weights_loaded": false,
+    "network_used": false
+  },
+  "teacher_capability": "UNVALIDATED: source complexity is only a preregistered hypothesis for Qwen2.5-Coder-0.5B-Instruct; no zero-error or passing guarantee"
+}

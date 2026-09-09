@@ -1,0 +1,870 @@
+{
+  "schema_version": 1,
+  "name": "specialist-v1-final",
+  "reference_source": "Pinned MIT HumanEval and CC-BY-4.0 sanitized MBPP; original literal assert subset. Standalone LOCAL split, not official benchmark scores. See ATTRIBUTION.md and manifest.json.",
+  "policy_version": "composition-admission-v2",
+  "claims": [
+    "coding"
+  ],
+  "cases": [
+    {
+      "id": "mbpp_602",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: first_repeated_char(str1).\nOriginal task:\nWrite a python function to find the first repeated character in a given string.",
+      "reference": "MBPP task 602 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "first_repeated_char",
+          "args": [
+            "abcabc"
+          ],
+          "kwargs": {},
+          "expected": "a",
+          "id": "io_1"
+        },
+        {
+          "function": "first_repeated_char",
+          "args": [
+            "abc"
+          ],
+          "kwargs": {},
+          "expected": null,
+          "id": "io_2"
+        },
+        {
+          "function": "first_repeated_char",
+          "args": [
+            "123123"
+          ],
+          "kwargs": {},
+          "expected": "1",
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "he_22",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: filter_integers(values).\nOriginal task:\nfrom typing import List, Any\n\n\ndef filter_integers(values: List[Any]) -> List[int]:\n    \"\"\" Filter given list of any python values only for integers\n    >>> filter_integers(['a', 3.14, 5])\n    [5]\n    >>> filter_integers([1, 2, 3, 'abc', {}, []])\n    [1, 2, 3]\n    \"\"\"\n",
+      "reference": "HumanEval task HumanEval/22 original literal assertions; MIT.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "filter_integers",
+          "args": [
+            []
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_1"
+        },
+        {
+          "function": "filter_integers",
+          "args": [
+            [
+              3,
+              "c",
+              3,
+              3,
+              "a",
+              "b"
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            3,
+            3,
+            3
+          ],
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_459",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: remove_uppercase(str1).\nOriginal task:\nWrite a function to remove uppercase substrings from a given string.",
+      "reference": "MBPP task 459 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "remove_uppercase",
+          "args": [
+            "cAstyoUrFavoRitETVshoWs"
+          ],
+          "kwargs": {},
+          "expected": "cstyoravoitshos",
+          "id": "io_1"
+        },
+        {
+          "function": "remove_uppercase",
+          "args": [
+            "wAtchTheinTernEtrAdIo"
+          ],
+          "kwargs": {},
+          "expected": "wtchheinerntrdo",
+          "id": "io_2"
+        },
+        {
+          "function": "remove_uppercase",
+          "args": [
+            "VoicESeaRchAndreComMendaTionS"
+          ],
+          "kwargs": {},
+          "expected": "oiceachndreomendaion",
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "he_98",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: count_upper(s).\nOriginal task:\n\ndef count_upper(s):\n    \"\"\"\n    Given a string s, count the number of uppercase vowels in even indices.\n    \n    For example:\n    count_upper('aBCdEf') returns 1\n    count_upper('abcdefg') returns 0\n    count_upper('dBBE') returns 0\n    \"\"\"\n",
+      "reference": "HumanEval task HumanEval/98 original literal assertions; MIT.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "count_upper",
+          "args": [
+            "aBCdEf"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_1"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "abcdefg"
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_2"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "dBBE"
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_3"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "B"
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_4"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "U"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_5"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_6"
+        },
+        {
+          "function": "count_upper",
+          "args": [
+            "EEEE"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_7"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_172",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: count_occurance(s).\nOriginal task:\nWrite a function to count the number of occurence of the string 'std' in a given string.",
+      "reference": "MBPP task 172 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "count_occurance",
+          "args": [
+            "letstdlenstdporstd"
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            "truststdsolensporsd"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_2"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            "makestdsostdworthit"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_3"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            "stds"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_4"
+        },
+        {
+          "function": "count_occurance",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_5"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_294",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: max_val(listval).\nOriginal task:\nWrite a function to find the maximum value in a given heterogeneous list.",
+      "reference": "MBPP task 294 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "max_val",
+          "args": [
+            [
+              "Python",
+              3,
+              2,
+              4,
+              5,
+              "version"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_1"
+        },
+        {
+          "function": "max_val",
+          "args": [
+            [
+              "Python",
+              15,
+              20,
+              25
+            ]
+          ],
+          "kwargs": {},
+          "expected": 25,
+          "id": "io_2"
+        },
+        {
+          "function": "max_val",
+          "args": [
+            [
+              "Python",
+              30,
+              20,
+              40,
+              50,
+              "version"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 50,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_227",
+      "group": "control",
+      "input": "Return only complete Python code. Preserve the required entrypoint: min_of_three(a, b, c).\nOriginal task:\nWrite a function to find minimum of three numbers.",
+      "reference": "MBPP task 227 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "min_of_three",
+          "args": [
+            10,
+            20,
+            0
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_1"
+        },
+        {
+          "function": "min_of_three",
+          "args": [
+            19,
+            15,
+            18
+          ],
+          "kwargs": {},
+          "expected": 15,
+          "id": "io_2"
+        },
+        {
+          "function": "min_of_three",
+          "args": [
+            -10,
+            -20,
+            -30
+          ],
+          "kwargs": {},
+          "expected": -30,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_426",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: filter_oddnumbers(nums).\nOriginal task:\nWrite a function to filter odd numbers.",
+      "reference": "MBPP task 426 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "filter_oddnumbers",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            3,
+            5,
+            7,
+            9
+          ],
+          "id": "io_1"
+        },
+        {
+          "function": "filter_oddnumbers",
+          "args": [
+            [
+              10,
+              20,
+              45,
+              67,
+              84,
+              93
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            45,
+            67,
+            93
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "filter_oddnumbers",
+          "args": [
+            [
+              5,
+              7,
+              9,
+              8,
+              6,
+              4,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            5,
+            7,
+            9,
+            3
+          ],
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "he_16",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: count_distinct_characters(string).\nOriginal task:\n\n\ndef count_distinct_characters(string: str) -> int:\n    \"\"\" Given a string, find out how many distinct characters (regardless of case) does it consist of\n    >>> count_distinct_characters('xyzXYZ')\n    3\n    >>> count_distinct_characters('Jerry')\n    4\n    \"\"\"\n",
+      "reference": "HumanEval task HumanEval/16 original literal assertions; MIT.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_1"
+        },
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            "abcde"
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_2"
+        },
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            "aaaaAAAAaaaa"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_4"
+        },
+        {
+          "function": "count_distinct_characters",
+          "args": [
+            "Jerry jERRY JeRRRY"
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_5"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_801",
+      "group": "control",
+      "input": "Return only complete Python code. Preserve the required entrypoint: test_three_equal(x, y, z).\nOriginal task:\nWrite a python function to count the number of equal numbers from three given integers.",
+      "reference": "MBPP task 801 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "test_three_equal",
+          "args": [
+            1,
+            1,
+            1
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1"
+        },
+        {
+          "function": "test_three_equal",
+          "args": [
+            -1,
+            -2,
+            -3
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_2"
+        },
+        {
+          "function": "test_three_equal",
+          "args": [
+            1,
+            2,
+            2
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "he_60",
+      "group": "control",
+      "input": "Return only complete Python code. Preserve the required entrypoint: sum_to_n(n).\nOriginal task:\n\n\ndef sum_to_n(n: int):\n    \"\"\"sum_to_n is a function that sums numbers from 1 to n.\n    >>> sum_to_n(30)\n    465\n    >>> sum_to_n(100)\n    5050\n    >>> sum_to_n(5)\n    15\n    >>> sum_to_n(10)\n    55\n    >>> sum_to_n(1)\n    1\n    \"\"\"\n",
+      "reference": "HumanEval task HumanEval/60 original literal assertions; MIT.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "sum_to_n",
+          "args": [
+            1
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_1"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            6
+          ],
+          "kwargs": {},
+          "expected": 21,
+          "id": "io_2"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            11
+          ],
+          "kwargs": {},
+          "expected": 66,
+          "id": "io_3"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            30
+          ],
+          "kwargs": {},
+          "expected": 465,
+          "id": "io_4"
+        },
+        {
+          "function": "sum_to_n",
+          "args": [
+            100
+          ],
+          "kwargs": {},
+          "expected": 5050,
+          "id": "io_5"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_725",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: extract_quotation(text1).\nOriginal task:\nWrite a function to extract values between quotation marks \" \" of the given string.",
+      "reference": "MBPP task 725 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Cortex \"A53\" Based \"multi\" tasking \"Processor\""
+          ],
+          "kwargs": {},
+          "expected": [
+            "A53",
+            "multi",
+            "Processor"
+          ],
+          "id": "io_1"
+        },
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Cast your \"favorite\" entertainment \"apps\""
+          ],
+          "kwargs": {},
+          "expected": [
+            "favorite",
+            "apps"
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Watch content \"4k Ultra HD\" resolution with \"HDR 10\" Support"
+          ],
+          "kwargs": {},
+          "expected": [
+            "4k Ultra HD",
+            "HDR 10"
+          ],
+          "id": "io_3"
+        },
+        {
+          "function": "extract_quotation",
+          "args": [
+            "Watch content '4k Ultra HD' resolution with 'HDR 10' Support"
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_4"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_130",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: max_occurrences(nums).\nOriginal task:\nWrite a function to find the item with maximum frequency in a given list.",
+      "reference": "MBPP task 130 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "max_occurrences",
+          "args": [
+            [
+              2,
+              3,
+              8,
+              4,
+              7,
+              9,
+              8,
+              2,
+              6,
+              5,
+              1,
+              6,
+              1,
+              2,
+              3,
+              2,
+              4,
+              6,
+              9,
+              1,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_1"
+        },
+        {
+          "function": "max_occurrences",
+          "args": [
+            [
+              2,
+              3,
+              8,
+              4,
+              7,
+              9,
+              8,
+              7,
+              9,
+              15,
+              14,
+              10,
+              12,
+              13,
+              16,
+              18
+            ]
+          ],
+          "kwargs": {},
+          "expected": 8,
+          "id": "io_2"
+        },
+        {
+          "function": "max_occurrences",
+          "args": [
+            [
+              10,
+              20,
+              20,
+              30,
+              40,
+              90,
+              80,
+              50,
+              30,
+              20,
+              50,
+              10
+            ]
+          ],
+          "kwargs": {},
+          "expected": 20,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_800",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: remove_all_spaces(text).\nOriginal task:\nWrite a function to remove all whitespaces from a string.",
+      "reference": "MBPP task 800 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "python  program"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogram",
+          "id": "io_1"
+        },
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "python   programming    language"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogramminglanguage",
+          "id": "io_2"
+        },
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "python                     program"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogram",
+          "id": "io_3"
+        },
+        {
+          "function": "remove_all_spaces",
+          "args": [
+            "   python                     program"
+          ],
+          "kwargs": {},
+          "expected": "pythonprogram",
+          "id": "io_4"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_435",
+      "group": "control",
+      "input": "Return only complete Python code. Preserve the required entrypoint: last_Digit(n).\nOriginal task:\nWrite a python function to find the last digit of a given number.",
+      "reference": "MBPP task 435 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "last_Digit",
+          "args": [
+            123
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1"
+        },
+        {
+          "function": "last_Digit",
+          "args": [
+            25
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_2"
+        },
+        {
+          "function": "last_Digit",
+          "args": [
+            30
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_439",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: multiple_to_single(L).\nOriginal task:\nWrite a function to join a list of multiple integers into a single integer.",
+      "reference": "MBPP task 439 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "multiple_to_single",
+          "args": [
+            [
+              11,
+              33,
+              50
+            ]
+          ],
+          "kwargs": {},
+          "expected": 113350,
+          "id": "io_1"
+        },
+        {
+          "function": "multiple_to_single",
+          "args": [
+            [
+              -1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ]
+          ],
+          "kwargs": {},
+          "expected": -123456,
+          "id": "io_2"
+        },
+        {
+          "function": "multiple_to_single",
+          "args": [
+            [
+              10,
+              15,
+              20,
+              25
+            ]
+          ],
+          "kwargs": {},
+          "expected": 10152025,
+          "id": "io_3"
+        }
+      ]
+    }
+  ]
+}

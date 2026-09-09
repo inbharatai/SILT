@@ -1,0 +1,277 @@
+{
+  "schema": "silt.specialist.supervised.v1",
+  "purpose": "development_validation",
+  "split_policy": "standalone_LOCAL_not_official_benchmark_split",
+  "samples": [
+    {
+      "id": "mbpp_229",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: re_arrange_array(arr, n).\nOriginal task:\nWrite a function that takes in an array and an integer n, and re-arranges the first n elements of the given array so that all negative elements appear before positive ones, and where the relative order among negative and positive elements is preserved.",
+      "response": "def re_arrange_array(arr, n):\n  j=0\n  for i in range(0, n):\n    if (arr[i] < 0):\n      temp = arr[i]\n      arr[i] = arr[j]\n      arr[j] = temp\n      j = j + 1\n  return arr",
+      "source": "MBPP",
+      "source_task_id": "229",
+      "license": "CC-BY-4.0",
+      "entrypoint": "re_arrange_array",
+      "function_parameters": [
+        "arr",
+        "n"
+      ],
+      "family": "family_fdf59a79bf44eb48",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function that takes in an array and an integer n, and re-arranges the first n elements of the given array so that all negative elements appear before positive ones, and where the relative order among negative and positive elements is preserved.",
+      "source_record_sha256": "454aa1b9dff788c21c7406ff217d7a2c5f78961226d8ff1332407963cba6969d",
+      "canonical_prompt_sha256": "422037786d0ca0640ab49d4464646de327375d6d8cbb852bb81814b93c7ab55d",
+      "canonical_source_sha256": "8129478f8f3153fb895a6098d8b3bd933e80e30541f32171c5b42f11db87c57b",
+      "alpha_source_sha256": "f51f7321c0adde1839d3b185b07e8ea81e1c4bfa90508d7a8d3cf3a387f34d91",
+      "response_sha256": "3ec598f0b9eca6efd6203f628137abfa4730dd06c7dea96ff22b2cf140561d78",
+      "token_lengths": {
+        "response_tokens": 66,
+        "flat_tokens_with_eos": 139,
+        "chat_tokens": 169,
+        "generation_prompt_tokens": 101
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_90",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: len_log(list1).\nOriginal task:\nWrite a python function to find the length of the longest word.",
+      "response": "def len_log(list1):\n    max=len(list1[0])\n    for i in list1:\n        if len(i)>max:\n            max=len(i)\n    return max",
+      "source": "MBPP",
+      "source_task_id": "90",
+      "license": "CC-BY-4.0",
+      "entrypoint": "len_log",
+      "function_parameters": [
+        "list1"
+      ],
+      "family": "family_05537c325c715c5d",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to find the length of the longest word.",
+      "source_record_sha256": "95c56865c478808875d709d3c2ce29a30e0c84495326fe934a8eaf9ae141ad81",
+      "canonical_prompt_sha256": "40503cb52aa4d7f387aeff14b946afc58094602fb08269eaa667c4e3a93c87b0",
+      "canonical_source_sha256": "e4005ed04cb17fb051d13e3fa624c2f89702baa7a26a3dbad28dd663b8961e9c",
+      "alpha_source_sha256": "7220845c41c2cc2ae7dd8250c332694b2d141652dff6e15d22a31b5f79237d35",
+      "response_sha256": "c960bbc64db5753c8fcd361d4cf74ff3a967d027437213475213f8c5210cb685",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 70,
+        "chat_tokens": 100,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_748",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: capital_words_spaces(str1).\nOriginal task:\nWrite a function to put spaces between words starting with capital letters in a given string.",
+      "response": "import re\ndef capital_words_spaces(str1):\n  return re.sub(r\"(\\w)([A-Z])\", r\"\\1 \\2\", str1)",
+      "source": "MBPP",
+      "source_task_id": "748",
+      "license": "CC-BY-4.0",
+      "entrypoint": "capital_words_spaces",
+      "function_parameters": [
+        "str1"
+      ],
+      "family": "family_9a7c8a73d742e915",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to put spaces between words starting with capital letters in a given string.",
+      "source_record_sha256": "c1c595aceaa17895fd8ea16c4a637725af1fa360ce08a2d9bc4523e1b90105ef",
+      "canonical_prompt_sha256": "866433899c72e26df4345eafb9fc2b69306dc6135c896112338b4fe2d86a335e",
+      "canonical_source_sha256": "ea2092735e1ddb96210d8d8928dce1929f1d54af517045a9daf72531617dbc6e",
+      "alpha_source_sha256": "2b9636f1f7c52778914c5a4aa4727ded72f7283fcdccd38647e512feea2d23e0",
+      "response_sha256": "632f475de7af8c50007ed5963ad3349567c18e177156143ed576af9325fa0d34",
+      "token_lengths": {
+        "response_tokens": 33,
+        "flat_tokens_with_eos": 72,
+        "chat_tokens": 102,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_637",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: noprofit_noloss(actual_cost, sale_amount).\nOriginal task:\nWrite a function to check whether the given amount has no profit and no loss",
+      "response": "def noprofit_noloss(actual_cost,sale_amount): \n  if(sale_amount == actual_cost):\n    return True\n  else:\n    return False",
+      "source": "MBPP",
+      "source_task_id": "637",
+      "license": "CC-BY-4.0",
+      "entrypoint": "noprofit_noloss",
+      "function_parameters": [
+        "actual_cost",
+        "sale_amount"
+      ],
+      "family": "family_d4588e7d640c1710",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "Write a function to check whether the given amount has no profit and no loss",
+      "source_record_sha256": "d7e880377ad955fb94c1a5f764a1049b6d8991456f9a4a1c184558de7e6d2568",
+      "canonical_prompt_sha256": "04789a7d76235bfd2a2482d2d962addf3b1b9a28302f39debf54f85094818f41",
+      "canonical_source_sha256": "d86f86e31e0d23e5b7c4ac79956526c42281f9de003a3da13fecbaaac1b9cf34",
+      "alpha_source_sha256": "84e711d04dd7c8b937a4fb59293f8ee2d24c09e3c9a86604004b8ba0b417774b",
+      "response_sha256": "32fc9196693e7d9ebdd7036bda2e735f7e03c175d150ddcdfb46520f25b37e13",
+      "token_lengths": {
+        "response_tokens": 33,
+        "flat_tokens_with_eos": 77,
+        "chat_tokens": 106,
+        "generation_prompt_tokens": 71
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_292",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: find(n, m).\nOriginal task:\nWrite a python function to find quotient of two numbers (rounded down to the nearest integer).",
+      "response": "def find(n,m):  \n    q = n//m \n    return (q)",
+      "source": "MBPP",
+      "source_task_id": "292",
+      "license": "CC-BY-4.0",
+      "entrypoint": "find",
+      "function_parameters": [
+        "n",
+        "m"
+      ],
+      "family": "family_b0d229d3fa7f6443",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "Write a python function to find quotient of two numbers (rounded down to the nearest integer).",
+      "source_record_sha256": "061a303cd4d5fdfeddb81e8f298a9894da6f65157609e38bc77abff865083371",
+      "canonical_prompt_sha256": "8ea3abada7608c286c028650423612bb8c752e92491eb5d81bdfe7da3f5f8541",
+      "canonical_source_sha256": "c492dea2dc283fa185cb593ebc415ba3689d490fa3ec5d29ff851cb4c8a2e691",
+      "alpha_source_sha256": "04d6892c71542f714ca53e637c8523cf14e5b2314f79d541f2101fd6842a53a6",
+      "response_sha256": "434a3a8fa67b42afddb02ce4e3fa4cbf6821d411d891560b0c0d5e59d735a28c",
+      "token_lengths": {
+        "response_tokens": 18,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_591",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: swap_List(newList).\nOriginal task:\nWrite a python function to interchange the first and last elements in a list.",
+      "response": "def swap_List(newList): \n    size = len(newList) \n    temp = newList[0] \n    newList[0] = newList[size - 1] \n    newList[size - 1] = temp  \n    return newList ",
+      "source": "MBPP",
+      "source_task_id": "591",
+      "license": "CC-BY-4.0",
+      "entrypoint": "swap_List",
+      "function_parameters": [
+        "newList"
+      ],
+      "family": "family_98b916b560f38fa7",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to interchange the first and last elements in a list.",
+      "source_record_sha256": "491c21eda9e67c89f37fe89f8e28437637c8636169bee785b37bcb9e0e060a5c",
+      "canonical_prompt_sha256": "083fadf8ab2ce99be6d2a2f1d904f253b48bac23a4ae7b912407215f51d014cd",
+      "canonical_source_sha256": "d849b4cabcde34f51287452eb345073137384b29665a6654a9ca32c54e3f736c",
+      "alpha_source_sha256": "c583722ebff7760db2bbcc04a907983dd8467304fef0d66d13eb678ddd23fe8c",
+      "response_sha256": "2e927446bf5c56d37205973c8f76f32de8219269f04491a93deb9b527eadd837",
+      "token_lengths": {
+        "response_tokens": 50,
+        "flat_tokens_with_eos": 86,
+        "chat_tokens": 116,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [
+        "sequence_rotation_or_end_swap"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_11",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: remove_Occ(s, ch).\nOriginal task:\nWrite a python function to remove first and last occurrence of a given character from the string.",
+      "response": "def remove_Occ(s,ch): \n    for i in range(len(s)): \n        if (s[i] == ch): \n            s = s[0 : i] + s[i + 1:] \n            break\n    for i in range(len(s) - 1,-1,-1):  \n        if (s[i] == ch): \n            s = s[0 : i] + s[i + 1:] \n            break\n    return s ",
+      "source": "MBPP",
+      "source_task_id": "11",
+      "license": "CC-BY-4.0",
+      "entrypoint": "remove_Occ",
+      "function_parameters": [
+        "s",
+        "ch"
+      ],
+      "family": "family_c045889ddcfda516",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to remove first and last occurrence of a given character from the string.",
+      "source_record_sha256": "184a38dea820560e7785a6dbb91c6d1859f9e7f7f616f9b93717f82ddcca7a03",
+      "canonical_prompt_sha256": "e49b5145babeb0c21f794db0f9f9f5f0b1cce87eee62d607df3f0e40838b5262",
+      "canonical_source_sha256": "5dc3114a22a6c236a58b7e1e40a5b33803d05528f9e5aa833a1b7387ac78072d",
+      "alpha_source_sha256": "c5d3e32dbce5bf3246dca82566d8c8a0ec39910326238dea015a3b3a2be15895",
+      "response_sha256": "40106cf3ba07e5e6a0eb9caa5c0626db1f59914ea2fb3c23b168eb6b2f649013",
+      "token_lengths": {
+        "response_tokens": 98,
+        "flat_tokens_with_eos": 139,
+        "chat_tokens": 169,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_165",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: count_char_position(str1).\nOriginal task:\nWrite a function to count the number of characters in a string that occur at the same position in the string as in the English alphabet (case insensitive).",
+      "response": "def count_char_position(str1): \n    count_chars = 0\n    for i in range(len(str1)):\n        if ((i == ord(str1[i]) - ord('A')) or \n            (i == ord(str1[i]) - ord('a'))): \n            count_chars += 1\n    return count_chars ",
+      "source": "MBPP",
+      "source_task_id": "165",
+      "license": "CC-BY-4.0",
+      "entrypoint": "count_char_position",
+      "function_parameters": [
+        "str1"
+      ],
+      "family": "family_ccb3e48f19c7d833",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to count the number of characters in a string that occur at the same position in the string as in the English alphabet (case insensitive).",
+      "source_record_sha256": "a04a70b1f21d7efe1d79085a229f64db7a4bc77c40867e169bcffd5167cd1082",
+      "canonical_prompt_sha256": "f7359119dad6a5058c50826398b731e42f290afbd1b86428f41aa395f785ecdb",
+      "canonical_source_sha256": "af1ceba63067e4fe3afd1691d8dc2edc53cea305ef31f39ea10968e5e399b461",
+      "alpha_source_sha256": "6c88d9756448bc2d0728e014dccb29854a99a124151d588a59449c25eeb762d8",
+      "response_sha256": "b1f7b5258356381c771a85bd82abbf2bbe510ddbe47515665954f9c4f766371e",
+      "token_lengths": {
+        "response_tokens": 69,
+        "flat_tokens_with_eos": 121,
+        "chat_tokens": 151,
+        "generation_prompt_tokens": 80
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    }
+  ]
+}

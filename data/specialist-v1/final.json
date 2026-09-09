@@ -1,0 +1,543 @@
+{
+  "schema": "silt.specialist.supervised.v1",
+  "purpose": "final_locked_do_not_retune",
+  "split_policy": "standalone_LOCAL_not_official_benchmark_split",
+  "samples": [
+    {
+      "id": "mbpp_602",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: first_repeated_char(str1).\nOriginal task:\nWrite a python function to find the first repeated character in a given string.",
+      "response": "def first_repeated_char(str1):\n  for index,c in enumerate(str1):\n    if str1[:index+1].count(c) > 1:\n      return c",
+      "source": "MBPP",
+      "source_task_id": "602",
+      "license": "CC-BY-4.0",
+      "entrypoint": "first_repeated_char",
+      "function_parameters": [
+        "str1"
+      ],
+      "family": "family_759d01631720d266",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to find the first repeated character in a given string.",
+      "source_record_sha256": "72db1252c920ea75ad08bd1c924cc906e98173f587744a6725144866ccc93c6e",
+      "canonical_prompt_sha256": "74b0070671d4a03d02dbb079b95960a3377ebeb67028430f9bec57c204e5a7ea",
+      "canonical_source_sha256": "eea8678a5a6182b27ea5931b548fbc87feaf2469c5fd8955544e13b34efa22d9",
+      "alpha_source_sha256": "8223cea1ec585cd463b8ae4af134b71a324d54ca5510e2a74ce1113610da7c03",
+      "response_sha256": "5d056258ecc7de77c43f307e6dad8226a79126406f0649ae6aca7fd4d4790ae3",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 74,
+        "chat_tokens": 104,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 2
+      }
+    },
+    {
+      "id": "he_22",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: filter_integers(values).\nOriginal task:\nfrom typing import List, Any\n\n\ndef filter_integers(values: List[Any]) -> List[int]:\n    \"\"\" Filter given list of any python values only for integers\n    >>> filter_integers(['a', 3.14, 5])\n    [5]\n    >>> filter_integers([1, 2, 3, 'abc', {}, []])\n    [1, 2, 3]\n    \"\"\"\n",
+      "response": "from typing import List, Any\n\n\ndef filter_integers(values: List[Any]) -> List[int]:\n    \"\"\" Filter given list of any python values only for integers\n    >>> filter_integers(['a', 3.14, 5])\n    [5]\n    >>> filter_integers([1, 2, 3, 'abc', {}, []])\n    [1, 2, 3]\n    \"\"\"\n    return [x for x in values if isinstance(x, int)]\n",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/22",
+      "license": "MIT",
+      "entrypoint": "filter_integers",
+      "function_parameters": [
+        "values"
+      ],
+      "family": "family_c2b4f7199a3ed427",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "from typing import List, Any\n\n\ndef filter_integers(values: List[Any]) -> List[int]:\n    \"\"\" Filter given list of any python values only for integers\n    >>> filter_integers(['a', 3.14, 5])\n    [5]\n    >>> filter_integers([1, 2, 3, 'abc', {}, []])\n    [1, 2, 3]\n    \"\"\"\n",
+      "source_record_sha256": "486652294b44881a5c500958c1075603327715bd669a0154fbe3bd14acf51ab5",
+      "canonical_prompt_sha256": "3402931e9218ee24d38de41433a9c5bc93e99f9912cf381cb79e1aab3f116e62",
+      "canonical_source_sha256": "ee911f20d2005ddc87c81a645c1db55079df4ca1e06572601646e735dad9d35c",
+      "alpha_source_sha256": "ad69e2c81fefb0191c9036005b0a9f345b11bc6134185b532534c4f53ddcc8bc",
+      "response_sha256": "f40d9490d41818b6e23ba51a94771abe1f0677aeb203e6923e5a400f0762ba30",
+      "token_lengths": {
+        "response_tokens": 100,
+        "flat_tokens_with_eos": 207,
+        "chat_tokens": 237,
+        "generation_prompt_tokens": 135
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 2,
+        "distinct_expected": 2,
+        "nonempty_expected": 1
+      }
+    },
+    {
+      "id": "mbpp_459",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: remove_uppercase(str1).\nOriginal task:\nWrite a function to remove uppercase substrings from a given string.",
+      "response": "import re\ndef remove_uppercase(str1):\n  return re.sub('[A-Z]', '', str1)",
+      "source": "MBPP",
+      "source_task_id": "459",
+      "license": "CC-BY-4.0",
+      "entrypoint": "remove_uppercase",
+      "function_parameters": [
+        "str1"
+      ],
+      "family": "family_55f4b1ffb9c7d101",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to remove uppercase substrings from a given string.",
+      "source_record_sha256": "77be55a0e4c97d86a61300063be4e2470ae06c4391fbf2926a17afc2a77a0e94",
+      "canonical_prompt_sha256": "bd7c0a45359566c21a060af3a440b2a404709ed7b6882690c2208c639bb37a46",
+      "canonical_source_sha256": "9d90b8c9256e49628d1d9b7b314b7b4f9bda8f97d4ece5d381ddaf35da3428a8",
+      "alpha_source_sha256": "ce0fb9dc3fe649b240ce852f30c999cb0a4c64a05320aabc15cc7b339aef87eb",
+      "response_sha256": "8ad524c2eba29d6b0f93ea337cf223ab5c42e86306e46b5f0b1b06918b61a011",
+      "token_lengths": {
+        "response_tokens": 22,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [
+        "text_case_removal"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_98",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: count_upper(s).\nOriginal task:\n\ndef count_upper(s):\n    \"\"\"\n    Given a string s, count the number of uppercase vowels in even indices.\n    \n    For example:\n    count_upper('aBCdEf') returns 1\n    count_upper('abcdefg') returns 0\n    count_upper('dBBE') returns 0\n    \"\"\"\n",
+      "response": "\ndef count_upper(s):\n    \"\"\"\n    Given a string s, count the number of uppercase vowels in even indices.\n    \n    For example:\n    count_upper('aBCdEf') returns 1\n    count_upper('abcdefg') returns 0\n    count_upper('dBBE') returns 0\n    \"\"\"\n    count = 0\n    for i in range(0,len(s),2):\n        if s[i] in \"AEIOU\":\n            count += 1\n    return count\n",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/98",
+      "license": "MIT",
+      "entrypoint": "count_upper",
+      "function_parameters": [
+        "s"
+      ],
+      "family": "family_c5ff9e9041e28bf7",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "\ndef count_upper(s):\n    \"\"\"\n    Given a string s, count the number of uppercase vowels in even indices.\n    \n    For example:\n    count_upper('aBCdEf') returns 1\n    count_upper('abcdefg') returns 0\n    count_upper('dBBE') returns 0\n    \"\"\"\n",
+      "source_record_sha256": "034d2b1ab96f61756a85dfa4dc960f8dedfa800db426c1d9e7de593d53c4983b",
+      "canonical_prompt_sha256": "d052d517ef461bf75e3dc25e67dd1e44ef19bb9cd4769cd9bf76d2ae97c63a1c",
+      "canonical_source_sha256": "fab1d089fdf0376de835de117b4463ef5e893a3ca86d3b9c6a440f9f469ea0d5",
+      "alpha_source_sha256": "1ddc99ce9a2e0ccffdebcaf223080d328ee259c251e360f4fc05106568f57b90",
+      "response_sha256": "11e595a2aae90f5bd3db9d5b0b25f8ecf7d7d5524a765b95acef9500fd88a64f",
+      "token_lengths": {
+        "response_tokens": 106,
+        "flat_tokens_with_eos": 192,
+        "chat_tokens": 221,
+        "generation_prompt_tokens": 114
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 7,
+        "distinct_expected": 3,
+        "nonempty_expected": 7
+      }
+    },
+    {
+      "id": "mbpp_172",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: count_occurance(s).\nOriginal task:\nWrite a function to count the number of occurence of the string 'std' in a given string.",
+      "response": "def count_occurance(s):\n  count = 0\n  for i in range(len(s) - 2):\n    if (s[i] == 's' and s[i+1] == 't' and s[i+2] == 'd'):\n      count = count + 1\n  return count",
+      "source": "MBPP",
+      "source_task_id": "172",
+      "license": "CC-BY-4.0",
+      "entrypoint": "count_occurance",
+      "function_parameters": [
+        "s"
+      ],
+      "family": "family_a9360e14fa066c13",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to count the number of occurence of the string 'std' in a given string.",
+      "source_record_sha256": "c5dee82738ed6c2726209f764e4ee9bc2205f5daa40a0d01a183a51b84d8bcb0",
+      "canonical_prompt_sha256": "43c2eef1d6485381a9e584c6ddf5682e8898ebb549e9cf44db17d6121b070e8f",
+      "canonical_source_sha256": "36dd4be0c09e2520229003c622b428c5b4db532eaab4f471e7a98f78b5adef5f",
+      "alpha_source_sha256": "9587e238e333b553538849cac4aa585a40c01d6426d23d79f61df5e653ae2c13",
+      "response_sha256": "a3266da18b9196462daad28d03c6feaf2ddd4089aa0a45b1a0148878fc1aef73",
+      "token_lengths": {
+        "response_tokens": 66,
+        "flat_tokens_with_eos": 109,
+        "chat_tokens": 139,
+        "generation_prompt_tokens": 71
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 5,
+        "distinct_expected": 4,
+        "nonempty_expected": 5
+      }
+    },
+    {
+      "id": "mbpp_294",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: max_val(listval).\nOriginal task:\nWrite a function to find the maximum value in a given heterogeneous list.",
+      "response": "def max_val(listval):\n     max_val = max(i for i in listval if isinstance(i, int)) \n     return(max_val)",
+      "source": "MBPP",
+      "source_task_id": "294",
+      "license": "CC-BY-4.0",
+      "entrypoint": "max_val",
+      "function_parameters": [
+        "listval"
+      ],
+      "family": "family_11a021013611911b",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to find the maximum value in a given heterogeneous list.",
+      "source_record_sha256": "43bcfa89846b0ccdef6588ffdfc57f63969ffba32d8f04c67c1156740a793e83",
+      "canonical_prompt_sha256": "09a111cd27b5934809f459e376f0353583406a49d625c813c270bae8d2a6ad8f",
+      "canonical_source_sha256": "dd7fc6b7d9808a67014dcae27a3868c2c593a3ed759593fd376d223ce2cce0ca",
+      "alpha_source_sha256": "705187f11404f67d4adb5f7eabf2e8e389be98afaed6f864e4cc49e536f1af9c",
+      "response_sha256": "d1779fccacc7fc9eeadc160ac11b40fec45709a74f4822af53408fe68bf319f8",
+      "token_lengths": {
+        "response_tokens": 29,
+        "flat_tokens_with_eos": 64,
+        "chat_tokens": 94,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_227",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: min_of_three(a, b, c).\nOriginal task:\nWrite a function to find minimum of three numbers.",
+      "response": "def min_of_three(a,b,c): \n      if (a <= b) and (a <= c): \n        smallest = a \n      elif (b <= a) and (b <= c): \n        smallest = b \n      else: \n        smallest = c \n      return smallest ",
+      "source": "MBPP",
+      "source_task_id": "227",
+      "license": "CC-BY-4.0",
+      "entrypoint": "min_of_three",
+      "function_parameters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "family": "family_dc0b139f0bf4c6ec",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "Write a function to find minimum of three numbers.",
+      "source_record_sha256": "1907c23f5ddb7e08ef642f22083d0a7ddaa093e779f02f9bee3718ec53e0c58c",
+      "canonical_prompt_sha256": "626fb2b844b1fdd62a71997411db72a7b446cd0370e103974102d77c49ac5808",
+      "canonical_source_sha256": "ce2c0d2012d10a7f65f6f477e345aab06cb99ea5cc560b0a0d100ed65e539a2d",
+      "alpha_source_sha256": "c9b3a6f10937e86954bc50e5baf3768887bb4e77a6eb02870a1da3c998aa238b",
+      "response_sha256": "b9911d851626d4d63518b4a8298d7dec915c0b4c6ac9d417db77aef3e9579749",
+      "token_lengths": {
+        "response_tokens": 60,
+        "flat_tokens_with_eos": 95,
+        "chat_tokens": 125,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_426",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: filter_oddnumbers(nums).\nOriginal task:\nWrite a function to filter odd numbers.",
+      "response": "def filter_oddnumbers(nums):\n odd_nums = list(filter(lambda x: x%2 != 0, nums))\n return odd_nums",
+      "source": "MBPP",
+      "source_task_id": "426",
+      "license": "CC-BY-4.0",
+      "entrypoint": "filter_oddnumbers",
+      "function_parameters": [
+        "nums"
+      ],
+      "family": "family_d52fb95d0805f4ae",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to filter odd numbers.",
+      "source_record_sha256": "216e7ae90ded095a9ca92ca5d37c2b0abf8f962b3e6ba4f4e8f935bddf523717",
+      "canonical_prompt_sha256": "8bdaeeb93a037e9f07092078b3caa477bfffd7227b0d8cf0f92971fd3e01e90f",
+      "canonical_source_sha256": "9540d6a2b15f0819cd352ce85930983f8d70793801bfa4ff55fc7e4f96a7bce9",
+      "alpha_source_sha256": "3d4b653285c383e98ce6aa8990790440cd7591c71c4bb2cf88460f2c13520831",
+      "response_sha256": "7938814e3181a7571c0839861075cd00589582a87ddf6c9aee7b76a1e55c2505",
+      "token_lengths": {
+        "response_tokens": 26,
+        "flat_tokens_with_eos": 55,
+        "chat_tokens": 85,
+        "generation_prompt_tokens": 57
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_16",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: count_distinct_characters(string).\nOriginal task:\n\n\ndef count_distinct_characters(string: str) -> int:\n    \"\"\" Given a string, find out how many distinct characters (regardless of case) does it consist of\n    >>> count_distinct_characters('xyzXYZ')\n    3\n    >>> count_distinct_characters('Jerry')\n    4\n    \"\"\"\n",
+      "response": "\n\ndef count_distinct_characters(string: str) -> int:\n    \"\"\" Given a string, find out how many distinct characters (regardless of case) does it consist of\n    >>> count_distinct_characters('xyzXYZ')\n    3\n    >>> count_distinct_characters('Jerry')\n    4\n    \"\"\"\n    return len(set(string.lower()))\n",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/16",
+      "license": "MIT",
+      "entrypoint": "count_distinct_characters",
+      "function_parameters": [
+        "string"
+      ],
+      "family": "family_c06de89a3d67c52b",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "\n\ndef count_distinct_characters(string: str) -> int:\n    \"\"\" Given a string, find out how many distinct characters (regardless of case) does it consist of\n    >>> count_distinct_characters('xyzXYZ')\n    3\n    >>> count_distinct_characters('Jerry')\n    4\n    \"\"\"\n",
+      "source_record_sha256": "4178c94452fa229e537c2dad339c3ba37d34b9e6610aed5b72edd9d40b514ef2",
+      "canonical_prompt_sha256": "898cd3f2ba16ada54d1f72c6a552f5f89afe78adc5a7e0ecfd5a1c5e087115b2",
+      "canonical_source_sha256": "f16f20b50db026dcb8f527b3b4b92a1b9f5dbe1994bdeacdbaef449827e92c54",
+      "alpha_source_sha256": "c06b172f26529797833226454068569ef893856e84f6d78d54db225b787e80a3",
+      "response_sha256": "b7f05bf0a6d10e8bb702baef920fb45bb68c347544c4e99502840e5fff06e93f",
+      "token_lengths": {
+        "response_tokens": 72,
+        "flat_tokens_with_eos": 158,
+        "chat_tokens": 187,
+        "generation_prompt_tokens": 114
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 3,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_801",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: test_three_equal(x, y, z).\nOriginal task:\nWrite a python function to count the number of equal numbers from three given integers.",
+      "response": "def test_three_equal(x,y,z):\n  result = set([x,y,z])\n  if len(result)==3:\n    return 0\n  else:\n    return 4-len(result)",
+      "source": "MBPP",
+      "source_task_id": "801",
+      "license": "CC-BY-4.0",
+      "entrypoint": "test_three_equal",
+      "function_parameters": [
+        "x",
+        "y",
+        "z"
+      ],
+      "family": "family_b303ad64d9303534",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "Write a python function to count the number of equal numbers from three given integers.",
+      "source_record_sha256": "d62727fd06a9f65b42b3bd7160fd7819dfbee424b641829ff635fbfff7a7d0a2",
+      "canonical_prompt_sha256": "01da9f3326fcdfeb989e43c659cd455f421d34ba009fb8b5bd9dc80d6aca1ee0",
+      "canonical_source_sha256": "b2f396be3042ff1d542186ec8d0e6348629797eb82d77bb1c4d8655fa7a85160",
+      "alpha_source_sha256": "62c7e4ecb9b4529a4e4b50a3908ceffbda8cfa31db98edf7b27183d794294c2d",
+      "response_sha256": "4fed2bd589e7b7885237efd19baadaff8fff626687c87789b332f50127be86da",
+      "token_lengths": {
+        "response_tokens": 39,
+        "flat_tokens_with_eos": 80,
+        "chat_tokens": 110,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_60",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: sum_to_n(n).\nOriginal task:\n\n\ndef sum_to_n(n: int):\n    \"\"\"sum_to_n is a function that sums numbers from 1 to n.\n    >>> sum_to_n(30)\n    465\n    >>> sum_to_n(100)\n    5050\n    >>> sum_to_n(5)\n    15\n    >>> sum_to_n(10)\n    55\n    >>> sum_to_n(1)\n    1\n    \"\"\"\n",
+      "response": "\n\ndef sum_to_n(n: int):\n    \"\"\"sum_to_n is a function that sums numbers from 1 to n.\n    >>> sum_to_n(30)\n    465\n    >>> sum_to_n(100)\n    5050\n    >>> sum_to_n(5)\n    15\n    >>> sum_to_n(10)\n    55\n    >>> sum_to_n(1)\n    1\n    \"\"\"\n    return sum(range(n + 1))\n",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/60",
+      "license": "MIT",
+      "entrypoint": "sum_to_n",
+      "function_parameters": [
+        "n"
+      ],
+      "family": "family_5859a50761854f7b",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "\n\ndef sum_to_n(n: int):\n    \"\"\"sum_to_n is a function that sums numbers from 1 to n.\n    >>> sum_to_n(30)\n    465\n    >>> sum_to_n(100)\n    5050\n    >>> sum_to_n(5)\n    15\n    >>> sum_to_n(10)\n    55\n    >>> sum_to_n(1)\n    1\n    \"\"\"\n",
+      "source_record_sha256": "73a337489bc8fff41264a51156acaff3ef330f9c758c473ac8d60bae37d9ed12",
+      "canonical_prompt_sha256": "b4a1a3ed9e561f9e223a380f133845a9d4f886d7c54854566a7224a88f58573f",
+      "canonical_source_sha256": "165e5579dbe351ad04ef375bfe940e379f5c98b1572756099cb33adaf86bfede",
+      "alpha_source_sha256": "924d22fad925245c5784faa23dcb3af81c5ef19423101e1dcc33a799f7c76ef5",
+      "response_sha256": "85d8cd7a6998176d12c44daec408e3c48c4a0b9b4bb2ea5c6b6533010eb46946",
+      "token_lengths": {
+        "response_tokens": 108,
+        "flat_tokens_with_eos": 227,
+        "chat_tokens": 256,
+        "generation_prompt_tokens": 147
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 5,
+        "distinct_expected": 5,
+        "nonempty_expected": 5
+      }
+    },
+    {
+      "id": "mbpp_725",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: extract_quotation(text1).\nOriginal task:\nWrite a function to extract values between quotation marks \" \" of the given string.",
+      "response": "import re\ndef extract_quotation(text1):\n  return (re.findall(r'\"(.*?)\"', text1))",
+      "source": "MBPP",
+      "source_task_id": "725",
+      "license": "CC-BY-4.0",
+      "entrypoint": "extract_quotation",
+      "function_parameters": [
+        "text1"
+      ],
+      "family": "family_4c69918c691c31e2",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to extract values between quotation marks \" \" of the given string.",
+      "source_record_sha256": "95e78f7fc5669ca70025e296951440c482ae1a243dfd5bdb58ec9533e3884128",
+      "canonical_prompt_sha256": "decfe3b4559d8d3eefbc3b5f0ffe5c5658a47caa0dea7b998aa9dce32a42826e",
+      "canonical_source_sha256": "7e32b696076d4ae4e3b8db407efdf5f7a53bd58a3ee63424b06103bda0a7692d",
+      "alpha_source_sha256": "8cf060ffc3177a370acc5e9cafb621efb5b878420b38c9ee10e4ccc7f90ed815",
+      "response_sha256": "3eaf7ccddd2b5ec8a8d801194db287556777a8e628f50c80d3c6e648cd5832f8",
+      "token_lengths": {
+        "response_tokens": 25,
+        "flat_tokens_with_eos": 63,
+        "chat_tokens": 93,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 4,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_130",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: max_occurrences(nums).\nOriginal task:\nWrite a function to find the item with maximum frequency in a given list.",
+      "response": "from collections import defaultdict\ndef max_occurrences(nums):\n    dict = defaultdict(int)\n    for i in nums:\n        dict[i] += 1\n    result = max(dict.items(), key=lambda x: x[1]) \n    return result[0]",
+      "source": "MBPP",
+      "source_task_id": "130",
+      "license": "CC-BY-4.0",
+      "entrypoint": "max_occurrences",
+      "function_parameters": [
+        "nums"
+      ],
+      "family": "family_eb2d79582978d2d6",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to find the item with maximum frequency in a given list.",
+      "source_record_sha256": "c67e7b108fd33a055afc206fda4972ffc1c21437b4253fa7157da9fcb98e8fab",
+      "canonical_prompt_sha256": "24283be7c03eaa97329f6bc76dd2c3c914bd3e91121ed3ee1b20b1ce9ddbedf4",
+      "canonical_source_sha256": "78695c6931d6958a3d36c5f72864c89e5ea59bc965fab2868dc1c0b55adedd88",
+      "alpha_source_sha256": "986eefd04362601767cc3cc29ade97be9305b66c94846e206d3bfddcf1696557",
+      "response_sha256": "5e0d062a354767279867c42cd8256bc1148dab8141a89dc7e7542ee80926f743",
+      "token_lengths": {
+        "response_tokens": 53,
+        "flat_tokens_with_eos": 89,
+        "chat_tokens": 119,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_800",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: remove_all_spaces(text).\nOriginal task:\nWrite a function to remove all whitespaces from a string.",
+      "response": "import re\ndef remove_all_spaces(text):\n return (re.sub(r'\\s+', '',text))",
+      "source": "MBPP",
+      "source_task_id": "800",
+      "license": "CC-BY-4.0",
+      "entrypoint": "remove_all_spaces",
+      "function_parameters": [
+        "text"
+      ],
+      "family": "family_5455e2a95c8c8f71",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to remove all whitespaces from a string.",
+      "source_record_sha256": "3178a3f5b70d13445d746812edabffa3c87a24c835bd86d922037692b9aa5aa4",
+      "canonical_prompt_sha256": "d850ad247f142589524dd8c28852f53afbc28b5d4aee61abfcb4946c14ca2de6",
+      "canonical_source_sha256": "1132b6edf585f98c9f4724e44220bddd2cdce34a06dc8ff890349b113f8d5d4b",
+      "alpha_source_sha256": "4b82298220dffbca8f22e4c4e82e8ed975b05d7c32df32f9d46fc1b477b3b3b2",
+      "response_sha256": "48d7b16a714761c7262434625bfefff84db672f93a2c2c9d6f2f108fb2fa85f8",
+      "token_lengths": {
+        "response_tokens": 20,
+        "flat_tokens_with_eos": 53,
+        "chat_tokens": 83,
+        "generation_prompt_tokens": 61
+      },
+      "operation_tags": [
+        "text_whitespace_replacement"
+      ],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 2,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_435",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: last_Digit(n).\nOriginal task:\nWrite a python function to find the last digit of a given number.",
+      "response": "def last_Digit(n) :\n    return (n % 10) ",
+      "source": "MBPP",
+      "source_task_id": "435",
+      "license": "CC-BY-4.0",
+      "entrypoint": "last_Digit",
+      "function_parameters": [
+        "n"
+      ],
+      "family": "family_7696dd36e8e3246a",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "Write a python function to find the last digit of a given number.",
+      "source_record_sha256": "d376536843cd3f7ee9211f4731ff69b1bc37e1e5145a7868bed9a1500c6c384b",
+      "canonical_prompt_sha256": "301ecec040abd649c94be8ec2d72eedcc3340bcea2a2cdb1076a72fb77a66cb9",
+      "canonical_source_sha256": "f04915683a0eb3e4e382f073d97eccc2b75747a85cc3bc5cbcbcd1d82c675a76",
+      "alpha_source_sha256": "1303f3da658edb7c83c31bc58d133de51ab684c55b7652fda88013eb6c4a5263",
+      "response_sha256": "4f984e7ee7c97a46e7e611ac716c0635e65acae62208264e93950c29b65ea04f",
+      "token_lengths": {
+        "response_tokens": 17,
+        "flat_tokens_with_eos": 52,
+        "chat_tokens": 82,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_439",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: multiple_to_single(L).\nOriginal task:\nWrite a function to join a list of multiple integers into a single integer.",
+      "response": "def multiple_to_single(L):\n  x = int(\"\".join(map(str, L)))\n  return x",
+      "source": "MBPP",
+      "source_task_id": "439",
+      "license": "CC-BY-4.0",
+      "entrypoint": "multiple_to_single",
+      "function_parameters": [
+        "L"
+      ],
+      "family": "family_294f150de58d3ec9",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to join a list of multiple integers into a single integer.",
+      "source_record_sha256": "ab21bdf6fb2e2158a9c4c020fee2630d0505be0fad8daabd46f123b466606596",
+      "canonical_prompt_sha256": "6583017a0218396f3cc013c85c5d5db7a5ac66aa61fb1e9645cd6b882cdf3706",
+      "canonical_source_sha256": "72478fe9c1cf529573fb3f8c0555db1f6c23fda28cfefcee789d122494939ad2",
+      "alpha_source_sha256": "6ec337447848c4f05695356cda8934dbcc28833ed4fa891bdd6facb4f50f1fcb",
+      "response_sha256": "b49e7db07fa4ab970d21834d0772da76b3fdbcd4cd5a9e04b88f04513c37ff2f",
+      "token_lengths": {
+        "response_tokens": 21,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    }
+  ]
+}

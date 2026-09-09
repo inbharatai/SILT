@@ -1,0 +1,141 @@
+{
+  "schema": "silt.specialist.manifest.v1",
+  "scope": "standalone_LOCAL_specialist_training_and_heldouts_NOT_official_benchmark",
+  "primary_capability_contract": "Implement short pure Python functions over flat strings/lists: transform, filter, count, test membership or aggregate; preserve original entrypoint and return value, no external I/O. Basic integer controls measure nearby non-target support.",
+  "predicted_fairness": "Groups represent real source-only input domains; both have diverse positive oracle values. Controls are simpler straight-line arithmetic, not difficulty matched. No performance parity or causal fairness claim. Source distribution and original benchmark exposure are not balanced/unknown.",
+  "teacher_capability_status": "UNVALIDATED; no model weights loaded or model outputs inspected; validate later on TRAIN/development only. Never select or retune using final.",
+  "official_split": false,
+  "counts": {
+    "upstream_total": 591,
+    "consumed_ids": 32,
+    "eligible_before_family_representatives": 85,
+    "eligible_independent_families": 67,
+    "eligible_by_group": {
+      "target": 58,
+      "control": 9
+    },
+    "selected_unique_tasks": 66,
+    "selected_by_split": {
+      "final": 16,
+      "train": 42,
+      "validation": 8
+    },
+    "selected_by_split_group_source": {
+      "final/target/MBPP": 9,
+      "final/target/HumanEval": 3,
+      "final/control/MBPP": 3,
+      "final/control/HumanEval": 1,
+      "train/target/MBPP": 39,
+      "train/control/MBPP": 2,
+      "train/target/HumanEval": 1,
+      "validation/target/MBPP": 6,
+      "validation/control/MBPP": 2
+    },
+    "eligible_not_selected": 1,
+    "exclusions_by_reason": {
+      "complete_prompt_response_over_256_tokens": 11,
+      "complete_response_over_192_tokens": 7,
+      "consumed_or_initial_six_near_family": 175,
+      "consumed_pilot_v2_id": 32,
+      "fewer_than_two_literal_cases": 122,
+      "import_outside_pure_stdlib_allowlist": 7,
+      "io_dynamic_or_recursive_call": 8,
+      "module_side_effect_or_global_state": 1,
+      "numeric_control_not_basic_arithmetic": 5,
+      "numeric_control_not_straightline_basic": 8,
+      "out_of_scope_advanced_or_algorithmic": 74,
+      "outside_basic_integer_control_contract": 1,
+      "outside_flat_string_list_scalar_contract": 13,
+      "reference_outside_simple_stateless_grammar": 12,
+      "reference_over_two_loops": 7,
+      "requires_single_function": 9,
+      "requires_test_imports": 12,
+      "retained_cases_lack_expected_value_diversity": 2,
+      "same_eligible_family_representative": 18
+    },
+    "train_requested": 64,
+    "train_shortfall": 22,
+    "function_cases": 210,
+    "calibration_from_train": 32
+  },
+  "selection_sha256": "5c53a5411bd7031908dfcd4c51e04c3629de527c44fb30b70830b5e982d80671",
+  "selection_lock_sha256": "7ec2082da6eefcb92db204db0355c4c4b1aee64c5ae1772937d6292fd9efaa9f",
+  "seed": "silt-specialist-v1-pure-sequences-20260908-before-any-generation",
+  "source_pins": {
+    "HumanEval": "6d43fb980f9fee3c892a914eda09951f772ad10d",
+    "MBPP_GitHub": "932d4685e23f671b9e8c2abc72dd228ba5ff9252",
+    "MBPP_publisher_license_card": "4bb6404fdc6cacfda99d4ac4205087b89d32030c"
+  },
+  "sources": [
+    {
+      "file": "sources/HumanEval.jsonl.gz",
+      "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/data/HumanEval.jsonl.gz",
+      "sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef"
+    },
+    {
+      "file": "sources/HumanEval-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/LICENSE",
+      "sha256": "bcba3de214851cce46ed5af42d6698044616eeace887c3231bc7a20474ab639e"
+    },
+    {
+      "file": "sources/mbpp-sanitized.json",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/932d4685e23f671b9e8c2abc72dd228ba5ff9252/mbpp/sanitized-mbpp.json",
+      "sha256": "ca95deaa9a01ef0a6f439f88bcf0dd3db3563d22f22aad6cae04ebb9a8d8c8e9"
+    },
+    {
+      "file": "sources/mbpp-README.md",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/932d4685e23f671b9e8c2abc72dd228ba5ff9252/mbpp/README.md",
+      "sha256": "02d63a4ffdad806c3c87b5ea2aa91e946f6eec0c2869643b09831650883f41be"
+    },
+    {
+      "file": "sources/mbpp-LICENSE-evidence.md",
+      "url": "https://huggingface.co/datasets/google-research-datasets/mbpp/resolve/4bb6404fdc6cacfda99d4ac4205087b89d32030c/README.md",
+      "sha256": "6377d5c76ba46b9e650daa6d5eb592e671c9b15586e39f23f50ed9bf2ac54cf6"
+    },
+    {
+      "file": "sources/CC-BY-4.0.txt",
+      "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+      "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+    }
+  ],
+  "prior_selection_lock_sha256": "3f9a6326dcfc417956c7db0a378f429ef3d097110e03324027d387b0d49d802a",
+  "builder_sha256": "8dbb34a742c4464fadaf2cddddd7a69f3a242110eb68dcb04457a3ab65b2b4e0",
+  "audited_parser_sha256": "fada630197d618ca7b5939032f45e5112c55e2a393aa3412def513b40dcd03c8",
+  "environment": {
+    "python": "3.9.25",
+    "transformers": "4.51.3",
+    "tokenizers": "0.21.4",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "eos_token_id": 151645,
+    "tokenizer_files_sha256": {
+      "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "tokenizer_config.json": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+    },
+    "tokenizer_local_path": "/agent/workspace/silt-models/Qwen2.5-Coder-0.5B-Instruct",
+    "weights_loaded": false,
+    "network_used": false
+  },
+  "artifact_sha256": {
+    "ATTRIBUTION.md": "fd704223216d68cd2fcb9324cfa081ce54223bda83ab349401f3ff4f87b72772",
+    "calibration.json": "9105d15cb702935a2c1c86b9238b94eb26b6a48a65235ec5da88c9a29aadaaee",
+    "eligibility-audit.json": "4341545f0bf09cde5239cead43a8f6be739227c1600b7b62d984aa2d67016157",
+    "final-provenance.json": "ba32e3d9fa85c1472e5d046f6f9f25ef69918493af912652eb51ded4b0829856",
+    "final-suite.json": "7dcabbdcd389e2991dac06e98fca6542bc0e2330b3bb8d8349b2fe26834056f8",
+    "final.json": "302b950947ddd08e68ce09bb4e999869cc0c554ccdf499464c26c39bde1f445e",
+    "selection-lock.json": "7ec2082da6eefcb92db204db0355c4c4b1aee64c5ae1772937d6292fd9efaa9f",
+    "sources/CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+    "sources/HumanEval-LICENSE.txt": "bcba3de214851cce46ed5af42d6698044616eeace887c3231bc7a20474ab639e",
+    "sources/HumanEval.jsonl.gz": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+    "sources/mbpp-LICENSE-evidence.md": "6377d5c76ba46b9e650daa6d5eb592e671c9b15586e39f23f50ed9bf2ac54cf6",
+    "sources/mbpp-README.md": "02d63a4ffdad806c3c87b5ea2aa91e946f6eec0c2869643b09831650883f41be",
+    "sources/mbpp-sanitized.json": "ca95deaa9a01ef0a6f439f88bcf0dd3db3563d22f22aad6cae04ebb9a8d8c8e9",
+    "train-cases.json": "8ee6201c900b1c9248b2c8f4235d28a20c8326ede99c33d2e55c897bf5ab0d5c",
+    "train.json": "2265e1592379ebe1e07ee8fae1e301902e0944769bf0f2284bd5d505958320e3",
+    "validation-provenance.json": "4a71c3a07038dade17e8769fe51902b1a25d8b82786d02d8830de1ace2514b4f",
+    "validation-suite.json": "9af7f95306f39843add23e4ab172184ed71cb776b3a8ed21374fd90fe1adbd0e",
+    "validation.json": "b580a5aaef676a8f59c9176e0bcddf4b8f50c03f9157a8d3315cc728e7e63041"
+  },
+  "governance": "Frozen before generation. Final files contain answers and are quarantined by policy, not encryption. Do not open final.json, final-suite.json or final-provenance.json for training/tuning. Dataset revisions after generation require a new version and lock. No cloning/padding for shortfalls."
+}

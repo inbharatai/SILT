@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "name": "specialist-v1-validation",
+  "reference_source": "Pinned MIT HumanEval and CC-BY-4.0 sanitized MBPP; original literal assert subset. Standalone LOCAL split, not official benchmark scores. See ATTRIBUTION.md and manifest.json.",
+  "policy_version": "composition-admission-v2",
+  "claims": [
+    "coding"
+  ],
+  "cases": [
+    {
+      "id": "mbpp_229",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: re_arrange_array(arr, n).\nOriginal task:\nWrite a function that takes in an array and an integer n, and re-arranges the first n elements of the given array so that all negative elements appear before positive ones, and where the relative order among negative and positive elements is preserved.",
+      "reference": "MBPP task 229 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "re_arrange_array",
+          "args": [
+            [
+              -1,
+              2,
+              -3,
+              4,
+              5,
+              6,
+              -7,
+              8,
+              9
+            ],
+            9
+          ],
+          "kwargs": {},
+          "expected": [
+            -1,
+            -3,
+            -7,
+            4,
+            5,
+            6,
+            2,
+            8,
+            9
+          ],
+          "id": "io_1"
+        },
+        {
+          "function": "re_arrange_array",
+          "args": [
+            [
+              12,
+              -14,
+              -26,
+              13,
+              15
+            ],
+            5
+          ],
+          "kwargs": {},
+          "expected": [
+            -14,
+            -26,
+            12,
+            13,
+            15
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "re_arrange_array",
+          "args": [
+            [
+              10,
+              24,
+              36,
+              -42,
+              -39,
+              -78,
+              85
+            ],
+            7
+          ],
+          "kwargs": {},
+          "expected": [
+            -42,
+            -39,
+            -78,
+            10,
+            24,
+            36,
+            85
+          ],
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_90",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: len_log(list1).\nOriginal task:\nWrite a python function to find the length of the longest word.",
+      "reference": "MBPP task 90 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "len_log",
+          "args": [
+            [
+              "python",
+              "PHP",
+              "bigdata"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 7,
+          "id": "io_1"
+        },
+        {
+          "function": "len_log",
+          "args": [
+            [
+              "a",
+              "ab",
+              "abc"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_2"
+        },
+        {
+          "function": "len_log",
+          "args": [
+            [
+              "small",
+              "big",
+              "tall"
+            ]
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_748",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: capital_words_spaces(str1).\nOriginal task:\nWrite a function to put spaces between words starting with capital letters in a given string.",
+      "reference": "MBPP task 748 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "capital_words_spaces",
+          "args": [
+            "Python"
+          ],
+          "kwargs": {},
+          "expected": "Python",
+          "id": "io_1"
+        },
+        {
+          "function": "capital_words_spaces",
+          "args": [
+            "PythonProgrammingExamples"
+          ],
+          "kwargs": {},
+          "expected": "Python Programming Examples",
+          "id": "io_2"
+        },
+        {
+          "function": "capital_words_spaces",
+          "args": [
+            "GetReadyToBeCodingFreak"
+          ],
+          "kwargs": {},
+          "expected": "Get Ready To Be Coding Freak",
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_637",
+      "group": "control",
+      "input": "Return only complete Python code. Preserve the required entrypoint: noprofit_noloss(actual_cost, sale_amount).\nOriginal task:\nWrite a function to check whether the given amount has no profit and no loss",
+      "reference": "MBPP task 637 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "noprofit_noloss",
+          "args": [
+            1500,
+            1200
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_1"
+        },
+        {
+          "function": "noprofit_noloss",
+          "args": [
+            100,
+            100
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_2"
+        },
+        {
+          "function": "noprofit_noloss",
+          "args": [
+            2000,
+            5000
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_292",
+      "group": "control",
+      "input": "Return only complete Python code. Preserve the required entrypoint: find(n, m).\nOriginal task:\nWrite a python function to find quotient of two numbers (rounded down to the nearest integer).",
+      "reference": "MBPP task 292 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "find",
+          "args": [
+            10,
+            3
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_1"
+        },
+        {
+          "function": "find",
+          "args": [
+            4,
+            2
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_2"
+        },
+        {
+          "function": "find",
+          "args": [
+            20,
+            5
+          ],
+          "kwargs": {},
+          "expected": 4,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_591",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: swap_List(newList).\nOriginal task:\nWrite a python function to interchange the first and last elements in a list.",
+      "reference": "MBPP task 591 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "swap_List",
+          "args": [
+            [
+              12,
+              35,
+              9,
+              56,
+              24
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            24,
+            35,
+            9,
+            56,
+            12
+          ],
+          "id": "io_1"
+        },
+        {
+          "function": "swap_List",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            3,
+            2,
+            1
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "swap_List",
+          "args": [
+            [
+              4,
+              5,
+              6
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            6,
+            5,
+            4
+          ],
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_11",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: remove_Occ(s, ch).\nOriginal task:\nWrite a python function to remove first and last occurrence of a given character from the string.",
+      "reference": "MBPP task 11 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "remove_Occ",
+          "args": [
+            "hello",
+            "l"
+          ],
+          "kwargs": {},
+          "expected": "heo",
+          "id": "io_1"
+        },
+        {
+          "function": "remove_Occ",
+          "args": [
+            "abcda",
+            "a"
+          ],
+          "kwargs": {},
+          "expected": "bcd",
+          "id": "io_2"
+        },
+        {
+          "function": "remove_Occ",
+          "args": [
+            "PHP",
+            "P"
+          ],
+          "kwargs": {},
+          "expected": "H",
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_165",
+      "group": "target",
+      "input": "Return only complete Python code. Preserve the required entrypoint: count_char_position(str1).\nOriginal task:\nWrite a function to count the number of characters in a string that occur at the same position in the string as in the English alphabet (case insensitive).",
+      "reference": "MBPP task 165 original literal assertions; CC-BY-4.0.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "output_format": "raw_python",
+      "function_cases": [
+        {
+          "function": "count_char_position",
+          "args": [
+            "xbcefg"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_1"
+        },
+        {
+          "function": "count_char_position",
+          "args": [
+            "ABcED"
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_2"
+        },
+        {
+          "function": "count_char_position",
+          "args": [
+            "AbgdeF"
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_3"
+        }
+      ]
+    }
+  ]
+}

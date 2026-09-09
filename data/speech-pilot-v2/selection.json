@@ -1,0 +1,556 @@
+{
+  "seed": "silt-speech-pilot-v2-fleurs-en-test-before-inference-1",
+  "order": "SHA256(seed|utterance|sentence_id|filename) chooses one; SHA256(seed|sentence|sentence_id) orders sentence population; first 60; first 48 target, last 12 control",
+  "eligibility_filters": [
+    "official en_us test only",
+    "0 < metadata num_samples <= 320000 (20 seconds at 16kHz)",
+    "nonblank dataset transcription <=65536 chars",
+    "numeric sentence ID and numeric WAV basename",
+    "one utterance per sentence ID; no speaker independence claim"
+  ],
+  "rows": [
+    {
+      "sentence_id": "1671",
+      "source_filename": "5904418145588789259.wav",
+      "reference_text": "congress began funding the obscenity initiative in fiscal 2005 and specified that the fbi must devote 10 agents to adult pornography",
+      "raw_transcription": "Congress began funding the obscenity initiative in fiscal 2005 and specified that the FBI must devote 10 agents to adult pornography.",
+      "num_samples": 198720,
+      "case_id": "fleurs_en_1671",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1838",
+      "source_filename": "16234809612157196531.wav",
+      "reference_text": "the great pyramid at giza is the only one of the seven wonders that is still standing today",
+      "raw_transcription": "The Great Pyramid at Giza is the only one of the seven wonders that is still standing today.",
+      "num_samples": 113280,
+      "case_id": "fleurs_en_1838",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1870",
+      "source_filename": "11827077161070295147.wav",
+      "reference_text": "the scenes are displayed on the pyramids and the different pyramids are lit up",
+      "raw_transcription": "The scenes are displayed on the pyramids and the different pyramids are lit up.",
+      "num_samples": 69120,
+      "case_id": "fleurs_en_1870",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1756",
+      "source_filename": "4566051537148836720.wav",
+      "reference_text": "late on sunday the united states president donald trump in a statement delivered via the press secretary announced us troops would be leaving syria",
+      "raw_transcription": "Late on Sunday, the United States President Donald Trump, in a statement delivered via the press secretary, announced US troops would be leaving Syria.",
+      "num_samples": 214080,
+      "case_id": "fleurs_en_1756",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1713",
+      "source_filename": "12921155570472263117.wav",
+      "reference_text": "while goma is reasonably safe any visits outside of goma should be researched to understand the state of the fighting that persists in the north kivu province",
+      "raw_transcription": "While Goma is reasonably safe, any visits outside of Goma should be researched to understand the state of the fighting that persists in the North Kivu province.",
+      "num_samples": 157440,
+      "case_id": "fleurs_en_1713",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1929",
+      "source_filename": "3306779845046917300.wav",
+      "reference_text": "del potro had the early advantage in the second set but this too required a tie break after reaching 6-6",
+      "raw_transcription": "Del Potro had the early advantage in the second set, but this too required a tie break after reaching 6-6.",
+      "num_samples": 129600,
+      "case_id": "fleurs_en_1929",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1711",
+      "source_filename": "1043394666292127188.wav",
+      "reference_text": "these theories look at what it is about certain people that make them want the things that they do and what things in their environment will make them do or not do certain things",
+      "raw_transcription": "These theories look at what it is about certain people that make them want the things that they do and what things in their environment will make them do or not do certain things.",
+      "num_samples": 248960,
+      "case_id": "fleurs_en_1711",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1670",
+      "source_filename": "6263891810431071444.wav",
+      "reference_text": "their thermal behavior is not as steady as large caves on earth that often maintain a fairly constant temperature but it is consistent with these being deep holes in the ground, said glen cushing of the united states geological survey usgs astrogeology team and of northern arizona university located in flagstaff arizona",
+      "raw_transcription": "Their thermal behavior is not as steady as large caves on Earth that often maintain a fairly constant temperature, but it is consistent with these being deep holes in the ground,\" said Glen Cushing of the United States Geological Survey (USGS) Astrogeology Team and of Northern Arizona University located in Flagstaff, Arizona.",
+      "num_samples": 316800,
+      "case_id": "fleurs_en_1670",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1872",
+      "source_filename": "7489324500816890474.wav",
+      "reference_text": "during the struggle for independence organised by the mau movement a peaceful gathering in the town resulted in the killing of the paramount chief tupua tamasese lealofi iii",
+      "raw_transcription": "During the struggle for independence organised by the Mau movement, a peaceful gathering in the town resulted in the killing of the paramount chief Tupua Tamasese Lealofi III.",
+      "num_samples": 200640,
+      "case_id": "fleurs_en_1872",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1683",
+      "source_filename": "14624695685248966546.wav",
+      "reference_text": "there are still many men and women alive who survived their time here and many more who had loved ones who were murdered or worked to death there jews and non-jews alike",
+      "raw_transcription": "There are still many men and women alive who survived their time here, and many more who had loved ones who were murdered or worked to death there, Jews and non-Jews alike.",
+      "num_samples": 177600,
+      "case_id": "fleurs_en_1683",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1984",
+      "source_filename": "15278922555301201869.wav",
+      "reference_text": "mass car ownership also leads to a higher incidence of accidents on the roads which leads to the invention of new techniques in healthcare for repairing damaged bodies",
+      "raw_transcription": "Mass car ownership also leads to a higher incidence of accidents on the roads, which leads to the invention of new techniques in healthcare for repairing damaged bodies.",
+      "num_samples": 179520,
+      "case_id": "fleurs_en_1984",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1744",
+      "source_filename": "3562415917464695718.wav",
+      "reference_text": "the smaller the rossby number the less active the star with respect to magnetic reversals",
+      "raw_transcription": "The smaller the Rossby number, the less active the star with respect to magnetic reversals.",
+      "num_samples": 90240,
+      "case_id": "fleurs_en_1744",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1769",
+      "source_filename": "11459777646810052940.wav",
+      "reference_text": "built by the egyptians in the third century bce the great pyramid is one of many large pyramid structures built to honor dead pharaoh",
+      "raw_transcription": "Built by the Egyptians in the third century BCE, the Great Pyramid is one of many large pyramid structures built to honor dead Pharaoh.",
+      "num_samples": 143040,
+      "case_id": "fleurs_en_1769",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1660",
+      "source_filename": "12742373433258665797.wav",
+      "reference_text": "romanticism had a large element of cultural determinism drawn from writers such as goethe fichte and schlegel",
+      "raw_transcription": "Romanticism had a large element of cultural determinism, drawn from writers such as Goethe, Fichte, and Schlegel.",
+      "num_samples": 170880,
+      "case_id": "fleurs_en_1660",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1759",
+      "source_filename": "8398257681626621326.wav",
+      "reference_text": "dr malar balasubramanian 29 was found in blue ash ohio a suburb approximately 15 miles north of cincinnati lying on the ground beside the road in a t-shirt and underwear in an apparently heavily medicated state",
+      "raw_transcription": "Dr. Malar Balasubramanian, 29, was found in Blue Ash, Ohio, a suburb approximately 15 miles north of Cincinnati lying on the ground beside the road in a T-shirt and underwear in an apparently heavily medicated state.",
+      "num_samples": 228480,
+      "case_id": "fleurs_en_1759",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1851",
+      "source_filename": "8742060069420489184.wav",
+      "reference_text": "rip currents are the returning flow from waves breaking off the beach often at a reef or similar",
+      "raw_transcription": "Rip currents are the returning flow from waves breaking off the beach, often at a reef or similar.",
+      "num_samples": 79680,
+      "case_id": "fleurs_en_1851",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1938",
+      "source_filename": "17392214165625498386.wav",
+      "reference_text": "the hospital has followed protocol for infection control including separating the patient from others to prevent possible infection of others",
+      "raw_transcription": "The hospital has followed protocol for infection control, including separating the patient from others to prevent possible infection of others.",
+      "num_samples": 168960,
+      "case_id": "fleurs_en_1938",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1960",
+      "source_filename": "4498640649175127270.wav",
+      "reference_text": "he was reportedly aged in his 20s. in a statement bieber said [w]hile i was not present nor directly involved with this tragic accident my thoughts and prayers are with the family of the victim.",
+      "raw_transcription": "He was reportedly aged in his 20s. In a statement, Bieber said \"[w]hile I was not present nor directly involved with this tragic accident, my thoughts and prayers are with the family of the victim.\"",
+      "num_samples": 168960,
+      "case_id": "fleurs_en_1960",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1753",
+      "source_filename": "4446007980468141561.wav",
+      "reference_text": "while this is often only an inaccurate stereotype the best way to get along in paris still is to be on your best behavior acting like someone who is bien élevé well brought up. it will make getting about considerably easier",
+      "raw_transcription": "While this is often only an inaccurate stereotype, the best way to get along in Paris still is to be on your best behavior, acting like someone who is \"bien élevé\" (well brought up). It will make getting about considerably easier.",
+      "num_samples": 264000,
+      "case_id": "fleurs_en_1753",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1699",
+      "source_filename": "16355757648693617724.wav",
+      "reference_text": "bishkek was described as sinking into a state of anarchy by one observer as gangs of people roamed the streets and plundered stores of consumer goods",
+      "raw_transcription": "Bishkek was described as sinking into a state of \"anarchy\" by one observer, as gangs of people roamed the streets and plundered stores of consumer goods.",
+      "num_samples": 126720,
+      "case_id": "fleurs_en_1699",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1797",
+      "source_filename": "15505806025419963341.wav",
+      "reference_text": "everyone participates in society and uses transportation systems almost everyone complains about transportation systems",
+      "raw_transcription": "Everyone participates in society and uses transportation systems. Almost everyone complains about transportation systems.",
+      "num_samples": 116160,
+      "case_id": "fleurs_en_1797",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1767",
+      "source_filename": "3296442401947230785.wav",
+      "reference_text": "this offers a good opportunity to see the aurora borealis as the sky will be dark more or less around the clock",
+      "raw_transcription": "This offers a good opportunity to see the Aurora borealis, as the sky will be dark more or less around the clock.",
+      "num_samples": 107520,
+      "case_id": "fleurs_en_1767",
+      "group": "target"
+    },
+    {
+      "sentence_id": "2005",
+      "source_filename": "1107772981946748169.wav",
+      "reference_text": "but there are a lot of things about birds that still look like a dinosaur",
+      "raw_transcription": "But there are a lot of things about birds that still look like a dinosaur.",
+      "num_samples": 92480,
+      "case_id": "fleurs_en_2005",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1662",
+      "source_filename": "10614481583312370701.wav",
+      "reference_text": "alloys are basically a mixture of two or more metals don't forget that there are many elements on the periodic table",
+      "raw_transcription": "Alloys are basically a mixture of two or more metals. Don't forget that there are many elements on the periodic table.",
+      "num_samples": 134080,
+      "case_id": "fleurs_en_1662",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1958",
+      "source_filename": "941860798944293989.wav",
+      "reference_text": "the city is in stark contrast to the rest of the country's cities because it has more of an arabic flair than of an african",
+      "raw_transcription": "The city is in stark contrast to the rest of the country's cities, because it has more of an Arabic flair than of an African.",
+      "num_samples": 174400,
+      "case_id": "fleurs_en_1958",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1845",
+      "source_filename": "12906384443438076827.wav",
+      "reference_text": "in a carriage they traveled back to paris surrounded by a mob of people screaming and shouting threats against the king and queen",
+      "raw_transcription": "In a carriage, they traveled back to Paris surrounded by a mob of people screaming and shouting threats against the King and Queen.",
+      "num_samples": 163520,
+      "case_id": "fleurs_en_1845",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1970",
+      "source_filename": "1394697283561012104.wav",
+      "reference_text": "we don't know for sure but it may have had a forked tongue its diet included turtles large fish other mosasaurs and it may even have been a cannibal",
+      "raw_transcription": "We don't know for sure, but it may have had a forked tongue. Its diet included turtles, large fish, other mosasaurs, and it may even have been a cannibal.",
+      "num_samples": 224960,
+      "case_id": "fleurs_en_1970",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1709",
+      "source_filename": "9273458614645013056.wav",
+      "reference_text": "the report is highly critical of almost every aspect of the present policy of the executive towards iraq and it urges an immediate change of direction",
+      "raw_transcription": "The Report is highly critical of almost every aspect of the present policy of the Executive towards Iraq and it urges an immediate change of direction.",
+      "num_samples": 138240,
+      "case_id": "fleurs_en_1709",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1684",
+      "source_filename": "4496786334735634498.wav",
+      "reference_text": "apia is the capital of samoa the town is on the island of upolu and has a population of just under 40,000",
+      "raw_transcription": "Apia is the capital of Samoa. The town is on the island of Upolu and has a population of just under 40,000.",
+      "num_samples": 175360,
+      "case_id": "fleurs_en_1684",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1987",
+      "source_filename": "10937407360976471523.wav",
+      "reference_text": "the crash occurred high up in mountainous terrain and is believed to have been the result of hostile fire",
+      "raw_transcription": "The crash occurred high up in mountainous terrain, and is believed to have been the result of hostile fire.",
+      "num_samples": 157120,
+      "case_id": "fleurs_en_1987",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1785",
+      "source_filename": "9833173223298420094.wav",
+      "reference_text": "scaffolding is not a method of learning but rather an aid that provides support to individuals whom are undergoing a new learning experience such as using a new computer program or beginning a new project",
+      "raw_transcription": "Scaffolding is not a method of learning but rather an aid that provides support to individuals whom are undergoing a new learning experience such as using a new computer program or beginning a new project.",
+      "num_samples": 244800,
+      "case_id": "fleurs_en_1785",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1985",
+      "source_filename": "678174152690230753.wav",
+      "reference_text": "it is related to but usually not involving alpine style ski touring or mountaineering the latter ones done in steep terrain and requiring much stiffer skis and boots",
+      "raw_transcription": "It is related to but usually not involving alpine style ski touring or mountaineering, the latter ones done in steep terrain and requiring much stiffer skis and boots.",
+      "num_samples": 144000,
+      "case_id": "fleurs_en_1985",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1712",
+      "source_filename": "11766033532714442721.wav",
+      "reference_text": "since 1966 the sundarbans have been a wildlife sanctuary and it is estimated that there are now 400 royal bengal tigers and about 30,000 spotted deer in the area",
+      "raw_transcription": "Since 1966 the Sundarbans have been a wildlife sanctuary, and it is estimated that there are now 400 Royal Bengal tigers and about 30,000 spotted deer in the area.",
+      "num_samples": 279360,
+      "case_id": "fleurs_en_1712",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1897",
+      "source_filename": "10861831846737909528.wav",
+      "reference_text": "in the north the region is bounded by the sahel and in the south and west by the atlantic ocean",
+      "raw_transcription": "In the north the region is bounded by the Sahel, and in the south and west by the Atlantic Ocean.",
+      "num_samples": 153280,
+      "case_id": "fleurs_en_1897",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1974",
+      "source_filename": "9781076737390802637.wav",
+      "reference_text": "along the same line men are required to wear trousers covering the knees",
+      "raw_transcription": "Along the same line, men are required to wear trousers covering the knees.",
+      "num_samples": 100480,
+      "case_id": "fleurs_en_1974",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1951",
+      "source_filename": "6909856093066898902.wav",
+      "reference_text": "in 2002 goma was destroyed by lava from the nyiragongo volcano which buried most of the town's streets particularly the town centre",
+      "raw_transcription": "In 2002 Goma was destroyed by lava from the Nyiragongo volcano which buried most of the town’s streets, particularly the town centre.",
+      "num_samples": 153600,
+      "case_id": "fleurs_en_1951",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1787",
+      "source_filename": "1559267283424963143.wav",
+      "reference_text": "blogging is a tool that inspires collaboration and encourages students to extend learning well beyond the traditional school day",
+      "raw_transcription": "Blogging is a tool that inspires collaboration, and encourages students to extend learning well beyond the traditional school day.",
+      "num_samples": 153600,
+      "case_id": "fleurs_en_1787",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1901",
+      "source_filename": "6354316372780583820.wav",
+      "reference_text": "although ai has a strong connotation of science fiction ai forms a very important branch of computer science dealing with behavior learning and intelligent adaptation in a machine",
+      "raw_transcription": "Although AI has a strong connotation of science fiction, AI forms a very important branch of computer science, dealing with behavior, learning and intelligent adaptation in a machine.",
+      "num_samples": 215680,
+      "case_id": "fleurs_en_1901",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1724",
+      "source_filename": "1774013444539766052.wav",
+      "reference_text": "its renown for being an epicenter of luxury began in about 400 a.d. and lasted up until about 1100 a.d",
+      "raw_transcription": "Its renown for being an epicenter of luxury began in about 400 A.D. and lasted up until about 1100 A.D.",
+      "num_samples": 183680,
+      "case_id": "fleurs_en_1724",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1859",
+      "source_filename": "978391636333640472.wav",
+      "reference_text": "towards the end of the middle ages western europe began to develop their own style one of the biggest developments of the time as a result of the crusades people began to use buttons to fasten clothing",
+      "raw_transcription": "towards the end of the Middle Ages western Europe began to develop their own style. one of the biggest developments of the time as a result of the crusades people began to use buttons to fasten clothing.",
+      "num_samples": 265920,
+      "case_id": "fleurs_en_1859",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1732",
+      "source_filename": "12462354014280856258.wav",
+      "reference_text": "the age where the events took place is commonly referred as the high middle ages the period of european history in the 11th 12th and 13th centuries ad 1000–1300",
+      "raw_transcription": "The age where the events took place is commonly referred as the High Middle Ages the period of European history in the 11th, 12th, and 13th centuries (AD 1000–1300).",
+      "num_samples": 218880,
+      "case_id": "fleurs_en_1732",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1852",
+      "source_filename": "517532078886085321.wav",
+      "reference_text": "appropriate use of blogs can empower students to become more analytical and critical; through actively responding to internet materials students can define their positions in the context of others' writings as well as outline their own perspectives on particular issues oravec 2002",
+      "raw_transcription": "Appropriate use of blogs \"can empower students to become more analytical and critical; through actively responding to Internet materials, students can define their positions in the context of others' writings as well as outline their own perspectives on particular issues (Oravec, 2002).",
+      "num_samples": 261120,
+      "case_id": "fleurs_en_1852",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1853",
+      "source_filename": "13713355703439016228.wav",
+      "reference_text": "giancarlo fisichella lost control of his car and ended the race very soon after the start",
+      "raw_transcription": "Giancarlo Fisichella lost control of his car and ended the race very soon after the start.",
+      "num_samples": 82560,
+      "case_id": "fleurs_en_1853",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1788",
+      "source_filename": "14960809846091330730.wav",
+      "reference_text": "usa gymnastics supports the united states olympic committee's letter and accepts the absolute need of the olympic family to promote a safe environment for all of our athletes",
+      "raw_transcription": "USA Gymnastics supports the United States Olympic Committee's letter and accepts the absolute need of the Olympic family to promote a safe environment for all of our athletes.",
+      "num_samples": 249600,
+      "case_id": "fleurs_en_1788",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1700",
+      "source_filename": "15228527404193944906.wav",
+      "reference_text": "it is thinner under the maria and thicker under the highlands",
+      "raw_transcription": "It is thinner under the maria and thicker under the highlands.",
+      "num_samples": 115200,
+      "case_id": "fleurs_en_1700",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1949",
+      "source_filename": "2652155470394119415.wav",
+      "reference_text": "the term bug is used by entomologists in a formal sense for this group of insects",
+      "raw_transcription": "The term bug is used by entomologists in a formal sense for this group of insects.",
+      "num_samples": 107520,
+      "case_id": "fleurs_en_1949",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1871",
+      "source_filename": "4838660681321542582.wav",
+      "reference_text": "in the warm climate of the middle east the house was not so important",
+      "raw_transcription": "In the warm climate of the Middle East, the house was not so important.",
+      "num_samples": 107520,
+      "case_id": "fleurs_en_1871",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1770",
+      "source_filename": "8324220666349639753.wav",
+      "reference_text": "this seems sensible because the earth doesn't feel as if it's moving does it",
+      "raw_transcription": "This seems sensible, because the Earth doesn't feel as if it's moving, does it?",
+      "num_samples": 70080,
+      "case_id": "fleurs_en_1770",
+      "group": "target"
+    },
+    {
+      "sentence_id": "1835",
+      "source_filename": "7610837418342439800.wav",
+      "reference_text": "no tsunami warning has been issued and according to the jakarta geophysics agency no tsunami warning will be issued because the quake did not meet the magnitude 6.5 requirement",
+      "raw_transcription": "No tsunami warning has been issued, and according to the Jakarta geophysics agency, no tsunami warning will be issued because the quake did not meet the magnitude 6.5 requirement.",
+      "num_samples": 257280,
+      "case_id": "fleurs_en_1835",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1848",
+      "source_filename": "8782270367315935727.wav",
+      "reference_text": "a car bomb detonated at police headquarters in gaziantep turkey yesterday morning killed two police officers and injured more than twenty other people",
+      "raw_transcription": "A car bomb detonated at police headquarters in Gaziantep, Turkey yesterday morning killed two police officers and injured more than twenty other people.",
+      "num_samples": 147840,
+      "case_id": "fleurs_en_1848",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1918",
+      "source_filename": "4027984920362132391.wav",
+      "reference_text": "the sundarbans has been declared a unesco world heritage site the part of the forest within indian territory is called sundarbans national park",
+      "raw_transcription": "The Sundarbans has been declared a UNESCO World Heritage Site. The part of the forest within Indian territory is called Sundarbans National Park.",
+      "num_samples": 190080,
+      "case_id": "fleurs_en_1918",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1893",
+      "source_filename": "11593450817032542587.wav",
+      "reference_text": "the sundarbans are the largest littoral mangrove belt in the world stretching 80 km 50 mi into the bangladeshi and indian hinterland from the coast",
+      "raw_transcription": "The Sundarbans are the largest littoral mangrove belt in the world, stretching 80 km (50 mi) into the Bangladeshi and Indian hinterland from the coast.",
+      "num_samples": 195840,
+      "case_id": "fleurs_en_1893",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1875",
+      "source_filename": "7886295100481437768.wav",
+      "reference_text": "a full 20% of the water that pours out of the planet's rivers into the oceans comes from the amazon",
+      "raw_transcription": "A full 20 percent of the water that pours out of the planet's rivers into the oceans comes from the Amazon.",
+      "num_samples": 161920,
+      "case_id": "fleurs_en_1875",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1977",
+      "source_filename": "3502277023574363012.wav",
+      "reference_text": "prides are made up of one to three related adult males along with as many as thirty females and cubs",
+      "raw_transcription": "Prides are made up of one to three related adult males, along with as many as thirty females and cubs.",
+      "num_samples": 105600,
+      "case_id": "fleurs_en_1977",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1830",
+      "source_filename": "3866409166763965048.wav",
+      "reference_text": "the ruling party south west africa people's organisation swapo also retained a majority in the parliamentary elections",
+      "raw_transcription": "The ruling party, South West Africa People's Organisation (SWAPO), also retained a majority in the parliamentary elections.",
+      "num_samples": 136320,
+      "case_id": "fleurs_en_1830",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1975",
+      "source_filename": "1605300975319497622.wav",
+      "reference_text": "vatican city's population is around 800 it is the smallest independent country in the world and the country with the lowest population",
+      "raw_transcription": "Vatican City's population is around 800. It is the smallest independent country in the world and the country with the lowest population.",
+      "num_samples": 156160,
+      "case_id": "fleurs_en_1975",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1953",
+      "source_filename": "10899527843662463911.wav",
+      "reference_text": "he was subsequently relocated to addenbrooke's hospital in cambridge",
+      "raw_transcription": "He was subsequently relocated to Addenbrooke's Hospital in Cambridge.",
+      "num_samples": 109440,
+      "case_id": "fleurs_en_1953",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1962",
+      "source_filename": "15038927295183526116.wav",
+      "reference_text": "the ph level is indicated by the amount of hydrogen the h in ph ions in the tested chemical",
+      "raw_transcription": "The pH level is indicated by the amount of Hydrogen (the H in pH) ions in the tested chemical.",
+      "num_samples": 105600,
+      "case_id": "fleurs_en_1962",
+      "group": "control"
+    },
+    {
+      "sentence_id": "1733",
+      "source_filename": "899317378039624755.wav",
+      "reference_text": "first among its 78 recommendations is that a new diplomatic initiative should be taken before the end of this year to secure iraq's borders against hostile interventions and to re-establish diplomatic relations with its neighbors",
+      "raw_transcription": "First among its 78 recommendations is that a new diplomatic initiative should be taken before the end of this year to secure Iraq’s borders against hostile interventions and to re-establish diplomatic relations with its neighbors.",
+      "num_samples": 281280,
+      "case_id": "fleurs_en_1733",
+      "group": "control"
+    },
+    {
+      "sentence_id": "2001",
+      "source_filename": "1116140877447157610.wav",
+      "reference_text": "travellers are strongly advised to be aware of any risk of severe weather affecting their area as they may affect any travel plans",
+      "raw_transcription": "Travellers are strongly advised to be aware of any risk of severe weather affecting their area as they may affect any travel plans.",
+      "num_samples": 117120,
+      "case_id": "fleurs_en_2001",
+      "group": "control"
+    }
+  ],
+  "selection_sha256": "4c749163be603e74ad1afdfe833014e7194cfbea86e352be1b82699821785295",
+  "total_eligible_utterances": 637,
+  "eligible_distinct_sentences": 347
+}

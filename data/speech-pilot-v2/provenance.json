@@ -1,0 +1,93 @@
+{
+  "repository": "google/fleurs",
+  "revision": "4683b04af03d2d9549064c7d72060a9a94bb6046",
+  "revision_api_url": "https://huggingface.co/api/datasets/google/fleurs/revision/4683b04af03d2d9549064c7d72060a9a94bb6046",
+  "card_url": "https://huggingface.co/datasets/google/fleurs/resolve/4683b04af03d2d9549064c7d72060a9a94bb6046/README.md",
+  "script_url": "https://huggingface.co/datasets/google/fleurs/resolve/4683b04af03d2d9549064c7d72060a9a94bb6046/fleurs.py",
+  "metadata_url": "https://huggingface.co/datasets/google/fleurs/resolve/4683b04af03d2d9549064c7d72060a9a94bb6046/data/en_us/test.tsv",
+  "archive_url": "https://huggingface.co/datasets/google/fleurs/resolve/4683b04af03d2d9549064c7d72060a9a94bb6046/data/en_us/audio/test.tar.gz",
+  "license": "CC-BY-4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+  "license_text_acquisition": "verified cached legalcode after HTTPError: HTTP Error 403: Forbidden",
+  "metadata_sha256": "74c046239374deeb60fa63f258f907388093a32bcaa3140965f70ef05c79f7ca",
+  "metadata_git_blob_oid": "bcd7e3e4ecb8ad2a4d9754fc6be14dd6d3364b54",
+  "metadata_lfs_sha256": null,
+  "metadata_lfs_note": "TSV is ordinary Git blob at this revision, not LFS; archive has LFS SHA256",
+  "metadata_api_entry": {
+    "type": "file",
+    "oid": "bcd7e3e4ecb8ad2a4d9754fc6be14dd6d3364b54",
+    "size": 367864,
+    "path": "data/en_us/test.tsv",
+    "lastCommit": {
+      "id": "4683b04af03d2d9549064c7d72060a9a94bb6046",
+      "title": "streaming (#11)",
+      "date": "2023-02-07T14:10:57.000Z"
+    },
+    "securityFileStatus": {
+      "status": "safe",
+      "protectAiScan": {
+        "status": "unscanned"
+      },
+      "avScan": {
+        "status": "safe",
+        "message": "No security issues detected",
+        "reportLink": "https://fdtn.ai/ai-supply-chain/hugging-face?utm_source=huggingface"
+      },
+      "pickleImportScan": {
+        "status": "unscanned",
+        "pickleImports": [],
+        "version": "0.0.0"
+      },
+      "virusTotalScan": {
+        "status": "unscanned"
+      }
+    }
+  },
+  "archive_api_entry": {
+    "type": "file",
+    "oid": "d89260457bcb6baad4d9279fe3a3ad1a619f833b",
+    "size": 289851356,
+    "lfs": {
+      "oid": "d9c2e37b41aacd41bc283554a0a82b5476b36887049774ecb2819dcaaa55a356",
+      "size": 289851356,
+      "pointerSize": 134
+    },
+    "xetHash": "15f71ce3feb465743e9a428a97a3bd8f5ad4338a2dd17558aa86700937659858",
+    "path": "data/en_us/audio/test.tar.gz",
+    "lastCommit": {
+      "id": "4683b04af03d2d9549064c7d72060a9a94bb6046",
+      "title": "streaming (#11)",
+      "date": "2023-02-07T14:10:57.000Z"
+    },
+    "securityFileStatus": {
+      "status": "safe",
+      "protectAiScan": {
+        "status": "unscanned"
+      },
+      "avScan": {
+        "status": "safe",
+        "message": "No security issues detected",
+        "reportLink": "https://fdtn.ai/ai-supply-chain/hugging-face?utm_source=huggingface"
+      },
+      "pickleImportScan": {
+        "status": "unscanned",
+        "pickleImports": [],
+        "version": "0.0.0"
+      },
+      "virusTotalScan": {
+        "status": "unscanned",
+        "message": "File not scanned in VirusTotal",
+        "reportLink": "https://www.virustotal.com/gui/file/d9c2e37b41aacd41bc283554a0a82b5476b36887049774ecb2819dcaaa55a356?utm_source=huggingface"
+      }
+    }
+  },
+  "archive_declared_bytes": 289851356,
+  "free_disk_before_download": 20434493440,
+  "archived_evidence_sha256": {
+    "upstream-README.md": "c6aa5052468b6b9f6807cdf760a03da66bcd287bc67f3f7dafdd022926930987",
+    "upstream-fleurs.py.txt": "25b9b502e29e82d64af85b0f12f6d20825a5b09c29696cb5f3de4fecee45d788",
+    "upstream-test.tsv": "74c046239374deeb60fa63f258f907388093a32bcaa3140965f70ef05c79f7ca",
+    "CC-BY-4.0.txt": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+    "hf-revision-api.json": "fc1c94b2bafebc1f8dd1edb54fbf6b217773805d27d2dbd617a23f49c76194f2"
+  }
+}
