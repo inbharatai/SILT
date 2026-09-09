@@ -695,15 +695,15 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <tbody>
       <tr><td>Core question</td><td>How fast / cheap can I fine-tune?</td><td class="fix">May this learned skill be admitted to a receiver?</td></tr>
       <tr><td>Gating</td><td>None — the human decides what to ship</td><td class="fix">Double-gate: Gate 1 on packets, Gate 2 (all-or-nothing) on the trained adapter</td></tr>
-      <tr><td>Admission bar</td><td>None — ship what you trained</td><td class="fix"><b>Parity</b> is the bar; a fail → <code>DeepApplyBlocked</code> — never a warning, never a fallback</td></tr>
+      <tr><td>Admission bar</td><td>Training completion alone is not admission</td><td class="fix">Gate 2 applies its recorded checks; required-check failures block admission. Sampled forward-parity checks do not prove identical trained weights or universal capability preservation.</td></tr>
       <tr><td>Failure mode</td><td>Best-effort; warnings; proceed anyway</td><td class="fix">Honest refusal: typed named errors; nothing silently degrades</td></tr>
-      <tr><td>High-risk domains</td><td>No concept</td><td class="fix">medical / legal / finance → a named human approver; no policy knob can disable it</td></tr>
+      <tr><td>High-risk domains</td><td>Depends on the surrounding workflow</td><td class="fix">Declared medical / legal / finance domains need an approver name and all other checks. The supplied name is not proof of human identity.</td></tr>
       <tr><td>Mocks</td><td>N/A</td><td class="fix">Studio is structurally unable to serve a mock (<code>is_mock</code> re-checked at build)</td></tr>
       <tr><td>Provenance</td><td>None</td><td class="fix">Hash-chained, append-only audit; tamper-evident; every transition recorded</td></tr>
-      <tr><td>Rollback</td><td>Manual</td><td class="fix">Snapshots + rollback layer; adapters are removable, never merged into base weights in v1</td></tr>
-      <tr><td>Quantization</td><td>“make it smaller / faster”</td><td class="fix">SiltSpring certifies per (state, skill); a state that degrades a skill has that skill revoked; stale certs refuse to serve</td></tr>
-      <tr><td>Memory discipline</td><td>“use gradient checkpointing”</td><td class="fix">Measured: one 4-bit 7B = 5.58 GB; two can’t co-reside on 8 GB → sequential evaluator, score-equivalent under deterministic decoding</td></tr>
-      <tr><td>Where it wins</td><td><b>Training throughput</b> (≈2× faster LoRA, less memory)</td><td class="fix"><b>Trust</b> — whether the result is safe to admit, with proof</td></tr>
+      <tr><td>Rollback</td><td>Manual</td><td class="fix">Approved-set snapshots support rollback; packet-derived deep-apply adapters remain removable. Separate specialist export has its own native-merged or factor-preserving contracts.</td></tr>
+      <tr><td>Quantization</td><td>“make it smaller / faster”</td><td class="fix">SiltSpring evaluates supplied suites per model state. Real-HF reports and toy certificate selection and staleness checks are separate; the suite helper does not enforce a held-out-only split.</td></tr>
+      <tr><td>Memory discipline</td><td>“use gradient checkpointing”</td><td class="fix">The receiver baseline and adapted receiver are evaluated in sequence. Unloading is conditional and best-effort. Fit depends on the full load, weights, activations, host RAM and runtime; no universal 7B/8GB fit or parity guarantee.</td></tr>
+      <tr><td>Primary focus</td><td><b>Training efficiency</b> — depends on the setup and benchmark</td><td class="fix"><b>Controlled capability acquisition</b> — explicit admission checks and retained evidence, not a universal safety or performance guarantee</td></tr>
     </tbody>
   </table>
 
