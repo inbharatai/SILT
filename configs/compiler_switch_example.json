@@ -1,0 +1,36 @@
+{
+  "schema": "asea.compiler.v1.example",
+  "description": "Declarative operator example, not an executable CLI config. CLI accepts flags and separate calibration/suite files.",
+  "architecture": "SwitchTransformersForConditionalGeneration",
+  "suggested_pretrained_repository": "google/switch-base-8",
+  "evidence_scope": "seq2seq_text_proxy_not_coding_capability",
+  "model": "/models/switch-base-8",
+  "output": "/models/switch-base-8-keep4",
+  "keep_experts": 4,
+  "dtype": "float16",
+  "max_length": 128,
+  "max_new_tokens": 32,
+  "batch_size": 1,
+  "calibration_file": "/data/calibration.json",
+  "suite_file": "/data/heldout.json",
+  "evidence_output": "/evidence/switch-keep4-evaluation.json",
+  "calibration_format_example_only": {
+    "samples": [
+      {"prompt": "The capital of France is <extra_id_0>.", "target": "<extra_id_0> Paris <extra_id_1>"}
+    ]
+  },
+  "suite_format_example_only": {
+    "split": "heldout",
+    "cases": [
+      {"id": "h001", "prompt": "The capital of Germany is <extra_id_0>.", "references": ["Berlin"]}
+    ]
+  },
+  "admission": "UNADMITTED",
+  "repair_training": {"supported": false},
+  "limitations": [
+    "Example rows are format demonstrations, not a sufficient calibration or evaluation set",
+    "Materialize local safetensors and tokenizer files; symlink-based HF snapshots are rejected",
+    "No downloads, pickle, remote code, functional coding tests, performance guarantees, or promotion",
+    "Routing probability usage is not causal expert importance"
+  ]
+}

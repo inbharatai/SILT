@@ -144,6 +144,11 @@ app.add_middleware(
     expose_headers=["Content-Disposition"],
 )
 
+# Opt-in extension: no imports or workspace side effects in the legacy default.
+if os.environ.get("SILT_ENABLE_EXPERIMENTAL") == "1":
+    from .experimental import router as experimental_router
+    app.include_router(experimental_router)
+
 manager = JobManager(WORKSPACES)
 deepapply_manager = DeepApplyManager()
 spring_manager = SpringManager()

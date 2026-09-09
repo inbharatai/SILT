@@ -18,14 +18,19 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import shutil
+import tempfile
 import zipfile
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ..core.protocol import LearningLevel, PromotionStatus, SkillPacket
 from ..promotion.gate import PromotionPolicy
+from ..memory.store import _root_lock, validate_storage_id
 
 # A bundle/dataset name is interpolated into filesystem paths and zip arcnames,
 # so it must be path-safe (adversarial audit 2026-08-13: a name containing '..'
@@ -35,7 +40,7 @@ _NAME_RE = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
 def _validate_name(name: str) -> str:
-    if not name or not _NAME_RE.match(name):
+    if not isinstance(name, str) or not name or not _NAME_RE.fullmatch(name):
         raise ValueError(
             "invalid bundle/dataset name {!r}: must match ^[A-Za-z0-9._-]+$ "
             "(no path separators or '..')".format(name)
@@ -50,6 +55,104 @@ def _validate_name(name: str) -> str:
             "traversals, not names".format(name)
         )
     return name
+
+
+def _validate_export_paths(out_dir: Path, names: List[str]) -> None:
+    """Preflight all destinations before the first mkdir/write; no symlinks."""
+    for path in [out_dir, *(out_dir / name for name in names)]:
+        for part in (path, *path.parents):
+            if part.is_symlink():
+                raise ValueError("symlink export path refused: {}".format(part))
+        if path.exists() and (not path.is_dir() if path == out_dir else not path.is_file()):
+            raise ValueError("invalid export destination: {}".format(path))
+
+
+_EXPORT_RECOVERY = ".export-recovery"
+
+
+@contextmanager
+def _export_transaction(out_dir: Path, names: List[str]):
+    """Stage a complete generation; roll back ALL companions on caught failure.
+
+    Each replacement is atomic, not the multi-file generation. Cooperating
+    exports to one root are serialized within ONE process only; multiple writer
+    processes and external filesystem edits are unsupported. Readers can see
+    mixed generations during publication: the ZIP is installed last and is the
+    self-contained artifact. There is no crash-atomic cross-directory promise.
+
+    Hard process death during publication leaves .export-recovery, containing
+    old files and a journal of formerly absent paths. Future exports fail closed
+    until an operator restores those files/removes formerly absent outputs and
+    removes the marker. File fsync is used, but power-loss durability (directory
+    fsync) is not guaranteed. Do not remove an active transaction's marker.
+    """
+    with _root_lock(out_dir):
+        _validate_export_paths(out_dir.absolute(), names)
+        recovery = out_dir / _EXPORT_RECOVERY
+        if recovery.exists() or recovery.is_symlink():
+            raise ValueError("interrupted export; operator recovery required at {}".format(recovery))
+        out_dir.mkdir(parents=True, exist_ok=True)
+        stage = Path(tempfile.mkdtemp(dir=out_dir, prefix=".export-stage-"))
+        attempted = []
+        try:
+            new, old = stage / "new", stage / "old"
+            new.mkdir()
+            old.mkdir()
+            yield new
+            _validate_export_paths(out_dir.absolute(), names)
+            previous = []
+            for name in names:
+                source, destination = new / name, out_dir / name
+                if source.exists():
+                    with open(source, "rb") as fh:
+                        os.fsync(fh.fileno())
+                if destination.exists():
+                    shutil.copyfile(destination, old / name)
+                    previous.append(name)
+                    with open(old / name, "rb") as fh:
+                        os.fsync(fh.fileno())
+            journal = stage / "journal.json"
+            journal.write_text(json.dumps({"names": names, "previous": previous}), encoding="utf-8")
+            with open(journal, "rb") as fh:
+                os.fsync(fh.fileno())
+            # Publish the recovery marker BEFORE changing any live destination.
+            os.replace(stage, recovery)
+            for name in names:
+                attempted.append(name)  # also recover an exception AFTER replace
+                source, destination = recovery / "new" / name, out_dir / name
+                if source.exists():
+                    os.replace(source, destination)
+                else:
+                    destination.unlink(missing_ok=True)  # obsolete optional job
+        except BaseException:
+            if recovery.exists():
+                try:
+                    for name in reversed(attempted):
+                        backup = recovery / "old" / name
+                        destination = out_dir / name
+                        if backup.exists():
+                            try:
+                                os.replace(backup, destination)
+                            except BaseException:
+                                # A replace wrapper may raise after a successful
+                                # rename. Otherwise try an independent primitive
+                                # (POSIX rename can replace an existing file).
+                                if backup.exists():
+                                    os.rename(backup, destination)
+                        else:
+                            destination.unlink(missing_ok=True)
+                except BaseException as exc:
+                    # Never destroy the only recoverable old generation.
+                    raise RuntimeError("export recovery required; retained files at {}".format(recovery)) from exc
+                shutil.rmtree(recovery)
+            raise
+        else:
+            # Publication is committed. Cleanup failure must not report a failed
+            # export after discarding backups; a leftover marker blocks reuse.
+            shutil.rmtree(recovery, ignore_errors=True)
+        finally:
+            if stage.exists():
+                shutil.rmtree(stage)
 
 
 def _eval_gate_from_policy(policy: PromotionPolicy) -> Dict[str, Any]:
@@ -213,8 +316,20 @@ def export_artifact_bundle(
     used -- never passed off as the real bar.
     """
     _validate_name(name)
+    # Validate every supplied ID (including skipped packets) before any output.
+    for packet in packets:
+        validate_storage_id(packet.packet_id)
     out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    names = [name + ".jsonl", name + ".manifest.json", "manifest.json", "README.txt",
+             name + ".job.json", name + ".zip"]  # publish self-contained ZIP last
+    _validate_export_paths(out_dir.absolute(), names)
+    if audit_path is not None:
+        audit = Path(audit_path).absolute()
+        for part in (audit, *audit.parents):
+            if part.is_symlink():
+                raise ValueError("symlink audit path refused: {}".format(part))
+        if audit.exists() and not audit.is_file():
+            raise ValueError("audit path is not a regular file")
 
     accepted: List[SkillPacket] = []
     skipped: List[Dict[str, str]] = []
@@ -227,14 +342,24 @@ def export_artifact_bundle(
             continue
         accepted.append(packet)
 
-    # Reuse the existing validated dataset writer (writes <name>.jsonl +
-    # <name>.manifest.json into out_dir, applying the same PROMOTED/mock guard).
-    dataset_manifest = export_dataset(accepted, out_dir, name, include_mock=include_mock)
+    if len({p.packet_id for p in accepted}) != len(accepted):
+        raise ValueError("duplicate packet IDs would create ambiguous ZIP members")
+
+    with _export_transaction(out_dir, names) as staging:
+        _write_artifact_bundle(accepted, skipped, staging, out_dir, name, base_model,
+                               include_mock, audit_path, policy)
+    return out_dir / "{}.zip".format(name)
+
+
+def _write_artifact_bundle(accepted, skipped, out_dir, display_dir, name, base_model,
+                           include_mock, audit_path, policy):
+    # Everything below writes ONLY inside staging, including all companions.
+    dataset_manifest = _write_dataset(accepted, out_dir, name, include_mock, display_dir)
     # The bundle has already filtered; export_dataset therefore sees nothing to
     # skip and would report skipped:[]. Surface the bundle-level skips on the
     # dataset manifest too, so a consumer reading it alone sees the truth
     # (audit 2026-08-13 #38: the on-disk manifest must agree with the bundle
-    # manifest, not just the in-memory dict). Rewrite the file in place.
+    # manifest, not just the in-memory dict). Rewrite the staged file only.
     dataset_manifest["skipped"] = skipped
     with open(out_dir / "{}.manifest.json".format(name), "w", encoding="utf-8") as fh:
         json.dump(dataset_manifest, fh, indent=2, ensure_ascii=False)
@@ -367,10 +492,17 @@ def export_dataset(
     a training set assembled from placeholder data is worse than no training set
     because it looks legitimate once it is on disk.
     """
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
     _validate_name(name)
+    for packet in packets:
+        validate_storage_id(packet.packet_id)
+    out_dir = Path(out_dir)
+    with _export_transaction(out_dir, [name + ".jsonl", name + ".manifest.json"]) as staging:
+        manifest = _write_dataset(packets, staging, name, include_mock, out_dir)
+    return manifest
 
+
+def _write_dataset(packets, out_dir, name, include_mock, display_dir):
+    """Private serializer; callers publish staged outputs as one operation."""
     accepted, skipped = [], []
     for packet in packets:
         if packet.promotion_status != PromotionStatus.PROMOTED:
@@ -392,7 +524,7 @@ def export_dataset(
     dataset_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
 
     manifest = {
-        "dataset_path": str(path),
+        "dataset_path": str(display_dir / "{}.jsonl".format(name)),
         "dataset_sha256": dataset_sha256,
         "row_count": len(rows),
         "packet_count": len(accepted),

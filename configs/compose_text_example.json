@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "name": "local-small-text-candidate",
+  "input_type": "text",
+  "nodes": [
+    {
+      "id": "coder",
+      "input": "$input",
+      "component": {
+        "schema_version": 1,
+        "kind": "hf_text",
+        "task": "causal",
+        "model_path": "/agent/workspace/silt-models/SmolLM2-135M-Instruct",
+        "risk": "medium",
+        "provenance": [
+          {
+            "source": "HuggingFaceTB/SmolLM2-135M-Instruct; user-provisioned local files",
+            "risk": "medium",
+            "license": "Apache-2.0; user must verify the local model license"
+          }
+        ]
+      },
+      "prompt_prefix": "Write a short Python function for the following request. Return code only.\n",
+      "max_new_tokens": 96
+    }
+  ],
+  "output_node": "coder",
+  "limits": {
+    "max_input_chars": 4096,
+    "max_output_chars": 8192,
+    "max_audio_seconds": 30,
+    "max_input_bytes": 16777216,
+    "max_seconds": 300.0,
+    "max_peak_rss_mb": 3800.0,
+    "threads": 2
+  }
+}
