@@ -1,0 +1,88 @@
+{
+  "schema": "specialist-span-fixture-audit-v1",
+  "status": "PASS_STATIC_ONLY",
+  "model_runs": 0,
+  "model_weights_accessed": false,
+  "tokenizer_loaded": false,
+  "python_code_written": false,
+  "checks": {
+    "total_rows": 40,
+    "unique_ids": 40,
+    "unique_prompts": 40,
+    "unique_entity_nouns": 40,
+    "pairwise_split_id_prompt_entity_noun_overlap": 0,
+    "old_prompt_overlap": 0,
+    "old_answer_value_overlap": 0,
+    "reference_word_present_elsewhere_in_input": true,
+    "exact_response_sentinel_text_shape": true,
+    "balanced_four_adjective_vocabulary_per_split": true,
+    "ascii_short_text_bounds": true,
+    "token_lengths_verified": false
+  },
+  "historical_exclusions": [
+    {
+      "path": "/agent/workspace/silt-validation/switch-diagnostic.json",
+      "sha256": "2b944fcbf8087f163c58c4974f1495eafa1b1d68bdd354ebd6a20a4372cb8179",
+      "row_count": 4
+    },
+    {
+      "path": "/agent/workspace/silt-validation/switch-calibration.json",
+      "sha256": "c45a84296492642013fb39ecff9ac1817d374b9543681c075edff1c08353694e",
+      "row_count": 6
+    },
+    {
+      "path": "/agent/workspace/silt-pass2-evidence/switch-span-debug-v2.json",
+      "sha256": "029a94207ea6a91dd5dffdab46c1fe72ce2177f1c62b11d0876598cd913b3ce0",
+      "row_count": 4
+    },
+    {
+      "path": "/agent/workspace/silt-pass2-evidence/switch-calibration-v2.json",
+      "sha256": "41bce7ec560b03d2df54e5839589640334cb1303cb9b7ee3d63ba375380d4900",
+      "row_count": 32
+    }
+  ],
+  "files": [
+    {
+      "path": "train.json",
+      "sha256": "607982d62214efdee54ca624a675936866ed50f018fea3fe5926c3946c238395",
+      "bytes": 3298,
+      "rows": 16,
+      "max_prompt_utf8_bytes": 58,
+      "max_response_utf8_bytes": 31,
+      "quarantined": false
+    },
+    {
+      "path": "calibration.json",
+      "sha256": "6c0ce0fce368b0518e44897ee4456ad348318234378360a5a8b764081164b36e",
+      "bytes": 3411,
+      "rows": 16,
+      "max_prompt_utf8_bytes": 59,
+      "max_response_utf8_bytes": 31,
+      "quarantined": false
+    },
+    {
+      "path": "dev.json",
+      "sha256": "58c9b20023c997be63741c3a682d4a2cbf545d31d02bb552cd6acb0b86de2746",
+      "bytes": 1272,
+      "rows": 4,
+      "max_prompt_utf8_bytes": 56,
+      "max_response_utf8_bytes": 31,
+      "quarantined": false
+    },
+    {
+      "path": "final.json",
+      "sha256": "ef3fc1ca4b4c2b8e8df4cb7671ddab1779d8aaeab43517b09c280e8d4165e0fc",
+      "bytes": 1307,
+      "rows": 4,
+      "max_prompt_utf8_bytes": 57,
+      "max_response_utf8_bytes": 31,
+      "quarantined": true
+    }
+  ],
+  "limitations": [
+    "Exact-string historical exclusion covers the four named prior artifacts; it is not a global corpus contamination proof.",
+    "No tokenizer access: byte bounds are not native token counts; all complete native prompt/response encodings must later pass 256 without truncation or compression.",
+    "Final bytes were inspected only by this fixture-authoring worker for static validation; final content is not included in this audit or handed to parent.",
+    "Shared syntax and target adjectives deliberately prevent independent-benchmark or generalization claims."
+  ]
+}

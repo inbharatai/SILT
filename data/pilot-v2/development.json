@@ -1,0 +1,562 @@
+{
+  "schema_version": 1,
+  "name": "adapted-public-coding-pilot-v2-development",
+  "reference_source": "Pinned OpenAI HumanEval (MIT) and Google Research sanitized MBPP (CC-BY-4.0); bounded AST-decoded literal assertions, not official full benchmark scores. See manifest.json and ATTRIBUTION.md.",
+  "policy_version": "composition-admission-v2",
+  "claims": [
+    "coding"
+  ],
+  "cases": [
+    {
+      "id": "he_15",
+      "group": "control",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: string_sequence(n).\n\nOriginal upstream prompt (verbatim):\n\n\ndef string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n",
+      "reference": "Adapted literal I/O assertions from HumanEval task HumanEval/15; MIT. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "string_sequence",
+          "args": [
+            0
+          ],
+          "kwargs": {},
+          "expected": "0",
+          "id": "io_1"
+        },
+        {
+          "function": "string_sequence",
+          "args": [
+            3
+          ],
+          "kwargs": {},
+          "expected": "0 1 2 3",
+          "id": "io_2"
+        },
+        {
+          "function": "string_sequence",
+          "args": [
+            10
+          ],
+          "kwargs": {},
+          "expected": "0 1 2 3 4 5 6 7 8 9 10",
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_100",
+      "group": "control",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: next_smallest_palindrome(num).\n\nOriginal upstream prompt (verbatim):\nWrite a function to find the next smallest palindrome of a specified integer, returned as an integer.",
+      "reference": "Adapted literal I/O assertions from MBPP task 100; CC-BY-4.0. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "next_smallest_palindrome",
+          "args": [
+            99
+          ],
+          "kwargs": {},
+          "expected": 101,
+          "id": "io_1"
+        },
+        {
+          "function": "next_smallest_palindrome",
+          "args": [
+            1221
+          ],
+          "kwargs": {},
+          "expected": 1331,
+          "id": "io_2"
+        },
+        {
+          "function": "next_smallest_palindrome",
+          "args": [
+            120
+          ],
+          "kwargs": {},
+          "expected": 121,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "he_69",
+      "group": "target",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: search(lst).\n\nOriginal upstream prompt (verbatim):\n\ndef search(lst):\n    '''\n    You are given a non-empty list of positive integers. Return the greatest integer that is greater than \n    zero, and has a frequency greater than or equal to the value of the integer itself. \n    The frequency of an integer is the number of times it appears in the list.\n    If no such a value exist, return -1.\n    Examples:\n        search([4, 1, 2, 2, 3, 1]) == 2\n        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3\n        search([5, 5, 4, 4, 4]) == -1\n    '''\n",
+      "reference": "Adapted literal I/O assertions from HumanEval task HumanEval/69; MIT. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "search",
+          "args": [
+            [
+              5,
+              5,
+              5,
+              5,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_1"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              4,
+              1,
+              4,
+              1,
+              4,
+              4
+            ]
+          ],
+          "kwargs": {},
+          "expected": 4,
+          "id": "io_2"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              3,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": -1,
+          "id": "io_3"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              8,
+              8,
+              8,
+              8,
+              8,
+              8,
+              8,
+              8
+            ]
+          ],
+          "kwargs": {},
+          "expected": 8,
+          "id": "io_4"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              2,
+              3,
+              3,
+              2,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_5"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              2,
+              7,
+              8,
+              8,
+              4,
+              8,
+              7,
+              3,
+              9,
+              6,
+              5,
+              10,
+              4,
+              3,
+              6,
+              7,
+              1,
+              7,
+              4,
+              10,
+              8,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_6"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              3,
+              2,
+              8,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_7"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              6,
+              7,
+              1,
+              8,
+              8,
+              10,
+              5,
+              8,
+              5,
+              3,
+              10
+            ]
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_8"
+        }
+      ]
+    },
+    {
+      "id": "he_14",
+      "group": "target",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: all_prefixes(string).\n\nOriginal upstream prompt (verbatim):\nfrom typing import List\n\n\ndef all_prefixes(string: str) -> List[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n",
+      "reference": "Adapted literal I/O assertions from HumanEval task HumanEval/14; MIT. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "all_prefixes",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_1"
+        },
+        {
+          "function": "all_prefixes",
+          "args": [
+            "asdfgh"
+          ],
+          "kwargs": {},
+          "expected": [
+            "a",
+            "as",
+            "asd",
+            "asdf",
+            "asdfg",
+            "asdfgh"
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "all_prefixes",
+          "args": [
+            "WWW"
+          ],
+          "kwargs": {},
+          "expected": [
+            "W",
+            "WW",
+            "WWW"
+          ],
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "he_125",
+      "group": "target",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: split_words(txt).\n\nOriginal upstream prompt (verbatim):\n\ndef split_words(txt):\n    '''\n    Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you\n    should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the\n    alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25\n    Examples\n    split_words(\"Hello world!\") ➞ [\"Hello\", \"world!\"]\n    split_words(\"Hello,world!\") ➞ [\"Hello\", \"world!\"]\n    split_words(\"abcdef\") == 3 \n    '''\n",
+      "reference": "Adapted literal I/O assertions from HumanEval task HumanEval/125; MIT. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "split_words",
+          "args": [
+            "Hello world!"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello",
+            "world!"
+          ],
+          "id": "io_1"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "Hello,world!"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello",
+            "world!"
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "Hello world,!"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello",
+            "world,!"
+          ],
+          "id": "io_3"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "Hello,Hello,world !"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello,Hello,world",
+            "!"
+          ],
+          "id": "io_4"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "abcdef"
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_5"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "aaabb"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_6"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "aaaBb"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_7"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_8"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_434",
+      "group": "target",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: text_match_one(text).\n\nOriginal upstream prompt (verbatim):\nWrite a function that matches a string that has an a followed by one or more b's.",
+      "reference": "Adapted literal I/O assertions from MBPP task 434; CC-BY-4.0. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "text_match_one",
+          "args": [
+            "ac"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_1"
+        },
+        {
+          "function": "text_match_one",
+          "args": [
+            "dc"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2"
+        },
+        {
+          "function": "text_match_one",
+          "args": [
+            "abba"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_91",
+      "group": "target",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: find_substring(str1, sub_str).\n\nOriginal upstream prompt (verbatim):\nWrite a function to check if a string is present as a substring in a given list of string values.",
+      "reference": "Adapted literal I/O assertions from MBPP task 91; CC-BY-4.0. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "find_substring",
+          "args": [
+            [
+              "red",
+              "black",
+              "white",
+              "green",
+              "orange"
+            ],
+            "ack"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_1"
+        },
+        {
+          "function": "find_substring",
+          "args": [
+            [
+              "red",
+              "black",
+              "white",
+              "green",
+              "orange"
+            ],
+            "abc"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2"
+        },
+        {
+          "function": "find_substring",
+          "args": [
+            [
+              "red",
+              "black",
+              "white",
+              "green",
+              "orange"
+            ],
+            "ange"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_3"
+        }
+      ]
+    },
+    {
+      "id": "mbpp_769",
+      "group": "target",
+      "input": "Write only Python source code implementing the requested function. Do not include markdown, explanations, example calls, print statements, or tests. Preserve the function name and parameter order. Return the requested result without external I/O or persistent state. Include any necessary standard-library imports.\nRequired entrypoint: Diff(li1, li2).\n\nOriginal upstream prompt (verbatim):\nWrite a python function to get the difference between two lists.",
+      "reference": "Adapted literal I/O assertions from MBPP task 769; CC-BY-4.0. Descriptive reference only; see provenance.json and ATTRIBUTION.md. Not the full upstream test suite.",
+      "metric": "function_io",
+      "threshold": 1.0,
+      "function_cases": [
+        {
+          "function": "Diff",
+          "args": [
+            [
+              10,
+              15,
+              20,
+              25,
+              30,
+              35,
+              40
+            ],
+            [
+              25,
+              40,
+              35
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            10,
+            20,
+            30,
+            15
+          ],
+          "id": "io_1"
+        },
+        {
+          "function": "Diff",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              6,
+              7,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "id": "io_2"
+        },
+        {
+          "function": "Diff",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ],
+            [
+              6,
+              7,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            6,
+            7
+          ],
+          "id": "io_3"
+        }
+      ]
+    }
+  ]
+}

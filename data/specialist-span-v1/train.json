@@ -1,0 +1,98 @@
+{
+  "schema": "specialist-span-supervised-v1",
+  "purpose": "Supervised recovery training only; context-redundant reconstruction fixtures.",
+  "split": "train",
+  "source": "locally_authored_synthetic",
+  "license": "CC0-1.0",
+  "seed": 271828,
+  "grouping": "One unique entity noun per row; entity nouns disjoint across splits; function words, templates, and adjective targets shared intentionally.",
+  "token_policy": {
+    "max_prompt_tokens": 256,
+    "max_response_tokens": 256,
+    "truncation": false,
+    "input_compression": false,
+    "tokenizer_verified": false
+  },
+  "samples": [
+    {
+      "id": "span-v1-train-01",
+      "prompt": "The acorn is damp. This acorn is <extra_id_0>.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-02",
+      "prompt": "This apron is clean. The <extra_id_0> apron is here.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-03",
+      "prompt": "Here is a dusty basket. This basket is <extra_id_0>.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-04",
+      "prompt": "This is a worn blanket. Here is the <extra_id_0> blanket.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-05",
+      "prompt": "This bowl is damp. The <extra_id_0> bowl is here.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-06",
+      "prompt": "Here is a clean buckle. This buckle is <extra_id_0>.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-07",
+      "prompt": "This is a dusty candle. Here is the <extra_id_0> candle.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-08",
+      "prompt": "The carpet is worn. This carpet is <extra_id_0>.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-09",
+      "prompt": "Here is a damp coaster. This coaster is <extra_id_0>.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-10",
+      "prompt": "This is a clean cushion. Here is the <extra_id_0> cushion.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-11",
+      "prompt": "The feather is dusty. This feather is <extra_id_0>.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-12",
+      "prompt": "This funnel is worn. The <extra_id_0> funnel is here.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-13",
+      "prompt": "This is a damp mitten. Here is the <extra_id_0> mitten.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-14",
+      "prompt": "The pebble is clean. This pebble is <extra_id_0>.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-15",
+      "prompt": "This plank is dusty. The <extra_id_0> plank is here.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-train-16",
+      "prompt": "Here is a worn thimble. This thimble is <extra_id_0>.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    }
+  ]
+}

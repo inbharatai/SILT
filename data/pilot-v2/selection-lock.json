@@ -1,0 +1,328 @@
+{
+  "version": "adapted-public-coding-pilot-v2",
+  "seed": "silt-adapted-coding-pilot-v2-2026-07-13-before-generation",
+  "selection": [
+    {
+      "id": "he_15",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/15",
+      "source_record_sha256": "9183c428bc04d2c388827a7e63cee5fc43521400d1f97cfe9f3ab175cd12e193",
+      "family": "family_ea6e385fce3f35cb",
+      "split": "development",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_100",
+      "source": "MBPP",
+      "source_task_id": "100",
+      "source_record_sha256": "d52e21686b60dc2eadf10c569d1a9dd430c1b311003e4eb21f31775c121d4d2b",
+      "family": "family_68b7c0619444461e",
+      "split": "development",
+      "group": "control"
+    },
+    {
+      "id": "he_69",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/69",
+      "source_record_sha256": "bda024130c6074a90dc77fd4127934edb8c96193aaffceacf335087ca6ffd6d3",
+      "family": "family_5d31828fa4420682",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "he_14",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/14",
+      "source_record_sha256": "68425558735fd2d857937e2bd518da18491f4b6c50c9b5ebac82d0ee6965e034",
+      "family": "family_35bdf830dd486e3b",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "he_125",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/125",
+      "source_record_sha256": "b04125c0faf9060b5e71fbbc9359d9af13788bfa8144b001e60c39e74310bd36",
+      "family": "family_f20d1bd1c843edad",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_434",
+      "source": "MBPP",
+      "source_task_id": "434",
+      "source_record_sha256": "f6e1fbe86c525f71763e372a308f142692e6298d62a12120c36713af8ebc700f",
+      "family": "family_697998fe02da1241",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_91",
+      "source": "MBPP",
+      "source_task_id": "91",
+      "source_record_sha256": "5eac0b4764a4ccdb4554b9e85d357d9fd7743697f980facd3bd960d7b6f0aeb4",
+      "family": "family_6e3c48f6fdaf586a",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_769",
+      "source": "MBPP",
+      "source_task_id": "769",
+      "source_record_sha256": "13d5a64b840c91921d4fc6e8dad723e72fdc0872eb5a19fba1ec796e87931d50",
+      "family": "family_eb938f27bcd106b4",
+      "split": "development",
+      "group": "target"
+    },
+    {
+      "id": "he_150",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/150",
+      "source_record_sha256": "ede8a43bee97731b104c6241aebd61f3d72062a5a117cf009dabaa7b048b0920",
+      "family": "family_3fe8751e9ff5b5d0",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "he_79",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/79",
+      "source_record_sha256": "49e757b3e70c817b681583121788042381fd203d526502dcd30fb2ef34279db9",
+      "family": "family_30e3c132ff94ab7f",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "he_96",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/96",
+      "source_record_sha256": "a7c27ead86353a3740da919f4af0637c8f92407c2b8bb518617a363db60e0326",
+      "family": "family_dee3f9637dc51f9f",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_407",
+      "source": "MBPP",
+      "source_task_id": "407",
+      "source_record_sha256": "4d92a0157af73700505dc5ae4de53963f0e121db0ffd4c09166c686c7cbbd5c8",
+      "family": "family_3e470ec600e7ea8d",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_608",
+      "source": "MBPP",
+      "source_task_id": "608",
+      "source_record_sha256": "5f4ee730eee5daccaac0654737e5e753ed9edb5f5fa532d8b42d63c83e624105",
+      "family": "family_1421ba1bd333bbe7",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "mbpp_455",
+      "source": "MBPP",
+      "source_task_id": "455",
+      "source_record_sha256": "418017b3c72effceca06d20fbed4ba79a8f8c7e485b0e328b7cea09c5171b946",
+      "family": "family_911b933cadcd2978",
+      "split": "final",
+      "group": "control"
+    },
+    {
+      "id": "he_124",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/124",
+      "source_record_sha256": "b8e9f0a2af9e355cc2030e739eb0eefeb94328507c587167f237f6940a7f0f06",
+      "family": "family_20930e75871b2e3a",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_9",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/9",
+      "source_record_sha256": "7c2f4c0df94d082d752b376be12c48f9746d6795f98c439fcd5c6c7536381524",
+      "family": "family_ea1e6da2d4d9174e",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_129",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/129",
+      "source_record_sha256": "815ef6ca6ff5627b6e0b61aadfa2d38f3801036287908a7f2a908decffe0ab41",
+      "family": "family_73b05b25fc66ed9e",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_141",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/141",
+      "source_record_sha256": "95b4ede999c88ca4416320f3318bba75be660d49d981d1821af06ca95630f5e1",
+      "family": "family_e4f1bd715ad7280d",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_48",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/48",
+      "source_record_sha256": "8fea9de4fc0828f3c5512ff8b191c33b107c177a0790c4f476cdc38245f35505",
+      "family": "family_c626bafbc357e3eb",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_105",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/105",
+      "source_record_sha256": "355ecea7ff52b92fca4b1db4f9a96005ea2ce611dae9ae91480ac29ed046c255",
+      "family": "family_ff942a0389f23227",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_101",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/101",
+      "source_record_sha256": "ff36c837169254c91edbe55336ef7297e1847d1318a8617651e85542f3d69f98",
+      "family": "family_ca17639cfccb1375",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_27",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/27",
+      "source_record_sha256": "7ce9c6b2dbb728f107b894e5cfa6ecb3a74b6b54daf8ebfc3eba91f5f3714930",
+      "family": "family_8cda1a911193b5ed",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "he_145",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/145",
+      "source_record_sha256": "37b55d66cfa9602cb8d7ba771ae97d96442d37b19715825b3e6336a97ecd325f",
+      "family": "family_f471006ca02fc125",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_108",
+      "source": "MBPP",
+      "source_task_id": "108",
+      "source_record_sha256": "236d71f960cf7cceeaca596e5b24eb81c88f268489a280ad697eb1632304b716",
+      "family": "family_06d1dfe778be0c46",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_398",
+      "source": "MBPP",
+      "source_task_id": "398",
+      "source_record_sha256": "5fcf1b3403c78830e929022ada2c3e01e36fb7fa383794fd21a03d2c18dd0c64",
+      "family": "family_dc25977ce4b597d8",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_79",
+      "source": "MBPP",
+      "source_task_id": "79",
+      "source_record_sha256": "5767a546fa15120057e58c56b6a7abec7ba4bd80e0bdd1fbd5d4c836d9cb11bc",
+      "family": "family_794704fc84b11fdd",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_465",
+      "source": "MBPP",
+      "source_task_id": "465",
+      "source_record_sha256": "0c9bbc2d8daa9f5c1aea7a98e81e0e335546a49b0921e2357c71b06ddb2124bf",
+      "family": "family_4f10e8b9c2394c96",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_57",
+      "source": "MBPP",
+      "source_task_id": "57",
+      "source_record_sha256": "9a9409ae8b9d14e21dc30efb80cd40e0e8cab0990ba3e2a568d4664e9f036e7b",
+      "family": "family_be28230f42d4be01",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_301",
+      "source": "MBPP",
+      "source_task_id": "301",
+      "source_record_sha256": "4255e48034065b1b1741f337148c6f3304927a56fdb96d2809b295cca9b1da52",
+      "family": "family_868244da11610394",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_66",
+      "source": "MBPP",
+      "source_task_id": "66",
+      "source_record_sha256": "754c2cea47924cb66ba541532c51e61641c765ce920b4f52f9b5ff0287255fc4",
+      "family": "family_59ec33418fb7a72d",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_619",
+      "source": "MBPP",
+      "source_task_id": "619",
+      "source_record_sha256": "5fe705258f515f69caea8d5507a97ae288c92204c670850faf1aac470fc8cd67",
+      "family": "family_272927dcc99de53b",
+      "split": "final",
+      "group": "target"
+    },
+    {
+      "id": "mbpp_573",
+      "source": "MBPP",
+      "source_task_id": "573",
+      "source_record_sha256": "896380cdfb6a8b3018f18205812481abbf73a7d01358b04c6d02324447f5baa1",
+      "family": "family_69c8ed9662f21bb6",
+      "split": "final",
+      "group": "target"
+    }
+  ],
+  "requested_total": 32,
+  "requested_development": 8,
+  "requested_final": 24,
+  "requested_target": 24,
+  "requested_control": 8,
+  "per_source_quota": {
+    "target": 12,
+    "control": 4,
+    "development_target": 3,
+    "development_control": 1
+  },
+  "ranking": "ascending SHA256(seed + ':' + purpose + ':' + task_id); purpose selection or split",
+  "families": "connected components: identical normalized entrypoint OR description token Jaccard >= 0.72; one representative per family; heuristic, not complete semantic deduplication",
+  "grouping": "target=text/collection inputs; control=numeric/scalar-only inputs; both sources in each domain; all real coding tasks with real positive oracle values",
+  "frozen_before_generation": true,
+  "model_outputs_consulted": false,
+  "existing_diagnostic_tasks_excluded": {
+    "add": "add(a, b): sum of two values",
+    "square": "square(x): x multiplied by itself",
+    "even": "is_even(n): even integer predicate",
+    "reverse": "reverse_text(s): reverse a string",
+    "maximum": "larger(a, b): larger of two values",
+    "absolute": "absolute_value(n): absolute value"
+  },
+  "upstream_split_policy": "All pinned HumanEval and sanitized MBPP rows considered; original MBPP splits NOT treated as unseen; our new splits are local pilot governance only.",
+  "existing_diagnostic_source": {
+    "path": "scripts/setup_local_validation.py",
+    "sha256_at_protocol_definition": "fe77062c70a14dcedec0a375792b536429ba79e632fa581f21b8185fc327ee70",
+    "lines": "37-43"
+  },
+  "literal_types": "null, bool, bounded integer (optional unary +/-), string, list, string-keyed dictionary; floats and tuples rejected",
+  "expected_diversity": "at least two distinct expected JSON values among retained cases; no conflicting expected values for identical inputs",
+  "maximum_literal_cases_per_task": 8,
+  "minimum_literal_cases_per_task": 2
+}

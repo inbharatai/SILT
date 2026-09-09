@@ -1,0 +1,2886 @@
+{
+  "tasks": [
+    {
+      "id": "he_15",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/15",
+      "entrypoint": "string_sequence",
+      "original_prompt": "\n\ndef string_sequence(n: int) -> str:\n    \"\"\" Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> string_sequence(0)\n    '0'\n    >>> string_sequence(5)\n    '0 1 2 3 4 5'\n    \"\"\"\n",
+      "function_parameters": [
+        "n"
+      ],
+      "source_record_sha256": "9183c428bc04d2c388827a7e63cee5fc43521400d1f97cfe9f3ab175cd12e193",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "string_sequence",
+          "args": [
+            0
+          ],
+          "kwargs": {},
+          "expected": "0",
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(0) == '0'"
+        },
+        {
+          "function": "string_sequence",
+          "args": [
+            3
+          ],
+          "kwargs": {},
+          "expected": "0 1 2 3",
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(3) == '0 1 2 3'"
+        },
+        {
+          "function": "string_sequence",
+          "args": [
+            10
+          ],
+          "kwargs": {},
+          "expected": "0 1 2 3 4 5 6 7 8 9 10",
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(10) == '0 1 2 3 4 5 6 7 8 9 10'"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "MIT",
+      "family": "family_ea6e385fce3f35cb",
+      "split": "development"
+    },
+    {
+      "id": "mbpp_100",
+      "source": "MBPP",
+      "source_task_id": "100",
+      "entrypoint": "next_smallest_palindrome",
+      "original_prompt": "Write a function to find the next smallest palindrome of a specified integer, returned as an integer.",
+      "function_parameters": [
+        "num"
+      ],
+      "source_record_sha256": "d52e21686b60dc2eadf10c569d1a9dd430c1b311003e4eb21f31775c121d4d2b",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "next_smallest_palindrome",
+          "args": [
+            99
+          ],
+          "kwargs": {},
+          "expected": 101,
+          "id": "io_1",
+          "upstream_assertion": "assert next_smallest_palindrome(99)==101"
+        },
+        {
+          "function": "next_smallest_palindrome",
+          "args": [
+            1221
+          ],
+          "kwargs": {},
+          "expected": 1331,
+          "id": "io_2",
+          "upstream_assertion": "assert next_smallest_palindrome(1221)==1331"
+        },
+        {
+          "function": "next_smallest_palindrome",
+          "args": [
+            120
+          ],
+          "kwargs": {},
+          "expected": 121,
+          "id": "io_3",
+          "upstream_assertion": "assert next_smallest_palindrome(120)==121"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_68b7c0619444461e",
+      "split": "development"
+    },
+    {
+      "id": "he_69",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/69",
+      "entrypoint": "search",
+      "original_prompt": "\ndef search(lst):\n    '''\n    You are given a non-empty list of positive integers. Return the greatest integer that is greater than \n    zero, and has a frequency greater than or equal to the value of the integer itself. \n    The frequency of an integer is the number of times it appears in the list.\n    If no such a value exist, return -1.\n    Examples:\n        search([4, 1, 2, 2, 3, 1]) == 2\n        search([1, 2, 2, 3, 3, 3, 4, 4, 4]) == 3\n        search([5, 5, 4, 4, 4]) == -1\n    '''\n",
+      "function_parameters": [
+        "lst"
+      ],
+      "source_record_sha256": "bda024130c6074a90dc77fd4127934edb8c96193aaffceacf335087ca6ffd6d3",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "search",
+          "args": [
+            [
+              5,
+              5,
+              5,
+              5,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate([5, 5, 5, 5, 1]) == 1"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              4,
+              1,
+              4,
+              1,
+              4,
+              4
+            ]
+          ],
+          "kwargs": {},
+          "expected": 4,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate([4, 1, 4, 1, 4, 4]) == 4"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              3,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": -1,
+          "id": "io_3",
+          "upstream_assertion": "assert candidate([3, 3]) == -1"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              8,
+              8,
+              8,
+              8,
+              8,
+              8,
+              8,
+              8
+            ]
+          ],
+          "kwargs": {},
+          "expected": 8,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate([8, 8, 8, 8, 8, 8, 8, 8]) == 8"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              2,
+              3,
+              3,
+              2,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate([2, 3, 3, 2, 2]) == 2"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              2,
+              7,
+              8,
+              8,
+              4,
+              8,
+              7,
+              3,
+              9,
+              6,
+              5,
+              10,
+              4,
+              3,
+              6,
+              7,
+              1,
+              7,
+              4,
+              10,
+              8,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_6",
+          "upstream_assertion": "assert candidate([2, 7, 8, 8, 4, 8, 7, 3, 9, 6, 5, 10, 4, 3, 6, 7, 1, 7, 4, 10, 8, 1]) == 1"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              3,
+              2,
+              8,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_7",
+          "upstream_assertion": "assert candidate([3, 2, 8, 2]) == 2"
+        },
+        {
+          "function": "search",
+          "args": [
+            [
+              6,
+              7,
+              1,
+              8,
+              8,
+              10,
+              5,
+              8,
+              5,
+              3,
+              10
+            ]
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_8",
+          "upstream_assertion": "assert candidate([6, 7, 1, 8, 8, 10, 5, 8, 5, 3, 10]) == 1"
+        }
+      ],
+      "available_literal_cases": 25,
+      "license": "MIT",
+      "family": "family_5d31828fa4420682",
+      "split": "development"
+    },
+    {
+      "id": "he_14",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/14",
+      "entrypoint": "all_prefixes",
+      "original_prompt": "from typing import List\n\n\ndef all_prefixes(string: str) -> List[str]:\n    \"\"\" Return list of all prefixes from shortest to longest of the input string\n    >>> all_prefixes('abc')\n    ['a', 'ab', 'abc']\n    \"\"\"\n",
+      "function_parameters": [
+        "string"
+      ],
+      "source_record_sha256": "68425558735fd2d857937e2bd518da18491f4b6c50c9b5ebac82d0ee6965e034",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "all_prefixes",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_1",
+          "upstream_assertion": "assert candidate('') == []"
+        },
+        {
+          "function": "all_prefixes",
+          "args": [
+            "asdfgh"
+          ],
+          "kwargs": {},
+          "expected": [
+            "a",
+            "as",
+            "asd",
+            "asdf",
+            "asdfg",
+            "asdfgh"
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate('asdfgh') == ['a', 'as', 'asd', 'asdf', 'asdfg', 'asdfgh']"
+        },
+        {
+          "function": "all_prefixes",
+          "args": [
+            "WWW"
+          ],
+          "kwargs": {},
+          "expected": [
+            "W",
+            "WW",
+            "WWW"
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate('WWW') == ['W', 'WW', 'WWW']"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "MIT",
+      "family": "family_35bdf830dd486e3b",
+      "split": "development"
+    },
+    {
+      "id": "he_125",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/125",
+      "entrypoint": "split_words",
+      "original_prompt": "\ndef split_words(txt):\n    '''\n    Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you\n    should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the\n    alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25\n    Examples\n    split_words(\"Hello world!\") ➞ [\"Hello\", \"world!\"]\n    split_words(\"Hello,world!\") ➞ [\"Hello\", \"world!\"]\n    split_words(\"abcdef\") == 3 \n    '''\n",
+      "function_parameters": [
+        "txt"
+      ],
+      "source_record_sha256": "b04125c0faf9060b5e71fbbc9359d9af13788bfa8144b001e60c39e74310bd36",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "split_words",
+          "args": [
+            "Hello world!"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello",
+            "world!"
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(\"Hello world!\") == [\"Hello\",\"world!\"]"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "Hello,world!"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello",
+            "world!"
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(\"Hello,world!\") == [\"Hello\",\"world!\"]"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "Hello world,!"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello",
+            "world,!"
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(\"Hello world,!\") == [\"Hello\",\"world,!\"]"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "Hello,Hello,world !"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hello,Hello,world",
+            "!"
+          ],
+          "id": "io_4",
+          "upstream_assertion": "assert candidate(\"Hello,Hello,world !\") == [\"Hello,Hello,world\",\"!\"]"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "abcdef"
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate(\"abcdef\") == 3"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "aaabb"
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_6",
+          "upstream_assertion": "assert candidate(\"aaabb\") == 2"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            "aaaBb"
+          ],
+          "kwargs": {},
+          "expected": 1,
+          "id": "io_7",
+          "upstream_assertion": "assert candidate(\"aaaBb\") == 1"
+        },
+        {
+          "function": "split_words",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_8",
+          "upstream_assertion": "assert candidate(\"\") == 0"
+        }
+      ],
+      "available_literal_cases": 8,
+      "license": "MIT",
+      "family": "family_f20d1bd1c843edad",
+      "split": "development"
+    },
+    {
+      "id": "mbpp_434",
+      "source": "MBPP",
+      "source_task_id": "434",
+      "entrypoint": "text_match_one",
+      "original_prompt": "Write a function that matches a string that has an a followed by one or more b's.",
+      "function_parameters": [
+        "text"
+      ],
+      "source_record_sha256": "f6e1fbe86c525f71763e372a308f142692e6298d62a12120c36713af8ebc700f",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "text_match_one",
+          "args": [
+            "ac"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_1",
+          "upstream_assertion": "assert text_match_one(\"ac\")==False"
+        },
+        {
+          "function": "text_match_one",
+          "args": [
+            "dc"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2",
+          "upstream_assertion": "assert text_match_one(\"dc\")==False"
+        },
+        {
+          "function": "text_match_one",
+          "args": [
+            "abba"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_3",
+          "upstream_assertion": "assert text_match_one(\"abba\")==True"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_697998fe02da1241",
+      "split": "development"
+    },
+    {
+      "id": "mbpp_91",
+      "source": "MBPP",
+      "source_task_id": "91",
+      "entrypoint": "find_substring",
+      "original_prompt": "Write a function to check if a string is present as a substring in a given list of string values.",
+      "function_parameters": [
+        "str1",
+        "sub_str"
+      ],
+      "source_record_sha256": "5eac0b4764a4ccdb4554b9e85d357d9fd7743697f980facd3bd960d7b6f0aeb4",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "find_substring",
+          "args": [
+            [
+              "red",
+              "black",
+              "white",
+              "green",
+              "orange"
+            ],
+            "ack"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_1",
+          "upstream_assertion": "assert find_substring([\"red\", \"black\", \"white\", \"green\", \"orange\"],\"ack\")==True"
+        },
+        {
+          "function": "find_substring",
+          "args": [
+            [
+              "red",
+              "black",
+              "white",
+              "green",
+              "orange"
+            ],
+            "abc"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2",
+          "upstream_assertion": "assert find_substring([\"red\", \"black\", \"white\", \"green\", \"orange\"],\"abc\")==False"
+        },
+        {
+          "function": "find_substring",
+          "args": [
+            [
+              "red",
+              "black",
+              "white",
+              "green",
+              "orange"
+            ],
+            "ange"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_3",
+          "upstream_assertion": "assert find_substring([\"red\", \"black\", \"white\", \"green\", \"orange\"],\"ange\")==True"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_6e3c48f6fdaf586a",
+      "split": "development"
+    },
+    {
+      "id": "mbpp_769",
+      "source": "MBPP",
+      "source_task_id": "769",
+      "entrypoint": "Diff",
+      "original_prompt": "Write a python function to get the difference between two lists.",
+      "function_parameters": [
+        "li1",
+        "li2"
+      ],
+      "source_record_sha256": "13d5a64b840c91921d4fc6e8dad723e72fdc0872eb5a19fba1ec796e87931d50",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "Diff",
+          "args": [
+            [
+              10,
+              15,
+              20,
+              25,
+              30,
+              35,
+              40
+            ],
+            [
+              25,
+              40,
+              35
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            10,
+            20,
+            30,
+            15
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert (Diff([10, 15, 20, 25, 30, 35, 40], [25, 40, 35])) == [10, 20, 30, 15]"
+        },
+        {
+          "function": "Diff",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              6,
+              7,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert (Diff([1,2,3,4,5], [6,7,1])) == [2,3,4,5,6,7]"
+        },
+        {
+          "function": "Diff",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ],
+            [
+              6,
+              7,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            6,
+            7
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert (Diff([1,2,3], [6,7,1])) == [2,3,6,7]"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_eb938f27bcd106b4",
+      "split": "development"
+    },
+    {
+      "id": "he_150",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/150",
+      "entrypoint": "x_or_y",
+      "original_prompt": "\ndef x_or_y(n, x, y):\n    \"\"\"A simple program which should return the value of x if n is \n    a prime number and should return the value of y otherwise.\n\n    Examples:\n    for x_or_y(7, 34, 12) == 34\n    for x_or_y(15, 8, 5) == 5\n    \n    \"\"\"\n",
+      "function_parameters": [
+        "n",
+        "x",
+        "y"
+      ],
+      "source_record_sha256": "ede8a43bee97731b104c6241aebd61f3d72062a5a117cf009dabaa7b048b0920",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "x_or_y",
+          "args": [
+            7,
+            34,
+            12
+          ],
+          "kwargs": {},
+          "expected": 34,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(7, 34, 12) == 34"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            15,
+            8,
+            5
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(15, 8, 5) == 5"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            3,
+            33,
+            5212
+          ],
+          "kwargs": {},
+          "expected": 33,
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(3, 33, 5212) == 33"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            1259,
+            3,
+            52
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate(1259, 3, 52) == 3"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            7919,
+            -1,
+            12
+          ],
+          "kwargs": {},
+          "expected": -1,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate(7919, -1, 12) == -1"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            3609,
+            1245,
+            583
+          ],
+          "kwargs": {},
+          "expected": 583,
+          "id": "io_6",
+          "upstream_assertion": "assert candidate(3609, 1245, 583) == 583"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            91,
+            56,
+            129
+          ],
+          "kwargs": {},
+          "expected": 129,
+          "id": "io_7",
+          "upstream_assertion": "assert candidate(91, 56, 129) == 129"
+        },
+        {
+          "function": "x_or_y",
+          "args": [
+            6,
+            34,
+            1234
+          ],
+          "kwargs": {},
+          "expected": 1234,
+          "id": "io_8",
+          "upstream_assertion": "assert candidate(6, 34, 1234) == 1234"
+        }
+      ],
+      "available_literal_cases": 10,
+      "license": "MIT",
+      "family": "family_3fe8751e9ff5b5d0",
+      "split": "final"
+    },
+    {
+      "id": "he_79",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/79",
+      "entrypoint": "decimal_to_binary",
+      "original_prompt": "\ndef decimal_to_binary(decimal):\n    \"\"\"You will be given a number in decimal form and your task is to convert it to\n    binary format. The function should return a string, with each character representing a binary\n    number. Each character in the string will be '0' or '1'.\n\n    There will be an extra couple of characters 'db' at the beginning and at the end of the string.\n    The extra characters are there to help with the format.\n\n    Examples:\n    decimal_to_binary(15)   # returns \"db1111db\"\n    decimal_to_binary(32)   # returns \"db100000db\"\n    \"\"\"\n",
+      "function_parameters": [
+        "decimal"
+      ],
+      "source_record_sha256": "49e757b3e70c817b681583121788042381fd203d526502dcd30fb2ef34279db9",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "decimal_to_binary",
+          "args": [
+            0
+          ],
+          "kwargs": {},
+          "expected": "db0db",
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(0) == \"db0db\""
+        },
+        {
+          "function": "decimal_to_binary",
+          "args": [
+            32
+          ],
+          "kwargs": {},
+          "expected": "db100000db",
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(32) == \"db100000db\""
+        },
+        {
+          "function": "decimal_to_binary",
+          "args": [
+            103
+          ],
+          "kwargs": {},
+          "expected": "db1100111db",
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(103) == \"db1100111db\""
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "MIT",
+      "family": "family_30e3c132ff94ab7f",
+      "split": "final"
+    },
+    {
+      "id": "he_96",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/96",
+      "entrypoint": "count_up_to",
+      "original_prompt": "\ndef count_up_to(n):\n    \"\"\"Implement a function that takes an non-negative integer and returns an array of the first n\n    integers that are prime numbers and less than n.\n    for example:\n    count_up_to(5) => [2,3]\n    count_up_to(11) => [2,3,5,7]\n    count_up_to(0) => []\n    count_up_to(20) => [2,3,5,7,11,13,17,19]\n    count_up_to(1) => []\n    count_up_to(18) => [2,3,5,7,11,13,17]\n    \"\"\"\n",
+      "function_parameters": [
+        "n"
+      ],
+      "source_record_sha256": "a7c27ead86353a3740da919f4af0637c8f92407c2b8bb518617a363db60e0326",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "count_up_to",
+          "args": [
+            5
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(5) == [2,3]"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            6
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            5
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(6) == [2,3,5]"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            7
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            5
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(7) == [2,3,5]"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            10
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            5,
+            7
+          ],
+          "id": "io_4",
+          "upstream_assertion": "assert candidate(10) == [2,3,5,7]"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            0
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_5",
+          "upstream_assertion": "assert candidate(0) == []"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            22
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            5,
+            7,
+            11,
+            13,
+            17,
+            19
+          ],
+          "id": "io_6",
+          "upstream_assertion": "assert candidate(22) == [2,3,5,7,11,13,17,19]"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            1
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_7",
+          "upstream_assertion": "assert candidate(1) == []"
+        },
+        {
+          "function": "count_up_to",
+          "args": [
+            18
+          ],
+          "kwargs": {},
+          "expected": [
+            2,
+            3,
+            5,
+            7,
+            11,
+            13,
+            17
+          ],
+          "id": "io_8",
+          "upstream_assertion": "assert candidate(18) == [2,3,5,7,11,13,17]"
+        }
+      ],
+      "available_literal_cases": 10,
+      "license": "MIT",
+      "family": "family_dee3f9637dc51f9f",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_407",
+      "source": "MBPP",
+      "source_task_id": "407",
+      "entrypoint": "rearrange_bigger",
+      "original_prompt": "Write a function to create the next bigger number by rearranging the digits of a given number.",
+      "function_parameters": [
+        "n"
+      ],
+      "source_record_sha256": "4d92a0157af73700505dc5ae4de53963f0e121db0ffd4c09166c686c7cbbd5c8",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "rearrange_bigger",
+          "args": [
+            12
+          ],
+          "kwargs": {},
+          "expected": 21,
+          "id": "io_1",
+          "upstream_assertion": "assert rearrange_bigger(12)==21"
+        },
+        {
+          "function": "rearrange_bigger",
+          "args": [
+            10
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2",
+          "upstream_assertion": "assert rearrange_bigger(10)==False"
+        },
+        {
+          "function": "rearrange_bigger",
+          "args": [
+            102
+          ],
+          "kwargs": {},
+          "expected": 120,
+          "id": "io_3",
+          "upstream_assertion": "assert rearrange_bigger(102)==120"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_3e470ec600e7ea8d",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_608",
+      "source": "MBPP",
+      "source_task_id": "608",
+      "entrypoint": "bell_Number",
+      "original_prompt": "Write a python function to find nth bell number.",
+      "function_parameters": [
+        "n"
+      ],
+      "source_record_sha256": "5f4ee730eee5daccaac0654737e5e753ed9edb5f5fa532d8b42d63c83e624105",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "bell_Number",
+          "args": [
+            2
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_1",
+          "upstream_assertion": "assert bell_Number(2) == 2"
+        },
+        {
+          "function": "bell_Number",
+          "args": [
+            3
+          ],
+          "kwargs": {},
+          "expected": 5,
+          "id": "io_2",
+          "upstream_assertion": "assert bell_Number(3) == 5"
+        },
+        {
+          "function": "bell_Number",
+          "args": [
+            4
+          ],
+          "kwargs": {},
+          "expected": 15,
+          "id": "io_3",
+          "upstream_assertion": "assert bell_Number(4) == 15"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_1421ba1bd333bbe7",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_455",
+      "source": "MBPP",
+      "source_task_id": "455",
+      "entrypoint": "check_monthnumb_number",
+      "original_prompt": "Write a function to check whether the given month number contains 31 days or not.",
+      "function_parameters": [
+        "monthnum2"
+      ],
+      "source_record_sha256": "418017b3c72effceca06d20fbed4ba79a8f8c7e485b0e328b7cea09c5171b946",
+      "group": "control",
+      "domain": "numeric_scalar_algorithms",
+      "function_cases": [
+        {
+          "function": "check_monthnumb_number",
+          "args": [
+            5
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_1",
+          "upstream_assertion": "assert check_monthnumb_number(5)==True"
+        },
+        {
+          "function": "check_monthnumb_number",
+          "args": [
+            2
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2",
+          "upstream_assertion": "assert check_monthnumb_number(2)==False"
+        },
+        {
+          "function": "check_monthnumb_number",
+          "args": [
+            6
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_3",
+          "upstream_assertion": "assert check_monthnumb_number(6)==False"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_911b933cadcd2978",
+      "split": "final"
+    },
+    {
+      "id": "he_124",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/124",
+      "entrypoint": "valid_date",
+      "original_prompt": "\ndef valid_date(date):\n    \"\"\"You have to write a function which validates a given date string and\n    returns True if the date is valid otherwise False.\n    The date is valid if all of the following rules are satisfied:\n    1. The date string is not empty.\n    2. The number of days is not less than 1 or higher than 31 days for months 1,3,5,7,8,10,12. And the number of days is not less than 1 or higher than 30 days for months 4,6,9,11. And, the number of days is not less than 1 or higher than 29 for the month 2.\n    3. The months should not be less than 1 or higher than 12.\n    4. The date should be in the format: mm-dd-yyyy\n\n    for example: \n    valid_date('03-11-2000') => True\n\n    valid_date('15-01-2012') => False\n\n    valid_date('04-0-2040') => False\n\n    valid_date('06-04-2020') => True\n\n    valid_date('06/04/2020') => False\n    \"\"\"\n",
+      "function_parameters": [
+        "date"
+      ],
+      "source_record_sha256": "b8e9f0a2af9e355cc2030e739eb0eefeb94328507c587167f237f6940a7f0f06",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "valid_date",
+          "args": [
+            "03-11-2000"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate('03-11-2000') == True"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            "15-01-2012"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate('15-01-2012') == False"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            "04-0-2040"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_3",
+          "upstream_assertion": "assert candidate('04-0-2040') == False"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            "06-04-2020"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate('06-04-2020') == True"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            "01-01-2007"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate('01-01-2007') == True"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            "03-32-2011"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_6",
+          "upstream_assertion": "assert candidate('03-32-2011') == False"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_7",
+          "upstream_assertion": "assert candidate('') == False"
+        },
+        {
+          "function": "valid_date",
+          "args": [
+            "04-31-3000"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_8",
+          "upstream_assertion": "assert candidate('04-31-3000') == False"
+        }
+      ],
+      "available_literal_cases": 16,
+      "license": "MIT",
+      "family": "family_20930e75871b2e3a",
+      "split": "final"
+    },
+    {
+      "id": "he_9",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/9",
+      "entrypoint": "rolling_max",
+      "original_prompt": "from typing import List, Tuple\n\n\ndef rolling_max(numbers: List[int]) -> List[int]:\n    \"\"\" From a given list of integers, generate a list of rolling maximum element found until given moment\n    in the sequence.\n    >>> rolling_max([1, 2, 3, 2, 3, 4, 2])\n    [1, 2, 3, 3, 3, 4, 4]\n    \"\"\"\n",
+      "function_parameters": [
+        "numbers"
+      ],
+      "source_record_sha256": "7c2f4c0df94d082d752b376be12c48f9746d6795f98c439fcd5c6c7536381524",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "rolling_max",
+          "args": [
+            []
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_1",
+          "upstream_assertion": "assert candidate([]) == []"
+        },
+        {
+          "function": "rolling_max",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate([1, 2, 3, 4]) == [1, 2, 3, 4]"
+        },
+        {
+          "function": "rolling_max",
+          "args": [
+            [
+              4,
+              3,
+              2,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate([4, 3, 2, 1]) == [4, 4, 4, 4]"
+        },
+        {
+          "function": "rolling_max",
+          "args": [
+            [
+              3,
+              2,
+              3,
+              100,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            3,
+            3,
+            3,
+            100,
+            100
+          ],
+          "id": "io_4",
+          "upstream_assertion": "assert candidate([3, 2, 3, 100, 3]) == [3, 3, 3, 100, 100]"
+        }
+      ],
+      "available_literal_cases": 4,
+      "license": "MIT",
+      "family": "family_ea1e6da2d4d9174e",
+      "split": "final"
+    },
+    {
+      "id": "he_129",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/129",
+      "entrypoint": "minPath",
+      "original_prompt": "\ndef minPath(grid, k):\n    \"\"\"\n    Given a grid with N rows and N columns (N >= 2) and a positive integer k, \n    each cell of the grid contains a value. Every integer in the range [1, N * N]\n    inclusive appears exactly once on the cells of the grid.\n\n    You have to find the minimum path of length k in the grid. You can start\n    from any cell, and in each step you can move to any of the neighbor cells,\n    in other words, you can go to cells which share an edge with you current\n    cell.\n    Please note that a path of length k means visiting exactly k cells (not\n    necessarily distinct).\n    You CANNOT go off the grid.\n    A path A (of length k) is considered less than a path B (of length k) if\n    after making the ordered lists of the values on the cells that A and B go\n    through (let's call them lst_A and lst_B), lst_A is lexicographically less\n    than lst_B, in other words, there exist an integer index i (1 <= i <= k)\n    such that lst_A[i] < lst_B[i] and for any j (1 <= j < i) we have\n    lst_A[j] = lst_B[j].\n    It is guaranteed that the answer is unique.\n    Return an ordered list of the values on the cells that the minimum path go through.\n\n    Examples:\n\n        Input: grid = [ [1,2,3], [4,5,6], [7,8,9]], k = 3\n        Output: [1, 2, 1]\n\n        Input: grid = [ [5,9,3], [4,1,6], [7,8,2]], k = 1\n        Output: [1]\n    \"\"\"\n",
+      "function_parameters": [
+        "grid",
+        "k"
+      ],
+      "source_record_sha256": "815ef6ca6ff5627b6e0b61aadfa2d38f3801036287908a7f2a908decffe0ab41",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                1,
+                2,
+                3
+              ],
+              [
+                4,
+                5,
+                6
+              ],
+              [
+                7,
+                8,
+                9
+              ]
+            ],
+            3
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            2,
+            1
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 3) == [1, 2, 1]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                5,
+                9,
+                3
+              ],
+              [
+                4,
+                1,
+                6
+              ],
+              [
+                7,
+                8,
+                2
+              ]
+            ],
+            1
+          ],
+          "kwargs": {},
+          "expected": [
+            1
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate([[5, 9, 3], [4, 1, 6], [7, 8, 2]], 1) == [1]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                1,
+                2,
+                3,
+                4
+              ],
+              [
+                5,
+                6,
+                7,
+                8
+              ],
+              [
+                9,
+                10,
+                11,
+                12
+              ],
+              [
+                13,
+                14,
+                15,
+                16
+              ]
+            ],
+            4
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            2,
+            1,
+            2
+          ],
+          "id": "io_4",
+          "upstream_assertion": "assert candidate([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]], 4) == [1, 2, 1, 2]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                6,
+                4,
+                13,
+                10
+              ],
+              [
+                5,
+                7,
+                12,
+                1
+              ],
+              [
+                3,
+                16,
+                11,
+                15
+              ],
+              [
+                8,
+                14,
+                9,
+                2
+              ]
+            ],
+            7
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            10,
+            1,
+            10,
+            1,
+            10,
+            1
+          ],
+          "id": "io_5",
+          "upstream_assertion": "assert candidate([[6, 4, 13, 10], [5, 7, 12, 1], [3, 16, 11, 15], [8, 14, 9, 2]], 7) == [1, 10, 1, 10, 1, 10, 1]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                8,
+                14,
+                9,
+                2
+              ],
+              [
+                6,
+                4,
+                13,
+                15
+              ],
+              [
+                5,
+                7,
+                1,
+                12
+              ],
+              [
+                3,
+                10,
+                11,
+                16
+              ]
+            ],
+            5
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            7,
+            1,
+            7,
+            1
+          ],
+          "id": "io_6",
+          "upstream_assertion": "assert candidate([[8, 14, 9, 2], [6, 4, 13, 15], [5, 7, 1, 12], [3, 10, 11, 16]], 5) == [1, 7, 1, 7, 1]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                11,
+                8,
+                7,
+                2
+              ],
+              [
+                5,
+                16,
+                14,
+                4
+              ],
+              [
+                9,
+                3,
+                15,
+                6
+              ],
+              [
+                12,
+                13,
+                10,
+                1
+              ]
+            ],
+            9
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            6,
+            1,
+            6,
+            1,
+            6,
+            1,
+            6,
+            1
+          ],
+          "id": "io_7",
+          "upstream_assertion": "assert candidate([[11, 8, 7, 2], [5, 16, 14, 4], [9, 3, 15, 6], [12, 13, 10, 1]], 9) == [1, 6, 1, 6, 1, 6, 1, 6, 1]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                12,
+                13,
+                10,
+                1
+              ],
+              [
+                9,
+                3,
+                15,
+                6
+              ],
+              [
+                5,
+                16,
+                14,
+                4
+              ],
+              [
+                11,
+                8,
+                7,
+                2
+              ]
+            ],
+            12
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            6,
+            1,
+            6,
+            1,
+            6,
+            1,
+            6,
+            1,
+            6,
+            1,
+            6
+          ],
+          "id": "io_8",
+          "upstream_assertion": "assert candidate([[12, 13, 10, 1], [9, 3, 15, 6], [5, 16, 14, 4], [11, 8, 7, 2]], 12) == [1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6]"
+        },
+        {
+          "function": "minPath",
+          "args": [
+            [
+              [
+                2,
+                7,
+                4
+              ],
+              [
+                3,
+                1,
+                5
+              ],
+              [
+                6,
+                8,
+                9
+              ]
+            ],
+            8
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            3,
+            1,
+            3,
+            1,
+            3,
+            1,
+            3
+          ],
+          "id": "io_9",
+          "upstream_assertion": "assert candidate([[2, 7, 4], [3, 1, 5], [6, 8, 9]], 8) == [1, 3, 1, 3, 1, 3, 1, 3]"
+        }
+      ],
+      "available_literal_cases": 11,
+      "license": "MIT",
+      "family": "family_73b05b25fc66ed9e",
+      "split": "final"
+    },
+    {
+      "id": "he_141",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/141",
+      "entrypoint": "file_name_check",
+      "original_prompt": "\ndef file_name_check(file_name):\n    \"\"\"Create a function which takes a string representing a file's name, and returns\n    'Yes' if the the file's name is valid, and returns 'No' otherwise.\n    A file's name is considered to be valid if and only if all the following conditions \n    are met:\n    - There should not be more than three digits ('0'-'9') in the file's name.\n    - The file's name contains exactly one dot '.'\n    - The substring before the dot should not be empty, and it starts with a letter from \n    the latin alphapet ('a'-'z' and 'A'-'Z').\n    - The substring after the dot should be one of these: ['txt', 'exe', 'dll']\n    Examples:\n    file_name_check(\"example.txt\") # => 'Yes'\n    file_name_check(\"1example.dll\") # => 'No' (the name should start with a latin alphapet letter)\n    \"\"\"\n",
+      "function_parameters": [
+        "file_name"
+      ],
+      "source_record_sha256": "95b4ede999c88ca4416320f3318bba75be660d49d981d1821af06ca95630f5e1",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "file_name_check",
+          "args": [
+            "example.txt"
+          ],
+          "kwargs": {},
+          "expected": "Yes",
+          "id": "io_1",
+          "upstream_assertion": "assert candidate(\"example.txt\") == 'Yes'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "1example.dll"
+          ],
+          "kwargs": {},
+          "expected": "No",
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(\"1example.dll\") == 'No'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "s1sdf3.asd"
+          ],
+          "kwargs": {},
+          "expected": "No",
+          "id": "io_3",
+          "upstream_assertion": "assert candidate('s1sdf3.asd') == 'No'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "K.dll"
+          ],
+          "kwargs": {},
+          "expected": "Yes",
+          "id": "io_4",
+          "upstream_assertion": "assert candidate('K.dll') == 'Yes'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "MY16FILE3.exe"
+          ],
+          "kwargs": {},
+          "expected": "Yes",
+          "id": "io_5",
+          "upstream_assertion": "assert candidate('MY16FILE3.exe') == 'Yes'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "His12FILE94.exe"
+          ],
+          "kwargs": {},
+          "expected": "No",
+          "id": "io_6",
+          "upstream_assertion": "assert candidate('His12FILE94.exe') == 'No'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "_Y.txt"
+          ],
+          "kwargs": {},
+          "expected": "No",
+          "id": "io_7",
+          "upstream_assertion": "assert candidate('_Y.txt') == 'No'"
+        },
+        {
+          "function": "file_name_check",
+          "args": [
+            "?aREYA.exe"
+          ],
+          "kwargs": {},
+          "expected": "No",
+          "id": "io_8",
+          "upstream_assertion": "assert candidate('?aREYA.exe') == 'No'"
+        }
+      ],
+      "available_literal_cases": 26,
+      "license": "MIT",
+      "family": "family_e4f1bd715ad7280d",
+      "split": "final"
+    },
+    {
+      "id": "he_48",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/48",
+      "entrypoint": "is_palindrome",
+      "original_prompt": "\n\ndef is_palindrome(text: str):\n    \"\"\"\n    Checks if given string is a palindrome\n    >>> is_palindrome('')\n    True\n    >>> is_palindrome('aba')\n    True\n    >>> is_palindrome('aaaaa')\n    True\n    >>> is_palindrome('zbcd')\n    False\n    \"\"\"\n",
+      "function_parameters": [
+        "text"
+      ],
+      "source_record_sha256": "8fea9de4fc0828f3c5512ff8b191c33b107c177a0790c4f476cdc38245f35505",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "is_palindrome",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_1",
+          "upstream_assertion": "assert candidate('') == True"
+        },
+        {
+          "function": "is_palindrome",
+          "args": [
+            "aba"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_2",
+          "upstream_assertion": "assert candidate('aba') == True"
+        },
+        {
+          "function": "is_palindrome",
+          "args": [
+            "aaaaa"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_3",
+          "upstream_assertion": "assert candidate('aaaaa') == True"
+        },
+        {
+          "function": "is_palindrome",
+          "args": [
+            "zbcd"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_4",
+          "upstream_assertion": "assert candidate('zbcd') == False"
+        },
+        {
+          "function": "is_palindrome",
+          "args": [
+            "xywyx"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_5",
+          "upstream_assertion": "assert candidate('xywyx') == True"
+        },
+        {
+          "function": "is_palindrome",
+          "args": [
+            "xywyz"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_6",
+          "upstream_assertion": "assert candidate('xywyz') == False"
+        },
+        {
+          "function": "is_palindrome",
+          "args": [
+            "xywzx"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_7",
+          "upstream_assertion": "assert candidate('xywzx') == False"
+        }
+      ],
+      "available_literal_cases": 7,
+      "license": "MIT",
+      "family": "family_c626bafbc357e3eb",
+      "split": "final"
+    },
+    {
+      "id": "he_105",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/105",
+      "entrypoint": "by_length",
+      "original_prompt": "\ndef by_length(arr):\n    \"\"\"\n    Given an array of integers, sort the integers that are between 1 and 9 inclusive,\n    reverse the resulting array, and then replace each digit by its corresponding name from\n    \"One\", \"Two\", \"Three\", \"Four\", \"Five\", \"Six\", \"Seven\", \"Eight\", \"Nine\".\n\n    For example:\n      arr = [2, 1, 1, 4, 5, 8, 2, 3]   \n            -> sort arr -> [1, 1, 2, 2, 3, 4, 5, 8] \n            -> reverse arr -> [8, 5, 4, 3, 2, 2, 1, 1]\n      return [\"Eight\", \"Five\", \"Four\", \"Three\", \"Two\", \"Two\", \"One\", \"One\"]\n    \n      If the array is empty, return an empty array:\n      arr = []\n      return []\n    \n      If the array has any strange number ignore it:\n      arr = [1, -1 , 55] \n            -> sort arr -> [-1, 1, 55]\n            -> reverse arr -> [55, 1, -1]\n      return = ['One']\n    \"\"\"\n",
+      "function_parameters": [
+        "arr"
+      ],
+      "source_record_sha256": "355ecea7ff52b92fca4b1db4f9a96005ea2ce611dae9ae91480ac29ed046c255",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "by_length",
+          "args": [
+            [
+              1,
+              -1,
+              3,
+              2
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            "Three",
+            "Two",
+            "One"
+          ],
+          "id": "io_6",
+          "upstream_assertion": "assert candidate([1, -1, 3, 2]) == [\"Three\", \"Two\", \"One\"]"
+        },
+        {
+          "function": "by_length",
+          "args": [
+            [
+              9,
+              4,
+              8
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            "Nine",
+            "Eight",
+            "Four"
+          ],
+          "id": "io_7",
+          "upstream_assertion": "assert candidate([9, 4, 8]) == [\"Nine\", \"Eight\", \"Four\"]"
+        }
+      ],
+      "available_literal_cases": 2,
+      "license": "MIT",
+      "family": "family_ff942a0389f23227",
+      "split": "final"
+    },
+    {
+      "id": "he_101",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/101",
+      "entrypoint": "words_string",
+      "original_prompt": "\ndef words_string(s):\n    \"\"\"\n    You will be given a string of words separated by commas or spaces. Your task is\n    to split the string into words and return an array of the words.\n    \n    For example:\n    words_string(\"Hi, my name is John\") == [\"Hi\", \"my\", \"name\", \"is\", \"John\"]\n    words_string(\"One, two, three, four, five, six\") == [\"One\", \"two\", \"three\", \"four\", \"five\", \"six\"]\n    \"\"\"\n",
+      "function_parameters": [
+        "s"
+      ],
+      "source_record_sha256": "ff36c837169254c91edbe55336ef7297e1847d1318a8617651e85542f3d69f98",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "words_string",
+          "args": [
+            "Hi, my name is John"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hi",
+            "my",
+            "name",
+            "is",
+            "John"
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate(\"Hi, my name is John\") == [\"Hi\", \"my\", \"name\", \"is\", \"John\"]"
+        },
+        {
+          "function": "words_string",
+          "args": [
+            "One, two, three, four, five, six"
+          ],
+          "kwargs": {},
+          "expected": [
+            "One",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six"
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate(\"One, two, three, four, five, six\") == [\"One\", \"two\", \"three\", \"four\", \"five\", \"six\"]"
+        },
+        {
+          "function": "words_string",
+          "args": [
+            "Hi, my name"
+          ],
+          "kwargs": {},
+          "expected": [
+            "Hi",
+            "my",
+            "name"
+          ],
+          "id": "io_4",
+          "upstream_assertion": "assert candidate(\"Hi, my name\") == [\"Hi\", \"my\", \"name\"]"
+        },
+        {
+          "function": "words_string",
+          "args": [
+            "One,, two, three, four, five, six,"
+          ],
+          "kwargs": {},
+          "expected": [
+            "One",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six"
+          ],
+          "id": "io_5",
+          "upstream_assertion": "assert candidate(\"One,, two, three, four, five, six,\") == [\"One\", \"two\", \"three\", \"four\", \"five\", \"six\"]"
+        },
+        {
+          "function": "words_string",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_7",
+          "upstream_assertion": "assert candidate(\"\") == []"
+        },
+        {
+          "function": "words_string",
+          "args": [
+            "ahmed     , gamal"
+          ],
+          "kwargs": {},
+          "expected": [
+            "ahmed",
+            "gamal"
+          ],
+          "id": "io_8",
+          "upstream_assertion": "assert candidate(\"ahmed     , gamal\") == [\"ahmed\", \"gamal\"]"
+        }
+      ],
+      "available_literal_cases": 6,
+      "license": "MIT",
+      "family": "family_ca17639cfccb1375",
+      "split": "final"
+    },
+    {
+      "id": "he_27",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/27",
+      "entrypoint": "flip_case",
+      "original_prompt": "\n\ndef flip_case(string: str) -> str:\n    \"\"\" For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flip_case('Hello')\n    'hELLO'\n    \"\"\"\n",
+      "function_parameters": [
+        "string"
+      ],
+      "source_record_sha256": "7ce9c6b2dbb728f107b894e5cfa6ecb3a74b6b54daf8ebfc3eba91f5f3714930",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "flip_case",
+          "args": [
+            ""
+          ],
+          "kwargs": {},
+          "expected": "",
+          "id": "io_1",
+          "upstream_assertion": "assert candidate('') == ''"
+        },
+        {
+          "function": "flip_case",
+          "args": [
+            "Hello!"
+          ],
+          "kwargs": {},
+          "expected": "hELLO!",
+          "id": "io_2",
+          "upstream_assertion": "assert candidate('Hello!') == 'hELLO!'"
+        },
+        {
+          "function": "flip_case",
+          "args": [
+            "These violent delights have violent ends"
+          ],
+          "kwargs": {},
+          "expected": "tHESE VIOLENT DELIGHTS HAVE VIOLENT ENDS",
+          "id": "io_3",
+          "upstream_assertion": "assert candidate('These violent delights have violent ends') == 'tHESE VIOLENT DELIGHTS HAVE VIOLENT ENDS'"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "MIT",
+      "family": "family_8cda1a911193b5ed",
+      "split": "final"
+    },
+    {
+      "id": "he_145",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/145",
+      "entrypoint": "order_by_points",
+      "original_prompt": "\ndef order_by_points(nums):\n    \"\"\"\n    Write a function which sorts the given list of integers\n    in ascending order according to the sum of their digits.\n    Note: if there are several items with similar sum of their digits,\n    order them based on their index in original list.\n\n    For example:\n    >>> order_by_points([1, 11, -1, -11, -12]) == [-1, -11, 1, -12, 11]\n    >>> order_by_points([]) == []\n    \"\"\"\n",
+      "function_parameters": [
+        "nums"
+      ],
+      "source_record_sha256": "37b55d66cfa9602cb8d7ba771ae97d96442d37b19715825b3e6336a97ecd325f",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "order_by_points",
+          "args": [
+            [
+              1,
+              11,
+              -1,
+              -11,
+              -12
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            -1,
+            -11,
+            1,
+            -12,
+            11
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert candidate([1, 11, -1, -11, -12]) == [-1, -11, 1, -12, 11]"
+        },
+        {
+          "function": "order_by_points",
+          "args": [
+            [
+              1234,
+              423,
+              463,
+              145,
+              2,
+              423,
+              423,
+              53,
+              6,
+              37,
+              3457,
+              3,
+              56,
+              0,
+              46
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            0,
+            2,
+            3,
+            6,
+            53,
+            423,
+            423,
+            423,
+            1234,
+            145,
+            37,
+            46,
+            56,
+            463,
+            3457
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert candidate([1234,423,463,145,2,423,423,53,6,37,3457,3,56,0,46]) == [0, 2, 3, 6, 53, 423, 423, 423, 1234, 145, 37, 46, 56, 463, 3457]"
+        },
+        {
+          "function": "order_by_points",
+          "args": [
+            []
+          ],
+          "kwargs": {},
+          "expected": [],
+          "id": "io_3",
+          "upstream_assertion": "assert candidate([]) == []"
+        },
+        {
+          "function": "order_by_points",
+          "args": [
+            [
+              1,
+              -11,
+              -32,
+              43,
+              54,
+              -98,
+              2,
+              -3
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            -3,
+            -32,
+            -98,
+            -11,
+            1,
+            2,
+            43,
+            54
+          ],
+          "id": "io_4",
+          "upstream_assertion": "assert candidate([1, -11, -32, 43, 54, -98, 2, -3]) == [-3, -32, -98, -11, 1, 2, 43, 54]"
+        },
+        {
+          "function": "order_by_points",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            10,
+            2,
+            11,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "id": "io_5",
+          "upstream_assertion": "assert candidate([1,2,3,4,5,6,7,8,9,10,11]) == [1, 10, 2, 11, 3, 4, 5, 6, 7, 8, 9]"
+        },
+        {
+          "function": "order_by_points",
+          "args": [
+            [
+              0,
+              6,
+              6,
+              -76,
+              -21,
+              23,
+              4
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            -76,
+            -21,
+            0,
+            4,
+            23,
+            6,
+            6
+          ],
+          "id": "io_6",
+          "upstream_assertion": "assert candidate([0,6,6,-76,-21,23,4]) == [-76, -21, 0, 4, 23, 6, 6]"
+        }
+      ],
+      "available_literal_cases": 6,
+      "license": "MIT",
+      "family": "family_f471006ca02fc125",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_108",
+      "source": "MBPP",
+      "source_task_id": "108",
+      "entrypoint": "merge_sorted_list",
+      "original_prompt": "Write a function to merge three lists into a single sorted list.",
+      "function_parameters": [
+        "num1",
+        "num2",
+        "num3"
+      ],
+      "source_record_sha256": "236d71f960cf7cceeaca596e5b24eb81c88f268489a280ad697eb1632304b716",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "merge_sorted_list",
+          "args": [
+            [
+              25,
+              24,
+              15,
+              4,
+              5,
+              29,
+              110
+            ],
+            [
+              19,
+              20,
+              11,
+              56,
+              25,
+              233,
+              154
+            ],
+            [
+              24,
+              26,
+              54,
+              48
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            4,
+            5,
+            11,
+            15,
+            19,
+            20,
+            24,
+            24,
+            25,
+            25,
+            26,
+            29,
+            48,
+            54,
+            56,
+            110,
+            154,
+            233
+          ],
+          "id": "io_1",
+          "upstream_assertion": "assert merge_sorted_list([25, 24, 15, 4, 5, 29, 110],[19, 20, 11, 56, 25, 233, 154],[24, 26, 54, 48])==[4, 5, 11, 15, 19, 20, 24, 24, 25, 25, 26, 29, 48, 54, 56, 110, 154, 233]"
+        },
+        {
+          "function": "merge_sorted_list",
+          "args": [
+            [
+              1,
+              3,
+              5,
+              6,
+              8,
+              9
+            ],
+            [
+              2,
+              5,
+              7,
+              11
+            ],
+            [
+              1,
+              4,
+              7,
+              8,
+              12
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            1,
+            2,
+            3,
+            4,
+            5,
+            5,
+            6,
+            7,
+            7,
+            8,
+            8,
+            9,
+            11,
+            12
+          ],
+          "id": "io_2",
+          "upstream_assertion": "assert merge_sorted_list([1, 3, 5, 6, 8, 9], [2, 5, 7, 11], [1, 4, 7, 8, 12])==[1, 1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 11, 12]"
+        },
+        {
+          "function": "merge_sorted_list",
+          "args": [
+            [
+              18,
+              14,
+              10,
+              9,
+              8,
+              7,
+              9,
+              3,
+              2,
+              4,
+              1
+            ],
+            [
+              25,
+              35,
+              22,
+              85,
+              14,
+              65,
+              75,
+              25,
+              58
+            ],
+            [
+              12,
+              74,
+              9,
+              50,
+              61,
+              41
+            ]
+          ],
+          "kwargs": {},
+          "expected": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            8,
+            9,
+            9,
+            9,
+            10,
+            12,
+            14,
+            14,
+            18,
+            22,
+            25,
+            25,
+            35,
+            41,
+            50,
+            58,
+            61,
+            65,
+            74,
+            75,
+            85
+          ],
+          "id": "io_3",
+          "upstream_assertion": "assert merge_sorted_list([18, 14, 10, 9, 8, 7, 9, 3, 2, 4, 1],[25, 35, 22, 85, 14, 65, 75, 25, 58],[12, 74, 9, 50, 61, 41])==[1, 2, 3, 4, 7, 8, 9, 9, 9, 10, 12, 14, 14, 18, 22, 25, 25, 35, 41, 50, 58, 61, 65, 74, 75, 85]"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_06d1dfe778be0c46",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_398",
+      "source": "MBPP",
+      "source_task_id": "398",
+      "entrypoint": "sum_of_digits",
+      "original_prompt": "Write a function to compute the sum of digits of each number of a given list.",
+      "function_parameters": [
+        "nums"
+      ],
+      "source_record_sha256": "5fcf1b3403c78830e929022ada2c3e01e36fb7fa383794fd21a03d2c18dd0c64",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "sum_of_digits",
+          "args": [
+            [
+              10,
+              2,
+              56
+            ]
+          ],
+          "kwargs": {},
+          "expected": 14,
+          "id": "io_1",
+          "upstream_assertion": "assert sum_of_digits([10,2,56])==14"
+        },
+        {
+          "function": "sum_of_digits",
+          "args": [
+            [
+              [
+                10,
+                20,
+                4,
+                5,
+                "b",
+                70,
+                "a"
+              ]
+            ]
+          ],
+          "kwargs": {},
+          "expected": 19,
+          "id": "io_2",
+          "upstream_assertion": "assert sum_of_digits([[10,20,4,5,'b',70,'a']])==19"
+        },
+        {
+          "function": "sum_of_digits",
+          "args": [
+            [
+              10,
+              20,
+              -4,
+              5,
+              -70
+            ]
+          ],
+          "kwargs": {},
+          "expected": 19,
+          "id": "io_3",
+          "upstream_assertion": "assert sum_of_digits([10,20,-4,5,-70])==19"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_dc25977ce4b597d8",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_79",
+      "source": "MBPP",
+      "source_task_id": "79",
+      "entrypoint": "word_len",
+      "original_prompt": "Write a python function to check whether the length of the word is odd or not.",
+      "function_parameters": [
+        "s"
+      ],
+      "source_record_sha256": "5767a546fa15120057e58c56b6a7abec7ba4bd80e0bdd1fbd5d4c836d9cb11bc",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "word_len",
+          "args": [
+            "Hadoop"
+          ],
+          "kwargs": {},
+          "expected": false,
+          "id": "io_1",
+          "upstream_assertion": "assert word_len(\"Hadoop\") == False"
+        },
+        {
+          "function": "word_len",
+          "args": [
+            "great"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_2",
+          "upstream_assertion": "assert word_len(\"great\") == True"
+        },
+        {
+          "function": "word_len",
+          "args": [
+            "structure"
+          ],
+          "kwargs": {},
+          "expected": true,
+          "id": "io_3",
+          "upstream_assertion": "assert word_len(\"structure\") == True"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_794704fc84b11fdd",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_465",
+      "source": "MBPP",
+      "source_task_id": "465",
+      "entrypoint": "drop_empty",
+      "original_prompt": "Write a function to drop empty items from a given dictionary.",
+      "function_parameters": [
+        "dict1"
+      ],
+      "source_record_sha256": "0c9bbc2d8daa9f5c1aea7a98e81e0e335546a49b0921e2357c71b06ddb2124bf",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "drop_empty",
+          "args": [
+            {
+              "c1": "Red",
+              "c2": "Green",
+              "c3": null
+            }
+          ],
+          "kwargs": {},
+          "expected": {
+            "c1": "Red",
+            "c2": "Green"
+          },
+          "id": "io_1",
+          "upstream_assertion": "assert drop_empty({'c1': 'Red', 'c2': 'Green', 'c3':None})=={'c1': 'Red', 'c2': 'Green'}"
+        },
+        {
+          "function": "drop_empty",
+          "args": [
+            {
+              "c1": "Red",
+              "c2": null,
+              "c3": null
+            }
+          ],
+          "kwargs": {},
+          "expected": {
+            "c1": "Red"
+          },
+          "id": "io_2",
+          "upstream_assertion": "assert drop_empty({'c1': 'Red', 'c2': None, 'c3':None})=={'c1': 'Red'}"
+        },
+        {
+          "function": "drop_empty",
+          "args": [
+            {
+              "c1": null,
+              "c2": "Green",
+              "c3": null
+            }
+          ],
+          "kwargs": {},
+          "expected": {
+            "c2": "Green"
+          },
+          "id": "io_3",
+          "upstream_assertion": "assert drop_empty({'c1': None, 'c2': 'Green', 'c3':None})=={ 'c2': 'Green'}"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_4f10e8b9c2394c96",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_57",
+      "source": "MBPP",
+      "source_task_id": "57",
+      "entrypoint": "find_Max_Num",
+      "original_prompt": "Write a python function to find the largest number that can be formed with the given list of digits.",
+      "function_parameters": [
+        "arr"
+      ],
+      "source_record_sha256": "9a9409ae8b9d14e21dc30efb80cd40e0e8cab0990ba3e2a568d4664e9f036e7b",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "find_Max_Num",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ]
+          ],
+          "kwargs": {},
+          "expected": 321,
+          "id": "io_1",
+          "upstream_assertion": "assert find_Max_Num([1,2,3]) == 321"
+        },
+        {
+          "function": "find_Max_Num",
+          "args": [
+            [
+              4,
+              5,
+              6,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 6541,
+          "id": "io_2",
+          "upstream_assertion": "assert find_Max_Num([4,5,6,1]) == 6541"
+        },
+        {
+          "function": "find_Max_Num",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              9
+            ]
+          ],
+          "kwargs": {},
+          "expected": 9321,
+          "id": "io_3",
+          "upstream_assertion": "assert find_Max_Num([1,2,3,9]) == 9321"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_be28230f42d4be01",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_301",
+      "source": "MBPP",
+      "source_task_id": "301",
+      "entrypoint": "dict_depth",
+      "original_prompt": "Write a function to find the depth of a dictionary.",
+      "function_parameters": [
+        "d"
+      ],
+      "source_record_sha256": "4255e48034065b1b1741f337148c6f3304927a56fdb96d2809b295cca9b1da52",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "dict_depth",
+          "args": [
+            {
+              "a": 1,
+              "b": {
+                "c": {
+                  "d": {}
+                }
+              }
+            }
+          ],
+          "kwargs": {},
+          "expected": 4,
+          "id": "io_1",
+          "upstream_assertion": "assert dict_depth({'a':1, 'b': {'c': {'d': {}}}})==4"
+        },
+        {
+          "function": "dict_depth",
+          "args": [
+            {
+              "a": 1,
+              "b": {
+                "c": "python"
+              }
+            }
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_2",
+          "upstream_assertion": "assert dict_depth({'a':1, 'b': {'c':'python'}})==2"
+        }
+      ],
+      "available_literal_cases": 2,
+      "license": "CC-BY-4.0",
+      "family": "family_868244da11610394",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_66",
+      "source": "MBPP",
+      "source_task_id": "66",
+      "entrypoint": "pos_count",
+      "original_prompt": "Write a python function to count the number of positive numbers in a list.",
+      "function_parameters": [
+        "list"
+      ],
+      "source_record_sha256": "754c2cea47924cb66ba541532c51e61641c765ce920b4f52f9b5ff0287255fc4",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "pos_count",
+          "args": [
+            [
+              1,
+              -2,
+              3,
+              -4
+            ]
+          ],
+          "kwargs": {},
+          "expected": 2,
+          "id": "io_1",
+          "upstream_assertion": "assert pos_count([1,-2,3,-4]) == 2"
+        },
+        {
+          "function": "pos_count",
+          "args": [
+            [
+              3,
+              4,
+              5,
+              -1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 3,
+          "id": "io_2",
+          "upstream_assertion": "assert pos_count([3,4,5,-1]) == 3"
+        },
+        {
+          "function": "pos_count",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "kwargs": {},
+          "expected": 4,
+          "id": "io_3",
+          "upstream_assertion": "assert pos_count([1,2,3,4]) == 4"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_59ec33418fb7a72d",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_619",
+      "source": "MBPP",
+      "source_task_id": "619",
+      "entrypoint": "move_num",
+      "original_prompt": "Write a function to move all the numbers to the end of the given string.",
+      "function_parameters": [
+        "test_str"
+      ],
+      "source_record_sha256": "5fe705258f515f69caea8d5507a97ae288c92204c670850faf1aac470fc8cd67",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "move_num",
+          "args": [
+            "I1love143you55three3000thousand"
+          ],
+          "kwargs": {},
+          "expected": "Iloveyouthreethousand1143553000",
+          "id": "io_1",
+          "upstream_assertion": "assert move_num('I1love143you55three3000thousand') == 'Iloveyouthreethousand1143553000'"
+        },
+        {
+          "function": "move_num",
+          "args": [
+            "Avengers124Assemble"
+          ],
+          "kwargs": {},
+          "expected": "AvengersAssemble124",
+          "id": "io_2",
+          "upstream_assertion": "assert move_num('Avengers124Assemble') == 'AvengersAssemble124'"
+        },
+        {
+          "function": "move_num",
+          "args": [
+            "Its11our12path13to14see15things16do17things"
+          ],
+          "kwargs": {},
+          "expected": "Itsourpathtoseethingsdothings11121314151617",
+          "id": "io_3",
+          "upstream_assertion": "assert move_num('Its11our12path13to14see15things16do17things') == 'Itsourpathtoseethingsdothings11121314151617'"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_272927dcc99de53b",
+      "split": "final"
+    },
+    {
+      "id": "mbpp_573",
+      "source": "MBPP",
+      "source_task_id": "573",
+      "entrypoint": "unique_product",
+      "original_prompt": "Write a python function to calculate the product of the unique numbers in a given list.",
+      "function_parameters": [
+        "list_data"
+      ],
+      "source_record_sha256": "896380cdfb6a8b3018f18205812481abbf73a7d01358b04c6d02324447f5baa1",
+      "group": "target",
+      "domain": "text_and_collection_transforms",
+      "function_cases": [
+        {
+          "function": "unique_product",
+          "args": [
+            [
+              10,
+              20,
+              30,
+              40,
+              20,
+              50,
+              60,
+              40
+            ]
+          ],
+          "kwargs": {},
+          "expected": 720000000,
+          "id": "io_1",
+          "upstream_assertion": "assert unique_product([10, 20, 30, 40, 20, 50, 60, 40]) ==  720000000"
+        },
+        {
+          "function": "unique_product",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 6,
+          "id": "io_2",
+          "upstream_assertion": "assert unique_product([1, 2, 3, 1,]) == 6"
+        },
+        {
+          "function": "unique_product",
+          "args": [
+            [
+              7,
+              8,
+              9,
+              0,
+              1,
+              1
+            ]
+          ],
+          "kwargs": {},
+          "expected": 0,
+          "id": "io_3",
+          "upstream_assertion": "assert unique_product([7, 8, 9, 0, 1, 1]) == 0"
+        }
+      ],
+      "available_literal_cases": 3,
+      "license": "CC-BY-4.0",
+      "family": "family_69c8ed9662f21bb6",
+      "split": "final"
+    }
+  ]
+}

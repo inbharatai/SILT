@@ -1,0 +1,145 @@
+{
+  "schema": "specialist-span-pilot-manifest-v1",
+  "name": "context-redundant-specialist-span-v1",
+  "status": "DATA_PREPARED_NO_MODEL_RUNS",
+  "purpose": "Controlled real Switch-to-dense-T5 source/reconstruction/recovery mechanics; not coding quality or an independent research benchmark.",
+  "source": "locally_authored_synthetic",
+  "license": "CC0-1.0",
+  "license_notes_file": "ATTRIBUTION.md",
+  "authoring": {
+    "generated_fixtures": true,
+    "human_review_claimed": false,
+    "model_outputs_consulted": false,
+    "model_weights_accessed": false,
+    "tokenizer_loaded": false,
+    "legal_guarantee": false,
+    "seed_label": 271828,
+    "split_assignment": "Explicit fixed membership and order, not a generated random split",
+    "recovery_seed": 271828
+  },
+  "files": [
+    {
+      "path": "train.json",
+      "sha256": "607982d62214efdee54ca624a675936866ed50f018fea3fe5926c3946c238395",
+      "bytes": 3298,
+      "rows": 16,
+      "max_prompt_utf8_bytes": 58,
+      "max_response_utf8_bytes": 31,
+      "quarantined": false
+    },
+    {
+      "path": "calibration.json",
+      "sha256": "6c0ce0fce368b0518e44897ee4456ad348318234378360a5a8b764081164b36e",
+      "bytes": 3411,
+      "rows": 16,
+      "max_prompt_utf8_bytes": 59,
+      "max_response_utf8_bytes": 31,
+      "quarantined": false
+    },
+    {
+      "path": "dev.json",
+      "sha256": "58c9b20023c997be63741c3a682d4a2cbf545d31d02bb552cd6acb0b86de2746",
+      "bytes": 1272,
+      "rows": 4,
+      "max_prompt_utf8_bytes": 56,
+      "max_response_utf8_bytes": 31,
+      "quarantined": false
+    },
+    {
+      "path": "final.json",
+      "sha256": "ef3fc1ca4b4c2b8e8df4cb7671ddab1779d8aaeab43517b09c280e8d4165e0fc",
+      "bytes": 1307,
+      "rows": 4,
+      "max_prompt_utf8_bytes": 57,
+      "max_response_utf8_bytes": 31,
+      "quarantined": true
+    }
+  ],
+  "static_audit": {
+    "path": "static-audit.json",
+    "sha256": "26c541b2ebb61900cae2cc2cb1aec945aaf0ecd6764ecbec18fd1f4c7694c44e",
+    "status": "PASS_STATIC_ONLY"
+  },
+  "provenance": {
+    "path": "ATTRIBUTION.md",
+    "sha256": "1d09a8ecd2b51e7eb137663ed01c9f2b817f9c4bb4a5a19b42092e7eb1afae90"
+  },
+  "protocol": {
+    "path": "../../docs/SPECIALIST_SPAN_PILOT.md",
+    "sha256": "0ec884fd7b4bb32a4afdb58292f7b5be049f74b3bfef4e32ed135808d4d09a86"
+  },
+  "split_policy": {
+    "unique_entity_nouns": 40,
+    "noun_overlap_across_splits": 0,
+    "prompt_overlap_across_splits": 0,
+    "id_overlap_across_splits": 0,
+    "shared_target_vocabulary": [
+      "damp",
+      "clean",
+      "dusty",
+      "worn"
+    ],
+    "shared_templates": 4,
+    "family_generalization_claim": false
+  },
+  "bounds": {
+    "prompt_max_tokens": 256,
+    "response_max_tokens": 256,
+    "native_token_lengths_verified": false,
+    "complete_encoding_required": true,
+    "truncation": false,
+    "input_compression": false,
+    "generation_max_new_tokens": 32
+  },
+  "proposed_run": {
+    "executed": false,
+    "family": "switch_transformers",
+    "reconstruction": {
+      "method": "activation",
+      "max_samples": 16,
+      "retention_argument": 0.75,
+      "actual_rule": "top-1 expert per sparse layer; retention argument not controlling expert count"
+    },
+    "recovery": {
+      "method": "lora_kd",
+      "steps": 32,
+      "rank": 8,
+      "learning_rate": 0.0001,
+      "kd_weight": 0.7,
+      "teacher_mode": "cached",
+      "export_mode": "native_merged",
+      "max_samples": 16
+    },
+    "dtype": "bfloat16",
+    "seed": 271828,
+    "protocol_change_requires_explicit_new_branch": true
+  },
+  "final_quarantine": {
+    "file": "final.json",
+    "rows": 4,
+    "sha256": "ef3fc1ca4b4c2b8e8df4cb7671ddab1779d8aaeab43517b09c280e8d4165e0fc",
+    "parent_may_read_now": false,
+    "author_static_validation_only": true,
+    "release": "Later explicit authorization after source identity, settings, artifacts, dev decisions, and token-aware metrics are frozen",
+    "not_allowed_as": [
+      "calibration",
+      "training",
+      "recovery_validation",
+      "selection"
+    ],
+    "access_control_enforced": false
+  },
+  "metrics": {
+    "computed": false,
+    "requires_raw_native_token_boundaries": true,
+    "requires_existing_recovery_teacher_forced_loss": true,
+    "decoded_word_equivalence_sufficient": false,
+    "code_oracle_suitable": false,
+    "missing_direct_cli_support": [
+      "source-teacher CE baseline",
+      "per-case dev CE",
+      "reloaded deployment CE",
+      "final read-only teacher-forced CE"
+    ]
+  }
+}

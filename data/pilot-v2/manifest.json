@@ -1,0 +1,103 @@
+{
+  "version": 2,
+  "scope": "ADAPTED PUBLIC BENCHMARK PILOT; NOT official full HumanEval/MBPP/EvalPlus score",
+  "pretraining_exposure": "unknown; no contamination-free claim",
+  "license_status": "verified_from_preserved_primary_repository_and_publisher_dataset_card",
+  "license_unresolved": [],
+  "source_pins": {
+    "HumanEval": "6d43fb980f9fee3c892a914eda09951f772ad10d",
+    "MBPP_GitHub": "932d4685e23f671b9e8c2abc72dd228ba5ff9252",
+    "MBPP_publisher_license_card": "4bb6404fdc6cacfda99d4ac4205087b89d32030c"
+  },
+  "sources": [
+    {
+      "file": "sources/HumanEval.jsonl.gz",
+      "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/data/HumanEval.jsonl.gz",
+      "sha256": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+      "bytes": 44877
+    },
+    {
+      "file": "sources/HumanEval-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/openai/human-eval/6d43fb980f9fee3c892a914eda09951f772ad10d/LICENSE",
+      "sha256": "bcba3de214851cce46ed5af42d6698044616eeace887c3231bc7a20474ab639e",
+      "bytes": 1083
+    },
+    {
+      "file": "sources/mbpp-sanitized.json",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/932d4685e23f671b9e8c2abc72dd228ba5ff9252/mbpp/sanitized-mbpp.json",
+      "sha256": "ca95deaa9a01ef0a6f439f88bcf0dd3db3563d22f22aad6cae04ebb9a8d8c8e9",
+      "bytes": 255053
+    },
+    {
+      "file": "sources/mbpp-README.md",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/932d4685e23f671b9e8c2abc72dd228ba5ff9252/mbpp/README.md",
+      "sha256": "02d63a4ffdad806c3c87b5ea2aa91e946f6eec0c2869643b09831650883f41be",
+      "bytes": 1422
+    },
+    {
+      "file": "sources/mbpp-LICENSE-evidence.md",
+      "url": "https://huggingface.co/datasets/google-research-datasets/mbpp/resolve/4bb6404fdc6cacfda99d4ac4205087b89d32030c/README.md",
+      "sha256": "6377d5c76ba46b9e650daa6d5eb592e671c9b15586e39f23f50ed9bf2ac54cf6",
+      "bytes": 9058
+    },
+    {
+      "file": "sources/CC-BY-4.0.txt",
+      "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+      "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+      "bytes": 18657
+    }
+  ],
+  "selection_sha256": "362610ae759aeae28759600c7f5064f99f264aec1eb25cf3a1e164acf9bad085",
+  "selection_lock_sha256": "3f9a6326dcfc417956c7db0a378f429ef3d097110e03324027d387b0d49d802a",
+  "builder_sha256": "fada630197d618ca7b5939032f45e5112c55e2a393aa3412def513b40dcd03c8",
+  "counts": {
+    "upstream_total": 591,
+    "upstream_by_source": {
+      "HumanEval": 164,
+      "MBPP": 427
+    },
+    "eligible_before_duplicate_filter": 372,
+    "eligible_by_source": {
+      "HumanEval": 96,
+      "MBPP": 276
+    },
+    "eligible_family_representatives": 357,
+    "duplicate_excluded": 15,
+    "unsupported_or_old_family_excluded": 219,
+    "eligible_not_selected": 325,
+    "selected": 32,
+    "selected_by_source": {
+      "HumanEval": 16,
+      "MBPP": 16
+    },
+    "selected_by_split_group_source": {
+      "development/control/HumanEval": 1,
+      "development/control/MBPP": 1,
+      "development/target/HumanEval": 3,
+      "development/target/MBPP": 3,
+      "final/control/HumanEval": 3,
+      "final/control/MBPP": 3,
+      "final/target/HumanEval": 9,
+      "final/target/MBPP": 9
+    },
+    "adapted_function_cases": 140,
+    "exclusion_reasons": {
+      "fewer_than_two_literal_cases": 166,
+      "excluded_existing_development_family": 24,
+      "retained_cases_lack_expected_value_diversity": 3,
+      "requires_single_function": 12,
+      "requires_test_imports": 13,
+      "entrypoint_name": 1
+    }
+  },
+  "artifact_sha256": {
+    "development.json": "2953e25720c4421c266888e61c9fd24a16802dc046379590a9d328d155dbb726",
+    "final.json": "01511d4dd5ed55cf51ad71335a7a4daa9f77ca900c183acadc9c8db08b9c002d",
+    "provenance.json": "752b532ae03a943b44e59c15b8fd5c2b0d9fe8e3d5248a4d2605d7c476a487d3",
+    "eligibility-audit.json": "bccdedaf86d07382f8cbbfd1dbc9117dd39f028e7380cb066f5f60346126a7fc",
+    "code-function-metadata.json": "330e75c389380d65641b3424f69010d468a502261deb595e2194460c5b71e4a2",
+    "selection-lock.json": "3f9a6326dcfc417956c7db0a378f429ef3d097110e03324027d387b0d49d802a",
+    "ATTRIBUTION.md": "fdb431fef1d4ecc2901f30874b850e5ae1164422ff96c30eb2e2df7a37b58176"
+  },
+  "governance": "Frozen before model generation. Do not tune on final. Development may be run first. Retain failed/time-limited results. Any fixture/selection change requires a new version and new lock; do not overwrite v2."
+}

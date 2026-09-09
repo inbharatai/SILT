@@ -1,0 +1,1078 @@
+{
+  "schema": "silt.specialist.supervised.v1",
+  "purpose": "calibration_TRAIN_ONLY_deliberate_overlap",
+  "split_policy": "standalone_LOCAL_not_official_benchmark_split",
+  "samples": [
+    {
+      "id": "mbpp_16",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: text_lowercase_underscore(text).\nOriginal task:\nWrite a function to that returns true if the input string contains sequences of lowercase letters joined with an underscore and false otherwise.",
+      "response": "import re\ndef text_lowercase_underscore(text):\n        patterns = '^[a-z]+_[a-z]+$'\n        if re.search(patterns,  text):\n                return True\n        else:\n                return False",
+      "source": "MBPP",
+      "source_task_id": "16",
+      "license": "CC-BY-4.0",
+      "entrypoint": "text_lowercase_underscore",
+      "function_parameters": [
+        "text"
+      ],
+      "family": "family_05d1f928afc87909",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to that returns true if the input string contains sequences of lowercase letters joined with an underscore and false otherwise.",
+      "source_record_sha256": "7ee4af3e511b4d9faa18380e49e6d0b3e14ff0d6ce1221037e158e02059dee61",
+      "canonical_prompt_sha256": "05aaa996a76d4fb7d2b4319d7a3530d18afa29ffc1c45028884d18894bda5606",
+      "canonical_source_sha256": "817150846cfc62bff1ce4d32d15236e02b0a6d712dd8db60c2ffc7c228ae0a86",
+      "alpha_source_sha256": "f001aa2208b7038d3b3b96b7cceba16584879df49dddcc4a191abbe5716137c0",
+      "response_sha256": "4f6d10d88e7cefaa58bc7f9e91deaf9d779a34710bdf30cf82e890d581a47481",
+      "token_lengths": {
+        "response_tokens": 43,
+        "flat_tokens_with_eos": 89,
+        "chat_tokens": 119,
+        "generation_prompt_tokens": 74
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_588",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: big_diff(nums).\nOriginal task:\nWrite a python function to find the difference between largest and smallest value in a given list.",
+      "response": "def big_diff(nums):\n     diff= max(nums)-min(nums)\n     return diff",
+      "source": "MBPP",
+      "source_task_id": "588",
+      "license": "CC-BY-4.0",
+      "entrypoint": "big_diff",
+      "function_parameters": [
+        "nums"
+      ],
+      "family": "family_c33ef2977450286c",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to find the difference between largest and smallest value in a given list.",
+      "source_record_sha256": "a455198cab6aee6300e20179b033fd8c2f20dbbc9242d749d46a9e1520c5feca",
+      "canonical_prompt_sha256": "7d35f2014dff06844eeaa8c21d1becc578c854c3dab76e01cadac5f025e884ae",
+      "canonical_source_sha256": "f345b4366fb7d2d4df15aeb921f1b491f6fe40020c995a0c8307298feca2c160",
+      "alpha_source_sha256": "5381845c4104ff4f28797b8ede157fa319001644f4c97ab53f33108601c35a03",
+      "response_sha256": "5bd8198f524848d14fc3679992a9d2e1755ab3e18a58602c29690fd7600384d4",
+      "token_lengths": {
+        "response_tokens": 17,
+        "flat_tokens_with_eos": 55,
+        "chat_tokens": 85,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [
+        "sequence_extrema_reduction"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_226",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: odd_values_string(str).\nOriginal task:\nWrite a python function to remove the characters which have odd index values of a given string.",
+      "response": "def odd_values_string(str):\n  result = \"\" \n  for i in range(len(str)):\n    if i % 2 == 0:\n      result = result + str[i]\n  return result",
+      "source": "MBPP",
+      "source_task_id": "226",
+      "license": "CC-BY-4.0",
+      "entrypoint": "odd_values_string",
+      "function_parameters": [
+        "str"
+      ],
+      "family": "family_5badd45d4f62d3d1",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to remove the characters which have odd index values of a given string.",
+      "source_record_sha256": "7de30abe86d587b67fea17f592fbf12a6be4660e8cc85fc08e9256918a7ed45b",
+      "canonical_prompt_sha256": "6ef4b61ca2be1f7f20e40dfac7cc9911297e0d9436f88fe240654fb9aec4f103",
+      "canonical_source_sha256": "ee819cb3402f74a4b84662c2c2709c0f4aab66b2e143a579ab7d578ded3a727c",
+      "alpha_source_sha256": "c2ba2fa263927e7e623a473d6129b4009caf544f951c1524ba3f80a6d9d8b1e6",
+      "response_sha256": "c11e13c75f1b900bc0dd63283d44931d30f00f44365f876732519eaa199ebcbd",
+      "token_lengths": {
+        "response_tokens": 40,
+        "flat_tokens_with_eos": 79,
+        "chat_tokens": 109,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 4,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_461",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: upper_ctr(str).\nOriginal task:\nWrite a python function to count the upper case characters in a given string.",
+      "response": "def upper_ctr(str):\n    upper_ctr = 0\n    for i in range(len(str)):\n          if str[i] >= 'A' and str[i] <= 'Z': upper_ctr += 1\n          return upper_ctr",
+      "source": "MBPP",
+      "source_task_id": "461",
+      "license": "CC-BY-4.0",
+      "entrypoint": "upper_ctr",
+      "function_parameters": [
+        "str"
+      ],
+      "family": "family_fd5b29123fb80c04",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to count the upper case characters in a given string.",
+      "source_record_sha256": "1694773472a126fe1942e4dbf13afb788459ce37ab8f05d8d49e68d5f10f8fb1",
+      "canonical_prompt_sha256": "7cd513687b69eca8099f6751e0669267b243d74a7e6d360de88eb8125f7e788a",
+      "canonical_source_sha256": "cf380d5314a74c3ca7ce18fc4eddc841fc7274a9542a4d0f33326b1e959f9600",
+      "alpha_source_sha256": "733a6e25210711d351e3a4d3be53de7de2fe5603d210d1bf25b649c9d396571e",
+      "response_sha256": "38173aa9338fa543ae2b214d130c3e0950764fbabec20d09a4dc4cb3a0c0c751",
+      "token_lengths": {
+        "response_tokens": 47,
+        "flat_tokens_with_eos": 82,
+        "chat_tokens": 112,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_764",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: number_ctr(str).\nOriginal task:\nWrite a python function to count number of digits in a given string.",
+      "response": "def number_ctr(str):\n      number_ctr= 0\n      for i in range(len(str)):\n          if str[i] >= '0' and str[i] <= '9': number_ctr += 1     \n      return  number_ctr",
+      "source": "MBPP",
+      "source_task_id": "764",
+      "license": "CC-BY-4.0",
+      "entrypoint": "number_ctr",
+      "function_parameters": [
+        "str"
+      ],
+      "family": "family_772ab74105187b7f",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to count number of digits in a given string.",
+      "source_record_sha256": "781788fc9a64894c719c709944a652463d8cd883f4bab7d9899223d51e8bfefc",
+      "canonical_prompt_sha256": "80eb295ce7838cb8762c067b6ef3313c371e3766f05e25f9c9b6a9c6bf9a0138",
+      "canonical_source_sha256": "6b322406311a39e32ac608213e4220c6a11cbf2ab1749547cf91c63f572ed75a",
+      "alpha_source_sha256": "5f7942de801bebe64edc636c1ce3b16f947fb18596c1ddf96a86df42d88801a5",
+      "response_sha256": "c37811905e38f61f2b0e76de9f789d0ec1ae47d4b631d247f4b61aa89a6c3ae4",
+      "token_lengths": {
+        "response_tokens": 48,
+        "flat_tokens_with_eos": 82,
+        "chat_tokens": 112,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 4,
+        "distinct_expected": 2,
+        "nonempty_expected": 4
+      }
+    },
+    {
+      "id": "mbpp_436",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: neg_nos(list1).\nOriginal task:\nWrite a python function to return the negative numbers in a list.",
+      "response": "def neg_nos(list1):\n  out = []\n  for num in list1: \n    if num < 0: \n      out.append(num)\n  return out ",
+      "source": "MBPP",
+      "source_task_id": "436",
+      "license": "CC-BY-4.0",
+      "entrypoint": "neg_nos",
+      "function_parameters": [
+        "list1"
+      ],
+      "family": "family_a9c230bd99786f8e",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to return the negative numbers in a list.",
+      "source_record_sha256": "fdd88c3a9f4e090031cfe1edebe06ca60e86915cf1c379158d546f27d1484db2",
+      "canonical_prompt_sha256": "dcc5d017deb32ee5d62e424eb29613deae16ef6368081fe0ea8a0b44f8a15b67",
+      "canonical_source_sha256": "19dd95fc2cb4ac8eb9aa887c4c77f21f874037726c1841603ba8145ee7d561b9",
+      "alpha_source_sha256": "00aefb41166d67ec95fe24038cfde1dc1b3fa4f71ecca5f82706597e8cf61ebb",
+      "response_sha256": "0fe9929d77d5e056a185a354d42bd72bf049b7ead18cf0704a4d161534450d10",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 71,
+        "chat_tokens": 101,
+        "generation_prompt_tokens": 63
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_807",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: first_odd(nums).\nOriginal task:\nWrite a python function to find the first odd number in a given list of numbers.",
+      "response": "def first_odd(nums):\n  first_odd = next((el for el in nums if el%2!=0),-1)\n  return first_odd",
+      "source": "MBPP",
+      "source_task_id": "807",
+      "license": "CC-BY-4.0",
+      "entrypoint": "first_odd",
+      "function_parameters": [
+        "nums"
+      ],
+      "family": "family_874d6a97b1f855c2",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to find the first odd number in a given list of numbers.",
+      "source_record_sha256": "9100afc4666e3c243b868dc6d4c8dbb82176e26abdc87494e81ea2081375fb62",
+      "canonical_prompt_sha256": "c67c2fec054bfb32a0fcf0047d6a77d93136d1f3440c8a84989f4439d20a3a47",
+      "canonical_source_sha256": "dbe3114c1bf0cf38debbb97b6d7222e12b763af0d954d9eadd8623830abfe4ad",
+      "alpha_source_sha256": "eb1b13f0bc6b8c9b18dc117e0a7effbc6608f56e6033af62764bef2d04d524b4",
+      "response_sha256": "79da95f2ff7e745af5d04867b9346834b17cbd6c7de8bb8aed6f31d1d15d1cac",
+      "token_lengths": {
+        "response_tokens": 30,
+        "flat_tokens_with_eos": 67,
+        "chat_tokens": 97,
+        "generation_prompt_tokens": 65
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_242",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: count_charac(str1).\nOriginal task:\nWrite a function to count the total number of characters in a string.",
+      "response": "def count_charac(str1):\n total = 0\n for i in str1:\n    total = total + 1\n return total",
+      "source": "MBPP",
+      "source_task_id": "242",
+      "license": "CC-BY-4.0",
+      "entrypoint": "count_charac",
+      "function_parameters": [
+        "str1"
+      ],
+      "family": "family_b637f5989749fa12",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to count the total number of characters in a string.",
+      "source_record_sha256": "7b94b6e11d48e209da1816045efc23ee3f1dff7b83e781b322d136f8ecac2ef0",
+      "canonical_prompt_sha256": "22b6ce05b550365bddb03d7484c8d017a28655693b5734ee13e3b6044cab4040",
+      "canonical_source_sha256": "f46a3d81617f22d33d9762dbc0733d472fefb5f16a67f4715ebd49a8261bc4a7",
+      "alpha_source_sha256": "0d4b096652252c6f2b9ac7e6cfe03f003953234763a70d09c9f988f9d3dddc1e",
+      "response_sha256": "b692acf6cd92abf8d7522c209391bb35af329c53ea49a09652b75f4edfc72478",
+      "token_lengths": {
+        "response_tokens": 28,
+        "flat_tokens_with_eos": 64,
+        "chat_tokens": 94,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_77",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: is_Diff(n).\nOriginal task:\nWrite a python function to find whether a number is divisible by 11.",
+      "response": "def is_Diff(n): \n    return (n % 11 == 0) ",
+      "source": "MBPP",
+      "source_task_id": "77",
+      "license": "CC-BY-4.0",
+      "entrypoint": "is_Diff",
+      "function_parameters": [
+        "n"
+      ],
+      "family": "family_7fd7afa5ef1041aa",
+      "group": "control",
+      "domain": "basic_integer_scalar_arithmetic_predicates",
+      "original_prompt": "Write a python function to find whether a number is divisible by 11.",
+      "source_record_sha256": "c174503e78cd6520aa7b80a3eba8cff2b678841ff0e3ca465e5009cd1e5229b0",
+      "canonical_prompt_sha256": "c30ad3fa542dbd9da91810911663de2a41844f00e62227e6ce443743135de548",
+      "canonical_source_sha256": "5416fb9aea898ef90f1842cd1f2b05d087dc3d75166a0a404b6a6f27ffafb615",
+      "alpha_source_sha256": "feebd6f534f1c2352a89188b88ac09c854aa6b142f1c2b0f6111a4a689d34fbb",
+      "response_sha256": "a2ce2d780ebd85e99ecb16af50d1d98d4ed7d6bd494fcd05dd23dd2db2792678",
+      "token_lengths": {
+        "response_tokens": 20,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 65
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_240",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: replace_list(list1, list2).\nOriginal task:\nWrite a function that takes in two lists and replaces the last element of the first list with the elements of the second list.",
+      "response": "def replace_list(list1,list2):\n list1[-1:] = list2\n replace_list=list1\n return replace_list\n",
+      "source": "MBPP",
+      "source_task_id": "240",
+      "license": "CC-BY-4.0",
+      "entrypoint": "replace_list",
+      "function_parameters": [
+        "list1",
+        "list2"
+      ],
+      "family": "family_299ad40dc820a307",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function that takes in two lists and replaces the last element of the first list with the elements of the second list.",
+      "source_record_sha256": "b03912e023953f3f71a828d36298337b42700f22088be4f9817190b598032c9e",
+      "canonical_prompt_sha256": "c87a745b9c31db909018c163c55f459d773f3679e768bafe80a79e592eee4986",
+      "canonical_source_sha256": "8e9a7703675d9da8ce97ad9ef496730f6b7cdd303deaf620f322e4f58dd3f083",
+      "alpha_source_sha256": "dca5dd32f032b003ac2d652694c7cef63b61be4e5c00829b4bcd06a383085c9a",
+      "response_sha256": "aa269c5b24b25aafe91a9196ac850baa499998d7cb64ce708bcb9a60b5d6d2af",
+      "token_lengths": {
+        "response_tokens": 26,
+        "flat_tokens_with_eos": 75,
+        "chat_tokens": 105,
+        "generation_prompt_tokens": 77
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_749",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: sort_numeric_strings(nums_str).\nOriginal task:\nWrite a function to sort a given list of strings of numbers numerically. https://www.geeksforgeeks.org/python-sort-numeric-strings-in-a-list/",
+      "response": "def sort_numeric_strings(nums_str):\n    result = [int(x) for x in nums_str]\n    result.sort()\n    return result",
+      "source": "MBPP",
+      "source_task_id": "749",
+      "license": "CC-BY-4.0",
+      "entrypoint": "sort_numeric_strings",
+      "function_parameters": [
+        "nums_str"
+      ],
+      "family": "family_e7b089afa54fad3e",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to sort a given list of strings of numbers numerically. https://www.geeksforgeeks.org/python-sort-numeric-strings-in-a-list/",
+      "source_record_sha256": "14c7743eb5cf9027feda6da2786975c8d16b4bdf96b28920e162c555f46455bd",
+      "canonical_prompt_sha256": "9466cc1272fc70a9e1fdecf0fbf0bab7551e386aa739ae130d896f3f153fd5c3",
+      "canonical_source_sha256": "9597f0b462b3273113cb80fba915a389e3e06bfe965ce8882d4bd048825d90ad",
+      "alpha_source_sha256": "0e92ab5a19020ee765a406d7f56a87851ce1f14ca1be760e459e0caabce8dfa5",
+      "response_sha256": "2e8fa32f7d0b1265fb6c342338877e95d81a2f31d65387a19c5b522d40cd2e9c",
+      "token_lengths": {
+        "response_tokens": 27,
+        "flat_tokens_with_eos": 82,
+        "chat_tokens": 112,
+        "generation_prompt_tokens": 83
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_640",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: remove_parenthesis(items).\nOriginal task:\nWrite a function to remove the parenthesis and what is inbetween them from a string.",
+      "response": "import re\ndef remove_parenthesis(items):\n for item in items:\n    return (re.sub(r\" ?\\([^)]+\\)\", \"\", item))",
+      "source": "MBPP",
+      "source_task_id": "640",
+      "license": "CC-BY-4.0",
+      "entrypoint": "remove_parenthesis",
+      "function_parameters": [
+        "items"
+      ],
+      "family": "family_196dd6848975d6b5",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to remove the parenthesis and what is inbetween them from a string.",
+      "source_record_sha256": "ca343dea2fb7567bcf630c4c3e25d7e03c4eef7f9e5d6b9dec7c292fdaae3f91",
+      "canonical_prompt_sha256": "864832da61fda103f858d0f246adaa8e1c1e1b919e139a3604112c38dc8fbd9a",
+      "canonical_source_sha256": "33561066f012b4927a17439b62c3d54dc13c4770e2bfc35c8cc2436cd0b73d46",
+      "alpha_source_sha256": "0890d8406f55d24665b8905597bace71af6aadaff5ba93de853b5a7ce0c67883",
+      "response_sha256": "5964a7e3857498099f198547e09dfcc9773fe77086f1f7f4c5cd4e66ec3ac011",
+      "token_lengths": {
+        "response_tokens": 31,
+        "flat_tokens_with_eos": 70,
+        "chat_tokens": 100,
+        "generation_prompt_tokens": 67
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_113",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: check_integer(text).\nOriginal task:\nWrite a function to check if a string represents an integer or not.",
+      "response": "def check_integer(text):\n text = text.strip()\n if len(text) < 1:\n    return None\n else:\n     if all(text[i] in \"0123456789\" for i in range(len(text))):\n          return True\n     elif (text[0] in \"+-\") and \\\n         all(text[i] in \"0123456789\" for i in range(1,len(text))):\n         return True\n     else:\n        return False",
+      "source": "MBPP",
+      "source_task_id": "113",
+      "license": "CC-BY-4.0",
+      "entrypoint": "check_integer",
+      "function_parameters": [
+        "text"
+      ],
+      "family": "family_05372ed524030f74",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to check if a string represents an integer or not.",
+      "source_record_sha256": "d33fcde9d9d8523f4bbf8321165bed3f688bdaf117ae4097a966d0d0e764e262",
+      "canonical_prompt_sha256": "86ff758435f88d7dd42d748d8f76bb20cf569e4244c3cd764e50380b673c670a",
+      "canonical_source_sha256": "4709da427ba9f5d32fce95f666447ba55e704968a28745b68b10cae736ce4b0c",
+      "alpha_source_sha256": "e80ed22a9af2ec6403e60ce3816ce5bc1adbf56b7ceff2920c95b2a76a01ce3c",
+      "response_sha256": "af6b95c86e8a20afb00d618f51db250543a66adae1ed0f6348c6394d89f6a7c5",
+      "token_lengths": {
+        "response_tokens": 104,
+        "flat_tokens_with_eos": 138,
+        "chat_tokens": 168,
+        "generation_prompt_tokens": 62
+      },
+      "operation_tags": [
+        "text_numeric_validation"
+      ],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_775",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: odd_position(nums).\nOriginal task:\nWrite a python function to check whether every odd index contains odd numbers of a given list.",
+      "response": "def odd_position(nums):\n\treturn all(nums[i]%2==i%2 for i in range(len(nums)))",
+      "source": "MBPP",
+      "source_task_id": "775",
+      "license": "CC-BY-4.0",
+      "entrypoint": "odd_position",
+      "function_parameters": [
+        "nums"
+      ],
+      "family": "family_8213a844182cccca",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to check whether every odd index contains odd numbers of a given list.",
+      "source_record_sha256": "1f7a4ccd50f8c679b45661d816c6c90c96d3fc4fee31b333e6adb9027fa82ea4",
+      "canonical_prompt_sha256": "e27369dd31c251337b33c9720e085b5ddb34460e350e09a6f3358410a60fa126",
+      "canonical_source_sha256": "b598fca48ebf4363421b3ed771122b82a2b38faede2e52ab89b0ac82116a7c88",
+      "alpha_source_sha256": "5994ac795c8ade28cb5ca741e67c9e4df8f6c033e794b44c8d7e1d36df1e25f2",
+      "response_sha256": "e676fe6af980ed92f55ba4407b56db58c6a5b1197e89ec5242c5e15684909d3b",
+      "token_lengths": {
+        "response_tokens": 22,
+        "flat_tokens_with_eos": 60,
+        "chat_tokens": 90,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_133",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: sum_negativenum(nums).\nOriginal task:\nWrite a function to calculate the sum of the negative numbers of a given list of numbers.",
+      "response": "def sum_negativenum(nums):\n  sum_negativenum = list(filter(lambda nums:nums<0,nums))\n  return sum(sum_negativenum)",
+      "source": "MBPP",
+      "source_task_id": "133",
+      "license": "CC-BY-4.0",
+      "entrypoint": "sum_negativenum",
+      "function_parameters": [
+        "nums"
+      ],
+      "family": "family_9b3ede0fd2d6c011",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to calculate the sum of the negative numbers of a given list of numbers.",
+      "source_record_sha256": "2fc35c6f1028e1a1f3683f15f5d34806ffe81150535edb3ad0eb1d2f2666beca",
+      "canonical_prompt_sha256": "640a1e219fcc79fc2242f4a4f406d9b120c88a0e08ff3a61c3b03028fcc8414d",
+      "canonical_source_sha256": "b8958ac453d9bd9f2974ece9ff5f1f9eca0aaacb3e457c4a2d1d92d420e2ee81",
+      "alpha_source_sha256": "02a44dda1cbb93f70c492aa60c9c1d89f6fdebdf4194821e5293edf82f30c281",
+      "response_sha256": "fe240396d31c6a0c3cf9f1bf7077a8993c360ea6b75408c582338201b7eddd4e",
+      "token_lengths": {
+        "response_tokens": 35,
+        "flat_tokens_with_eos": 76,
+        "chat_tokens": 106,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_639",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: sample_nam(sample_names).\nOriginal task:\nWrite a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.",
+      "response": "def sample_nam(sample_names):\n  sample_names=list(filter(lambda el:el[0].isupper() and el[1:].islower(),sample_names))\n  return len(''.join(sample_names))",
+      "source": "MBPP",
+      "source_task_id": "639",
+      "license": "CC-BY-4.0",
+      "entrypoint": "sample_nam",
+      "function_parameters": [
+        "sample_names"
+      ],
+      "family": "family_8e3af68a322b8e03",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.",
+      "source_record_sha256": "ea9be488965396367794c26fc911473ecb10868b9f5b1aae3d1a5d2dee36fc1f",
+      "canonical_prompt_sha256": "80f2c17aaa6dd9dc8aac32cec133e3af16c774f27309b376980bc6b74526c9c4",
+      "canonical_source_sha256": "53c860d30d95e93d2afc9c77d44d941d1bc1bbc15cc92cf98ba3e6ba9f69deea",
+      "alpha_source_sha256": "34bbcbb059c39c334e1e07788b5df159cdc09cf55a2d13d870465d5ec6a13382",
+      "response_sha256": "dd05deacc01a7bfa7f48b43788b23c9d7ed04b8bd0b7788a637affedf20431ea",
+      "token_lengths": {
+        "response_tokens": 42,
+        "flat_tokens_with_eos": 91,
+        "chat_tokens": 121,
+        "generation_prompt_tokens": 77
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_101",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: kth_element(arr, k).\nOriginal task:\nWrite a function to find the kth element in the given array using 1-based indexing.",
+      "response": "def kth_element(arr, k):\n  n = len(arr)\n  for i in range(n):\n    for j in range(0, n-i-1):\n      if arr[j] > arr[j+1]:\n        arr[j], arr[j+1] == arr[j+1], arr[j]\n  return arr[k-1]",
+      "source": "MBPP",
+      "source_task_id": "101",
+      "license": "CC-BY-4.0",
+      "entrypoint": "kth_element",
+      "function_parameters": [
+        "arr",
+        "k"
+      ],
+      "family": "family_e05f805cea3fa1f1",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to find the kth element in the given array using 1-based indexing.",
+      "source_record_sha256": "31299c38c755244aa11128c4a7b3dfa31a15e5fb45f8f5c07b21143d7fd77a31",
+      "canonical_prompt_sha256": "9174032124277400b50e5110c5c7d2cde20e376f1aed76fc7781721361cadc31",
+      "canonical_source_sha256": "1d4743c908b855c37eb66500a461ac86aaf558c69c1b1bd659760ad62cac8f99",
+      "alpha_source_sha256": "e1fa9c7f3cbb822af595935d1055b94e3eb4d0958ba32b570d6e7832d1d9faa8",
+      "response_sha256": "53a48ccf37022d54cf8e4c7e897d5f97d2ee4fcffc21840f03c21ed3d9605512",
+      "token_lengths": {
+        "response_tokens": 70,
+        "flat_tokens_with_eos": 112,
+        "chat_tokens": 142,
+        "generation_prompt_tokens": 70
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_474",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: replace_char(str1, ch, newch).\nOriginal task:\nWrite a function to replace characters in a string.",
+      "response": "def replace_char(str1,ch,newch):\n str2 = str1.replace(ch, newch)\n return str2",
+      "source": "MBPP",
+      "source_task_id": "474",
+      "license": "CC-BY-4.0",
+      "entrypoint": "replace_char",
+      "function_parameters": [
+        "str1",
+        "ch",
+        "newch"
+      ],
+      "family": "family_063e00e9d1efffcf",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to replace characters in a string.",
+      "source_record_sha256": "67374bf1c22742fe87bc6424c265a91322d066ecd63695843d65e03fb05a5004",
+      "canonical_prompt_sha256": "54e4a01ace98b5e03cdf94d6907ac0b5fa015b116c92090aacbad1e29e744f1f",
+      "canonical_source_sha256": "b4de767456b75a544bb0d2da4ccf080f780c8843aa3b4dca7c9d3c7aa6372298",
+      "alpha_source_sha256": "da29b38439713fbd9b9e6f5744b6b50e59e84bd71bb473d4acb8e2ec630fc154",
+      "response_sha256": "df71ceaca60e410cff5f7982dd758713ed0d4706be6393d041b99e37c2e2f7c6",
+      "token_lengths": {
+        "response_tokens": 23,
+        "flat_tokens_with_eos": 59,
+        "chat_tokens": 89,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_578",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: interleave_lists(list1, list2, list3).\nOriginal task:\nWrite a function to interleave 3 lists of the same length into a single flat list.",
+      "response": "def interleave_lists(list1,list2,list3):\n    result = [el for pair in zip(list1, list2, list3) for el in pair]\n    return result",
+      "source": "MBPP",
+      "source_task_id": "578",
+      "license": "CC-BY-4.0",
+      "entrypoint": "interleave_lists",
+      "function_parameters": [
+        "list1",
+        "list2",
+        "list3"
+      ],
+      "family": "family_3861c0d8dfb116e5",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to interleave 3 lists of the same length into a single flat list.",
+      "source_record_sha256": "2470646dc7a53bd659e85bf52f1403e67d2f7b9adc4b04b8aba1fb65ef668394",
+      "canonical_prompt_sha256": "2b81427196dac9c85436a9a66e198d98ecadad2aa91d9dd575b203358c3c3610",
+      "canonical_source_sha256": "f62bdbd804526a0385f96ee72d2a5d3829b0d141519696672b5f7a272c88b3c7",
+      "alpha_source_sha256": "3da536110a67df0221fe9f638119f96788d22dc3836483f38937e03087f818d5",
+      "response_sha256": "b588d9809a0b0a5988aa602e35a51447812926949984c2dca927f0d01e13b57c",
+      "token_lengths": {
+        "response_tokens": 37,
+        "flat_tokens_with_eos": 84,
+        "chat_tokens": 114,
+        "generation_prompt_tokens": 75
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_593",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: removezero_ip(ip).\nOriginal task:\nWrite a function to remove leading zeroes from an ip address.",
+      "response": "import re\ndef removezero_ip(ip):\n string = re.sub('\\.[0]*', '.', ip)\n return string\n",
+      "source": "MBPP",
+      "source_task_id": "593",
+      "license": "CC-BY-4.0",
+      "entrypoint": "removezero_ip",
+      "function_parameters": [
+        "ip"
+      ],
+      "family": "family_db05bb52eb4928d1",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to remove leading zeroes from an ip address.",
+      "source_record_sha256": "8035114c35d44dad0f2d7ab0cfc1b2edf6c53e33db379204060d6bb5b51d5283",
+      "canonical_prompt_sha256": "da712fbc2411862b123bdf96f2bdf1844087dab3cdbf4bf38608af5200e7b24d",
+      "canonical_source_sha256": "613f758cecf5e5116885d2d8b07cb5fa80471c9800f31ce882bb24fdaee32150",
+      "alpha_source_sha256": "cc914f34c2327ec7f81ba696a486b41880beb206b3a9d72fc0986e15ead7d07a",
+      "response_sha256": "f15d58356fb3686e6225a0b50afa5607758d03a0403e114ff719a73685c5438a",
+      "token_lengths": {
+        "response_tokens": 24,
+        "flat_tokens_with_eos": 57,
+        "chat_tokens": 87,
+        "generation_prompt_tokens": 61
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_784",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: mul_even_odd(list1).\nOriginal task:\nWrite a function to find the product of first even and odd number of a given list.",
+      "response": "def mul_even_odd(list1):\n    first_even = next((el for el in list1 if el%2==0),-1)\n    first_odd = next((el for el in list1 if el%2!=0),-1)\n    return (first_even*first_odd)",
+      "source": "MBPP",
+      "source_task_id": "784",
+      "license": "CC-BY-4.0",
+      "entrypoint": "mul_even_odd",
+      "function_parameters": [
+        "list1"
+      ],
+      "family": "family_b361f60ab8453181",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to find the product of first even and odd number of a given list.",
+      "source_record_sha256": "4b5c4a3cea7caec25a44c16a2ed4b4f5317d448ba3e283b7a5410b3c12825862",
+      "canonical_prompt_sha256": "f7be3646866d6021f1173b171708cd511c97ffab276652d892e13fd785db5a38",
+      "canonical_source_sha256": "098c20a394f16d8d425b73a281e8309c04c65df5c5a1cad82e7f7f677c54f7cd",
+      "alpha_source_sha256": "136f7e4a45468c78350013fada225bbaad04eb037ad69b70cba2384f3bb51a80",
+      "response_sha256": "60c94145f0a61722954a2aaf2fff26e93dbfbf6352846ece9a12d9f8bd1bfc74",
+      "token_lengths": {
+        "response_tokens": 60,
+        "flat_tokens_with_eos": 100,
+        "chat_tokens": 130,
+        "generation_prompt_tokens": 68
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_168",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: frequency(a, x).\nOriginal task:\nWrite a function to count the number of occurrences of a number in a given list.",
+      "response": "def frequency(a,x): \n    count = 0  \n    for i in a: \n      if i == x: \n        count += 1\n\n    return count ",
+      "source": "MBPP",
+      "source_task_id": "168",
+      "license": "CC-BY-4.0",
+      "entrypoint": "frequency",
+      "function_parameters": [
+        "a",
+        "x"
+      ],
+      "family": "family_796c470885296912",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to count the number of occurrences of a number in a given list.",
+      "source_record_sha256": "d4d4fae4e00be20129a13738f1cabe86d54df510e1dbd89508c8765740ef0914",
+      "canonical_prompt_sha256": "558a2b577fb0dd0f39318d3e6bb7390ca9af5ef6ed2bc5b9efb91d192775ebb5",
+      "canonical_source_sha256": "4f59342251703841fafcffe336fb1eacd2e08e7ec88eb785f3c945b2141c0379",
+      "alpha_source_sha256": "f60b0068a6b8c6e63a36216c32ae02145840fc8c25d8c5ef617f346bd7d3148d",
+      "response_sha256": "34382137bbbe286c8abf174bba6bec4b0ec648e6f144e846f4cd49a6ad6b5cec",
+      "token_lengths": {
+        "response_tokens": 36,
+        "flat_tokens_with_eos": 74,
+        "chat_tokens": 104,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_471",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: find_remainder(arr, n).\nOriginal task:\nWrite a python function to find the product of the array multiplication modulo n.",
+      "response": "def find_remainder(arr, n): \n    mul = 1\n    for i in range(len(arr)):  \n        mul = (mul * (arr[i] % n)) % n \n    return mul % n ",
+      "source": "MBPP",
+      "source_task_id": "471",
+      "license": "CC-BY-4.0",
+      "entrypoint": "find_remainder",
+      "function_parameters": [
+        "arr",
+        "n"
+      ],
+      "family": "family_8b3b87a937d9a791",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to find the product of the array multiplication modulo n.",
+      "source_record_sha256": "63190140ce02ba2102ab5f2ee74ca76b362f582f65939a672498421c4b231848",
+      "canonical_prompt_sha256": "6ea86f6d7874db600d78f369819e39459a41f617c61b327fa6219b7722720d7b",
+      "canonical_source_sha256": "71db6f3a8eccea859037c1ee6a2d3ba95fd8c7861d1c565b55bea423098458ea",
+      "alpha_source_sha256": "d5527a88bb00b668e95920f8da5e3bd5a3c0fc67b9d42ec4323bc872b35c3ad3",
+      "response_sha256": "4764fecb650071b486167a18f9f962040df9fb925de6a62112b92c60cb224f69",
+      "token_lengths": {
+        "response_tokens": 46,
+        "flat_tokens_with_eos": 84,
+        "chat_tokens": 114,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_776",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: count_vowels(test_str).\nOriginal task:\nWrite a function to count those characters which have vowels as their neighbors in the given string.",
+      "response": "def count_vowels(test_str):\n  res = 0\n  vow_list = ['a', 'e', 'i', 'o', 'u']\n  for idx in range(1, len(test_str) - 1):\n    if test_str[idx] not in vow_list and (test_str[idx - 1] in vow_list or test_str[idx + 1] in vow_list):\n      res += 1\n  if test_str[0] not in vow_list and test_str[1] in vow_list:\n    res += 1\n  if test_str[-1] not in vow_list and test_str[-2] in vow_list:\n    res += 1\n  return (res) ",
+      "source": "MBPP",
+      "source_task_id": "776",
+      "license": "CC-BY-4.0",
+      "entrypoint": "count_vowels",
+      "function_parameters": [
+        "test_str"
+      ],
+      "family": "family_1cee2aa215ffad68",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to count those characters which have vowels as their neighbors in the given string.",
+      "source_record_sha256": "1eb766a8c6a5622f4cfc24efcbb1da6d8cf9652f98a5665aff43030b46e3a967",
+      "canonical_prompt_sha256": "a3ad521fa66fd9340007cdc5a8b310920f4e184ee01cff55e24ad2b78ce7933f",
+      "canonical_source_sha256": "579df98cfeccec0bbacb6b9b3fd8b5cd9618a42f2f074cffc2921559a88ffc87",
+      "alpha_source_sha256": "f62a9391826eb52be589409c092cb70d3f9a365573b18633c02bd93fa49a3c71",
+      "response_sha256": "f8c99e79647f393a5d2fc96bae64eaa7d5b3a6c6766509576b0777a6a1cdca15",
+      "token_lengths": {
+        "response_tokens": 149,
+        "flat_tokens_with_eos": 190,
+        "chat_tokens": 220,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_251",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: insert_element(list, element).\nOriginal task:\nWrite a function that takes in a list and an element and inserts the element before each element in the list, and returns the resulting list.",
+      "response": "def insert_element(list,element):\n list = [v for elt in list for v in (element, elt)]\n return list",
+      "source": "MBPP",
+      "source_task_id": "251",
+      "license": "CC-BY-4.0",
+      "entrypoint": "insert_element",
+      "function_parameters": [
+        "list",
+        "element"
+      ],
+      "family": "family_bbef894c7de1a508",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function that takes in a list and an element and inserts the element before each element in the list, and returns the resulting list.",
+      "source_record_sha256": "4bba01f123e2a5b77d7493479e7d68dfab2ffcd5ce00e21eb5d3bc2f5781068a",
+      "canonical_prompt_sha256": "a8be3329370b8dd71f63f4ed5db55acef2fec5198d8cafb4acb553d80958c8de",
+      "canonical_source_sha256": "5724eb81df4db57fa0faa061176e9f24f4f4a3cdde20cff2abf5d6e33add0960",
+      "alpha_source_sha256": "8fad8864f6d177b5c8b3d7a990b5527e82c39e0f458809ad4d06c52791152f36",
+      "response_sha256": "174ea11a22a7c83e9618d8795a94f90d20de131d72082fe510a9e976f1afb85c",
+      "token_lengths": {
+        "response_tokens": 25,
+        "flat_tokens_with_eos": 75,
+        "chat_tokens": 105,
+        "generation_prompt_tokens": 78
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_270",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: sum_even_and_even_index(arr).\nOriginal task:\nWrite a python function to find the sum of even numbers at even positions of a list.",
+      "response": "def sum_even_and_even_index(arr):  \n    i = 0\n    sum = 0\n    for i in range(0, len(arr),2): \n        if (arr[i] % 2 == 0) : \n            sum += arr[i]  \n    return sum",
+      "source": "MBPP",
+      "source_task_id": "270",
+      "license": "CC-BY-4.0",
+      "entrypoint": "sum_even_and_even_index",
+      "function_parameters": [
+        "arr"
+      ],
+      "family": "family_250eb574c2bc1eb7",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a python function to find the sum of even numbers at even positions of a list.",
+      "source_record_sha256": "d08aee68e4f6b51e9b850a981fe2d1e821675084bc82cfb687fc0e36f7cb544a",
+      "canonical_prompt_sha256": "28698ad68f588f3bad39e9c881d8888a4decdfec51e9fd6c7a111d36fcef2e61",
+      "canonical_source_sha256": "4362eeb7148e2e539e28f2f98c2cf6545e86c40b8d3a099318878a436bd06703",
+      "alpha_source_sha256": "0a4a8137b7aab95134f31af6b53a19031c957bf3a65db5c8884a2b0fa857bf8b",
+      "response_sha256": "2ff18671976bdd6787ecb9c7764e73d2eebe50f447f6acfc0833caadd09291cd",
+      "token_lengths": {
+        "response_tokens": 60,
+        "flat_tokens_with_eos": 101,
+        "chat_tokens": 131,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_102",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: snake_to_camel(word).\nOriginal task:\nWrite a function to convert a snake case string to camel case string.",
+      "response": "def snake_to_camel(word):\n        import re\n        return ''.join(x.capitalize() or '_' for x in word.split('_'))",
+      "source": "MBPP",
+      "source_task_id": "102",
+      "license": "CC-BY-4.0",
+      "entrypoint": "snake_to_camel",
+      "function_parameters": [
+        "word"
+      ],
+      "family": "family_185cccc8bfb5c412",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to convert a snake case string to camel case string.",
+      "source_record_sha256": "b6c3e48ed4449eef89af2d883560e14f6681af6fc7197720b65b31d6a3d9379b",
+      "canonical_prompt_sha256": "7dbb498196e14274f5b20c31249fd859bf49f5a16612fcdaab19f840cea2646e",
+      "canonical_source_sha256": "9a485b38ab115ca2cc95b320f7f7c42879b27d8dbdc62ae4fc089c11154b763a",
+      "alpha_source_sha256": "64d9a25da30cd313141f68703f4095679e1afa4d5288b7ae84a8237d28d21563",
+      "response_sha256": "4f3bcc9b7b3f034259284347dbac7f7fd39a455a175ec5b280244003ba6257c3",
+      "token_lengths": {
+        "response_tokens": 27,
+        "flat_tokens_with_eos": 63,
+        "chat_tokens": 93,
+        "generation_prompt_tokens": 64
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_433",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: check_greater(arr, number).\nOriginal task:\nWrite a function to check whether the entered number is greater than the elements of the given array.",
+      "response": "def check_greater(arr, number):\n  arr.sort()\n  return number > arr[-1]",
+      "source": "MBPP",
+      "source_task_id": "433",
+      "license": "CC-BY-4.0",
+      "entrypoint": "check_greater",
+      "function_parameters": [
+        "arr",
+        "number"
+      ],
+      "family": "family_49b12f3bb4c88e45",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to check whether the entered number is greater than the elements of the given array.",
+      "source_record_sha256": "4314db47ba9aa919f0a5c00fe531e73965af6b5813adb645616985965b3f78bb",
+      "canonical_prompt_sha256": "673c7aab59634e7752c186d7971b937c44e43f5d54333178b13b5e3a8a4a8a45",
+      "canonical_source_sha256": "8307bb99e04f19aabd90b334027f4b757fa10993d5cc7c420477c576f80f3527",
+      "alpha_source_sha256": "d6ce6883576341e4bbb09818bff903920bb1debb38defed6d2951aea44e0aedd",
+      "response_sha256": "f716b00d1c5693e57a536349d2698e0b71cc9c53fb3412378b6af9115802f492",
+      "token_lengths": {
+        "response_tokens": 19,
+        "flat_tokens_with_eos": 60,
+        "chat_tokens": 90,
+        "generation_prompt_tokens": 69
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 2,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "he_28",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: concatenate(strings).\nOriginal task:\nfrom typing import List\n\n\ndef concatenate(strings: List[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n",
+      "response": "from typing import List\n\n\ndef concatenate(strings: List[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n    return ''.join(strings)\n",
+      "source": "HumanEval",
+      "source_task_id": "HumanEval/28",
+      "license": "MIT",
+      "entrypoint": "concatenate",
+      "function_parameters": [
+        "strings"
+      ],
+      "family": "family_62a73c3ea8b52b9c",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "from typing import List\n\n\ndef concatenate(strings: List[str]) -> str:\n    \"\"\" Concatenate list of strings into a single string\n    >>> concatenate([])\n    ''\n    >>> concatenate(['a', 'b', 'c'])\n    'abc'\n    \"\"\"\n",
+      "source_record_sha256": "5d2ed909691be8dd43e02b43f98ea6e0d46b492b95a511fd3c51a026b6d25514",
+      "canonical_prompt_sha256": "f8793ca1441e464b90177abde4a4a1d5b104469730e85514e654d6fc55cea8c8",
+      "canonical_source_sha256": "8aa3ac3a26b0b15be145daeeef72b1379db62b64e64559525c39eadfd08b9262",
+      "alpha_source_sha256": "bf4fdaaa3931385a96c2d199797d616b81a4e27cae7b526d1a414ed6d983ba0a",
+      "response_sha256": "6adee129d74e8fadb0bda08ffab73b5277437b7b98db5fd44b13a14a5dd74b79",
+      "token_lengths": {
+        "response_tokens": 57,
+        "flat_tokens_with_eos": 127,
+        "chat_tokens": 157,
+        "generation_prompt_tokens": 98
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 2
+      }
+    },
+    {
+      "id": "mbpp_390",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: add_string(list_, string).\nOriginal task:\nWrite a function to apply a given format string to all of the elements in a list.",
+      "response": "def add_string(list_, string):\n add_string=[string.format(i) for i in  list_]\n return add_string",
+      "source": "MBPP",
+      "source_task_id": "390",
+      "license": "CC-BY-4.0",
+      "entrypoint": "add_string",
+      "function_parameters": [
+        "list_",
+        "string"
+      ],
+      "family": "family_758e3bbd10fae71b",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to apply a given format string to all of the elements in a list.",
+      "source_record_sha256": "a200f80f86b95d18f8f1a5e990eb377eed3b57a334ed200363f3da78484ffddc",
+      "canonical_prompt_sha256": "0ae4608aad56896f430dc6e2257a18b60ef0748da8881624707282cf0ff762d2",
+      "canonical_source_sha256": "ae1b6da067178d820acc78578c7842dc54cdf4f30feeef8bcee5a42c502a67fc",
+      "alpha_source_sha256": "e818d9da10318f791a02c6ef2076b15e11c7f14fff96e6918c82f5f2a4244388",
+      "response_sha256": "ba4ef5f4f2b96673112b9aa69635fd96c7c0078d4d29baaed6e7d690dd5763fb",
+      "token_lengths": {
+        "response_tokens": 24,
+        "flat_tokens_with_eos": 64,
+        "chat_tokens": 94,
+        "generation_prompt_tokens": 68
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_269",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: ascii_value(k).\nOriginal task:\nWrite a function to find the ascii value of a character.",
+      "response": "def ascii_value(k):\n  ch=k\n  return ord(ch)",
+      "source": "MBPP",
+      "source_task_id": "269",
+      "license": "CC-BY-4.0",
+      "entrypoint": "ascii_value",
+      "function_parameters": [
+        "k"
+      ],
+      "family": "family_bbb974e94189a31f",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to find the ascii value of a character.",
+      "source_record_sha256": "37d75e060a16ff8a1ede53c793f0acaac5efe0e732f50a1029287c6fc756a7d6",
+      "canonical_prompt_sha256": "62de78f4cdf1a7ce6b8c9928ae0206101fdc465d82d9b787a03b1480c923243a",
+      "canonical_source_sha256": "139bef12d5361a93fe42e2834440297ab7cebccecbeafc622b802350bc3e9073",
+      "alpha_source_sha256": "c77fd110d2d4c2342d8c9945121a3312cb7e6220bea6b577185852666b9766b5",
+      "response_sha256": "c8a0176f2f517c66cabdacfb806656a0b1e075b3347bebe76966e6e28de7704d",
+      "token_lengths": {
+        "response_tokens": 14,
+        "flat_tokens_with_eos": 46,
+        "chat_tokens": 76,
+        "generation_prompt_tokens": 60
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    },
+    {
+      "id": "mbpp_806",
+      "prompt": "Return only complete Python code. Preserve the required entrypoint: max_run_uppercase(test_str).\nOriginal task:\nWrite a function to find maximum run of uppercase characters in the given string.",
+      "response": "def max_run_uppercase(test_str):\n  cnt = 0\n  res = 0\n  for idx in range(0, len(test_str)):\n    if test_str[idx].isupper():\n      cnt += 1\n    else:\n      res = cnt\n      cnt = 0\n  if test_str[len(test_str) - 1].isupper():\n    res = cnt\n  return (res)",
+      "source": "MBPP",
+      "source_task_id": "806",
+      "license": "CC-BY-4.0",
+      "entrypoint": "max_run_uppercase",
+      "function_parameters": [
+        "test_str"
+      ],
+      "family": "family_ccc73f00bf49d153",
+      "group": "target",
+      "domain": "pure_python_flat_string_list_operations",
+      "original_prompt": "Write a function to find maximum run of uppercase characters in the given string.",
+      "source_record_sha256": "25f3dbf05288148b31188902aa0680021611669059e2d83cc8585fe4cf20a1e5",
+      "canonical_prompt_sha256": "e124bb5cf111fdcbeec0725e204f2a9d4e6c7a835081f334af89fa73ebf87c38",
+      "canonical_source_sha256": "78cd6dfe1f41458f976d77a0667e00d18797e030d3451efa3a7453b66b9be87c",
+      "alpha_source_sha256": "1acb1f6bfd0a35b79ae9201c9565912d80e236270559ee7cb5ebf1f2359409f0",
+      "response_sha256": "af7fd5765ca0a2f63619fbcab747549e4167109fef80e49c3439c35a9a88eb7f",
+      "token_lengths": {
+        "response_tokens": 86,
+        "flat_tokens_with_eos": 124,
+        "chat_tokens": 154,
+        "generation_prompt_tokens": 66
+      },
+      "operation_tags": [],
+      "case_statistics": {
+        "retained": 3,
+        "distinct_expected": 3,
+        "nonempty_expected": 3
+      }
+    }
+  ]
+}

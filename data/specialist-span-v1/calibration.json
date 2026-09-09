@@ -1,0 +1,98 @@
+{
+  "schema": "specialist-span-supervised-v1",
+  "purpose": "Activation/expert selection only; independent from optimizer rows; zero input compression.",
+  "split": "calibration",
+  "source": "locally_authored_synthetic",
+  "license": "CC0-1.0",
+  "seed": 271828,
+  "grouping": "One unique entity noun per row; entity nouns disjoint across splits; function words, templates, and adjective targets shared intentionally.",
+  "token_policy": {
+    "max_prompt_tokens": 256,
+    "max_response_tokens": 256,
+    "truncation": false,
+    "input_compression": false,
+    "tokenizer_verified": false
+  },
+  "samples": [
+    {
+      "id": "span-v1-calibration-01",
+      "prompt": "This comb is clean. The <extra_id_0> comb is here.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-02",
+      "prompt": "Here is a dusty curtain. This curtain is <extra_id_0>.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-03",
+      "prompt": "This is a worn envelope. Here is the <extra_id_0> envelope.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-04",
+      "prompt": "The folder is damp. This folder is <extra_id_0>.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-05",
+      "prompt": "Here is a clean glove. This glove is <extra_id_0>.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-06",
+      "prompt": "This is a dusty hammer. Here is the <extra_id_0> hammer.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-07",
+      "prompt": "The jacket is worn. This jacket is <extra_id_0>.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-08",
+      "prompt": "This kettle is damp. The <extra_id_0> kettle is here.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-09",
+      "prompt": "This is a clean ladder. Here is the <extra_id_0> ladder.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-10",
+      "prompt": "The napkin is dusty. This napkin is <extra_id_0>.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-11",
+      "prompt": "This paddle is worn. The <extra_id_0> paddle is here.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-12",
+      "prompt": "Here is a damp pillow. This pillow is <extra_id_0>.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-13",
+      "prompt": "The ribbon is clean. This ribbon is <extra_id_0>.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-14",
+      "prompt": "This sandal is dusty. The <extra_id_0> sandal is here.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-15",
+      "prompt": "Here is a worn sponge. This sponge is <extra_id_0>.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-calibration-16",
+      "prompt": "This is a damp towel. Here is the <extra_id_0> towel.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    }
+  ]
+}

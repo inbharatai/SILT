@@ -1,0 +1,300 @@
+{
+  "note": "Entrypoint metadata for the generated Code artifact; never hardcode a generic solve name.",
+  "tasks": [
+    {
+      "id": "he_15",
+      "language": "python",
+      "function": "string_sequence",
+      "parameters": [
+        "n"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "mbpp_100",
+      "language": "python",
+      "function": "next_smallest_palindrome",
+      "parameters": [
+        "num"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "he_69",
+      "language": "python",
+      "function": "search",
+      "parameters": [
+        "lst"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "he_14",
+      "language": "python",
+      "function": "all_prefixes",
+      "parameters": [
+        "string"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "he_125",
+      "language": "python",
+      "function": "split_words",
+      "parameters": [
+        "txt"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "mbpp_434",
+      "language": "python",
+      "function": "text_match_one",
+      "parameters": [
+        "text"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "mbpp_91",
+      "language": "python",
+      "function": "find_substring",
+      "parameters": [
+        "str1",
+        "sub_str"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "mbpp_769",
+      "language": "python",
+      "function": "Diff",
+      "parameters": [
+        "li1",
+        "li2"
+      ],
+      "split": "development"
+    },
+    {
+      "id": "he_150",
+      "language": "python",
+      "function": "x_or_y",
+      "parameters": [
+        "n",
+        "x",
+        "y"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_79",
+      "language": "python",
+      "function": "decimal_to_binary",
+      "parameters": [
+        "decimal"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_96",
+      "language": "python",
+      "function": "count_up_to",
+      "parameters": [
+        "n"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_407",
+      "language": "python",
+      "function": "rearrange_bigger",
+      "parameters": [
+        "n"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_608",
+      "language": "python",
+      "function": "bell_Number",
+      "parameters": [
+        "n"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_455",
+      "language": "python",
+      "function": "check_monthnumb_number",
+      "parameters": [
+        "monthnum2"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_124",
+      "language": "python",
+      "function": "valid_date",
+      "parameters": [
+        "date"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_9",
+      "language": "python",
+      "function": "rolling_max",
+      "parameters": [
+        "numbers"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_129",
+      "language": "python",
+      "function": "minPath",
+      "parameters": [
+        "grid",
+        "k"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_141",
+      "language": "python",
+      "function": "file_name_check",
+      "parameters": [
+        "file_name"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_48",
+      "language": "python",
+      "function": "is_palindrome",
+      "parameters": [
+        "text"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_105",
+      "language": "python",
+      "function": "by_length",
+      "parameters": [
+        "arr"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_101",
+      "language": "python",
+      "function": "words_string",
+      "parameters": [
+        "s"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_27",
+      "language": "python",
+      "function": "flip_case",
+      "parameters": [
+        "string"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "he_145",
+      "language": "python",
+      "function": "order_by_points",
+      "parameters": [
+        "nums"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_108",
+      "language": "python",
+      "function": "merge_sorted_list",
+      "parameters": [
+        "num1",
+        "num2",
+        "num3"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_398",
+      "language": "python",
+      "function": "sum_of_digits",
+      "parameters": [
+        "nums"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_79",
+      "language": "python",
+      "function": "word_len",
+      "parameters": [
+        "s"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_465",
+      "language": "python",
+      "function": "drop_empty",
+      "parameters": [
+        "dict1"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_57",
+      "language": "python",
+      "function": "find_Max_Num",
+      "parameters": [
+        "arr"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_301",
+      "language": "python",
+      "function": "dict_depth",
+      "parameters": [
+        "d"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_66",
+      "language": "python",
+      "function": "pos_count",
+      "parameters": [
+        "list"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_619",
+      "language": "python",
+      "function": "move_num",
+      "parameters": [
+        "test_str"
+      ],
+      "split": "final"
+    },
+    {
+      "id": "mbpp_573",
+      "language": "python",
+      "function": "unique_product",
+      "parameters": [
+        "list_data"
+      ],
+      "split": "final"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "specialist-span-supervised-v1",
+  "purpose": "Quarantined one-shot mechanism holdout; parent must not open until a later explicitly authorized final stage.",
+  "split": "final",
+  "source": "locally_authored_synthetic",
+  "license": "CC0-1.0",
+  "seed": 271828,
+  "grouping": "One unique entity noun per row; entity nouns disjoint across splits; function words, templates, and adjective targets shared intentionally.",
+  "token_policy": {
+    "max_prompt_tokens": 256,
+    "max_response_tokens": 256,
+    "truncation": false,
+    "input_compression": false,
+    "tokenizer_verified": false
+  },
+  "samples": [
+    {
+      "id": "span-v1-final-01",
+      "prompt": "This is a worn lantern. Here is the <extra_id_0> lantern.",
+      "response": "<extra_id_0> worn <extra_id_1>"
+    },
+    {
+      "id": "span-v1-final-02",
+      "prompt": "The satchel is damp. This satchel is <extra_id_0>.",
+      "response": "<extra_id_0> damp <extra_id_1>"
+    },
+    {
+      "id": "span-v1-final-03",
+      "prompt": "This trinket is clean. The <extra_id_0> trinket is here.",
+      "response": "<extra_id_0> clean <extra_id_1>"
+    },
+    {
+      "id": "span-v1-final-04",
+      "prompt": "Here is a dusty vase. This vase is <extra_id_0>.",
+      "response": "<extra_id_0> dusty <extra_id_1>"
+    }
+  ]
+}
