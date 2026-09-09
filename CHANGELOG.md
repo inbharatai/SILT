@@ -5,8 +5,47 @@ recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/
 
 Older in-repo audit docs (`docs/audit_2026-08-13.md`, `docs/deep_apply_real_run_findings.md`)
 quote test counts from the day they were written (238 passed, 279 passed). Those
-are historical snapshots. From this release onward the canonical count is the one
-CI produces — see the CI badge in the README.
+are historical snapshots. CI counts describe their own run and environment — see
+the CI badge in the README. The September experimental evidence separately records
+the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
+
+## Experimental reconstruction/recovery checkpoint — 2026-09-09
+
+This entry records local frozen-V5 evidence, not certified model quality or a
+claim that models have been publicly deployed. See
+[`docs/EXPERIMENTAL_RELEASE_2026_09.md`](docs/EXPERIMENTAL_RELEASE_2026_09.md).
+
+### Added
+- Optional real source-weight calibration, coherent Qwen MLP reconstruction,
+  native Switch-to-dense-T5 conversion, teacher-guided recovery, factor-preserving
+  teacher-independent export, strict registered loader and once-only final
+  comparison. Existing SILT transfer mechanisms and defaults remain alongside it.
+- Qwen evidence: **494,032,768 → 415,586,176 base + 1,413,120 factors =
+  416,999,296 parameters**, with **64 real optimizer steps**.
+- Switch evidence: **619,339,008 → 224,525,568 base-plus-factor parameters**,
+  with **32 real recovery steps**; synthetic-span mechanics, not coding quality.
+- Bounded public report with six final arms, actual runtime/verification scope,
+  a Git-independent frozen-source digest and read-only loss/win interpretation.
+
+### Recorded results and limits
+- Final local 16-task totals: **source 12; activation-unrepaired 8; recovered 8;
+  random-MLP control 0; uniform-unrepaired control 0; SmolLM2-360M-Instruct 8**.
+  No missing or operationally blocked tasks. No recovery aggregate improvement,
+  teacher-level quality preservation or compact-model advantage established.
+- Prepublication V5 verification: **2,039 passed, eight expected skips and
+  75 warnings**, locally recorded on its stated environment. Older counts below
+  remain historical; this result is not a guarantee about later CI or platforms.
+- Five Studio construction stages completed as `BUILT_UNCERTIFIED`; successful
+  engineering and bounded standalone reload/inference are not quality admission.
+- Failed BF16 native merge retained; factor-preserving export selected explicitly
+  without relaxed tolerances. The registered SILT factor bundle is not an ordinary
+  HF-root/GGUF checkpoint and needs its matching runtime.
+- Read-only case analysis distinguishes semantics, API/executability and output
+  termination. No case-hardcoded source fix or score change; future improvement
+  requires fresh data and a new governed evaluation, not consumed-final tuning.
+- LoRA and teacher-guided training are established prior art. No patent novelty
+  or coverage of these additions by the existing provisional is claimed. Existing
+  legal notices remain unchanged; model weights are separate from source.
 
 ## [0.1.0] — 2026-08-25
 

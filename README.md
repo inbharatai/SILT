@@ -4,7 +4,7 @@
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
-> **Local experimental checkpoint — not published or release-accepted.** This copy adds optional capability composition and one-family structural expert pruning alongside the existing packet/LoRA/Spring paths. Existing transfer gates and defaults remain unchanged. Structural pruning is a different operation from the packet extraction described below; it does not demonstrate universal capability copying. Read [HARDENING_PASS2.md](docs/HARDENING_PASS2.md) for the current research-led hardening, broader pilots and unresolved acceptance limits; [EXPERIMENTAL_HANDOFF.md](docs/EXPERIMENTAL_HANDOFF.md) records the earlier checkpoint and base setup. No claim is made that these new mechanisms are covered by the earlier provisional. Phase 6 remains deferred.
+> **Experimental reconstruction/recovery checkpoint — quality not certified.** The frozen V5 construction pipeline completed local verification; model quality remains experimental. Optional source-weight reconstruction and teacher-guided recovery now sit alongside capability composition, structural pruning and the existing packet/LoRA/Spring paths. Existing transfer gates and defaults remain unchanged. Read the bounded [September 2026 release evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) for actual training, all six final-comparison arms and verification scope. [HARDENING_PASS2.md](docs/HARDENING_PASS2.md) and [EXPERIMENTAL_HANDOFF.md](docs/EXPERIMENTAL_HANDOFF.md) retain earlier checkpoint context. No claim is made that these new mechanisms are covered by the earlier provisional. The earlier phase labels are historical: the scoped reconstruction/recovery work described here is implemented, while unvalidated model families, latent cross-modal bridges and hardware targets remain outside this release.
 
 <p align="center"><em>Transfer a specialist skill. Prove the gain. Adapt and certify for constrained hardware.</em></p>
 
@@ -77,6 +77,58 @@ Two adversarial audits tried to break the gates:
 [`docs/loophole_audit.md`](docs/loophole_audit.md) and
 [`docs/audit_2026-08-13.md`](docs/audit_2026-08-13.md).
 
+### Experimental source-weight reconstruction and recovery — September 2026
+
+This optional path **physically constructs smaller models from real pretrained
+source weights**, rather than transferring a packet or keeping a masked full
+checkpoint. It adds calibration, coherent Qwen MLP reconstruction or native
+Switch-to-dense-T5 conversion, teacher-guided recovery, teacher-independent
+export and once-only final comparison. It does not replace SILT's existing
+packet, double-gate, SiltStream, ZeroForge or SiltSpring mechanisms.
+
+- **Qwen2.5-Coder-0.5B-Instruct:** 494,032,768 source parameters → 415,586,176 reconstructed base +
+  1,413,120 trained **LoRA factors** (about 1.413M) = **416,999,296 unique stored parameters**;
+  **64 real optimizer steps**. Tied aliases are counted once; this is not an active-parameter,
+  FLOP or memory measure. Lower development token loss is not a quality certificate.
+- **Switch:** 619,339,008 source parameters → **224,525,568 dense-base-plus-factor
+  parameters**, with **32 real recovery steps**. Its synthetic-span exercise is
+  construction evidence, not coding-quality evidence.
+- **Serving:** the complete base and factors reload through the registered SILT
+  factor-bundle loader with the matching PyTorch/Transformers/PEFT runtime,
+  without the original teacher or training workspace. This is **not an ordinary
+  HF-root or GGUF model**. The failed BF16 merge remains recorded; the selected
+  export preserves factors instead of silently relaxing numerical checks.
+
+| Frozen final arm | Correct tasks out of 16 |
+| :-- | --: |
+| Original Qwen source | 12 |
+| Activation-reconstructed, unrepaired | 8 |
+| Activation-reconstructed and recovered | 8 |
+| Random MLP with retained backbone and same low-rank repair budget | 0 |
+| Uniform-channel reconstruction, unrepaired | 0 |
+| Off-the-shelf SmolLM2-360M-Instruct | 8 |
+
+All six arms completed without missing or operationally blocked tasks. Recovery
+did not improve the aggregate total; the compact baseline matched it. This small
+local cohort establishes **neither teacher-level quality preservation nor a
+competitive advantage**, and is not official HumanEval/MBPP accuracy. Engine
+completion (`BUILT_UNCERTIFIED`) does not mean quality success or admission.
+
+**Recorded prepublication verification:** 2,039 passed, eight expected skips and
+75 warnings on the verified V5 snapshot; not a promise about CI or every machine.
+Earlier approximately 420/421-test references are historical snapshots. The
+[release evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) gives runtime/skip scope,
+the Git-independent frozen source digest and the locally recorded verification
+method; it is not third-party authentication. Later read-only loss/win analysis
+distinguishes API/executability and token-completion failures from algorithmic
+errors. Scores remain unchanged; no case-hardcoded fix was made. Future studies
+require fresh data rather than retuning the consumed final set.
+
+LoRA and teacher-guided training are established prior art. These additions are
+not presented as patent novelty or as covered by the existing provisional; the
+existing legal notice is unchanged. See the [bounded release report](docs/EXPERIMENTAL_RELEASE_2026_09.md)
+for the full experimental boundary and implementation links.
+
 ### 🚀 Get started
 
 A 60-second path from clone to a gated skill transfer:
@@ -84,7 +136,7 @@ A 60-second path from clone to a gated skill transfer:
 ```bash
 git clone https://github.com/inbharatai/SILT.git && cd SILT
 python -m pip install -r requirements.txt          # core: pydantic only, no torch
-PYTHONPATH=src python -m pytest tests/ -q           # 420+ passing, offline
+PYTHONPATH=src python -m pytest tests/ -q           # offline; counts depend on installed extras and snapshot
 PYTHONPATH=src python -m asea.cli run --config configs/assamese_transfer.json --workspace .work
 PYTHONPATH=src python -m asea.cli report --workspace .work
 ```
@@ -296,11 +348,12 @@ otherwise. See [`docs/feasibility_review.md`](docs/feasibility_review.md).
 
 ## Can SILT add a missing specialist capability to the model you want to use?
 
-Short answer: **no weight copying, ever — but yes, a narrow skill can move
-across automatically once it proves itself.** SILT is a skill-interchange and
-trust-gating layer, not a model copier; one model cannot become a copy of
-another. What crosses by default is an **inspectable skill packet**, and only
-after it beats the learner on cases the teacher never saw.
+For the default packet path: **no teacher-weight copying — a narrow skill can
+move across automatically once it proves itself.** What crosses by default is
+an **inspectable skill packet**, admitted only after held-out evidence meets
+the gate. The separate experimental reconstruction path derives smaller models
+from source weights; it does not establish universal model or capability copying.
+The Hindi example below describes packet mode, not source-weight reconstruction.
 
 ### Specialist teacher → general learner: Hindi example
 
@@ -353,9 +406,9 @@ make "auto" safe:
 If you install `[deep]`, SILT can train a **removable LoRA adapter** on the
 learner from *already-Gate-1-promoted* packets — but behind a **second gate
 (Gate 2)** that never trusts the trainer, with parity as the admission bar.
-This is the closest SILT gets to "weights transfer," and it is still: a
-removable adapter, trained only from proven packets, re-gated on held-out
-evidence, never merged into base weights in v1. See
+In this packet-derived deep-apply path, the result is a removable adapter,
+trained only from proven packets, re-gated on held-out evidence and never merged
+into base weights in v1. The experimental source-derived path is separate. See
 [Beyond packet transfer](#beyond-packet-transfer--deep-apply-hardware-adaptation-and-verification).
 
 > Recorded real run: NLLB-200 (genuinely covers Hindi + Assamese) → Qwen2.5
@@ -379,7 +432,7 @@ python -m pip install -e ".[connectors]"  # real HF/Ollama connectors (transform
 python -m pip install -e ".[deep]"        # deep-apply + SiltSpring (adds peft/accelerate/sentencepiece)
 
 # tests (needs PYTHONPATH so `asea` + the `tests` package both resolve on Windows)
-PYTHONPATH=src python -m pytest tests/ -q     # 420+ passing, 6–7 skipped (offline; the live CI badge is the source of truth)
+PYTHONPATH=src python -m pytest tests/ -q     # offline; see the frozen release evidence and CI for their respective scope
 
 # all four mock demonstration flows
 cd examples && python run_all.py && cd ..
@@ -1001,7 +1054,7 @@ adaptive-skill-extraction-adapter/
 │   ├── unlearning.py   verified unlearning + ErasureCertificate
 │   ├── capability_diff.py  Capability Diff + signed DiffReport
 │   └── _signing.py     LocalSigner (HMAC-SHA256) shared by diff + unlearning
-└── tests/              20 files, offline (420+ passing; CI badge in the README header is the source of truth)
+└── tests/              offline regression (historical core: 20 files, 420+ passing; see release evidence for V5)
 ```
 
 ### Package layering
