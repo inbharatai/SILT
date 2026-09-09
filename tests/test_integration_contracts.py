@@ -209,8 +209,16 @@ on = os.environ.get("SILT_ENABLE_EXPERIMENTAL") == "1"
 assert ("asea.studio.experimental" in sys.modules) is on
 root = Path(os.environ["SILT_EXPERIMENTAL_ROOT"])
 assert not root.exists()
-legacy = sorted((r.path, sorted(r.methods), r.name) for r in server.app.routes
-                if not r.path.startswith(("/experimental", "/api/experimental")))
+# Snapshot the public HTTP contract, not FastAPI's version-specific route
+# storage (newer versions can retain nested _IncludedRouter entries).
+http_methods = {"get", "put", "post", "delete", "options", "head", "patch", "trace"}
+legacy = sorted(
+    (path, sorted(method.upper() for method in operations if method in http_methods),
+     sorted((method, operation.get("operationId"))
+            for method, operation in operations.items() if method in http_methods))
+    for path, operations in server.app.openapi()["paths"].items()
+    if not path.startswith(("/experimental", "/api/experimental"))
+)
 with TestClient(server.app, base_url="http://127.0.0.1") as client:
     health = client.get("/api/health").json()
     assert health["ok"] is True and health["mock_free"] is True
