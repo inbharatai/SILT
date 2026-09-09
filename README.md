@@ -4,6 +4,8 @@
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
+> **Local experimental checkpoint — not published or release-accepted.** This copy adds optional capability composition and one-family structural expert pruning alongside the existing packet/LoRA/Spring paths. Existing transfer gates and defaults remain unchanged. Structural pruning is a different operation from the packet extraction described below; it does not demonstrate universal capability copying. Read [HARDENING_PASS2.md](docs/HARDENING_PASS2.md) for the current research-led hardening, broader pilots and unresolved acceptance limits; [EXPERIMENTAL_HANDOFF.md](docs/EXPERIMENTAL_HANDOFF.md) records the earlier checkpoint and base setup. No claim is made that these new mechanisms are covered by the earlier provisional. Phase 6 remains deferred.
+
 <p align="center"><em>Transfer a specialist skill. Prove the gain. Adapt and certify for constrained hardware.</em></p>
 
 <p align="center"><strong>A powerful model can still be missing one specialist capability.<br>Another AI may already have it.<br>SILT is built to transfer that narrow capability — not copy the teacher — and verify what the receiver can actually use.</strong></p>
