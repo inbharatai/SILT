@@ -12,6 +12,7 @@ import pytest
 
 from asea.execution import probe, run
 from asea.execution.controls import _run_test_child
+from process_assertions import assert_process_dead
 
 NATIVE_LINUX = platform.system() == "Linux" and hasattr(os, "wait4")
 linux = pytest.mark.skipif(not NATIVE_LINUX, reason="Requires real native Linux RLIMIT/wait4")
@@ -23,6 +24,92 @@ def cli(*args):
     child = subprocess.run([sys.executable, "-m", "asea.execution", *args],
                            env=env, capture_output=True, text=True, timeout=15)
     return child.returncode, json.loads(child.stdout)
+
+
+@pytest.fixture
+def proc_observation(monkeypatch):
+    """One-shot /proc snapshots and virtual time; no synthetic OS enforcement."""
+    import process_assertions as assertions
+    clock = {"now": 0.0, "reads": 0, "sleeps": []}
+    def install(*observations):
+        pending = list(observations)
+        class Status:
+            def read_text(self):
+                clock["reads"] += 1
+                value = pending.pop(0) if len(pending) > 1 else pending[0]
+                if isinstance(value, BaseException):
+                    raise value
+                return value
+        def path(value):
+            assert value == "/proc/123456789/status"
+            return Status()  # No exists(): only the actual read proves absence.
+        def sleep(seconds):
+            clock["sleeps"].append(seconds)
+            clock["now"] += seconds
+        monkeypatch.setattr(assertions, "Path", path)
+        monkeypatch.setattr(assertions, "monotonic", lambda: clock["now"])
+        monkeypatch.setattr(assertions, "sleep", sleep)
+        return clock
+    return install
+
+
+@pytest.mark.parametrize("error", [FileNotFoundError(2, "gone before open"),
+                                  ProcessLookupError(3, "gone during read")])
+def test_proc_death_accepts_only_disappearance(proc_observation, error):
+    clock = proc_observation(error)
+    assert_process_dead(123456789)
+    assert clock["reads"] == 1 and not clock["sleeps"]
+
+
+@pytest.mark.parametrize("error", [PermissionError(13, "denied"), PermissionError(1, "not permitted"),
+                                  OSError(5, "I/O error"), OSError("unknown error"),
+                                  FileNotFoundError(5, "not disappearance")])
+def test_proc_death_propagates_read_errors(proc_observation, error):
+    proc_observation(error)
+    with pytest.raises(type(error)) as caught:
+        assert_process_dead(123456789)
+    assert caught.value is error
+
+
+@pytest.mark.parametrize("state", ["Z", "X"])
+def test_proc_death_accepts_terminal_snapshot_without_reread(proc_observation, state):
+    clock = proc_observation(f"Name:\tfixture\nState:\t{state} (terminal)\n",
+                             OSError(5, "must not reread a terminal snapshot"))
+    assert_process_dead(123456789)
+    assert clock["reads"] == 1 and not clock["sleeps"]
+
+
+@pytest.mark.parametrize("snapshot", [f"State:\t{state} (not accepted)\n"
+                                     for state in ("R", "S", "D", "T", "t", "I", "W", "P", "K", "x", "ZZ")]
+                         + ["Name:\tState:\tZ\n", "State:\n", ""])
+def test_proc_death_live_or_unknown_state_fails_at_deadline(proc_observation, snapshot):
+    clock = proc_observation(snapshot)
+    with pytest.raises(pytest.fail.Exception, match="remains live or unconfirmed"):
+        assert_process_dead(123456789, timeout=0.025)
+    assert clock["now"] == pytest.approx(0.025)
+    assert clock["reads"] == 4
+    assert clock["sleeps"] == pytest.approx([0.01, 0.01, 0.005])
+
+
+@pytest.mark.parametrize("terminal", ["State:\tZ (zombie)\n", "State:\tX (dead)\n",
+                                     FileNotFoundError(2, "gone"), ProcessLookupError(3, "gone")])
+def test_proc_death_waits_for_actual_terminal_evidence(proc_observation, terminal):
+    clock = proc_observation("State:\tR (running)\n", "State:\tS (sleeping)\n", terminal)
+    assert_process_dead(123456789, timeout=0.025)
+    assert clock["reads"] == 3 and clock["now"] == pytest.approx(0.02)
+
+
+@linux
+def test_proc_death_rejects_real_live_child():
+    child = subprocess.Popen([sys.executable, "-I", "-S", "-c", "import time; time.sleep(30)"])
+    try:
+        with pytest.raises(pytest.fail.Exception, match="remains live or unconfirmed"):
+            assert_process_dead(child.pid, timeout=0.025)
+        assert child.poll() is None
+    finally:
+        child.kill()
+        child.wait(timeout=3)
+    assert_process_dead(child.pid, timeout=0.025)
 
 
 def test_probe_is_observation_not_enforcement():
@@ -115,15 +202,8 @@ def test_deadline_kills_same_group_descendant():
     assert result["status"] == "TIMEOUT", result
     child = json.loads(result["stdout"])["descendant_pid"]
     # Grandchild reaping belongs to its adopting init, not this supervisor.
-    # A zombie is no longer executing and consumes no address space.
-    status = Path("/proc") / str(child) / "status"
-    end = time.monotonic() + 1
-    while status.exists() and time.monotonic() < end:
-        text = status.read_text()
-        if "State:\tZ" in text:
-            break
-        time.sleep(0.01)
-    assert not status.exists() or "State:\tZ" in status.read_text()
+    # Terminal Z/X snapshots count as dead even before init reaps the child.
+    assert_process_dead(child, timeout=1)
     assert result["group_kill_succeeded"]
 
 
@@ -249,7 +329,10 @@ def test_windows_job_target_enforcement_template():
 
 @linux
 @pytest.mark.parametrize("death_signal", [signal.SIGTERM, signal.SIGINT, signal.SIGKILL])
-def test_supervisor_death_terminates_real_fixed_worker(tmp_path, death_signal):
+@pytest.mark.parametrize("proc_fallback", [False, True], ids=["pidfd_if_available", "proc_fallback"])
+def test_supervisor_death_terminates_real_fixed_worker(tmp_path, monkeypatch, death_signal, proc_fallback):
+    if proc_fallback:
+        monkeypatch.delattr(os, "pidfd_open", raising=False)
     marker = tmp_path / "armed-worker.json"
     # The marker is emitted only when sampling is armed by a VALID bootstrap
     # receipt. No sleep-based guess about whether prctl has been installed.
@@ -294,11 +377,7 @@ print(json.dumps(c._run_test_child('sleep', timeout=20)), flush=True)
             import select
             assert select.select([pidfd], [], [], 2)[0], "worker outlived supervisor"
         else:
-            status = Path('/proc', str(worker), 'status')
-            end = time.monotonic() + 2
-            while status.exists() and 'State:\tZ' not in status.read_text() and time.monotonic() < end:
-                time.sleep(0.01)
-            assert not status.exists() or 'State:\tZ' in status.read_text()
+            assert_process_dead(worker, timeout=2)
     finally:
         if supervisor.poll() is None:
             supervisor.kill()
@@ -347,11 +426,7 @@ def test_exited_leader_group_cleanup_precedes_reaping(monkeypatch):
     assert result['status'] == 'OK', result
     assert checks and result['group_kill_succeeded']
     child = json.loads(result['stdout'])['descendant_pid']
-    status = Path('/proc', str(child), 'status')
-    end = time.monotonic() + 2
-    while status.exists() and 'State:\tZ' not in status.read_text() and time.monotonic() < end:
-        time.sleep(0.01)
-    assert not status.exists() or 'State:\tZ' in status.read_text()
+    assert_process_dead(child, timeout=2)
 
 
 def test_parent_death_setup_error_is_not_silently_ignored(monkeypatch):

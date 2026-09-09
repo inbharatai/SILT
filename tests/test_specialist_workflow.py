@@ -1060,40 +1060,42 @@ def wait_fixture(path, process):
 
 
 def assert_process_dead(pid):
-    import time
-    deadline = time.monotonic() + 2
-    while time.monotonic() < deadline:
-        status = Path(f"/proc/{pid}/stat")
-        try:
-            if status.read_text().split(") ", 1)[1].split()[0] == "Z":
-                return  # Reparented zombies await init, but execute no code.
-        except (FileNotFoundError, ProcessLookupError):
-            # /proc may disappear before open (ENOENT) or during read (ESRCH).
-            # Both mean the process is gone; other read errors must still fail.
-            return
-        time.sleep(0.01)
-    pytest.fail(f"process {pid} remains live")
+    # Keep this import local: subprocess fixtures load this test module by path
+    # without putting the tests directory on their import path.
+    from process_assertions import assert_process_dead as assert_dead
+    assert_dead(pid, timeout=2)
 
 
 @pytest.mark.parametrize("error", [FileNotFoundError(2, "gone before open"),
                                   ProcessLookupError(3, "gone during read")])
 def test_process_dead_helper_accepts_proc_disappearance(monkeypatch, error):
     # Test-only /proc read double: no process is launched or signalled here.
-    import sys
+    import process_assertions
     class GoneStatus:
         def read_text(self):
             raise error
-    monkeypatch.setattr(sys.modules[__name__], "Path", lambda path: GoneStatus())
+    monkeypatch.setattr(process_assertions, "Path", lambda path: GoneStatus())
+    assert_process_dead(123456789)
+
+
+@pytest.mark.parametrize("state", ["Z", "X"])
+def test_process_dead_helper_accepts_terminal_snapshot(monkeypatch, state):
+    import process_assertions
+    class TerminalStatus:
+        def read_text(self):
+            return f"State:\t{state} (terminal)\n"
+    monkeypatch.setattr(process_assertions, "Path", lambda path: TerminalStatus())
+    monkeypatch.setattr(process_assertions, "sleep", lambda seconds: pytest.fail("terminal state must not wait"))
     assert_process_dead(123456789)
 
 
 @pytest.mark.parametrize("error", [PermissionError(13, "denied"), OSError(5, "I/O error")])
 def test_process_dead_helper_preserves_unexpected_read_errors(monkeypatch, error):
-    import sys
+    import process_assertions
     class UnreadableStatus:
         def read_text(self):
             raise error
-    monkeypatch.setattr(sys.modules[__name__], "Path", lambda path: UnreadableStatus())
+    monkeypatch.setattr(process_assertions, "Path", lambda path: UnreadableStatus())
     with pytest.raises(type(error)) as caught:
         assert_process_dead(123456789)
     assert caught.value is error

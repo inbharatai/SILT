@@ -240,15 +240,11 @@ def test_public_subprocess_timeout_is_finite_unit_only(tmp_path, monkeypatch, ca
         assert result["termination_cause"] == "overall_timeout"
         assert result["exit_code"] != 0
     else:
-        import time
+        from process_assertions import assert_process_dead
         assert result['exit_code'] == 0 and result['termination_cause'] is None
         rows = [json.loads(line) for line in Path(result['stdout']).read_text().splitlines()]
         child = next(row['descendant_pid'] for row in rows if 'descendant_pid' in row)
-        status = Path('/proc', str(child), 'status')
-        end = time.monotonic() + 2
-        while status.exists() and 'State:\tZ' not in status.read_text() and time.monotonic() < end:
-            time.sleep(0.01)
-        assert not status.exists() or 'State:\tZ' in status.read_text()
+        assert_process_dead(child, timeout=2)
     assert result["elapsed_seconds"] < 11
 
 
