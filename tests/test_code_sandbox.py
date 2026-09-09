@@ -1,5 +1,6 @@
 """Real OS containment tests; never read actual host secrets or run fork bombs."""
 import errno
+from contextlib import nullcontext
 
 import pytest
 
@@ -154,6 +155,9 @@ def test_windows_explicitly_blocked(monkeypatch):
 
 def test_failed_selftest_blocks_before_candidate(monkeypatch):
     calls = []
+    # Test-only runtime assembly: no files are copied and no Python is executed.
+    # Isolate selftest failure from the host runtime; native /opt stays BLOCKED.
+    monkeypatch.setattr(sandbox, '_runtime', lambda root: '/test-only/not-executed-python')
     def failed_launch(root, config, limits):
         calls.append(config['probe'])
         assert not (root / 'work/candidate.py').exists()
@@ -161,6 +165,34 @@ def test_failed_selftest_blocks_before_candidate(monkeypatch):
     monkeypatch.setattr(sandbox, '_launch', failed_launch)
     result = evaluate_code('raise AssertionError("never execute")', '')
     assert result.status == 'BLOCKED' and calls == [True]
+    assert not result.supported and not result.passed
+    assert result.reason == 'namespace/runtime selftest failed; candidate was not executed'
+    assert result.stderr == 'probe refused'
+
+
+def test_rejected_runtime_blocks_before_launch_and_candidate(tmp_path, monkeypatch):
+    calls = []
+    # Exercise the real /usr-only runtime guard with a nonexistent CI-style path.
+    # Test-only staging persists so absence is checked before automatic cleanup;
+    # no runtime is copied or executed, and /opt support is not being simulated.
+    monkeypatch.setattr(sandbox.sys, '_base_executable',
+                        '/opt/hostedtoolcache/Python/ci-unit-sentinel/bin/python')
+    monkeypatch.setattr(sandbox.tempfile, 'TemporaryDirectory',
+                        lambda prefix: nullcontext(str(tmp_path)))
+    def forbidden_copy(source, root):
+        pytest.fail('rejected runtime must not copy runtime files')
+    def forbidden_launch(root, config, limits):
+        calls.append(config['probe'])
+        pytest.fail('rejected runtime must not launch a selftest or candidate')
+    monkeypatch.setattr(sandbox, '_copy_file', forbidden_copy)
+    monkeypatch.setattr(sandbox, '_launch', forbidden_launch)
+    result = evaluate_code('raise AssertionError("never execute")', '')
+    assert result.status == 'BLOCKED' and not result.supported and not result.passed
+    assert result.reason == 'sandbox setup failed: only a trusted /usr system Python runtime is supported'
+    assert calls == [] and result.tests_run == 0
+    assert (tmp_path / 'root/work').is_dir()
+    assert not (tmp_path / 'root/work/candidate.py').exists()
+    assert not (tmp_path / 'root/work/tests.py').exists()
 
 
 def test_invalid_limits_and_input():
