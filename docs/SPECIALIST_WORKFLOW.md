@@ -49,6 +49,15 @@ python -m asea.specialist finalize --study /local/new-study \
   --suite /local/data/final-suite.json --output /local/new-final-result.json
 ```
 
+The reproducible operator wrapper in
+[`../scripts/run_specialist_quality_experiment.py`](../scripts/run_specialist_quality_experiment.py)
+collects hardware/runtime evidence and then invokes the same public commands.
+It does not load models or grade outputs itself. See
+[`SPECIALIST_QUALITY_EXPERIMENT.md`](SPECIALIST_QUALITY_EXPERIMENT.md) and
+[`../configs/specialist_qwen3b_quality_template.json`](../configs/specialist_qwen3b_quality_template.json)
+for the Qwen2.5-Coder-3B recipe template, pre-training acceptance criteria and
+current local admission boundary.
+
 `reconstruct` supports `family=auto|qwen2|switch_transformers`,
 `method=activation|magnitude|uniform`. `recover` supports
 `method=lora_kd|supervised_lora`; supervised-only requires `kd_weight=0`.

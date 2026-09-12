@@ -651,7 +651,7 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 **Default / enablement:** experimental; separate opt-in, not enabled or run by installing/merging the source.
 
-**Invoke / knobs:** specialist build --recipe FILE --workspace NEW; separately finalize --study --suite --output, with frozen implementation/models/data and consumed marker.
+**Invoke / knobs:** specialist build --recipe FILE --workspace NEW; separately finalize --study --suite --output, with frozen implementation/models/data and consumed marker. `scripts/run_specialist_quality_experiment.py` is an operator wrapper around these public commands; it records environment evidence and preserves blocked/rejected outcomes, not independent model logic.
 
 **Mechanism:** Source-validation -> reconstruction -> reconstructed-validation -> recovery -> recovered-validation, records/freeze; final consumption durably precedes final suite hash/load. Backend finalize evaluates three core arms; recorded six-arm release comparison has separate controls.
 
@@ -661,9 +661,9 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 **Pinned source:** [src/asea/specialist/workflow.py:583–619](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L583-L619) · [src/asea/specialist/workflow.py:623–733](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L623-L733) · [src/asea/specialist/workflow.py:742–805](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L742-L805)
 
-**Test definitions (not new executions):** [tests/test_specialist_workflow.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_specialist_workflow.py) · [tests/test_specialist_studio.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_specialist_studio.py)
+**Test definitions (not new executions):** [tests/test_specialist_workflow.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_specialist_workflow.py) · [tests/test_specialist_studio.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_specialist_studio.py) · `tests/test_specialist_quality_experiment_runner.py`
 
-**Guides / recorded evidence:** [docs/SPECIALIST_WORKFLOW.md](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/docs/SPECIALIST_WORKFLOW.md) · [docs/EXPERIMENTAL_RELEASE_2026_09.md:9–13](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/docs/EXPERIMENTAL_RELEASE_2026_09.md#L9-L13)
+**Guides / recorded evidence:** [docs/SPECIALIST_WORKFLOW.md](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/docs/SPECIALIST_WORKFLOW.md) · [docs/EXPERIMENTAL_RELEASE_2026_09.md:9–13](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/docs/EXPERIMENTAL_RELEASE_2026_09.md#L9-L13) · [docs/SPECIALIST_QUALITY_EXPERIMENT.md](SPECIALIST_QUALITY_EXPERIMENT.md)
 
 <a id="c20"></a>
 ### C20 — Native Llama-family evaluation-only baseline support
