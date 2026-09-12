@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source_path": "/local/models/Qwen2.5-Coder-3B-Instruct",
+  "training": "/local/fresh-specialist-data/train.json",
+  "calibration": "/local/fresh-specialist-data/calibration.json",
+  "validation_data": "/local/fresh-specialist-data/validation.json",
+  "validation_suite": "/local/fresh-specialist-data/validation-suite.json",
+  "data_manifest": "/local/fresh-specialist-data/manifest.json",
+  "selection_lock": "/local/fresh-specialist-data/selection-lock.json",
+  "source_metadata": {
+    "canonical_id": "Qwen/Qwen2.5-Coder-3B-Instruct",
+    "revision": "REPLACE_WITH_PINNED_LOCAL_REVISION",
+    "acquisition_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct",
+    "license": "REPLACE_WITH_VERIFIED_MODEL_LICENSE"
+  },
+  "dtype": "bfloat16",
+  "seed": 17,
+  "encoding": "native_recovery_v1",
+  "max_length": 256,
+  "max_new_tokens": 256,
+  "output_budget_bytes": 4294967296,
+  "timeout_seconds": 3600,
+  "memory_budget_bytes": null,
+  "source_quality_floor": 1.0,
+  "reconstruction": {
+    "family": "auto",
+    "method": "activation",
+    "retention": 0.75,
+    "max_samples": 32
+  },
+  "recovery": {
+    "steps": 64,
+    "rank": 8,
+    "learning_rate": 0.0001,
+    "kd_weight": 0.7,
+    "method": "lora_kd",
+    "max_samples": 256,
+    "teacher_mode": "cached",
+    "export_mode": "factor_preserving"
+  }
+}

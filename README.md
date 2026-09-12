@@ -36,6 +36,15 @@ The default mechanism is L3 **when you invoke** `asea run`; installing or mergin
 
 [Full source-cited capability catalog](docs/CAPABILITIES.md) · [local setup](LOCAL_SETUP.md) · [experimental workbench](docs/EXPERIMENTAL_STUDIO.md) · [specialist build](docs/SPECIALIST_STUDIO.md). The public [Studio page](https://silt.inbharat.ai/studio/) is setup/launcher documentation, not hosted model compute. Locally provisioned inference can stay local; remote connectors and cloud-tagged Ollama models can send prompts/payloads off-host. Neither a loopback HTTP endpoint nor “local-first” guarantees zero upload or zero cost.
 
+For a reproducible larger-model quality study, use the public-CLI automation in
+[`scripts/run_specialist_quality_experiment.py`](scripts/run_specialist_quality_experiment.py)
+with a fresh recipe such as
+[`configs/specialist_qwen3b_quality_template.json`](configs/specialist_qwen3b_quality_template.json).
+The runbook and the current Qwen2.5-Coder-3B admission boundary are documented in
+[`docs/SPECIALIST_QUALITY_EXPERIMENT.md`](docs/SPECIALIST_QUALITY_EXPERIMENT.md).
+The automation invokes `python -m asea.specialist build` and `finalize`; it does
+not implement its own model loading, training, grading or gate logic.
+
 ### 🎯 The SILT thesis — Transfer → Prove → Adapt
 
 SILT began from a practical problem: the model you want to use may be powerful,
@@ -169,6 +178,20 @@ PYTHONPATH=src python -m asea.cli report --workspace .work
 
 Optional extras, the full CLI, the mock flows and Windows / PowerShell notes
 are in [Quick start](#quick-start) below.
+
+For source-weight specialist studies, start with the reproducible experiment
+runner instead of ad hoc shell notes:
+
+```bash
+PYTHONPATH=src python scripts/run_specialist_quality_experiment.py \
+  --preflight-only \
+  --candidate Qwen/Qwen2.5-Coder-3B-Instruct \
+  --report .work-specialist/preflight.json
+```
+
+Use `--recipe`, `--workspace`, and finally `--run-final` only with fresh governed
+data and local model stores. `--run-final` deliberately consumes the final suite
+through SILT's one-shot `finalize` command.
 
 📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
 [`docs/teaser.html`](docs/teaser.html).
