@@ -22,10 +22,18 @@ def _memory_mib(value):
         raise argparse.ArgumentTypeError("memory budget must be positive MiB with an integral byte value")
 
 
+def _device(value):
+    from .workflow import validate_execution_device
+    try:
+        return validate_execution_device(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+
+
 def _operational_error(error_type):
     return error_type in {"ImportError", "ModuleNotFoundError", "RuntimeError", "MemoryError",
                           "OutOfMemoryError", "OSError", "FileNotFoundError", "PermissionError",
-                          "ReconstructionBlocked", "TimeoutExpired", "TimeoutError"}
+                          "ReconstructionBlocked", "StageBlocked", "TimeoutExpired", "TimeoutError"}
 
 
 def parser():
@@ -69,6 +77,11 @@ def parser():
     for command in (reconstruct, recover, infer, evaluate):
         command.add_argument("--memory-budget-mib", dest="memory_budget_bytes", type=_memory_mib, default=None,
                              help="optional operator ceiling; never overrides observed CPU RAM headroom")
+    for command in (recover, infer, evaluate):
+        command.add_argument("--device-memory-budget-mib", dest="device_memory_budget_bytes", type=_memory_mib,
+                             default=None, help="optional device memory ceiling, separate from host RAM")
+        command.add_argument("--device", dest="execution_device", type=_device, default="cpu",
+                             help="cpu (default), auto, or cuda:N; resolved once, no fallback")
     validate = commands.add_parser("validate", help="externally compare previously generated code; no model load")
     validate.add_argument("--generations", required=True, help="JSON array of {id, status, text, generation} native records")
     validate.add_argument("--suite", required=True)
@@ -78,10 +91,18 @@ def parser():
     build = commands.add_parser("build", help="one immutable staged study; never reads final answers")
     build.add_argument("--recipe", required=True)
     build.add_argument("--workspace", required=True)
+    build.add_argument("--expected-recipe-sha256", default=None,
+                       help="optional controller-bound recipe bytes; checked before model effects")
+    build.add_argument('--expected-data-binding-file', default=None)
+    build.add_argument('--expected-data-binding-sha256', default=None,
+                       help='approved permitted data/metadata snapshot SHA map; requires binding file')
     finalize = commands.add_parser("finalize", help="one-shot final evaluation of already frozen controls")
     finalize.add_argument("--study", required=True)
     finalize.add_argument("--suite", required=True)
     finalize.add_argument("--output", required=True)
+    finalize.add_argument("--expected-recipe-sha256", default=None)
+    finalize.add_argument("--expected-config-sha256", default=None)
+    finalize.add_argument('--expected-data-binding-sha256', default=None)
     return root
 
 
@@ -96,19 +117,19 @@ def main(argv=None):
             raise ValueError("receipt_mode must be full or compact")
         # Libraries sometimes print diagnostics: stdout stays exactly one compact
         # JSON object; no candidate-controlled stdout is promoted to a receipt.
-        with contextlib.redirect_stdout(sys.stderr):
+        with contextlib.ExitStack() as reservations, contextlib.redirect_stdout(sys.stderr):
             from .workflow import write_json
             if command in ("reconstruct", "recover"):
                 report_path = args.pop("report")
                 if receipt_mode == "compact" and not report_path:
                     raise ValueError("compact receipt requires --report")
-                if report_path:
-                    from asea.artifacts import safe_path
-                    report_target, output_target = safe_path(report_path), safe_path(args["output_dir"])
-                    if report_target == output_target or output_target in report_target.parents:
-                        raise ValueError("receipt/history must stay outside the strict output directory")
-                    if safe_path(report_path).exists():
-                        raise ValueError("report already exists")
+                from .workflow import admit_receipt_targets, ReceiptReservation
+                targets = admit_receipt_targets(args, report_path)
+                owned = {}
+                for name in ("report", "history"):
+                    if name in targets:
+                        owned[name] = ReceiptReservation(targets[name])
+                        reservations.callback(owned[name].close)
                 if command == "reconstruct":
                     from .reconstruction import reconstruct
                     result = reconstruct(**args)
@@ -124,16 +145,24 @@ def main(argv=None):
                 if not completed and isinstance(error, dict) and _operational_error(error.get("type")):
                     receipt.update(status="BLOCKED", operational_failure=True)
                 if report_path:
-                    # Write the complete immutable evidence BEFORE projecting stdout.
-                    write_json(report_path, receipt)
+                    from .workflow import compact_receipt, receipt_pointer
+                    # Preserve full evidence as INCOMPLETE until history + all
+                    # candidate compact pointers have been validated/published.
+                    receipt["final_acknowledgement"] = "requires_successful_stdout; snapshot alone does not acknowledge fsync or guarantee power-failure survival"
+                    owned["report"].write(dict(receipt, completed=False, engineering_complete=False,
+                                               publication_state="PREPARING_EVIDENCE"))
                     if receipt_mode == "compact":
-                        from .workflow import compact_receipt, receipt_pointer
                         durable_pointer = receipt_pointer("full_receipt", report_path)
                     history = result.get("training_history", result.get("recovery_history"))
                     if history is not None:
                         history_path = str(report_path) + ".history.json"
-                        write_json(history_path, {"schema_version": 1, "history": history,
+                        owned["history"].write({"schema_version": 1, "history": history,
                             "actual_steps": result.get("actual_steps"), "status": result.get("status")})
+                    if receipt_mode == "compact":
+                        compact_receipt(receipt, command, report_path, args["output_dir"])
+                    owned["report"].write(receipt)
+                    if receipt_mode == "compact":
+                        durable_pointer = receipt_pointer("full_receipt", report_path)
                     if receipt_mode == "compact":
                         receipt = compact_receipt(receipt, command, report_path, args["output_dir"])
                     else:

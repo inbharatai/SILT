@@ -239,11 +239,20 @@ def cmd_unlearn(args) -> int:
     )
     binding = pipeline.adapters.get(adapter_id)
     receiver = pipeline.modules.get(binding.receiver_id)
-    if args.suite not in suites:
+    # build_pipeline returns a list; the public --suite argument is a suite_id,
+    # not a config filename stem. Distinct files may contain duplicate IDs.
+    suites_by_id = {}
+    for suite in suites:
+        if suite.suite_id in suites_by_id:
+            _emit({"error": "duplicate suite_id '{}'; configure suites with unique IDs".format(
+                suite.suite_id)})
+            return 1
+        suites_by_id[suite.suite_id] = suite
+    if args.suite not in suites_by_id:
         _emit({"error": "unknown suite '{}'".format(args.suite),
-               "available": sorted(suites)})
+               "available": sorted(suites_by_id)})
         return 1
-    suite = suites[args.suite]
+    suite = suites_by_id[args.suite]
     verifier = UnlearningVerifier(
         harness=pipeline.harness,
         rollback=pipeline.rollback,

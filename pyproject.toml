@@ -77,6 +77,17 @@ silt-validate = "asea.validation.__main__:main"
 silt-execution = "asea.execution.__main__:main"
 silt-specialist = "asea.specialist.__main__:main"
 
+[tool.setuptools.package-dir]
+"" = "src"
+# Build-only helper at the source root; not an importable runtime package.
+build_support = "build_support"
+
+[tool.setuptools.cmdclass]
+build_py = "build_support.BuildPy"
+
+[tool.setuptools.package-data]
+"asea.studio" = ["static/*.html", "static/*.svg"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

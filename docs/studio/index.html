@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SILT Studio — Run locally</title>
-<meta name="description" content="Launch SILT Studio locally on your own machine. Models, skills, benchmark data and audit state remain local.">
+<meta name="description" content="Launch SILT Studio locally on your own machine. Local app setup; selected remote or cloud-backed models may send data off-host.">
 <link rel="canonical" href="https://silt.inbharat.ai/studio/">
 <style>
 :root{--bg:#071019;--panel:#0c1723;--line:#203244;--ink:#eff7f7;--dim:#a4b5c3;--faint:#708597;--teal:#21d4bd;--green:#6ee7a8;--amber:#f6c85f;--red:#ff7a7a;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans)}a{color:var(--teal);text-decoration:none}.wrap{max-width:1000px;margin:auto;padding:0 6%}header{border-bottom:1px solid var(--line)}header .wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:800;letter-spacing:.16em;color:var(--ink)}.back{font:12px var(--mono)}main{padding:76px 0 90px}.eyebrow{font:600 12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}h1{font-size:clamp(38px,6vw,64px);line-height:1.05;letter-spacing:-.04em;margin:14px 0 0}.lead{max-width:800px;color:var(--dim);font-size:19px;margin-top:22px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-block;padding:13px 20px;border-radius:10px;border:1px solid var(--line);font-weight:750;cursor:pointer;background:transparent;color:var(--ink);font:inherit}.btn.primary{background:var(--teal);border-color:var(--teal);color:#04231f}.notice{margin-top:26px;padding:18px 20px;border:1px solid #315e58;background:#0a181c;border-radius:12px;color:var(--dim)}.notice strong{color:var(--green)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:38px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}.card .n{font:700 12px var(--mono);color:var(--teal)}.card h2{font-size:18px;margin:8px 0 0}.card p{font-size:14px;color:var(--dim)}section{margin-top:46px}h2{font-size:28px;letter-spacing:-.02em}.platforms{display:grid;grid-template-columns:1fr 1fr;gap:16px}.platform{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}.platform h3{margin:0 0 12px}.code{background:#040b11;border:1px solid var(--line);border-radius:12px;padding:18px;overflow:auto;color:#c9d8df;font:13px/1.8 var(--mono);white-space:pre-wrap}.small{font-size:13px;color:var(--faint)}.status{margin-top:18px;font:13px var(--mono);color:var(--amber)}.good{color:var(--green)}footer{border-top:1px solid var(--line);padding:30px 0;color:var(--faint);font-size:13px}@media(max-width:780px){.grid,.platforms{grid-template-columns:1fr}}
+/* Shrink installation grid children; wrap long commands instead of clipping. */
+.grid > *, .platforms > *, .platform, .card {min-width:0;max-width:100%}
+.platform .code, #experimental-setup .code {max-width:100%;overflow-wrap:anywhere}
+#experimental-setup, .notice {overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -16,7 +20,7 @@
 <div class="eyebrow">Local-first Studio</div>
 <h1>Run SILT Studio on your machine.</h1>
 <p class="lead">The public SILT site is the discovery and launch surface. The actual Studio runs on <strong>your own computer</strong> at <code>127.0.0.1:8377</code>, so your models, skill packets, benchmark data and audit state do not need to pass through Vercel.</p>
-<div class="actions"><a class="btn primary" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Open Local Studio</a><a class="btn" href="https://github.com/inbharatai/SILT" target="_blank" rel="noopener">View GitHub</a></div>
+<div class="actions"><a class="btn primary" href="http://127.0.0.1:8377/" target="_blank" rel="noopener noreferrer">Open Local Studio</a><a class="btn" href="https://github.com/inbharatai/SILT" target="_blank" rel="noopener noreferrer">View GitHub</a></div>
 <div class="status">If the local Studio is already running, the first button opens it immediately. Otherwise install/start it below.</div>
 <div class="notice"><strong>Privacy boundary:</strong> <code>127.0.0.1</code> always means the visitor's own machine. SILT Studio binds to loopback by design; the public website does not expose a user's local model runtime to the internet.</div>
 
@@ -41,6 +45,17 @@ silt-studio</div></div>
 <p class="small">Requires Python 3.9 or newer. Real-model connector dependencies and deep-apply dependencies remain optional and can be installed when those features are needed.</p>
 </section>
 
+<section id="experimental-setup">
+<h2>Choose a local workflow</h2>
+<p class="lead">Legacy Studio: Transfer an instruction packet, Train approved packets into a removable adapter, or Compress for a quantized-state loss report. The optional workbench adds composition, smaller specialists and evidence inspection; CLI/library-only paths remain in the <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md" target="_blank" rel="noopener noreferrer">capability catalog</a>.</p>
+<div class="notice"><strong>Experimental workbench — disabled by default.</strong> This public page does not inspect or enable your local server. Stop the existing Studio before restarting with the exact flag <code>SILT_ENABLE_EXPERIMENTAL=1</code>. Unset, <code>0</code> and <code>true</code> stay off; setting the flag after an off-start requires restart. The launcher reuses a running server, so changing only its environment is insufficient.</div>
+<h3>macOS / Linux · from the repository</h3>
+<div class="code">SILT_ENABLE_EXPERIMENTAL=1 PYTHONPATH=src python -m uvicorn asea.studio.server:app --host 127.0.0.1 --port 8377</div>
+<h3>Windows · PowerShell</h3>
+<div class="code">$env:SILT_ENABLE_EXPERIMENTAL="1"; $env:PYTHONPATH="src"; python -m uvicorn asea.studio.server:app --host 127.0.0.1 --port 8377</div>
+<p>Open Local Studio above, then use its enabled-workbench link. No credentials or session tokens are sent to this public page. <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_STUDIO.md" target="_blank" rel="noopener noreferrer">Read workbench prerequisites and recipes</a> · <a href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_STUDIO.md" target="_blank" rel="noopener noreferrer">Specialist guide</a>.</p>
+<div class="notice"><strong>App available ≠ model ready.</strong> The Studio extra starts the app only. Default HF teacher/learner and embedding similarity require connector dependencies (<code>[connectors]</code>) and assets; Train/Compress additionally need <code>[deep]</code>. Before executing, confirm model assets, endpoint location, device fit and budget. A loopback Ollama endpoint can use cloud-backed tags (for example <code>glm-5.2:cloud</code>); prompts may leave your machine and incur cost. This setup page performs no downloads or provider probes. Dependencies can require newer Python than the package minimum.</div>
+</section>
 <section>
 <h2>What the launcher does</h2>
 <div class="code">✓ checks http://127.0.0.1:8377/api/health
@@ -55,7 +70,7 @@ silt-studio</div></div>
 <h2>Already running?</h2>
 <p class="lead">Your Studio address is:</p>
 <div class="code">http://127.0.0.1:8377/</div>
-<div class="actions"><a class="btn primary" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Launch SILT Studio</a></div>
+<div class="actions"><a class="btn primary" href="http://127.0.0.1:8377/" target="_blank" rel="noopener noreferrer">Launch SILT Studio</a></div>
 </section>
 
 <section>

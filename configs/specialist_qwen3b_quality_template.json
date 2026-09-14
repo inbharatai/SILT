@@ -14,11 +14,12 @@
     "license": "REPLACE_WITH_VERIFIED_MODEL_LICENSE"
   },
   "dtype": "bfloat16",
+  "execution_device": "auto",
   "seed": 17,
   "encoding": "native_recovery_v1",
   "max_length": 256,
   "max_new_tokens": 256,
-  "output_budget_bytes": 4294967296,
+  "output_budget_bytes": 6442450944,
   "timeout_seconds": 3600,
   "memory_budget_bytes": null,
   "source_quality_floor": 1.0,

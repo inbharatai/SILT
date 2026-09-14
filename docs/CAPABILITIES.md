@@ -1,12 +1,20 @@
 # Capability catalog — implemented, optional and experimental
 
-This is the operational catalog for SILT source commit
-[`b583ba0d7de077d4e8594b08f0f77cc29655459e`](https://github.com/inbharatai/SILT/tree/b583ba0d7de077d4e8594b08f0f77cc29655459e).
-Runtime/source and test citations below are pinned to that commit, not to moving
-`main`. The catalog combines **18 legacy entries (L01–L18) and 25 activation
-entries (C01–C25)**; **C01 is the same core packet path as L01** and is indexed
-there rather than duplicated. C25 records unsupported/unproven outcomes, not a
-completed capability. No runtime, policy, metric or feature default is changed.
+This operational catalog describes the **2026-09-12 integrated release snapshot**.
+The original source/test citations pinned to
+[`b583ba0d7de077d4e8594b08f0f77cc29655459e`](https://github.com/inbharatai/SILT/tree/b583ba0d7de077d4e8594b08f0f77cc29655459e)
+remain historical evidence, not citations for later fixes. Integrated updates below
+use repository-relative source/test links; see the
+[integrated release summary](INTEGRATED_RELEASE_2026_09_12.md),
+[hardware contract](HARDWARE_ADAPTIVE.md) and
+[controller/device-local runbook](SPECIALIST_QUALITY_EXPERIMENT.md).
+The catalog retains **18 legacy entries (L01–L18) and 25 activation entries
+(C01–C25)**; **C01 is the same core packet path as L01** and is indexed there rather
+than duplicated. C25 records unsupported/unproven outcomes, not a completed
+capability. The integration adds runtime safeguards and product fixes without
+changing core transfer gates or defaults. Independent integrated local regression
+recorded **2,695 passed, 18 skipped and 92 warnings**. Historical component runs
+below remain separate; this local result is not GPU validation or a remote CI result.
 
 [README overview](../README.md#capability-status-and-activation) ·
 [Core packets](#core-packet-transfer) · [Optional adaptation](#optional-adaptation-and-diagnostics) ·
@@ -14,6 +22,8 @@ completed capability. No runtime, policy, metric or feature default is changed.
 [Compiler](#structural-compiler) · [Specialist](#source-derived-specialist) ·
 [Evaluation/resources](#evaluation-observability-and-governance) · [Evidence](#recorded-evidence-and-measurement-units) ·
 [Remaining gaps](#remaining-gaps)
+
+**Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. Fresh governed data and a frozen, verified effective-policy protocol are required for new quality claims; the consumed final set is not a retry set. The [generation-policy correction](GENERATION_POLICY_NOTICE.md) qualifies the historical specialist comparison and supersedes requested-only greedy receipt descriptions; it does not alter core transfer defaults. The full-suite counts above precede this readiness fix and are not a current all-tests-green or packaging verdict.
 
 ## Status and evidence legend
 
@@ -202,6 +212,10 @@ Legacy code similarity is not the later function-IO oracle.
 
 **Current real HF workflow:** full resident load/reference → quantized decoder-layer bank → streamed next-token prompt-loss report. `suites_from_benchmark` consumes all cases and Studio supplies full suites; it does **not** enforce heldout-only certification. Toy choose/serve/fingerprint/logging semantics must not be inferred for the real report. See [hardware boundary](#hardware-and-receipt-boundary).
 
+**Integrated numeric/state fixes:** real `certify_hf_states` and toy `SpringModel.certify` both validate finite real tolerances, reference/candidate losses and derived delta/ratio, reject malformed suite mappings and refuse invalid certificates. Toy recertification clears old/partial certificates on failure. This supersedes earlier static cautions about missing finite guards; it does not change valid finite comparisons, the denominator floor `max(abs(reference), 1e-12)`, .02/.05 defaults or the full-suite/heldout limitation. `HFStreamer` restores banked parameters and persistent buffers from the original full bank, preserving native dtype, pre-offload device and registered object ties on exit. Live LoRA, nonpersistent caches, failed entry, arbitrary forward side effects and storage failure are outside that guarantee.
+
+**Integrated source / regression definitions:** [HF numeric and restoration path](../src/asea/deepapply/backends/siltstream_vendor/hf_real.py) · [toy numeric path](../src/asea/deepapply/backends/siltstream_vendor/spring.py) · [numeric tests](../tests/test_spring_nonfinite_guards.py) · [state tests](../tests/test_streamer_state_restore.py). Scripted losses and tiny tensors test mechanics, not model quality or GPU execution.
+
 **Pinned source / tests / recorded reports:** [src/asea/spring/certifier.py:46-79](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/spring/certifier.py#L46-L79) · [src/asea/spring/certifier.py:119-305](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/spring/certifier.py#L119-L305) · [src/asea/deepapply/backends/siltstream_vendor/spring.py:177-267](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/deepapply/backends/siltstream_vendor/spring.py#L177-L267) · [src/asea/deepapply/backends/siltstream_vendor/hf_real.py:312-374](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/deepapply/backends/siltstream_vendor/hf_real.py#L312-L374) · [src/asea/studio/spring_jobs.py:198-315](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/studio/spring_jobs.py#L198-L315) · [src/asea/studio/server.py:260-271](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/studio/server.py#L260-L271) · [tests/test_siltspring_certification.py:85-93](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_siltspring_certification.py#L85-L93) · [tests/test_siltspring_certification.py:101-273](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_siltspring_certification.py#L101-L273) · [scripts/real_siltspring_1p5b.py:28-81](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/scripts/real_siltspring_1p5b.py#L28-L81)
 
 <a id="l12"></a>
@@ -325,6 +339,8 @@ Rollback is a whole approved-set restoration and can undo later unrelated skills
 **Mechanism:** Server conditionally imports/mounts router; router independently checks strict flag, local hostname and same origin. Lazy root/worker, fixed command allowlist, bounded queue/logs, named confirmation for deployment changes.
 
 **Limits:** Unset, 0 and true do not enable it. Public landing origin is rejected by experimental routes even though legacy CORS may allow it. Merge/restart without exact flag cannot enable it. Tokens/operator names are local workflow controls, not independent human authentication.
+
+**Integrated product fixes:** health reports distinguish code availability, startup-mounted routes and current enablement without model loading, hardware probing or creating an experimental manager. An off-start requires restart with the exact flag; “App available” is not model readiness. Tab-scoped navigation, mobile form layout and the bounded README table reader are repaired, with catalog selections still marked unverified and cloud-backed connectors disclosed. Public setup remains documentation, not hosted compute or a public-to-local token bridge. See [server](../src/asea/studio/server.py), [local UI](../src/asea/studio/static/index.html), [setup page](studio/index.html) and [actual-browser regression definitions](../tests/test_studio_product_fixes.py). No fixed README cell count is a feature guarantee.
 
 **Evidence kind:** Fresh-process GET-only setup checks observed unset/0/true → 404, exact 1 → workbench 200; API without token → 403 and with token → schema 200; public Host/Origin → 403. Legacy OpenAPI remained identical, ML libraries were not imported, and no active pointer was created. These are setup boundaries, not model functionality.
 
@@ -570,6 +586,8 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 ## Source-derived specialist
 
+The local specialist generation-policy fix is verified on tiny models and a retained recovered-Qwen nonfinal CPU prompt under seeds 0 and 1; this is mechanics evidence, not quality. It requires **Transformers 4.51.3** and, for factor wrappers, **non-prompt PEFT 0.15.2**. Production receipts distinguish requested/resolved policy and do not claim live-mode instrumentation. Subsequent local readiness verification rebuilt the wheel and sdist and confirmed payload equality with the previously tested installed wheel. This is packaging integrity evidence, not new model-quality or CUDA evidence; rebuild and reverify packaged resources after further source/document edits. See [policy enforcement, receipt semantics and evidence limits](GENERATION_POLICY_NOTICE.md). Older pinned source citations below identify history, not this local correction.
+
 <a id="c15"></a>
 ### C15 — Source-derived coherent Qwen2 MLP reconstruction
 
@@ -619,7 +637,7 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 **Limits:** Not core packet deep-apply, and does not make compiler --repair-training supported. Lower token loss or nonzero optimizer steps is not functional recovery or quality certification.
 
-**Evidence kind:** Qwen64 steps;42 training/8 dev tasks;1,413,120 factors; CE .91756688->.70981678; KL .13315734->.13044521 over411 dev response tokens. Final aggregate remained8/16.
+**Evidence kind:** Qwen64 steps;42 training/8 dev tasks;1,413,120 factors; CE .91756688->.70981678; KL .13315734->.13044521 over411 dev response tokens. Final aggregate remained8/16 as an unchanged historical observation, not a matched-greedy recovery result; [archived policy overrides](GENERATION_POLICY_NOTICE.md) affect that interpretation, not teacher-forced CE/KL.
 
 **Pinned source:** [src/asea/specialist/recovery.py:53–65](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/recovery.py#L53-L65) · [src/asea/specialist/recovery.py:503–538](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/recovery.py#L503-L538) · [src/asea/specialist/recovery.py:643–652](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/recovery.py#L643-L652) · [src/asea/specialist/__main__.py:41–59](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/__main__.py#L41-L59)
 
@@ -657,6 +675,10 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 **Limits:** BUILT_UNCERTIFIED/engineering_complete/candidate_frozen are not certificate or quality success. Certificate remains false. Consumed final must never be retried, retuned or reused as new evidence.
 
+**Integrated controller contract:** executed recipe/config and the mandatory reviewed five-file data sidecar are hash/identity-bound and rechecked; an editable manifest or hash-less READY plan is not approval. Header-only planning differs from authorized TRAIN/DEV profiling, which keeps unseen FINAL quarantined. Linux worker containment, bounded capture, exact receipt/status classification and pre-effect output admission repair the earlier unmerged wrapper issues. A `<report>.terminal.json` result requires its separate `<report>.ack.json` fsync acknowledgement; neither alone guarantees power-loss survival. Missing, blocked or rejected evidence is not success. These are scoped controls for trusted-owner immutable inputs, not protection against every same-owner file race or escaped descendant.
+
+The wrapper's compact baseline remains `BASELINE_NOT_RUN`, even with `--compact-baseline`; it does not automate a four-arm quality experiment. Final requires explicit reviewed engineering-only acceptance waiving the missing baseline, current READY admission, an exclusion ledger and a separate exercised teacher-unavailable deployment receipt. This does not admit model quality or activate a deployment. See [current wrapper](../scripts/run_specialist_quality_experiment.py), [workflow](../src/asea/specialist/workflow.py), [worker](../src/asea/specialist/controller_worker.py), [controller regressions](../tests/test_controller_integrity_review.py), [data-binding regressions](../tests/test_data_binding_review.py) and the [runbook](SPECIALIST_QUALITY_EXPERIMENT.md).
+
 **Evidence kind:** Recorded V5 Studio five-stage completion BUILT_UNCERTIFIED, engineering_complete=true, candidate_frozen=true, certificate=false, quality_pass=false. Audit did not call build/finalize.
 
 **Pinned source:** [src/asea/specialist/workflow.py:583–619](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L583-L619) · [src/asea/specialist/workflow.py:623–733](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L623-L733) · [src/asea/specialist/workflow.py:742–805](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L742-L805)
@@ -676,7 +698,7 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 **Limits:** Not Llama reconstruction/recovery or arbitrary-family support. Baseline SmolLM2 is in the Llama native evaluation family; cannot claim every Llama-size model fits available hardware.
 
-**Evidence kind:** Tiny random Llama fixtures test loader mechanics; real off-the-shelf SmolLM2-360M-Instruct final arm scored8/16. These are separate evidence classes.
+**Evidence kind:** Tiny random Llama fixtures test loader mechanics; real off-the-shelf SmolLM2-360M-Instruct final arm scored8/16. These are separate evidence classes. SmolLM2 logs show no sampling-default override; that absence is not live-mode certification, and the six-arm comparison is not matched-policy evidence. See the [correction](GENERATION_POLICY_NOTICE.md).
 
 **Pinned source:** [src/asea/specialist/evaluation.py:72–145](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/evaluation.py#L72-L145) · [src/asea/specialist/workflow.py:646–648](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L646-L648) · [src/asea/specialist/__main__.py:37–37](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/__main__.py#L37)
 
@@ -720,7 +742,11 @@ Acquisition validates a pinned 40-hex revision, expected metadata hashes and a b
 
 **Limits:** RLIMIT_AS is per-process virtual address space, not RSS/aggregate-memory/cgroup enforcement. cgroup_v2 and Windows execution backends unavailable/fail closed. No GPU validation or arbitrary-B-on4GB guarantee; estimates cannot rule out OOM.
 
-**Evidence kind:** Recorded model target Linux x86_64 CPU/Python3.9, roughly4.18GiB and2 CPUs, no NVIDIA GPU. Largest exercised source619M; size ceilings are refusal guards, not full model/device support declarations.
+**Evidence kind:** Historical model target Linux x86_64 CPU/Python3.9, roughly4.18GiB and2 CPUs, no NVIDIA GPU. Largest exercised source619M in that record; size ceilings are refusal guards, not full model/device support declarations.
+
+**Integrated specialist hardware path:** [asea.hardware](../src/asea/hardware/__init__.py) exposes explicit `probe`/`plan` with native inventory, dtype, phase-lifetime, host/device/disk and authorized data-profile estimates. `READY` is pure feasibility planning, not approval, reservation, execution or quality. Config-only estimates cannot be READY. Current specialist `recover`/`infer`/`evaluate` accept `cpu`, `auto`, `cuda:N`; an explicit unavailable device blocks, without fallback or hidden dtype reduction. Reconstruction stays CPU-only. Strict native loading and cache/workspace lifetimes are bounded by actual admitted inputs; CUDA CPU staging is not out-of-core loading or unlimited memory. Linux CPU is supported and exercised; single-NVIDIA-CUDA code is **GPU_UNVERIFIED**, not an execution receipt. Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and offload execution remain unsupported for this path.
+
+See [hardware/CLI contract](HARDWARE_ADAPTIVE.md), [native-loading regression definitions](../tests/test_native_evaluation_loading.py), [memory-envelope definitions](../tests/test_specialist_envelopes.py), [device definitions](../tests/test_specialist_devices.py) and [device-local validation](SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook). These additions do not replace the distinct `execution` worker-control contract above.
 
 **Pinned source:** [src/asea/execution/controls.py:31–81](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/execution/controls.py#L31-L81) · [src/asea/execution/controls.py:106–154](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/execution/controls.py#L106-L154) · [src/asea/compose/__main__.py:33–39](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/compose/__main__.py#L33-L39) · [src/asea/specialist/workflow.py:618–619](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L618-L619)
 
@@ -811,6 +837,8 @@ results to a local V5 experiment; these are not fresh executions of the catalog.
 | Uniform channels, unrepaired | **0/16** |
 | Off-the-shelf SmolLM2-360M-Instruct | **8/16** |
 
+**Critical historical generation-policy correction — 2026-09-12.** Archived V5 logs record sampling-default overrides for the reconstructed and recovered Qwen students and the random-MLP and uniform-channel controls, despite receipts reporting requested greedy settings. Source-Qwen and SmolLM2 logs do not show that override; historical per-case actual modes were not instrumented. Original counts remain unchanged. This is not a certified matched-greedy retention or competitive comparison, and the four source-only passes cannot be attributed solely to compression or recovery training. No corrected score, final rerun or rescore is claimed. See the [full correction](GENERATION_POLICY_NOTICE.md) for saved-config versions, original hashes and bounded fix checks.
+
 All 96 generations completed and each task received a Boolean grade; **16/16
 graded does not mean 16/16 correct**. Preprocessing failures remain scored
 failures, not omitted tasks (14 recovered host-oracle calls is not a smaller
@@ -824,6 +852,8 @@ losses**, leaving 8/16 unchanged. Archived analysis associates the wins with
 function-name/API binding and executability repair, not acquisition of new
 algorithms; neither was a token-cap/EOS rescue. Among four source-only passes,
 three involved program-semantics errors and one termination-policy failure.
+These remain real static defects in the saved outputs, not causal proof of
+compression/training damage or benefit under matched greedy decoding.
 See [the read-only analysis summary](EXPERIMENTAL_RELEASE_2026_09.md#what-the-later-read-only-case-analysis-adds).
 No raw traces need be republished to establish these distinctions. Scores remain
 unchanged; the final set is consumed. Future work needs fresh governed data,
@@ -860,8 +890,8 @@ not validate voice synthesis or local-GPU inference.
   resident reference; decoder banks are built afterwards. Full model residency,
   embeddings/head, host RAM, disk/restore banks, activations and runtime overhead
   all matter. There is **no current 7B-on-8GB end-to-end guarantee**.
-- A recorded RTX5050 hardware inventory with CPU-only Torch/CUDA unavailable is
-  hardware metadata, not a GPU execution receipt. Prepared `NOT_EXECUTED` jobs,
+- An operator-reported Windows RTX5050 inventory with CPU-only Torch/CUDA
+  unavailable is not an independently retained GPU execution receipt. Prepared `NOT_EXECUTED` jobs,
   schema-only training logs, declared budgets and recognized architecture paths
   cannot be upgraded to model/device execution.
 - Restore stronger claims only with an exact model revision, backend/device/dtype,
@@ -870,6 +900,21 @@ not validate voice synthesis or local-GPU inference.
   substitute Soup's hardware numbers for SILT measurements; preserve [NOTICE](../NOTICE).
 
 ## Verification scope
+
+**Integrated local verification:** 2,695 passed, 18 skipped, 92 warnings, zero
+failures/errors in the pinned Python 3.9 CPU environment. Ten skips need actual
+GPU hardware; six are pretrained opt-ins and two are pending host-enforcement
+implementations. This is not a clean-install, Python 3.11/3.12, CUDA or remote CI
+claim. The CPU CI environment has separate pinned dependencies; read its own
+run result rather than substituting the local count.
+The hardware branch's historical local result was **2,447 passed / 14 skipped**
+(92 warnings; six skips require NVIDIA CUDA). The separate product branch recorded
+**2,325 passed / 12 skipped**. These are different source/runtime snapshots, not
+additive totals or evidence of a completed integrated run. The separate pretrained
+CPU engineering smoke used **two optimizer steps, one TRAIN row, one supervised
+DEV row, two calibration samples and a 32-token generation cap**, with strict
+reload and fresh inference. No final was consumed; this is not a 3B or model-quality
+result. See the [integrated evidence boundary](INTEGRATED_RELEASE_2026_09_12.md).
 
 - **Frozen V5 prepublication:** 2,039 passed / eight expected skips / 75 warnings,
   documented in the [release report](EXPERIMENTAL_RELEASE_2026_09.md#frozen-source-verification-what-was-actually-recorded).
@@ -889,7 +934,8 @@ not validate voice synthesis or local-GPU inference.
   were not available to the anonymous review and are not invented.
 - Earlier 420/421, 746 and other counts retain their own historical scopes.
   None certifies model quality, every optional dependency, every platform or
-  current documentation edits. This content-only update runs no model/full tests.
+  current documentation edits. This documentation pass runs no model/full tests;
+  the integrated release's verification status is stated separately above.
 
 ## Historical documentation and genuine limits
 

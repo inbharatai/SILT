@@ -80,7 +80,6 @@
   .readme-body hr{border:0;border-top:1px solid var(--line);margin:1em 0}
   .readme-body a{color:var(--teal);text-decoration:none}
   .readme-body a:hover{text-decoration:underline}
-  .readme-body .md-link-off{color:var(--teal);text-decoration:underline dotted;cursor:default}
   .readme-body img{display:none}            /* README's logo line; the header already shows it */
   .readme-body code{font:12px var(--mono)}
   /* tight hero strip shown above the dropdowns so the landing opens on the tool */
@@ -301,6 +300,22 @@
     .cmd pre{white-space:pre-wrap}
   }
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+  /* Task forms shrink within their grid tracks, without hiding document overflow. */
+  #tab-train > *, #tab-compress > *, #tab-train .cols > *, #tab-compress .cols > *,
+  #tab-train .card, #tab-compress .card {min-width:0;max-width:100%}
+  #tab-train select, #tab-compress select, #tab-train input, #tab-compress input {min-width:0;max-width:100%;width:100%}
+  #tab-train button, #tab-compress button {min-width:0;max-width:100%}
+  #tab-train canvas {max-width:100%;height:auto}
+  #tab-train .footnote, #tab-compress .footnote, .workflow-help {overflow-wrap:anywhere}
+  .workflow-help .headlink {max-width:100%;white-space:normal}
+  .workflow-help ul {padding-left:20px;font-size:12px;color:var(--dim)}
+  .md-table-scroll, .loss-table-scroll {max-width:100%;overflow-x:auto}
+  .readme-body h1, .readme-body h2, .readme-body h3 {scroll-margin-top:12px}
+  @media(max-width:780px){
+    #tab-train.grid, #tab-compress.grid {grid-template-columns:minmax(0,1fr)}
+    #tab-train .cols, #tab-compress .cols {grid-template-columns:minmax(0,1fr)}
+  }
 </style>
 </head>
 <body>
@@ -331,9 +346,9 @@
   <span class="lh-tag">What this is &mdash; in plain English</span>
   <p class="lh-lead">
     SILT moves a <b>skill</b> from one AI (the <b>teacher</b>) to another (the <b>learner</b>) &mdash; but only
-    after it proves itself on test cases the teacher never saw. The skill is a <b>packet of instructions</b>
-    (not weights), and <b>you approve it by name</b>. A skill that fails the gate is <b>rejected, with reasons</b>
-    &mdash; nothing is faked, nothing silently degrades.
+    after passing checks on supplied suites withheld from this extraction workflow; prior model exposure is unknown.
+    The skill is a <b>packet of instructions</b>, not weights. Detected failures are <b>rejected, with reasons</b>;
+    untested failures remain possible. A named approver is caller-supplied metadata, not authenticated identity.
   </p>
 
   <div class="lh-flow" aria-label="How to use this Studio, in three groups">
@@ -350,7 +365,7 @@
     <div class="lh-step">
       <span class="lh-num">3 &middot; Probe</span>
       <span class="lh-tabs">Playground &middot; Compress</span>
-      <span class="lh-do">Ask a model a question live (base vs. with-skills), or compress + certify a model with SiltSpring.</span>
+      <span class="lh-do">Ask a model a question live (base vs. with-skills), or report quantized-state prompt loss with SiltSpring.</span>
     </div>
   </div>
 
@@ -359,6 +374,35 @@
     <a class="headlink" href="#about">Full vocabulary &amp; technical steps &darr;</a>
     <a class="headlink" href="#onboarding">Step-by-step install guide &darr;</a>
   </div>
+</section>
+
+
+<section class="landing-hero workflow-help" id="workflow-help" aria-label="Choose a workflow">
+  <h2>Choose a workflow</h2>
+  <p class="readme-note">Navigation only — no model job starts. App available is not dependencies, model assets, device fit, or quality ready.</p>
+  <div class="lh-cta">
+    <a class="headlink" href="#tab-transfer" data-workflow="transfer">Transfer a skill → instruction packet</a>
+    <a class="headlink" href="#tab-train" data-workflow="train">Train approved packets → removable adapter</a>
+    <a class="headlink" href="#tab-compress" data-workflow="compress">Quantized-state loss → report</a>
+    <a class="headlink" href="#experimental-help">Compose / specialist / inspect evidence</a>
+  </div>
+  <div id="experimental-help" class="readme-note">
+    <b id="experimental-status" role="status">Experimental workbench — status unchecked</b>
+    <a id="experimental-link" class="headlink" hidden>Open experimental workbench</a>
+    <p>Compose models, build a smaller specialist, or inspect/validate evidence. Optional code requires local assets, matching dependencies, explicit operator consent and loopback access; a build or completed command is not quality admission or activation.</p>
+    <details id="experimental-instructions"><summary>Enable / prerequisites / startup instructions (no jobs)</summary>
+    <p>Disabled by default. Stop the existing server, then set <code>SILT_ENABLE_EXPERIMENTAL=1</code> before restarting. Unset, <code>0</code>, and <code>true</code> stay off; setting it after an off-start requires a restart to mount routes. No toggle here changes configuration.</p>
+    <div class="cmd"><pre><code>SILT_ENABLE_EXPERIMENTAL=1 PYTHONPATH=src python -m uvicorn asea.studio.server:app --host 127.0.0.1 --port 8377</code></pre><button class="copy" type="button" aria-label="Copy experimental startup command">copy</button></div>
+    <p>PowerShell: <code>$env:SILT_ENABLE_EXPERIMENTAL="1"; $env:PYTHONPATH="src"; python -m uvicorn asea.studio.server:app --host 127.0.0.1 --port 8377</code></p>
+    <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_STUDIO.md" target="_blank" rel="noopener noreferrer">Workbench prerequisites and recipes</a> ·
+    <a href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_STUDIO.md" target="_blank" rel="noopener noreferrer">Specialist guide</a> ·
+    <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md" target="_blank" rel="noopener noreferrer">CLI/library capability catalog</a>
+    </details>
+  </div>
+  <details id="model-readiness"><summary>Before executing: selected-model readiness (unchecked)</summary>
+    <p class="readme-note">Catalog declarations only — no automatic downloads, dependency/model probes or provider requests. Confirm dependencies, asset location, endpoint/cloud policy, device fit and budget yourself. Default Transfer similarity is embedding (library/config default lexical); embedding may fetch weights. Default HF models need <code>[connectors]</code> and assets; Train/Compress also need <code>[deep]</code>. Loopback Ollama can use cloud-backed models; prompts may leave the machine and incur cost.</p>
+    <ul id="selected-model-readiness"></ul>
+  </details>
 </section>
 
 <!-- ===================== ABOUT SILT — the first part ===================== -->
@@ -381,22 +425,20 @@
       e.g. <code>translate/text/translation/as-&gt;en</code> = Assamese→English) plus two sets of questions:
       <ul>
         <li><b>extraction</b> — questions the teacher is shown (to pull the skill out)</li>
-        <li><b>heldout</b> — unseen questions the learner is scored on (the real test)</li>
+        <li><b>heldout</b> — questions withheld from extraction; prior model exposure is unknown</li>
       </ul></dd>
     <dt>Skill / packet</dt>
     <dd>the thing transferred. A JSON packet of instructions, <b>no weights</b>. This is what you
-      "download" as the trained model.</dd>
+      download as an instruction/data artifact, <b>not a standalone trained model</b>; a receiving runtime is still required.</dd>
     <dt>Gate</dt>
     <dd>the pass/fail decision: <b>PROMOTED</b> (every check passed), <b>REJECTED</b> (named reasons —
-      the system caught something that wouldn't help), or <b>PENDING_HUMAN</b> (high-risk domain like
-      medical / legal / finance → needs your name).</dd>
+      a detected check failed), or <b>PENDING_HUMAN</b> (otherwise-passing high-risk packet lacking a named approver). The name is metadata, not identity authentication; low-risk promotion need not wait for a name.</dd>
     <dt>deep-apply</dt>
     <dd>optional: train a real <b>LoRA adapter</b> on the learner's weights from the approved packets,
       then re-gate (<b>Gate 2</b>). Needs the <code>[deep]</code> install + an in-process HuggingFace
       model. Lives in the <b>Train</b> tab.</dd>
     <dt>SiltSpring</dt>
-    <dd>the compression + certification surface: compress a model to <b>int8 / int4 / int2</b> and
-      certify each compressed state still passes the skill. Lives in the <b>Compress</b> tab.</dd>
+    <dd>the quantized-state loss-report surface: compare <b>int8 / int4 / int2</b> prompt loss against a reference. A loss threshold is not task-quality certification or whole-device fit. Lives in the <b>Compress</b> tab.</dd>
   </dl>
 
   <div class="callout quiet" style="margin-top:18px">
@@ -406,13 +448,13 @@
 
   <p class="lead">SILT = <b>Skill Interchange Layer with Trust-gating</b>. A protocol that moves
   an <b>inspectable skill packet</b> from a teacher AI to a learner AI — but the skill only
-  crosses after it proves itself on cases the teacher never saw. <b>SILT trains no weights by
+  crosses after passing supplied-suite checks on cases withheld from extraction; prior model exposure is unknown. <b>SILT trains no weights by
   default.</b> The promoted artefact is something you can open and read, not a blob of weights.</p>
 
   <div class="invariants" aria-label="What makes SILT different">
     <div class="invariant"><b>A trust layer, not a trainer.</b> Unsloth/PEFT make training fast; SILT decides whether a learned skill may be admitted.</div>
     <div class="invariant"><b>Parity is the streamed admission bar.</b> A streamed parity fail → blocked; standard/zeroforge gate on the all-or-nothing checks. Never a warning, never a fallback.</div>
-    <div class="invariant"><b>High-risk never auto-promotes.</b> medical / legal / finance need a named human — not a config knob.</div>
+    <div class="invariant"><b>High-risk requires a name.</b> Otherwise-passing packets without one park at PENDING_HUMAN. Caller-supplied metadata is not authenticated human presence.</div>
     <div class="invariant"><b>No “% transferred.”</b> Held-out benchmark evidence, not a gauge. No such measurement exists.</div>
   </div>
 
@@ -425,12 +467,12 @@
 
     <li class="step" tabindex="-1">
       <div class="step-head"><span class="step-num">2</span><h3>Extract, don’t copy</h3></div>
-      <p class="do">SILT probes the sender on a benchmark, then drops everything that would not help: <b>sender_incorrect</b>, <b>receiver_competent</b>, <b>no_delta</b> (relevance), and anything a rule-based safety tripwire catches. What survives is compressed into an <b>inspectable skill packet</b> — JSON with the capability, distilled examples, provenance, and a gate verdict. Raw teacher output is discarded.</p>
+      <p class="do">SILT probes the sender on a benchmark, then drops detected failures: <b>sender_incorrect</b>, <b>receiver_competent</b>, <b>no_delta</b> (relevance), and anything a rule-based safety tripwire catches. What survives is compressed into an <b>inspectable skill packet</b> — JSON with the capability, distilled examples, provenance, and a gate verdict. Raw teacher output is discarded.</p>
     </li>
 
     <li class="step" tabindex="-1">
       <div class="step-head"><span class="step-num">3</span><h3>Prove it on held-out data</h3></div>
-      <p class="do">Before anything is admitted, the receiver is scored <b>alone</b> vs. <b>receiver + packet</b> on a held-out split the sender never saw. No held-out improvement → no admission. This is why the product shows <b>no “% of knowledge transferred”</b> anywhere: that number does not exist, and showing it would be a lie. What you get instead is a before/after score and a per-case diff.</p>
+      <p class="do">Before anything is admitted, the receiver is scored <b>alone</b> vs. <b>receiver + packet</b> on a split withheld from this extraction workflow (prior model exposure unknown). No held-out improvement → no admission. This is why the product shows <b>no “% of knowledge transferred”</b> anywhere: that number does not exist, and showing it would be a lie. What you get instead is a before/after score and a per-case diff.</p>
     </li>
 
     <li class="step" tabindex="-1">
@@ -441,19 +483,19 @@
 
     <li class="step" tabindex="-1">
       <div class="step-head"><span class="step-num">5</span><h3>Honest refusal</h3></div>
-      <p class="do">Anything that would degrade, fabricate, or silently serve a worse result raises a <b>typed, named error</b> instead: <code>DeepApplyBlocked</code>, <code>ParityError</code>, <code>StateNotCertifiedError</code>, <code>StaleCertificateError</code>, <code>BudgetError</code>. A 7B model on a CPU-only host is blocked by name — never a fabricated training log. A non-CausalLM architecture is blocked by name — never a silent fallback. The Studio is structurally unable to serve a mock (<code>is_mock</code> is re-checked at build).</p>
+      <p class="do">Detected policy, provenance, parity and resource violations raise <b>typed, named errors</b>. Finite suites and statistical/rule checks cannot guarantee no degradation on untested tasks. Depending on the subsystem: <code>DeepApplyBlocked</code>, <code>ParityError</code>, <code>StateNotCertifiedError</code>, <code>StaleCertificateError</code>, <code>BudgetError</code>. A 7B model on a CPU-only host is blocked by name — never a fabricated training log. A non-CausalLM architecture is blocked by name — never a silent fallback. The Studio is structurally unable to serve a mock (<code>is_mock</code> is re-checked at build).</p>
     </li>
 
     <li class="step" tabindex="-1">
       <div class="step-head"><span class="step-num">6</span><h3>Provenance &amp; rollback</h3></div>
-      <p class="do">Every transition is a <b>hash-chained, append-only audit event</b> — tamper-evident, and the single source of truth when something looks wrong. Adapters are <b>removable by construction</b>; v1 never merges LoRA into base weights. <b>Rollback</b> restores the pre-admission state. <b>SiltSpring</b> extends this to compression: a quantized state is certified per (state, skill) against the same held-out suites the gate uses, and a <b>stale</b> certificate (the model changed since certification) refuses to serve.</p>
+      <p class="do">Transfer audit transitions are <b>hash-chained, append-only events</b>. Train/Compress runner telemetry and observations are separate evidence sources; not all telemetry is chained or signed. Adapters are <b>removable by construction</b>; v1 never merges LoRA into base weights. <b>Rollback</b> restores the pre-admission state. <b>SiltSpring</b> in Studio reports quantized-state loss over operator-supplied suite cases. Explicitly filter held-out cases if required. Toy/library choose/serve/fingerprint contracts are separate from this real loss-report path; Studio does not automatically serve or adapt a model to hardware.</p>
     </li>
 
   </ol>
 
   <div class="callout" style="border-left-color:var(--teal);font-size:14px;color:var(--ink)">
   <b style="color:var(--teal)">The one-liner:</b> Trainers make a model <i>able</i>. SILT decides whether the
-  result <i>deserves to exist</i> in the receiver — with held-out proof, a non-bypassable gate, and a
+  result meets the selected admission policy — with supplied-suite evidence, an all-checks gate, and a
   hash-chained audit trail. <b>SILT could run Unsloth as the trainer behind its Gate 2.</b>
   </div>
   <p class="note">Local-first &middot; patent pending (India). The guide below turns each of these steps into a live action in this Studio.</p>
@@ -474,9 +516,9 @@
 
   <div class="invariants" aria-label="Honesty invariants">
     <div class="invariant"><b>Gate 2 never trusts the trainer.</b> It measures the artifact's outcome.</div>
-    <div class="invariant"><b>High-risk never auto-promotes.</b> medical / legal / finance → PENDING_HUMAN.</div>
+    <div class="invariant"><b>High-risk needs named approval.</b> Otherwise-passing packets without a name → PENDING_HUMAN; other failures reject.</div>
     <div class="invariant"><b>No “% transferred.”</b> Benchmark evidence, not a gauge.</div>
-    <div class="invariant"><b>Every pixel traces to an audit event.</b> Hash-chained, append-only.</div>
+    <div class="invariant"><b>Evidence sources differ.</b> Transfer audit, runner telemetry, observations and illustrative help are not all chained or signed.</div>
   </div>
 
   <p class="legend"><span class="live">● live in this Studio</span> &nbsp; <span class="cli">● CLI / test</span> &nbsp; <span class="library">● library surface</span></p>
@@ -486,7 +528,7 @@
     <!-- STEP 1 -->
     <li class="step" id="step-1" tabindex="-1">
       <div class="step-head"><span class="step-num">1</span><h3>Install</h3><span class="tag cli">CLI</span></div>
-      <p class="do">Python 3.10+. <b>Packet mode</b> (default — no weights, instant inference-time skills) needs only the Studio extra. <b>Weights mode</b> (optional deep-apply, Step 6) adds torch / transformers / peft / accelerate / sentencepiece.</p>
+      <p class="do">Python 3.9+ at package level; selected dependencies may require newer Python. The <b>Studio extra starts the app only</b>. Default HF teacher/learner and embedding similarity need connector dependencies and model assets (<code>[connectors]</code>); they are not ready merely because the UI opens. <b>Deep-apply</b> additionally needs <code>[deep]</code>. Review downloads, endpoint location and device/budget before executing.</p>
       <div class="label">Packet mode (default)</div>
       <div class="cmd"><pre><code>python -m pip install -e ".[studio]"</code></pre><button class="copy" aria-label="Copy command">copy</button></div>
       <div class="label">Weights / deep-apply mode (optional)</div>
@@ -537,7 +579,7 @@
     <!-- STEP 4 -->
     <li class="step" id="step-4" tabindex="-1">
       <div class="step-head"><span class="step-num">4</span><h3>Run a transfer</h3><span class="tag live">LIVE · Transfer tab</span></div>
-      <p class="do">On the <b>Transfer</b> tab, pick Teacher, Learner, one or more Benchmark suites, a Similarity metric, an optional Relevance floor, and a Named approver (required to ever promote high-risk domains). Click <b>Run transfer</b>. The audit stream (SSE) replays every station as it happens — no element is invented state.</p>
+      <p class="do">On the <b>Transfer</b> tab, pick Teacher, Learner, one or more Benchmark suites, a Similarity metric, an optional Relevance floor, and a Named approver (required to ever promote high-risk domains). Click <b>Run transfer</b>. The transfer audit stream (SSE) replays audited stations. Approver names are caller-supplied metadata, not authentication.</p>
       <div class="cmd"><pre><code>embedding  → semantic (loads a sentence-transformer; needs network/weights)
 lexical    → proxy only, scores are directional; stays fully offline</code></pre><button class="copy" aria-label="Copy">copy</button></div>
       <div class="expect">GATE: PROMOTED          — every gate check passed (all-or-nothing)
@@ -563,11 +605,11 @@ GATE: PENDING_HUMAN     — high-risk domain; parked for a named approver</div>
     <!-- STEP 5 -->
     <li class="step" id="step-5" tabindex="-1">
       <div class="step-head"><span class="step-num">5</span><h3>Approve / rollback</h3><span class="tag live">LIVE · Packets tab</span></div>
-      <p class="do">On the <b>Packets &amp; Approval</b> tab, load a run's buckets. A <b>named approval</b> re-runs the FULL all-or-nothing gate — a human satisfies exactly one check and can waive none of the others. <b>Rollback</b> restores the pre-promotion snapshot. <b>Download approved bundle</b> emits the “trained model” = the approved skill packet(s), no weights.</p>
+      <p class="do">On the <b>Packets &amp; Approval</b> tab, load a run's buckets. A <b>named approval</b> re-runs the FULL all-or-nothing gate — the supplied name satisfies the approval check and waives none of the others; identity is not authenticated. <b>Rollback</b> restores the pre-promotion snapshot. <b>Download approved bundle</b> emits approved instruction/data packet(s), no weights — not a standalone model.</p>
       <p class="expect one">✓ <code>gate says: promoted</code> (approval + every other check passed) · <code>rollback: removed 1, restored 1</code></p>
       <p class="note">Endpoints: <code>POST /api/transfers/{id}/approve</code> (body: <code>packet_id</code>, <code>approver</code>) · <code>POST /api/transfers/{id}/rollback</code> (body: <code>token</code>) · <code>GET /api/transfers/{id}/export</code> (zip bundle).</p>
       <details><summary>High-risk domains can never auto-promote</summary><div class="details-body">
-        <div class="callout">medical / legal / finance park at <code>PENDING_HUMAN</code> regardless of scores. This is a module constant, not a config knob: a test constructs a maximally permissive policy and asserts a medical packet still stops at PENDING_HUMAN.</div>
+        <div class="callout">medical / legal / finance packets that otherwise pass and lack a named approver park at <code>PENDING_HUMAN</code>; failed checks reject. A supplied name is metadata, not verified human presence. Low-risk packets can promote without a name.</div>
       </div></details>
     </li>
 
@@ -613,9 +655,9 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <!-- STEP 7 -->
     <li class="step" id="step-7" tabindex="-1">
       <div class="step-head"><span class="step-num">7</span><h3>SiltSpring compression certification</h3><span class="tag library">LIBRARY</span></div>
-      <p class="do">The <b>third SILT surface</b> (beside transfer and deep-apply). A model <b>rests compressed</b> (int2 / int4 — small enough for weak hardware) and <b>expands</b> to higher precision when memory allows. What makes it a trust component rather than a serving trick: per-(state, skill) capability certificates, honest refusal, and staleness-bound certificates.</p>
-      <p class="callout"><b>Studio surface — Compress tab.</b> SiltSpring is drivable from the Studio <b>Compress</b> tab: pick an in-process HF model, the held-out suites to certify against, the quantization levels (int8 / int4 / int2), a tolerance, and a device. The run measures the full-precision reference loss, then each quantized state's loss, and streams per-state <code>bytes_packed</code>, per-skill <code>degradation</code>, certified/revoked skill sets, and peak VRAM as SSE. The library surface in <code>src/asea/spring/</code> remains the Python API. Certification reuses SILT's held-out split machinery via <code>suites_from_benchmark</code> — the same held-out cases Gate 2 uses become the suites spring states are certified against.</p>
-      <details><summary>Library surface (Python) &amp; named refusals</summary><div class="details-body">
+      <p class="do">The <b>third SILT surface</b> reports quantized-state prompt loss. Packed layer bytes are not whole-device memory fit; there is no automatic hardware adaptation or Studio serving here. Toy/library per-(state, skill) choose/serve/fingerprint contracts below are separate from the real HF loss-report path.</p>
+      <p class="callout"><b>Studio surface — Compress tab.</b> SiltSpring is drivable from the Studio <b>Compress</b> tab: pick an in-process HF model, operator-provided loss suites, the quantization levels (int8 / int4 / int2), a tolerance, and a device. The run measures the full-precision reference loss, then each quantized state's loss, and streams per-state <code>bytes_packed</code>, per-skill <code>degradation</code>, certified/revoked skill sets, and peak VRAM as SSE. The library surface in <code>src/asea/spring/</code> remains the Python API. <code>suites_from_benchmark</code> iterates the supplied suite cases without enforcing held-out filtering. Filter cases explicitly if held-out measurement is required. These next-token prompt-loss checks are not a guarantee of retained task quality.</p>
+      <details><summary>Separate toy/library serving contract (Python) &amp; named refusals</summary><div class="details-body">
         <div class="cmd"><pre><code>from asea.spring import CompressionCertifier, suites_from_benchmark
 # suites = suites_from_benchmark(held_out_suites, tokenizer)
 # cert = CompressionCertifier(spring_model, audit=audit_log)
@@ -629,7 +671,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
           <div><b>choose_state(budget, required_skills)</b>honest refusal</div>
           <div><b>admit_skill(name)</b>invalidates prior certs</div>
         </div>
-        <div class="callout"><b>Three named refusals (never silent degraded output):</b>
+        <div class="callout"><b>Three named contract refusals (not a universal quality guarantee):</b>
         <ul>
           <li><code>StateNotCertifiedError</code> — a (state, skill) pair is revoked or never certified; <code>serve</code> refuses.</li>
           <li><code>StaleCertificateError</code> — a new skill was admitted since certification (the LoRA fingerprint changed); every prior certificate is stale until <code>certify()</code> re-runs. A certificate for yesterday's model must never authorize today's.</li>
@@ -641,8 +683,8 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <!-- STEP 8 -->
     <li class="step" id="step-8" tabindex="-1">
       <div class="step-head"><span class="step-num">8</span><h3>Test before download</h3><span class="tag live">LIVE · Test tab</span></div>
-      <p class="do">On the <b>Test</b> tab, run a <b>read-only accuracy A/B</b> on the suite's held-out split: receiver alone vs receiver conditioned on its approved skill packet(s). It uses the same harness the gate used, but <b>never</b> calls <code>Evaluator.evaluate</code> (which mutates the packet) and <b>never</b> the gate — the approved store is unchanged. Then <b>Download</b> the approved bundle.</p>
-      <p class="expect one">✓ <code>baseline 0.420 · candidate 0.580 · improvement +0.1600</code> → per-case rows → <code>bundle.zip</code> (approved/&lt;packet_id&gt;.json + manifest.json + &lt;name&gt;.jsonl + audit.jsonl + README.txt)</p>
+      <p class="do">On the <b>Test</b> tab, run a <b>accuracy A/B (executes models; read-only with respect to the approved store)</b> on the suite's held-out split: receiver alone vs receiver conditioned on its approved skill packet(s). It uses the same harness the gate used, but <b>never</b> calls <code>Evaluator.evaluate</code> (which mutates the packet) and <b>never</b> the gate — the approved store is unchanged. Then <b>Download</b> the approved bundle.</p>
+      <p class="expect one"><b>Illustrative example — not a measured run:</b> <code>baseline 0.420 · candidate 0.580 · improvement +0.1600</code> → per-case rows → <code>bundle.zip</code> (approved/&lt;packet_id&gt;.json + manifest.json + &lt;name&gt;.jsonl + audit.jsonl + README.txt)</p>
       <p class="note">Endpoint <code>POST /api/skills/test</code> (read-only) · download <code>GET /api/transfers/{id}/export</code>. The bundle refuses non-PROMOTED and mock-derived packets by default. Pass <code>?base_model=…</code> to also emit a <code>NOT_EXECUTED</code> L4/L5 training job spec for an external trainer — a recipe, not a trained adapter.</p>
     </li>
 
@@ -656,7 +698,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
         <thead><tr><th>Symptom</th><th>Why</th><th class="fix">Exact fix</th></tr></thead>
         <tbody>
           <tr><td>400 “backing model … is not installed”</td><td>Preflight <code>ollama tags</code> didn't find the tag</td><td class="fix">ollama pull &lt;tag&gt;</td></tr>
-          <tr><td>GATE: PENDING_HUMAN (medical / legal / finance)</td><td>High-risk domain; human-approval is not a knob</td><td class="fix">Approve by name in the Packets tab (re-runs full gate)</td></tr>
+          <tr><td>GATE: PENDING_HUMAN (medical / legal / finance)</td><td>Otherwise-passing high-risk packet lacking a named approver</td><td class="fix">Approve by name in the Packets tab (re-runs full gate)</td></tr>
           <tr><td>400 “duplicate suites” / “self-transfer”</td><td>Adversarial guard: no amplification, no model-collapse loop</td><td class="fix">Use distinct suites; pick a different receiver</td></tr>
           <tr><td><code>DeepApplyBlocked</code> naming CUDA</td><td>Big model on a CPU-only host; no silent fallback</td><td class="fix">Use a CUDA GPU, a smaller model (e.g. SmolLM2-135M), or packet mode</td></tr>
           <tr><td><code>DeepApplyBlocked</code> naming UnsupportedModelError</td><td>Non-CausalLM architecture; streaming targets CausalLM stacks</td><td class="fix">Use backend="standard", or a model with <code>model.layers</code>/<code>transformer.h</code></td></tr>
@@ -668,10 +710,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
           <tr><td>Transfer button stays disabled, no verdict</td><td>A POST error was surfaced in the checklist panel</td><td class="fix">Read the red “TRANSFER NOT STARTED” reason; it names the exact guard</td></tr>
         </tbody>
       </table>
-      <div class="callout"><b>If something else breaks:</b> the audit log is the single source of truth. Open
-      <code>GET /api/transfers/{id}/audit</code> — <code>integrity.ok: true</code> with a broken-at index means
-      tampering; otherwise the entries explain every transition. Every live element on this page is a replay of
-      that hash-chained stream, never invented state.</div>
+      <div class="callout"><b>If something else breaks:</b> inspect <code>GET /api/transfers/{id}/audit</code> for transfer audit events and integrity results. An integrity failure needs investigation; it does not alone establish intent. Train/Compress runner telemetry, observations and help examples are separate; not all telemetry is chained or signed.</div>
     </div>
   </details>
   </div>
@@ -696,7 +735,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
       <tr><td>Core question</td><td>How fast / cheap can I fine-tune?</td><td class="fix">May this learned skill be admitted to a receiver?</td></tr>
       <tr><td>Gating</td><td>None — the human decides what to ship</td><td class="fix">Double-gate: Gate 1 on packets, Gate 2 (all-or-nothing) on the trained adapter</td></tr>
       <tr><td>Admission bar</td><td>Training completion alone is not admission</td><td class="fix">Gate 2 applies its recorded checks; required-check failures block admission. Sampled forward-parity checks do not prove identical trained weights or universal capability preservation.</td></tr>
-      <tr><td>Failure mode</td><td>Best-effort; warnings; proceed anyway</td><td class="fix">Honest refusal: typed named errors; nothing silently degrades</td></tr>
+      <tr><td>Failure mode</td><td>Best-effort; warnings; proceed anyway</td><td class="fix">Detected violations raise typed named errors; finite checks cannot guarantee against untested degradation</td></tr>
       <tr><td>High-risk domains</td><td>Depends on the surrounding workflow</td><td class="fix">Declared medical / legal / finance domains need an approver name and all other checks. The supplied name is not proof of human identity.</td></tr>
       <tr><td>Mocks</td><td>N/A</td><td class="fix">Studio is structurally unable to serve a mock (<code>is_mock</code> re-checked at build)</td></tr>
       <tr><td>Provenance</td><td>None</td><td class="fix">Hash-chained, append-only audit; tamper-evident; every transition recorded</td></tr>
@@ -730,7 +769,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <span class="chev">▾</span>
   </summary>
   <div class="ob-body">
-    <p class="readme-note">Served verbatim from <code>README.md</code> on disk &mdash; the single source of truth. What you read here is exactly the repo README; it can never drift.</p>
+    <p class="readme-note">Rendered from the current <code>README.md</code> using a bounded Markdown subset, not a verbatim display. Decorative HTML/images are omitted; raw HTML never executes. Tables scroll horizontally when needed. <a href="https://github.com/inbharatai/SILT/blob/main/README.md" target="_blank" rel="noopener noreferrer">Open complete README on GitHub</a>. Repository links use canonical <code>main</code> (which may differ from this checkout).</p>
     <div id="readme-body" class="readme-body" aria-live="polite">Open to load the README…</div>
   </div>
 </details>
@@ -868,9 +907,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <input id="pk-base-model" placeholder="e.g. Qwen/Qwen2.5-7B-Instruct">
     <button class="mini" type="button" id="pk-train" style="margin-top:10px">→ Train a LoRA from these approved packets</button>
     <div class="footnote">Approval requires a typed name and re-runs the FULL
-    gate — a human satisfies exactly one check and can waive none of the
-    others. Rollback restores the pre-promotion snapshot. The download is the
-    "trained model": the approved skill packet(s), no weights.</div>
+    gate — the supplied name satisfies one check and waives none of the others; it is not authenticated identity. Rollback restores the pre-promotion snapshot. The download contains approved instruction/data packets, no weights — not a standalone model.</div>
   </div>
   <div>
     <div class="card"><h2>Pending human approval</h2><div id="pk-pending">—</div></div>
@@ -943,8 +980,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <div class="footnote">Every packet below passed the full promotion gate.
     <b>Load</b> selects its run as the source for a new transfer or test;
     <b>Test</b> runs an accuracy A/B before you download; <b>Download</b>
-    saves the approved skill bundle (the trained model = receiver + packet,
-    no weights).</div>
+    saves the approved instruction/data packet bundle, no weights. A receiving model/runtime is still required; the bundle is not a standalone model.</div>
   </div>
 </div>
 
@@ -1001,7 +1037,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     <div class="currun"><span class="cr-empty" id="tr-crempty">No current run — <a href="#" id="tr-pickrun">run or select a Transfer</a> first.</span><span class="hidden" id="tr-crset"><span class="cr-label">Using run</span> <span class="cr-id" id="tr-crid">—</span></span></div>
     <select id="tr-job" class="hidden" aria-hidden="true"></select>
     <div id="tr-receiver-note" class="footnote"></div>
-    <label>Backend</label>
+    <label>Backend (Studio selects streamed; API/library default is standard)</label>
     <select id="tr-backend">
       <option value="streamed">streamed — layer-streamed LoRA, low-VRAM (soup-spirit)</option>
       <option value="standard">standard — resident LoRA, needs the model to fit VRAM</option>
@@ -1032,8 +1068,7 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     without it the run fails with a typed error before any weights load. The
     telemetry is REAL — per-step loss read from the backend's own loop;
     <code>zeroforge</code> (vendored loop) emits phase-level only, so the loss
-    curve stays flat between phases by design. High-risk domains still park at
-    PENDING_HUMAN.</div>
+    curve stays flat between phases by design. Otherwise-passing high-risk packets without named approval park at PENDING_HUMAN; other failed checks reject. Names are caller-supplied metadata, not authentication.</div>
   </div>
   <div>
     <div class="card">
@@ -1067,10 +1102,11 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
 <!-- ============================ COMPRESS ============================ -->
 <div id="tab-compress" class="grid hidden">
   <div class="card">
-    <h2>SiltSpring compression certification</h2>
+    <h2>SiltSpring quantized-state loss report</h2>
     <label>Model (in-process HF only — Ollama is refused)</label><select id="cp-module"></select>
     <div id="cp-receiver-note" class="footnote"></div>
-    <label>Held-out suites to certify against (1–8)</label><select id="cp-suites" multiple size="5"></select>
+    <label>Operator-provided loss suites (1–8; filter held-out cases explicitly)</label><select id="cp-suites" multiple size="5"></select>
+    <p class="footnote">Loss thresholds are not task-quality guarantees, whole-device fit, or automatic serving. Studio tolerance starts at 0.05; library default is 0.02.</p>
     <label>Quantization states</label>
     <select id="cp-levels" multiple size="3">
       <option value="int8" selected>int8</option>
@@ -1083,9 +1119,8 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
         <select id="cp-device"><option value="auto">auto</option><option value="cpu">cpu</option><option value="cuda">cuda</option></select></div>
       <div><label style="font-size:12px">Max len</label><input id="cp-maxlen" type="number" step="8" min="8" max="512" value="96"></div>
     </div>
-    <button class="primary" id="cp-run">Certify states</button>
-    <div class="footnote">Measures the full-precision reference loss on the held-out
-    suites, then each quantized state's loss, and marks a state
+    <button class="primary" id="cp-run">Measure + certify loss states</button>
+    <div class="footnote">Measures next-token prompt loss on all operator-supplied suite cases (no automatic held-out filtering), then each quantized state's loss, and marks a state
     <b>certified</b> for a skill when degradation ≤ tolerance (directional — only a
     WORSE loss revokes). Requires the <code>[deep]</code> extra
     (<code>pip install -e ".[deep]"</code>); without it the run fails with a
@@ -1108,10 +1143,10 @@ backend="zeroforge"   # forward-only zeroth-order (MeZO-spirit): central-differe
     </div>
     <div class="card" style="margin-top:12px">
       <h2>Per-state results</h2>
-      <table id="cp-table"><thead><tr>
+      <p class="footnote">Dense results table: scroll horizontally for all columns.</p><div class="loss-table-scroll" tabindex="0" role="region" aria-label="Quantized loss results, horizontally scrollable"><table id="cp-table"><thead><tr>
         <th>state</th><th>bytes packed</th><th>degradation (worst skill)</th>
         <th>certified</th><th>revoked</th><th>unmeasured</th><th>overall</th>
-      </tr></thead><tbody></tbody></table>
+      </tr></thead><tbody></tbody></table></div>
     </div>
     <div class="card" style="margin-top:12px">
       <h2>Phase stream</h2><div class="log" id="cp-events">—</div>
@@ -1393,6 +1428,11 @@ document.querySelectorAll("[data-addmodel]").forEach(b=>b.onclick=()=>{
   const id=$("#am-id"); if(id){setTimeout(()=>{id.focus();id.scrollIntoView({block:"center"});},30);}
 });
 
+document.querySelectorAll('[data-workflow]').forEach(link=>link.addEventListener('click',event=>{
+  event.preventDefault();
+  document.querySelector('.tab[data-tab="'+link.dataset.workflow+'"]').click();
+  document.getElementById('tab-'+link.dataset.workflow).scrollIntoView({block:'start'});
+}));
 /* init */
 async function populateDropdowns(){
   // Re-fetch catalog + suites and repopulate EVERY model/suite/capability
@@ -1437,13 +1477,25 @@ async function populateDropdowns(){
   // stages load weights the process owns) and how to get one, instead of a
   // bare blank select. (On a normal install the built-in HF receivers populate
   // these, so the note stays empty.)
-  const hfNote = hfRecv.length ? "" :
+  const hfNote = hfRecv.length ? "Catalog entry only: dependencies, model assets and device fit are unchecked; no model was loaded. Review selected-model readiness above before running." :
     "No in-process HuggingFace receiver is registered. Deep-apply and SiltSpring " +
     "load weights the process owns, so Ollama (external weights) is refused up " +
     "front. Use a built-in HF module (e.g. qwen2.5-0.5b, smollm2-360m-hf) or " +
     "register a new HF receiver via the Python catalog API.";
   $("#tr-receiver-note").textContent = hfNote;
   $("#cp-receiver-note").textContent = hfNote;
+  const showReadiness=()=>{
+    const entries=[['Teacher','#sender'],['Learner','#receiver'],['Train receiver','#tr-receiver'],['Compress model','#cp-module']];
+    $('#selected-model-readiness').replaceChildren(...entries.map(([label,selector])=>{
+      const item=document.createElement('li'), model=cat.modules.find(m=>m.id===$(selector).value);
+      const hint=model ? (model.requires||'No prerequisite details declared.') : 'No model selected.';
+      const cloud=/cloud/i.test((model?.description||'')+' '+hint+' '+(model?.id||''));
+      item.textContent=label+': '+(model?.id||'none')+' — '+(cloud?'CLOUD-BACKED / remote execution possible. ':'Endpoint/asset location unchecked. ')+hint+' Dependencies/assets/device/budget not verified.';
+      return item;
+    }));
+  };
+  ['#sender','#receiver','#tr-receiver','#cp-module'].forEach(selector=>$(selector).addEventListener('change',showReadiness));
+  showReadiness();
   return {cat, suites};
 }
 async function init(){
@@ -1656,7 +1708,7 @@ $("#pk-load").onclick=async()=>{
 };
 window.approvePk=async(job,pk)=>{
   const name=$("#ap-"+pk).value;
-  if(!name||name.length<3){alert("named approval requires a real name");return;}
+  if(!name||name.length<3){alert("named approval requires an approver name (metadata, not authenticated identity)");return;}
   const r=await fetch(`/api/transfers/${job}/approve`,{method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({packet_id:pk,approver:name})}).then(r=>r.json());
@@ -2303,32 +2355,116 @@ async function refreshSpringHistory(){
 $("#tr-history").onclick=refreshDeepapplyHistory;
 $("#cp-history").onclick=refreshSpringHistory;
 
-/* ---- README dropdown: render the live README.md (single source of truth) ----
-   renderMarkdown covers exactly the README's subset (fences, headings, tables,
-   blockquotes [recursive], lists w/ nesting, hr, paragraphs, inline code/bold/
-   links). All text is HTML-escaped first; external links open in a new tab,
-   repo-relative links (docs/…, #…) render as non-navigating styled spans so
-   nothing 404s on the Studio host. */
-function renderMarkdown(md){
-  const e=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-  const isSep=ln=>{
-    if(!/\|/.test(ln)) return false;
-    const cells=ln.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|");
-    return cells.length>=1 && cells.every(c=>/^:?-+:?$/.test(c.trim())) && cells.some(c=>/-/.test(c));
-  };
+/* Bounded Markdown reader, not a CommonMark engine. Supports headings, fences,
+   lists, blockquotes, tables and inline code/emphasis/links. No raw HTML runs.
+   Relative paths always resolve to the canonical repository main branch, never
+   this host's filesystem/API. Images/decorative README HTML are not fetched. */
+const README_REPO_BASE='https://github.com/inbharatai/SILT/blob/main/';
+function readmeHref(raw){
+  let decoded=String(raw);
+  // Refuse whitespace/control obfuscation, entities, backslashes, absolute paths
+  // and protocol-relative URLs before URL parsing can silently normalize them.
+  for(let n=0;n<5;n++){
+    if(/[\s\p{Cc}\p{Cf}\\]/u.test(decoded) || /&(?:#|[a-z]+;)/i.test(decoded)) return null;
+    let next;
+    try{next=decodeURIComponent(decoded);}catch(_){return null;}
+    if(next===decoded) break;
+    if(n===4) return null;
+    decoded=next;
+  }
+  if(!decoded || decoded.startsWith('/')) return null;
+  if(decoded.startsWith('#')) return '#readme-'+encodeURIComponent(decoded.slice(1));
+  const scheme=/^[a-z][a-z0-9+.-]*:/i;
+  if(scheme.test(decoded)){
+    if(!/^https:\/\//i.test(decoded) || !/^https:\/\//i.test(raw)) return null;
+    try{
+      const u=new URL(raw);
+      return u.protocol==='https:' && !u.username && !u.password ? u.href : null;
+    }catch(_){return null;}
+  }
+  // Colon-bearing relative paths can hide alternate schemes/Windows paths.
+  if(decoded.split(/[?#]/)[0].includes(':')) return null;
+  try{
+    const u=new URL(decoded,README_REPO_BASE);
+    return u.href.startsWith(README_REPO_BASE) ? u.href : null;
+  }catch(_){return null;}
+}
+function readmeCodeEnd(source,start,count){
+  // A delimiter is a whole maximal backtick run, never a substring of one.
+  // Unmatched openers remain ordinary text; they cannot hide cell separators.
+  for(let i=start+count;i<source.length;){
+    if(source[i]!=='`'){i++;continue;}
+    let end=i;while(source[end]==='`')end++;
+    if(end-i===count)return i;
+    i=end;
+  }
+  return -1;
+}
+function readmeCells(row){
+  // Preserve source for inline escaping. Paired backslashes escape each other:
+  // only an odd final backslash escapes a pipe (or a backtick opener).
+  const cells=[];let cell='',lastSeparator=-1;
+  row=row.trim();
+  for(let i=0;i<row.length;i++){
+    const ch=row[i];
+    if(ch==='\\' && /[\\`|]/.test(row[i+1]||'')){
+      cell+=row.slice(i,i+2);i++;continue;
+    }
+    if(ch==='`'){
+      let end=i;while(row[end]==='`')end++;
+      const close=readmeCodeEnd(row,i,end-i);
+      if(close!==-1)end=close+(end-i);
+      cell+=row.slice(i,end);i=end-1;continue;
+    }
+    if(ch==='|'){cells.push(cell.trim());cell='';lastSeparator=i;}else cell+=ch;
+  }
+  cells.push(cell.trim());
+  // Remove only syntactic border pipes, not escaped/code pipes or empty cells.
+  if(row.startsWith('|'))cells.shift();
+  if(lastSeparator>=0 && lastSeparator===row.length-1)cells.pop();
+  return cells;
+}
+function renderMarkdown(md, headingState=null){
+  const root=headingState===null;
+  if(root)headingState={used:new Set(),anchors:new Map()};
+  const e=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const isSep=ln=>ln.includes('|') && readmeCells(ln).every(c=>/^:?-+:?$/.test(c));
   const isBlock=ln=>/^\s*```/.test(ln)||/^#{1,6}\s/.test(ln)||/^\s*>/.test(ln)||/^\s*([-*])\s+/.test(ln)||/^\s*\d+\.\s+/.test(ln)||/^\s*(-{3,}|\*{3}|_{3})\s*$/.test(ln);
-  md=String(md??"").replace(/\r\n/g,"\n").replace(/^\s*<img\b[^>]*>\s*\n/i,""); // strip logo line (header shows it)
-  const lines=md.split("\n"), out=[]; let i=0;
-  const inline=s=>{
-    let t=e(s);
-    t=t.replace(/`([^`]+)`/g,(m,c)=>`<code>${c}</code>`);
-    t=t.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-    t=t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,(m,txt,url)=>{
-      if(/^https?:\/\//i.test(url)||/^mailto:/i.test(url))
-        return `<a href="${e(url)}" target="_blank" rel="noopener noreferrer">${txt}</a>`;
-      return `<span class="md-link-off" title="${e(url)} — open in the repo README">${txt}</span>`;
-    });
-    return t;
+  // Recognize only decorative README markup, OUTSIDE fences. Unknown HTML is
+  // ordinary escaped text. Even recognized tags are translated, never executed.
+  let fenced=false;
+  md=String(md??'').replace(/\r\n/g,'\n').split('\n').map(line=>{
+    if(/^\s*```/.test(line)){fenced=!fenced;return line;}
+    if(fenced)return line;
+    if(/^\s*(?:<img\b[^>]*>|<a\s+href="[^"]*"><img\b[^>]*><\/a>)\s*$/i.test(line))return '';
+    const title=line.match(/^<h([1-6]) align="center">(.*?)<\/h\1>$/i);
+    if(title)return '#'.repeat(Number(title[1]))+' '+title[2];
+    return line.replace(/<p align="center">/g,'').replace(/^\s*<\/p>\s*$/,'')
+      .replace(/<\/(?:p)>$/,'').replace(/<\/?strong>/g,'**').replace(/<\/?em>/g,'*').replace(/<br\s*\/?>/g,' ');
+  }).join('\n');
+  const lines=md.split('\n'),out=[];let i=0;
+  const inline=(s,allowLinks=true)=>{
+    // Tokenize raw source; escaping happens ONLY at text sinks. Generated HTML
+    // is never reparsed for Markdown, so code and href attributes stay literal.
+    const tokens=/\\([\\`|])|(`+)|(!?)\[([^\]\n]+)\]\(([^)\n]*)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+    let html='',last=0,match;
+    while((match=tokens.exec(s))){
+      html+=e(s.slice(last,match.index));last=tokens.lastIndex;
+      if(match[1])html+=e(match[1]);
+      else if(match[2]){
+        const close=readmeCodeEnd(s,match.index,match[2].length);
+        if(close===-1)html+=e(match[2]);
+        else{
+          html+='<code>'+e(s.slice(last,close))+'</code>';
+          last=tokens.lastIndex=close+match[2].length;
+        }
+      }else if(match[4]!==undefined){
+        const label=inline(match[4],false),href=allowLinks&&!match[3]?readmeHref(match[5]):null;
+        html+=href?'<a href="'+e(href)+'"'+(href.startsWith('#')?'':' target="_blank" rel="noopener noreferrer"')+'>'+label+'</a>':label;
+      }else if(match[6]!==undefined)html+='<strong>'+inline(match[6],allowLinks)+'</strong>';
+      else html+='<em>'+inline(match[7],allowLinks)+'</em>';
+    }
+    return html+e(s.slice(last));
   };
   while(i<lines.length){
     const line=lines[i];
@@ -2339,21 +2475,31 @@ function renderMarkdown(md){
     }
     if(/^\s*$/.test(line)){ i++; continue; }         // blank
     const h=line.match(/^(#{1,6})\s+(.*)$/);         // heading
-    if(h){ const lvl=h[1].length; out.push(`<h${lvl}>${inline(h[2].trim())}</h${lvl}>`); i++; continue; }
+    if(h){
+      const lvl=h[1].length,text=h[2].trim();
+      const slug=text.toLowerCase().replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/[^\p{L}\p{N}_\-\s]/gu,'').replace(/\s/g,'-');
+      const base='readme-'+slug;let id=base,count=0;
+      while(headingState.used.has(id))id=base+'-'+(++count);
+      headingState.used.add(id);
+      // Source-slug links choose its first heading in document order, including
+      // recursive blocks. Literal suffix headings can themselves be displaced.
+      if(!headingState.anchors.has(slug))headingState.anchors.set(slug,id);
+      out.push(`<h${lvl} id="${e(id)}">${inline(text)}</h${lvl}>`);i++;continue;
+    }
     if(/^\s*(-{3,}|\*{3}|_{3})\s*$/.test(line)){ out.push("<hr>"); i++; continue; } // hr
     if(/\|/.test(line) && i+1<lines.length && isSep(lines[i+1])){ // table
       const rows=[line]; i++; i++; // header + separator
       while(i<lines.length && /\|/.test(lines[i]) && lines[i].trim()!==""){ rows.push(lines[i]); i++; }
-      const parse=r=>r.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|").map(c=>c.trim());
+      const parse=readmeCells;
       const head=parse(rows[0]);
       let t=`<table><thead><tr>${head.map(c=>`<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>`;
-      for(let r=2;r<rows.length;r++){ const cells=parse(rows[r]); t+=`<tr>${cells.map(c=>`<td>${inline(c)}</td>`).join("")}</tr>`; }
-      out.push(t+"</tbody></table>"); continue;
+      for(let r=1;r<rows.length;r++){ const cells=parse(rows[r]); t+=`<tr>${cells.map(c=>`<td>${inline(c)}</td>`).join("")}</tr>`; }
+      out.push('<div class="md-table-scroll" role="region" tabindex="0" aria-label="README table, scroll horizontally for all columns">'+t+"</tbody></table></div>"); continue;
     }
     if(/^\s*>/.test(line)){                          // blockquote (recursive)
       const buf=[];
       while(i<lines.length && /^\s*>/.test(lines[i])){ buf.push(lines[i].replace(/^\s*>\s?/,"")); i++; }
-      out.push(`<blockquote>${renderMarkdown(buf.join("\n"))}</blockquote>`); continue;
+      out.push(`<blockquote>${renderMarkdown(buf.join("\n"),headingState)}</blockquote>`); continue;
     }
     const ul=line.match(/^(\s*)([-*])\s+(.*)$/), ol=line.match(/^(\s*)(\d+)\.\s+(.*)$/);
     if(ul||ol){                                      // list (flat; multi-line items gathered)
@@ -2381,7 +2527,7 @@ function renderMarkdown(md){
       html+=`<${curOrdered?"ol":"ul"}>`;
       for(const it of items){
         if(it.ordered!==curOrdered){ html+=`</${curOrdered?"ol":"ul"}><${it.ordered?"ol":"ul"}>`; curOrdered=it.ordered; }
-        const body=it.cont.length?renderMarkdown(it.text+"\n"+it.cont.join("\n")):inline(it.text);
+        const body=it.cont.length?renderMarkdown(it.text+"\n"+it.cont.join("\n"),headingState):inline(it.text);
         html+=`<li>${body}</li>`;
       }
       html+=`</${curOrdered?"ol":"ul"}>`;
@@ -2391,7 +2537,14 @@ function renderMarkdown(md){
     while(i<lines.length && !/^\s*$/.test(lines[i]) && !isBlock(lines[i]) && !(/\|/.test(lines[i]) && i+1<lines.length && isSep(lines[i+1]))) buf.push(lines[i]), i++;
     out.push(`<p>${inline(buf.join(" "))}</p>`);
   }
-  return out.join("\n");
+  const html=out.join("\n");
+  // Resolve forward links once, after all recursive headings are allocated.
+  // This touches only generated, policy-checked fragment attributes; raw HTML
+  // remains escaped. Unmapped suffix links retain their existing valid target.
+  return root?html.replace(/href="#readme-([^"]*)"/g,(attr,fragment)=>{
+    const id=headingState.anchors.get(decodeURIComponent(fragment));
+    return id?'href="#readme-'+e(encodeURIComponent(id.slice(7)))+'"':attr;
+  }):html;
 }
 let _readmeLoaded=false;
 (function(){
@@ -2430,11 +2583,23 @@ init();
   }
 
   async function check(){
-    set(null, 'Checking…', 'Sending a health probe to /api/health on the same origin.');
+    document.getElementById('experimental-link').hidden=true;
+    document.getElementById('experimental-link').removeAttribute('href');
+    document.getElementById('experimental-status').textContent='Experimental workbench — status unchecked';
+    set(null, 'Checking…', 'Sending an app health GET to /api/health on the same origin; no model probe.');
     try{
       const r = await fetch('/api/health', { method: 'GET', headers: { 'Accept': 'application/json' } });
       if(r.ok){
-        set(true, 'Engine reachable', 'The local SILT engine responded. You can use the Studio tabs below.');
+        const health=await r.json();
+        set(true, 'App available', 'App reachability only — dependencies, models, assets, device fit and quality are unchecked.');
+        const experimental=health.experimental;
+        const link=document.getElementById('experimental-link');
+        const enabled=experimental?.code_available===true && experimental?.routes_mounted===true && experimental?.enabled===true;
+        link.hidden=!enabled;
+        if(enabled) link.setAttribute('href','/experimental'); else link.removeAttribute('href');
+        document.getElementById('experimental-status').textContent=experimental ?
+          'Experimental workbench — '+(enabled?'enabled (code route only; model readiness unchecked)':experimental.code_available?'code available, disabled'+(!experimental.routes_mounted?' — restart with flag 1 required':''):'code unavailable') :
+          'Experimental workbench — status unavailable (older server); see startup instructions';
       } else {
         set(false, 'Engine returned '+r.status, 'The engine is running but /api/health did not return 200. Check the server logs.');
       }

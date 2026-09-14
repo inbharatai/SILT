@@ -9,6 +9,60 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## Integrated release snapshot — 2026-09-12
+
+This entry describes the combined source snapshot, not a claim of a completed
+push, remote CI run or model deployment. See
+[`docs/INTEGRATED_RELEASE_2026_09_12.md`](docs/INTEGRATED_RELEASE_2026_09_12.md).
+
+### Added
+- Hardware-adaptive specialist feasibility planning, native checkpoint loading,
+  phase-lifetime memory/cache estimates and explicit CPU/single-NVIDIA-CUDA device
+  dispatch. Linux CPU is supported and exercised; CUDA remains `GPU_UNVERIFIED`.
+  Reconstruction is CPU-only; CPU staging for CUDA is not out-of-core execution.
+- Header-only planning and separate authorized TRAIN/DEV profiling with unseen
+  FINAL quarantine. `READY` is not approval, reservation, execution or quality.
+- Bound execution recipes/configs and mandatory reviewed dataset sidecars in the
+  controller; Linux worker containment, bounded capture and exclusive report
+  publication with separate terminal/summary fsync acknowledgement.
+- [Hardware contract](docs/HARDWARE_ADAPTIVE.md) and updated
+  [experiment/device-local runbook](docs/SPECIALIST_QUALITY_EXPERIMENT.md).
+
+### Fixed
+- Earlier unmerged wrapper issues in executed recipe/config binding, process
+  containment, report admission and outcome/durability classification are remedied
+  in this source package. Missing acknowledgements are not claimed as success;
+  arbitrary power-loss survival and escaped-descendant containment are not promised.
+- Real-HF and toy Spring finite-real numeric guards reject invalid tolerance/loss
+  values, malformed suite mappings and derived overflow. Toy recertification
+  clears stale/partial certificates; valid finite tolerances and the existing
+  full-suite/heldout limitation are unchanged.
+- Streamer exit restores original banked parameters and persistent buffers with
+  native dtypes, pre-offload devices and registered object ties. Live LoRA,
+  nonpersistent caches, failed entry and storage failure are outside that contract.
+- Studio tab-scoped navigation, mobile form layout, README table rendering and
+  health/readiness language. No model load, probe or job is implied by discovery.
+
+### Evidence and unchanged limits
+- **Integrated local full-suite verification:** **2,695 passed / 18 skipped**,
+  92 warnings, zero failures/errors in the pinned Python 3.9 CPU environment.
+  Ten skips require GPU hardware, six are pretrained opt-ins, and two are pending
+  host-enforcement implementations. This is not a clean-install or remote CI claim.
+  Historical hardware **2,447 / 14** and product **2,325 / 12** results remain
+  separate snapshots, not additive totals. GPU skips are not GPU passes.
+- Separate pretrained Linux CPU engineering smoke: **two optimizer steps, one
+  TRAIN row, one supervised DEV row, two calibration samples, 32-token generation
+  cap**, strict reload and fresh inference. No final consumed; no 3B quality result.
+- Historical consumed final remains **source 12/16; recovered 8/16**; recovery did
+  not improve the aggregate. No case-retuning, score change or new quality claim.
+- Wrapper baseline remains `BASELINE_NOT_RUN`; final needs an explicit reviewed
+  engineering-only waiver and separate exercised deployment receipt, not automatic
+  four-arm quality approval. Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and
+  offload remain unsupported for the adaptive specialist path.
+- No model weights included in the public source repository; no model or endpoint
+  automatically activated. Existing core gates/defaults and legal notices remain
+  unchanged; no new patent coverage is claimed.
+
 ## Experimental reconstruction/recovery checkpoint — 2026-09-09
 
 This entry records local frozen-V5 evidence, not certified model quality or a

@@ -206,6 +206,81 @@ def write_json(path, value):
     return str(path)
 
 
+class ReceiptReservation:
+    """Own an exclusive receipt inode through publication; never replace a name.
+
+    RESERVED/incomplete content is not a completed report. A final snapshot says
+    nothing about its own final fsync returning: successful stdout is the separate
+    acknowledgement. No non-atomic acknowledgement guarantees power-loss survival.
+    """
+    def __init__(self, path):
+        self.path = safe_path(path)
+        directory = os.open(self.path.anchor, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        self.fd = None
+        try:
+            for component in self.path.parent.parts[1:]:
+                child = os.open(component, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) |
+                                getattr(os, "O_NOFOLLOW", 0), dir_fd=directory)
+                os.close(directory)
+                directory = child
+            self.fd = os.open(self.path.name, os.O_RDWR | os.O_CREAT | os.O_EXCL |
+                              getattr(os, "O_NOFOLLOW", 0), 0o600, dir_fd=directory)
+            self.identity = os.fstat(self.fd)
+            self.write({"schema_version": 1, "status": "RESERVED", "completed": False})
+            os.fsync(directory)
+        except BaseException:
+            if self.fd is not None:
+                os.close(self.fd)
+            raise
+        finally:
+            os.close(directory)
+
+    def write(self, value):
+        payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+        if len(payload) > REPORT_LIMIT:
+            raise ValueError("report exceeds 16 MiB")
+        current = safe_path(self.path).lstat()
+        if (current.st_dev, current.st_ino) != (self.identity.st_dev, self.identity.st_ino):
+            raise FileExistsError("receipt reservation replaced; refusing publication")
+        os.lseek(self.fd, 0, os.SEEK_SET)
+        view = memoryview(payload)
+        while view:
+            count = os.write(self.fd, view)
+            view = view[count:]
+        os.ftruncate(self.fd, len(payload))
+        os.fsync(self.fd)
+
+    def close(self):
+        os.close(self.fd)
+
+
+def admit_receipt_targets(args, report_path):
+    """Validate ALL candidate outputs and pointer locations before any API effect.
+
+    Backend manifests live inside a strict NEW output directory. History is
+    reserved even if the backend ultimately emits none. Inputs can never alias
+    or contain receipts/output; missing parents and symlinks are rejected.
+    """
+    targets = {"output": safe_path(args["output_dir"])}
+    if report_path:
+        targets.update(report=safe_path(report_path), history=safe_path(str(report_path) + ".history.json"))
+        if any(path == targets["output"] or targets["output"] in path.parents
+               for name, path in targets.items() if name != "output"):
+            raise ValueError("receipt/history must stay outside the strict output directory")
+    for path in targets.values():
+        if path.exists() or not path.parent.is_dir():
+            raise ValueError("all receipt/history/output targets must be new with existing parents")
+        if not os.access(path.parent, os.W_OK) or not path.parent.stat().st_mode & 0o222:
+            raise PermissionError("output parent is not writable")
+    paths = list(targets.values())
+    inputs = [safe_path(args[key]) for key in
+              ("source_dir", "teacher_dir", "student_dir", "calibration_path", "training_path", "validation_path") if key in args]
+    for index, path in enumerate(paths):
+        if any(path == other or path in other.parents or other in path.parents for other in paths[index + 1:] + inputs):
+            raise ValueError("receipt/history/output and input paths must be disjoint")
+    return targets
+
+
 def _fields(value, allowed, required=()):
     if type(value) is not dict or set(value) - set(allowed) or set(required) - set(value):
         raise ValueError("invalid/unknown recipe fields; allowed: " + ", ".join(sorted(allowed)))
@@ -213,38 +288,84 @@ def _fields(value, allowed, required=()):
 
 def _number(value, low, high, integer=False):
     import math
-    if type(value) not in ((int,) if integer else (int, float)) or not math.isfinite(value) or not low <= value <= high:
+    if type(value) not in ((int,) if integer else (int, float)) or not low <= value <= high or not math.isfinite(value):
         raise ValueError("invalid bounded numeric recipe value")
 
 
-def recipe_config(path):
-    path = safe_file(path)
-    value = _bounded_json(path)
+def validate_execution_device(value, *, concrete=False):
+    import re
+    if type(value) is not str or not (value == "cpu" or (value == "auto" and not concrete)
+                                     or re.fullmatch(r"cuda:(0|[1-9][0-9]*)", value)):
+        raise ValueError("execution_device must be cpu, auto, or cuda:N with a nonnegative index")
+    return value
+
+
+def _execution_plan(config, workspace_parent, *, inference_scope="dev"):
+    """Resolve optional acceleration without changing any scientific recipe value."""
+    requested = config.get("execution_device", "cpu")
+    validate_execution_device(requested)
+    if requested == "cpu" and inference_scope == "dev":
+        return "cpu", None  # Legacy CPU admission remains authoritative in each stage.
+    from asea.hardware import plan_specialist
+    scope = {"inference_scope": inference_scope} if inference_scope != "dev" else {}
+    plan = plan_specialist(config, workspace_parent=workspace_parent, requested_device=requested, **scope)
+    if plan.get("schema_version") != 1 or plan.get("status") != "READY":
+        raise StageBlocked("execution plan not READY: " + str(plan.get("reasons")))
+    device = validate_execution_device(plan.get("execution_device"), concrete=True)
+    if requested != "auto" and requested != device:
+        raise StageBlocked("planner changed explicitly requested execution device")
+    return device, plan
+
+
+def load_recipe(value):
+    """Shared strict recipe normalization for execution and metadata-only planners."""
+    return recipe_config(value)
+
+
+def recipe_config(path, *, expected_recipe_sha256=None, _fingerprint=None):
+    if isinstance(path, dict):
+        value, base = dict(path), Path.cwd()
+    else:
+        from asea.hardware.data import snapshot
+        path = safe_file(path)
+        raw, pin = snapshot(path, REPORT_LIMIT, single_link=True)
+        if expected_recipe_sha256 is not None:
+            import re
+            if type(expected_recipe_sha256) is not str or not re.fullmatch(r"[0-9a-f]{64}", expected_recipe_sha256):
+                raise ValueError("expected recipe SHA256 must be lowercase hex")
+            if pin['sha256'] != expected_recipe_sha256:
+                raise ValueError('execution recipe SHA256 mismatch')
+        value = _bounded_json(raw)
+        if _fingerprint is not None:
+            _fingerprint.update(pin)
+        base = path.parent
     required = {"source_path", "calibration", "training", "validation_data", "validation_suite"}
     allowed = required | {"schema_version", "dtype", "seed", "encoding", "max_length", "max_new_tokens",
         "output_budget_bytes", "timeout_seconds", "reconstruction", "recovery", "data_manifest", "selection_lock", "source_metadata",
-        "memory_budget_bytes", "source_quality_floor"}
+        "memory_budget_bytes", "device_memory_budget_bytes", "source_quality_floor", "execution_device"}
     _fields(value, allowed, required)
     result = dict(schema_version=1, dtype="bfloat16", seed=17, encoding="native_recovery_v1",
         max_length=256, max_new_tokens=256, output_budget_bytes=4 * 1024**3,
-        timeout_seconds=3600, source_metadata={}, memory_budget_bytes=None, source_quality_floor=1.0)
+        timeout_seconds=3600, source_metadata={}, memory_budget_bytes=None, device_memory_budget_bytes=None, source_quality_floor=1.0, execution_device="cpu")
     result.update(value)
+    validate_execution_device(result["execution_device"])
     if type(result["schema_version"]) is not int or result["schema_version"] != 1 or result["encoding"] != "native_recovery_v1":
         raise ValueError("unsupported recipe schema/encoding")
     if result["dtype"] not in ("bfloat16", "float32"):
         raise ValueError("unsupported dtype")
     for key, low, high in (("seed", 0, 2**32 - 1), ("max_length", 4, 2048),
-            ("max_new_tokens", 1, 384), ("output_budget_bytes", 1, 64 * 1024**3), ("timeout_seconds", 1, 3600)):
+            ("max_new_tokens", 1, 384), ("output_budget_bytes", 1, 2**63 - 1), ("timeout_seconds", 1, 3600)):
         _number(result[key], low, high, True)
-    if result["memory_budget_bytes"] is not None:
-        _number(result["memory_budget_bytes"], 1, 2**63 - 1, True)
+    for key in ("memory_budget_bytes", "device_memory_budget_bytes"):
+        if result[key] is not None:
+            _number(result[key], 1, 2**63 - 1, True)
     _number(result["source_quality_floor"], 0, 1)
     for key in required | {"data_manifest", "selection_lock"}:
         if key in result:
             if type(result[key]) is not str or not result[key]:
                 raise ValueError(key + " must be a local path string")
             candidate = Path(result[key])
-            result[key] = str(safe_path(candidate if candidate.is_absolute() else path.parent / candidate))
+            result[key] = str(safe_path(candidate if candidate.is_absolute() else base / candidate))
     data_root = Path(result["training"]).parent
     result.setdefault("data_manifest", str(data_root / "manifest.json"))
     result.setdefault("selection_lock", str(data_root / "selection-lock.json"))
@@ -278,7 +399,7 @@ def recipe_config(path):
     return result
 
 
-def data_preflight(config, source_files):
+def data_preflight(config, source_files, expected_data_binding=None):
     """Read permitted train/dev + answer-free lock only. Never open final artifacts."""
     manifest_path, lock_path = safe_path(config["data_manifest"]), safe_path(config["selection_lock"])
     permitted_paths = [safe_path(config[key]) for key in
@@ -288,24 +409,24 @@ def data_preflight(config, source_files):
         raise ValueError("quarantined final/source-calibration-only paths cannot enter training or validation")
     if manifest_path.name != "manifest.json" or lock_path != manifest_path.parent / "selection-lock.json":
         raise ValueError("only designated metadata manifest.json and selection-lock.json may be opened")
-    manifest, lock = _bounded_json(safe_file(manifest_path)), _bounded_json(safe_file(lock_path))
+    from asea.hardware.data import data_snapshots
+    snapshots, hashes, final_paths = data_snapshots(config, expected_data_binding, calibration=True)
+    manifest, lock = _bounded_json(snapshots['data_manifest']), _bounded_json(snapshots['selection_lock'])
     if manifest.get("source_calibration_only") is True or manifest.get("usage") == "source_calibration_only":
         raise ValueError("source-calibration-only data is not eligible for a training build")
     if manifest.get("schema") != "silt.specialist.manifest.v1" or lock.get("schema") != "silt.specialist.selection-lock.v1":
         raise ValueError("versioned specialist data manifest and selection lock required")
     if lock.get("frozen_before_model_generation") is not True or lock.get("model_outputs_consulted") is not False:
         raise ValueError("selection must be frozen without model-output selection")
-    if file_hash(lock_path)["sha256"] != manifest.get("selection_lock_sha256"):
+    if hashes[str(lock_path)]["sha256"] != manifest.get("selection_lock_sha256"):
         raise ValueError("selection lock hash mismatch")
-    hashes = {str(manifest_path): file_hash(manifest_path), str(lock_path): file_hash(lock_path)}
     artifacts = manifest.get("artifact_sha256", {})
     # Explicit allowed split basenames also prevent swapping final for training.
     for key, name in (("training", "train.json"), ("calibration", "calibration.json"),
                       ("validation_data", "validation.json"), ("validation_suite", "validation-suite.json")):
         path = safe_path(config[key])
-        if path != manifest_path.parent / name or file_hash(path)["sha256"] != artifacts.get(name):
+        if path != manifest_path.parent / name or hashes[str(path)]["sha256"] != artifacts.get(name):
             raise ValueError("permitted data path/hash mismatch: " + key)
-        hashes[str(path)] = file_hash(path)
     rows = lock.get("selection", [])
     if not isinstance(rows, list) or not rows:
         raise ValueError("empty selection lock")
@@ -327,8 +448,8 @@ def data_preflight(config, source_files):
     for a, b in (("train", "validation"), ("train", "final"), ("validation", "final")):
         if ids[a] & ids[b] or families[a] & families[b]:
             raise ValueError("cross-split ID/family overlap")
-    train, train_ids, train_pairs = _read_samples(safe_file(config["training"]))
-    dev, dev_ids, dev_pairs = _read_samples(safe_file(config["validation_data"]))
+    train, train_ids, train_pairs = _read_samples(snapshots["training"])
+    dev, dev_ids, dev_pairs = _read_samples(snapshots["validation_data"])
     if train_ids & dev_ids or train_pairs & dev_pairs:
         raise ValueError("training/validation content overlap")
     # Inspect the whole files before any selection or weight load.
@@ -343,10 +464,10 @@ def data_preflight(config, source_files):
                 if key in selected and row.get(key) != selected[key]:
                     raise ValueError("sample provenance differs from selection lock")
     train_by_id = {r["id"]: r for r in train}
-    calibration = _read_samples(safe_file(config["calibration"]))[0]
+    calibration = _read_samples(snapshots["calibration"])[0]
     if any(row != train_by_id.get(row["id"]) for row in calibration):
         raise ValueError("calibration must be an exact TRAIN-only subset")
-    suite = load_suite(config["validation_suite"])
+    suite = load_suite(snapshots["validation_suite"])
     if {c.id for c in suite.cases} != ids["validation"]:
         raise ValueError("validation suite IDs differ from validation data")
     dev_by_id = {r["id"]: r for r in dev}
@@ -358,11 +479,13 @@ def data_preflight(config, source_files):
         tokenizer_pins = manifest.get(section, {}).get("tokenizer_files_sha256", tokenizer_pins)
     if tokenizer_pins and any(source_files.get(k, {}).get("sha256") != v for k, v in tokenizer_pins.items()):
         raise ValueError("source tokenizer differs from locked data encoding")
+    from asea.hardware.data import check_pins
+    check_pins(hashes)
     return {"hashes": hashes, "counts": {s: len(ids[s]) for s in ids},
         "validation_tasks": len(suite.cases), "ids": {s: sorted(ids[s]) for s in ids},
         "families": {s: sorted(families[s]) for s in families},
         "final_opened": False, "prior_consumed_checked": True,
-        "manifest": manifest, "selection_lock_sha256": file_hash(lock_path)["sha256"],
+        "manifest": manifest, "selection_lock_sha256": hashes[str(lock_path)]["sha256"],
         "final_suite_path": str(manifest_path.parent / "final-suite.json"),
         "final_suite_sha256": artifacts.get("final-suite.json")}
 
@@ -507,17 +630,21 @@ def _options(values):
             raise ValueError("receipt_mode must be full or compact")
         if value is None:
             continue
-        if key == "memory_budget_bytes":
+        if key in ("memory_budget_bytes", "device_memory_budget_bytes"):
             from decimal import Decimal, localcontext
             with localcontext() as context:
                 context.prec = 64
-                key, value = "memory_budget_mib", Decimal(value) / Decimal(1024**2)
+                key, value = key.replace("_bytes", "_mib"), Decimal(value) / Decimal(1024**2)
+        if key == "execution_device":
+            key = "device"
         args += ["--" + key.replace("_", "-"), str(value)]
     return args
 
 
 def _check_unchanged(hashes):
-    if any(file_hash(path) != before for path, before in hashes.items()):
+    from asea.hardware.data import check_pins
+    check_pins({p: v for p, v in hashes.items() if 'identity' in v})
+    if any(file_hash(path) != before for path, before in hashes.items() if 'identity' not in before):
         raise ValueError("permitted data/config changed during study")
 
 
@@ -608,23 +735,45 @@ def implementation_manifest():
     from .evaluation import infer, evaluate, validate
     from .standalone import inspect_bundle, load_standalone
     package = Path(__file__).resolve().parent
-    files = [package / name for name in ("__init__.py", "__main__.py", "workflow.py", "stage_worker.py", "evaluation.py", "reconstruction.py", "recovery.py", "standalone.py", "controls.py")]
+    files = [package / name for name in ("__init__.py", "__main__.py", "workflow.py", "stage_worker.py", "controller_worker.py", "evaluation.py", "reconstruction.py", "recovery.py", "standalone.py", "controls.py")]
     files += [package.parent / "artifacts/__init__.py", package.parent / "certification/function_oracle.py",
               package.parent / "certification/sandbox.py", package.parent / "certification/__init__.py"]
-    # This revision also freezes the transport contract and its regression tests.
-    files += [package.parents[2] / "docs/SPECIALIST_WORKFLOW.md",
-              package.parents[2] / "tests/test_specialist_workflow.py"]
+    # Freeze hardware/device implementation, including future module additions.
+    files += sorted((package.parent / "hardware").glob("**/*.py"))
+    files += sorted(package.parent.glob("hardware.py"))
+    files += sorted(package.glob("devices.py"))
+    files += sorted(package.glob("device.py"))
+    # Preserve exact source-origin audit bytes in both checkout and wheel layouts.
+    # Never remap existing frozen paths: finalize still verifies the old lock first.
+    from asea import _package_resources
+    files += [Path(_package_resources.__file__).resolve()]
+    files += _package_resources.audit_paths()
     return {"source_files": {str(path): file_hash(path) for path in files},
             "api_signatures": {f.__name__: str(inspect.signature(f)) for f in (reconstruct, recover, infer, evaluate, validate, inspect_bundle, load_standalone)},
-            "device_contract": "cpu_only; no GPU capability claim", "command_exit_is_certificate": False}
+            "device_contract": "reconstruction_cpu; other_stages_frozen_cpu_or_cuda_index", "command_exit_is_certificate": False}
 
 
 @_managed_signals()
-def build(recipe, workspace):
+def build(recipe, workspace, expected_recipe_sha256=None, expected_data_binding_file=None, expected_data_binding_sha256=None):
     root = safe_path(workspace)
     if root.exists() or not root.parent.is_dir():
         raise ValueError("workspace must be a new immutable directory with existing parent")
-    config = recipe_config(recipe)
+    recipe_fingerprint = {}
+    config = recipe_config(recipe, expected_recipe_sha256=expected_recipe_sha256, _fingerprint=recipe_fingerprint)
+    from asea.hardware.data import snapshot, compare_binding, admit_source_assets
+    expected_data = None
+    if (expected_data_binding_file is None) != (expected_data_binding_sha256 is None):
+        raise ValueError('expected data binding requires both file and SHA256')
+    if expected_data_binding_file is not None:
+        raw, pin = snapshot(expected_data_binding_file, single_link=True)
+        if pin['sha256'] != expected_data_binding_sha256:
+            raise ValueError('expected data binding SHA256 mismatch')
+        expected_data = _bounded_json(raw)
+        if not isinstance(expected_data, dict):
+            raise ValueError('expected data binding must be a path/SHA/identity map')
+    requested_device = config["execution_device"]
+    execution_device, execution_plan = _execution_plan(config, str(root.parent))
+    config["execution_device"] = execution_device
     source = safe_path(config["source_path"])
     if root == source or source in root.parents or root in source.parents:
         raise ValueError("workspace and source must be disjoint")
@@ -636,26 +785,38 @@ def build(recipe, workspace):
         "workspace": str(root), "config": config, "config_sha256": json_hash(config),
         "source_metadata": config["source_metadata"], "stages": [], "attempted_stages": [],
         "qualified_source": False, "source_qualification": "not_measured",
-        "study_role": "RESEARCH", "device_contract": "cpu_only"}
+        "study_role": "RESEARCH", "device_contract": "reconstruction_cpu; other_stages_frozen",
+        "execution_device": execution_device, "requested_execution_device": requested_device,
+        "execution_plan": execution_plan}
+    if expected_recipe_sha256 is not None:
+        report["recipe_binding"] = {"path": str(safe_file(recipe)), "sha256": expected_recipe_sha256}
     write_json(root / "recipe.json", config)
     try:
         implementation = implementation_manifest()
         report["implementation"] = implementation
         report["implementation_sha256"] = json_hash(implementation)
         write_json(root / "implementation-lock.json", implementation)
-        source_config = _bounded_json(safe_file(source / "config.json"))
+        admit_source_assets(source, (Path(config['data_manifest']).parent / 'final-suite.json',
+                                     Path(config['data_manifest']).parent / 'final.json'))
+        source_config = _bounded_json(snapshot(source / 'config.json', single_link=True)[0])
         if source_config.get("model_type") not in ("qwen2", "switch_transformers"):
             raise ValueError("build source must be a reconstructable native Qwen2 or Switch model")
         source_files = representation_inventory(source)
         report["source"] = {"path": str(source), "files": source_files,
                             "config": source_config, "metadata": config["source_metadata"]}
-        data = data_preflight(config, source_files)
+        data = data_preflight(config, source_files) if expected_data is None else data_preflight(config, source_files, expected_data)
+        if expected_data is not None:
+            compare_binding(expected_data, data['hashes'])
+            report['expected_data_binding'] = expected_data
+            report['expected_data_binding_file'] = str(safe_file(expected_data_binding_file))
+            report['expected_data_binding_sha256'] = expected_data_binding_sha256
         report["data"] = data
         write_json(root / "preflight.json", {"status": "completed", "source": report["source"], "data": data})
-        hashes = dict(data["hashes"], **{str(safe_file(recipe)): file_hash(recipe)})
+        hashes = dict(data["hashes"], **{str(safe_file(recipe)): recipe_fingerprint or file_hash(recipe)})
         hashes.update(implementation["source_files"])
         common_eval = dict(suite=config["validation_suite"], dtype=config["dtype"],
-                           max_new_tokens=config["max_new_tokens"], trace_policy="digest", memory_budget_bytes=config["memory_budget_bytes"])
+                           max_new_tokens=config["max_new_tokens"], trace_policy="digest", memory_budget_bytes=config["memory_budget_bytes"],
+                           execution_device=execution_device, device_memory_budget_bytes=config["device_memory_budget_bytes"])
         models = {"source": source, "reconstructed": root / "reconstructed", "recovered": root / "recovered"}
         evaluations = {}
         def stage(name, argv):
@@ -689,7 +850,8 @@ def build(recipe, workspace):
         rargs = dict(teacher_dir=str(source), student_dir=str(models["reconstructed"]), output_dir=str(models["recovered"]),
             training_path=config["training"], validation_path=config["validation_data"], dtype=config["dtype"],
             seed=config["seed"], max_length=config["max_length"], memory_budget_bytes=config["memory_budget_bytes"],
-            report=str(root / "recover.receipt.json"), receipt_mode="compact", **config["recovery"])
+            report=str(root / "recover.receipt.json"), receipt_mode="compact", execution_device=execution_device,
+            device_memory_budget_bytes=config["device_memory_budget_bytes"], **config["recovery"])
         stage("recover", ["recover"] + _options(rargs))
         recovery = _bounded_json(models["recovered"] / "recovery_report.json")
         if not recovery_complete(recovery, config["recovery"]["export_mode"]) or recovery.get("actual_steps") != config["recovery"]["steps"]:
@@ -739,17 +901,53 @@ def evaluations_to_comparison(evaluations):
 
 
 @_managed_signals()
-def finalize(study, suite, output):
+def finalize(study, suite, output, expected_recipe_sha256=None, expected_config_sha256=None, expected_data_binding_sha256=None):
     root, output = safe_path(study), safe_path(output)
     if output.exists() or not output.parent.is_dir():
         raise ValueError("final output must be new with existing parent")
-    report = _bounded_json(root / "manifest.json")
+    from asea.hardware.data import snapshot
+    report = _bounded_json(snapshot(root / 'manifest.json', forbidden=(suite,), single_link=True)[0])
     if report.get("status") != "BUILT_UNCERTIFIED" or report.get("candidate_frozen") is not True:
         raise ValueError("only a completed frozen candidate study may consume final")
     implementation = report.get("implementation")
     if not implementation or json_hash(implementation) != report.get("implementation_sha256"):
         raise ValueError("implementation lock missing or changed")
     _check_unchanged(implementation["source_files"])
+    if set(implementation["source_files"]) != set(implementation_manifest()["source_files"]):
+        raise ValueError("implementation module set changed since build")
+    config = report["config"]
+    if json_hash(config) != report.get("config_sha256"):
+        raise ValueError("frozen recipe changed")
+    if expected_config_sha256 is not None and json_hash(config) != expected_config_sha256:
+        raise ValueError("config differs from controller-approved recipe")
+    binding = report.get("recipe_binding")
+    if expected_recipe_sha256 is not None:
+        if not binding or binding.get("sha256") != expected_recipe_sha256:
+            raise ValueError("recipe binding differs from controller approval")
+        approved = recipe_config(binding["path"], expected_recipe_sha256=expected_recipe_sha256)
+        if approved != config:
+            raise ValueError("effective config differs from controller-approved bytes")
+    execution_device = validate_execution_device(config.get("execution_device", "cpu"), concrete=True)
+    if execution_device != report.get("execution_device", "cpu"):
+        raise ValueError("frozen execution device mismatch")
+    from asea.hardware.data import compare_binding
+    if expected_data_binding_sha256 is not None and (report.get('expected_data_binding_sha256') != expected_data_binding_sha256
+            or not report.get('expected_data_binding') or not report.get('expected_data_binding_file')):
+        raise ValueError('data binding differs from controller approval')
+    if report.get('expected_data_binding') is not None:
+        raw, binding_pin = snapshot(report['expected_data_binding_file'], forbidden=(suite,), single_link=True)
+        if binding_pin['sha256'] != report['expected_data_binding_sha256']:
+            raise ValueError('approved data binding file changed before final')
+        approved_data = _bounded_json(raw)
+        if approved_data != report['expected_data_binding']:
+            raise ValueError('frozen data binding differs from approved bytes')
+        compare_binding(approved_data, report['data']['hashes'])
+    _check_unchanged(report['data']['hashes'])
+    # Final input text is still quarantined. DEV's measured envelope cannot
+    # authorize final consumption; use the conservative unprofiled bound here.
+    rechecked, _ = _execution_plan(config, str(root.parent), inference_scope="final")
+    if rechecked != execution_device:
+        raise StageBlocked("frozen execution device no longer available; no fallback")
     frozen = report["frozen_models"]
     if json_hash(frozen) != report["frozen_models_sha256"]:
         raise ValueError("frozen control metadata changed")
@@ -757,6 +955,7 @@ def finalize(study, suite, output):
         if representation_inventory(store["path"]) != store["files"]:
             raise ValueError("frozen candidate/source/pruned control changed")
     data = report["data"]
+    _check_unchanged(data["hashes"])
     # Do not open/hash suite until exclusive consumed marker is durable.
     if safe_path(suite) != safe_path(data["final_suite_path"]):
         raise ValueError("final suite must be the preregistered quarantined suite")
@@ -765,7 +964,7 @@ def finalize(study, suite, output):
         "frozen_models_sha256": report["frozen_models_sha256"], "output": str(output)})
     result = {"schema_version": 1, "status": "REJECTED", "completed": False,
         "engineering_complete": False, "quality_pass": False, "certificate": False,
-        "final_consumed": True, "training_on_final": False,
+        "final_consumed": True, "training_on_final": False, "execution_device": execution_device,
         "qualified_source": report.get("qualified_source", False)}
     try:
         if file_hash(suite)["sha256"] != data["final_suite_sha256"]:
@@ -776,6 +975,7 @@ def finalize(study, suite, output):
         deadline = time.monotonic() + min(3600, report["config"]["timeout_seconds"])
         evaluations = {}
         for name in ("source", "reconstructed", "recovered"):
+            _check_unchanged(data["hashes"])
             _check_unchanged(implementation["source_files"])
             for store in frozen.values():
                 if representation_inventory(store["path"]) != store["files"]:
@@ -783,8 +983,10 @@ def finalize(study, suite, output):
             path = root / (name + "-final.json")
             _stage(root, name + "-final", ["evaluate"] + _options(dict(model=frozen[name]["path"], suite=str(suite),
                 output=str(path), dtype=report["config"]["dtype"], max_new_tokens=report["config"]["max_new_tokens"], trace_policy="digest",
-                memory_budget_bytes=report["config"].get("memory_budget_bytes"))), deadline)
+                memory_budget_bytes=report["config"].get("memory_budget_bytes"), execution_device=execution_device,
+                device_memory_budget_bytes=report["config"].get("device_memory_budget_bytes"))), deadline)
             _check_unchanged(implementation["source_files"])
+            _check_unchanged(data["hashes"])
             if file_hash(suite)["sha256"] != data["final_suite_sha256"]:
                 raise ValueError("final suite changed during evaluation")
             evaluations[name] = _bounded_json(path)

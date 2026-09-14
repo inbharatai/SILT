@@ -77,11 +77,14 @@ def _unique_pairs(pairs):
 
 
 def _bounded_json(path):
-    # Bound bytes BEFORE allocating/decoding JSON, including a growing-file race.
-    _require(path.is_file() and path.stat().st_size <= MAX_DATA_BYTES,
-             "Dataset exceeds 16 MiB byte limit or is not a file")
-    with path.open("rb") as handle:
-        raw = handle.read(MAX_DATA_BYTES + 1)
+    # Internal admitted snapshots reuse the exact parser/validator without reopening.
+    if isinstance(path, bytes):
+        raw = path
+    else:
+        _require(path.is_file() and path.stat().st_size <= MAX_DATA_BYTES,
+                 "Dataset exceeds 16 MiB byte limit or is not a file")
+        with path.open("rb") as handle:
+            raw = handle.read(MAX_DATA_BYTES + 1)
     _require(len(raw) <= MAX_DATA_BYTES, "Dataset exceeds 16 MiB byte limit")
     text = raw.decode("utf-8")
     # Lightweight lexical prepass: count every array's elements before json.loads
@@ -354,8 +357,23 @@ def _phase_guard(resources, phase, required, memory_budget_bytes):
     weights/pages remain in observed usage, not an invented subtraction from it.
     """
     from .reconstruction import _memory_budget
+    selected = resources.get("execution_device", "cpu")
+    device_check = None
+    if selected.startswith("cuda:"):
+        import torch
+        from .devices import device_admission
+        # The CPU writer requires a complete host base/factor allocation while
+        # GPU training storage may still be live. No low-host streaming claim.
+        if phase == "export-write":
+            required += resources["student"]["loaded_bytes"] + resources["student"]["adapter_parameters"] * 4
+        if phase != "factor-stream-write":
+            device_required = resources.get("cuda_phase_additional_bytes", {}).get(phase, required)
+            device_check = device_admission(torch, selected, device_required + 128 * 1024**2,
+                resources.get("device_memory_budget_bytes"), phase=phase)
     budget = _memory_budget(memory_budget_bytes, available=_available_ram())
     check = {"phase": phase, "additional_required_bytes": required, **budget}
+    if device_check is not None:
+        check["device_admission"] = device_check
     resources["runtime_phase_checks"].append(check)
     _require(required <= budget["limit_bytes"],
              "Insufficient %s memory headroom: %d > %d" % (phase, required, budget["limit_bytes"]))
@@ -643,7 +661,8 @@ def _publish_no_replace(source, destination):
 def recover(teacher_dir, student_dir, output_dir, training_path, validation_path, *,
             steps=64, learning_rate=0.0001, rank=8, max_length=256, dtype="bfloat16",
             seed=17, kd_weight=0.7, method="lora_kd", max_samples=256,
-            memory_budget_bytes=None, teacher_mode="cached", export_mode="native_merged") -> dict:
+            memory_budget_bytes=None, teacher_mode="cached", export_mode="native_merged",
+            execution_device="cpu", device_memory_budget_bytes=None) -> dict:
     """Train only LoRA; explicitly export merged native or factor-preserving bundle.
 
     Rejections return status='rejected', artifact_admitted=False and no output.
@@ -655,11 +674,15 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                               "seed": seed, "quality_claim": "none; loss metrics are not code quality"}
     started = time.monotonic()
     staging = None
+    device = None
     teacher = student = optimizer = bank = None
     try:
         from asea.artifacts import safe_path, safe_file, model_inventory
         from .reconstruction import (_artifact_preflight, _native_meta, _strict_header_match,
                                      _restore_f32_routers, _memory_budget, _headers, _release_file_cache)
+        from .devices import (validate_device_request, resolve_device, move_preserving_dtype,
+                              runtime_metadata, release_cuda_cache)
+        validate_device_request(execution_device)
         _require(export_mode in ("native_merged", "factor_preserving"),
                  "export_mode must be native_merged or factor_preserving; no implicit fallback")
         _require(teacher_mode in ("cached", "resident"), "teacher_mode must be cached or resident")
@@ -773,12 +796,54 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                                           (candidate_inventory, candidate_headers, student_plan))
         report["source_hashes_before"] = {k: v["sha256"] for k, v in source_inventory.items()}
         report["student_store_hashes_before"] = {k: v["sha256"] for k, v in candidate_inventory.items()}
-        device = torch.device("cpu")
+        resources = report["resources"]
+        device_peak = resources["estimated_peak_bytes"]
+        if execution_device != "cpu":
+            from .devices import recovery_workspace
+            def cuda_work(raw, training=False):
+                plan = recovery_workspace(raw, dtype, actual_length, max(response_counts), training=training,
+                    factor_rank=rank if training else 0,
+                    factor_parameters=resources["student"]["adapter_parameters"] if training else 0, kd=use_kd)
+                resources.setdefault("cuda_lifetime_envelopes", {})["student" if training else raw["model_type"]] = plan
+                return plan["estimated_additional_peak_bytes"]
+            teacher_work = cuda_work(source_raw) if use_kd else 0
+            student_work = cuda_work(candidate_raw, True) + resources["merge_workspace_bytes"] + resources["merge_cow_source_pages_bytes"]
+            resident_work = teacher_work if use_kd and teacher_mode == "resident" else 0
+            resident_weights = resources["teacher"]["loaded_bytes"] if resident_work else 0
+            student_weights = resources["student"]["loaded_bytes"]
+            probe_work = max(resources["export_workspace_bytes"], cuda_work(candidate_raw))
+            cuda_phases = {
+                "teacher-load": resources["teacher"]["loaded_bytes"] + teacher_work if use_kd else 0,
+                "teacher-cache-forward": teacher_work,
+                "student-phase": student_weights + student_work,
+                "student-forward-backward": student_work + resident_work,
+                "export-write": probe_work + resources["merge_workspace_bytes"],
+                "export-reload": student_weights + probe_work + resources["lora_optimizer_training_bytes"],
+                "factor-reload-forward": probe_work, "native-reload-forward": probe_work,
+                "factor-host-transfer": 0}
+            resources["cuda_phase_additional_bytes"] = cuda_phases
+            device_peak = max(cuda_phases["teacher-load"], cuda_phases["student-phase"] + resident_weights + resident_work,
+                              student_weights + cuda_phases["export-write"], cuda_phases["export-reload"])
+        selection = resolve_device(execution_device, torch=torch, dtype=dtype,
+            host_required_bytes=resources["estimated_peak_bytes"],
+            device_required_bytes=device_peak + 128 * 1024**2,
+            memory_budget_bytes=memory_budget_bytes, device_memory_budget_bytes=device_memory_budget_bytes)
+        device = torch.device(selection["device"])
+        resources.update(execution_device=str(device), device_memory_budget_bytes=device_memory_budget_bytes,
+                         device_selection=selection)
+        resources["device"] = str(device)
+        if device.type == "cuda":
+            resources["available_device_bytes"] = selection["device_admission"]["limit_bytes"]
+            resources["cuda_host_load_policy"] = "full CPU native base + cast/mmap transient before CUDA transfer; full CPU export staging"
+            report["determinism"] = "seeded selected CUDA; actual settings recorded; no cross-device parity claim"
         report["device"] = str(device)
+        report["execution_device_requested"] = execution_device
+        report["cross_device_validation"] = "unknown"
         report["hyperparameters"] = {"learning_rate": learning_rate, "rank": rank, "max_length": max_length,
                                        "dtype": dtype, "kd_weight": kd_weight, "max_samples": max_samples,
                                        "batch_size": 1, "gradient_clip_norm": 1.0, "temperature": 1.0,
-                                       "teacher_mode": teacher_mode, "memory_budget_bytes": memory_budget_bytes}
+                                       "teacher_mode": teacher_mode, "memory_budget_bytes": memory_budget_bytes,
+                                       "execution_device": str(device), "device_memory_budget_bytes": device_memory_budget_bytes}
         model_class = AutoModelForCausalLM if family == "causal" else AutoModelForSeq2SeqLM
         load = dict(local_files_only=True, trust_remote_code=False, use_safetensors=True,
                     torch_dtype=getattr(torch, dtype), low_cpu_mem_usage=True, device_map={"": "cpu"}, attn_implementation="eager")
@@ -798,6 +863,11 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                 expected = report["resources"]["teacher" if is_teacher else "student"]["loaded_bytes"]
                 _require(sum(p.numel() * p.element_size() for p in model.parameters()) == expected,
                          "Materialized recovery dtype/alias plan disagreement")
+                if device.type == "cuda":
+                    from .devices import device_admission
+                    device_admission(torch, str(device), expected + 128 * 1024**2,
+                                     device_memory_budget_bytes, phase="loaded-native-before-transfer")
+                    return move_preserving_dtype(model, str(device))
                 return model
             # Independent native export validation deliberately retains the prior
             # HF loader, tolerances and computation graph; not a training input.
@@ -805,7 +875,11 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
             _require(not any(information.get(key) for key in
                              ("missing_keys", "unexpected_keys", "mismatched_keys", "error_msgs")),
                      "Native checkpoint is incomplete/incompatible: " + str(information))
-            return model.to(device)
+            if device.type == "cuda":
+                from .devices import device_admission
+                device_admission(torch, str(device), report["resources"]["student"]["loaded_bytes"] + 128 * 1024**2,
+                                 device_memory_budget_bytes, phase="native-reload-before-transfer")
+            return move_preserving_dtype(model, str(device))
 
         staging = Path(tempfile.mkdtemp(prefix="." + output.name + ".recovery-", dir=output.parent))
         # Teacher-only phase. No student weights, adapters, gradients or optimizer exist.
@@ -838,6 +912,7 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                 _require(all(not p.requires_grad and p.grad is None for p in teacher.parameters()), "Teacher acquired gradients")
                 _require(teacher_hash == _parameter_hash(teacher.named_parameters()), "Teacher weights changed during cache generation")
                 _require(report["source_hashes_before"] == _store_hash(source), "Teacher files changed during cache generation")
+                report["teacher_execution_runtime"] = runtime_metadata(torch, device, teacher)
                 report["teacher_bank"] = bank.receipt()
                 report["teacher_frozen_no_grad"] = True
                 teacher_refs = [("teacher", weakref.ref(teacher))] + [
@@ -845,6 +920,7 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                 del teacher
                 teacher = None
                 _assert_collected(teacher_refs, report["resources"], "cached-teacher-release")
+                release_cuda_cache(torch, device)
                 for name in source_inventory:
                     if name.endswith(".safetensors"):
                         _release_file_cache(source / name)
@@ -868,6 +944,7 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
             student.enable_input_require_grads()
         adapters = [(n, p) for n, p in student.named_parameters() if p.requires_grad]
         _require(adapters and all("lora_" in n for n, _ in adapters), "Non-adapter parameter marked trainable")
+        _require(all(p.dtype == torch.float32 for _, p in adapters), "Native LoRA factors must remain F32")
         initial = {n: p.detach().float().cpu().clone() for n, p in adapters}
         report["adapter_hash_before"] = _parameter_hash(adapters)
         frozen = [(n, p) for n, p in student.named_parameters() if not p.requires_grad]
@@ -881,6 +958,19 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
 
         def losses(example, validation=False):
             _require(time.monotonic() - started < 86400, "One-day recovery wall-clock budget exhausted")
+            if device.type == "cuda":
+                from .devices import recovery_incremental_workspace
+                # These live buffers are already reflected in driver free and
+                # Torch reserved bytes. Never credit presumed allocator release.
+                def live_bytes(tensors):
+                    stores = {(t.untyped_storage().data_ptr(), t.untyped_storage().nbytes())
+                        for t in tensors if isinstance(t, torch.Tensor) and t.device == device}
+                    return sum(size for _, size in stores)
+                incremental = recovery_incremental_workspace(resources["cuda_lifetime_envelopes"]["student"],
+                    resident_factors=live_bytes(p for _, p in adapters),
+                    resident_optimizer=live_bytes(t for state in optimizer.state.values() for t in state.values()),
+                    resident_gradients=live_bytes(p.grad for _, p in adapters if p.grad is not None))
+                resources["cuda_phase_additional_bytes"]["student-forward-backward"] = incremental + resident_work
             _phase_guard(report["resources"], "student-forward-backward",
                          report["resources"]["student_workspace_bytes"] +
                          (report["resources"]["teacher_workspace_bytes"] if teacher is not None else 0), memory_budget_bytes)
@@ -942,6 +1032,7 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                               "supervised_ce": sum(x["supervised_ce"] * x["response_tokens"] for x in history) / token_total,
                               "forward_kl": sum(x["forward_kl"] * x["response_tokens"] for x in history) / token_total if use_kd else None}
         report["validation_post"] = evaluate()
+        report["training_execution_runtime"] = runtime_metadata(torch, device, student)
         report["validation_post"]["model_state"] = "trained_adapter_premerge; not reloaded deployment validation"
         report["adapter_hash_after"] = _parameter_hash(adapters)
         delta = sum(float((p.detach().float().cpu() - initial[n]).square().sum()) for n, p in adapters)
@@ -958,9 +1049,10 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
             not p.requires_grad and p.grad is None for p in teacher.parameters())
         _require(report["teacher_frozen_no_grad"], "Teacher acquired gradients")
         if teacher is not None:
+            report["teacher_execution_runtime"] = runtime_metadata(torch, device, teacher)
             _require(teacher_hash == _parameter_hash(teacher.named_parameters()), "Resident teacher weights changed")
         optimizer.zero_grad(set_to_none=True)
-        if export_mode == "factor_preserving":
+        if export_mode in ("factor_preserving", "native_merged"):
             training_refs = [("student", weakref.ref(student)), ("optimizer", weakref.ref(optimizer))]
             training_refs += [("student." + n, weakref.ref(p)) for n, p in student.named_parameters()]
             if teacher is not None:
@@ -1016,7 +1108,19 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                     generated = model.generate(**generation_inputs, do_sample=False, max_new_tokens=2,
                                                use_cache=deployment_cache).detach().cpu().clone()
                 return full, generated
+            generation_inputs = {k: v.to(device) for k, v in generation_inputs.items()}
             before_logits, before_generated = factor_probe(student)
+            report["execution_runtime"] = runtime_metadata(torch, device, student)
+            if device.type == "cuda":
+                # Both numerical probes execute on the SAME CUDA device; the
+                # intervening CPU move is serialization only, with no recast.
+                _phase_guard(report["resources"], "factor-host-transfer",
+                    report["resources"]["student"]["loaded_bytes"] + report["trainable_parameters"] * 4 +
+                    report["resources"]["export_io_and_metadata_bytes"], memory_budget_bytes)
+                move_preserving_dtype(student, "cpu")
+                report["factor_export_host_transfer"] = {
+                    "full_host_base_and_factors": True, "dtype_recast": False,
+                    "host_tensor_bytes": sum(p.numel() * p.element_size() for p in student.parameters())}
             manifest = _write_bundle(staging, student, tokenizer, report, deployment_cache, candidate)
             report["trained_artifact_capture"] = {"before_merge": True, "merge_called": False,
                 "adapter_parameters_sha256": report["adapter_hash_after"],
@@ -1032,6 +1136,7 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
             del student, frozen, adapters, objective, ce, kl, grads
             student = None
             release = _assert_collected(training_refs, report["resources"], "factor-export-reload")
+            release_cuda_cache(torch, device)
             # Mapped training weights can prevent earlier cache advice taking
             # effect. Retry only after verified unmapping; still grant zero free
             # credit and make the following dynamic observation authoritative.
@@ -1044,7 +1149,8 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                 libc.malloc_trim(0)
             release["post_collection_cache_and_heap_release"] = "best-effort only; no credited bytes"
             _phase_guard(report["resources"], "export-reload", report["resources"]["export_reload_estimated_bytes"], memory_budget_bytes)
-            bundle = load_standalone(staging, dtype=dtype)
+            bundle = load_standalone(staging, dtype=dtype, execution_device=str(device),
+                                     device_memory_budget_bytes=device_memory_budget_bytes)
             merged = bundle.model  # common publication code; this model is NOT merged
             reloaded_tokenizer = bundle.tokenizer
             _require(_parameter_hash((n, p) for n, p in merged.named_parameters() if "lora_" in n)
@@ -1068,6 +1174,8 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                 "scope": "one complete dev teacher-forced forward and two-token greedy generation fixture; not quality validation",
                 "sample_id": dev[0]["id"], "atol": 0.0, "rtol": 0.0, "exact_equality_required": True,
                 "forward_bitwise_equal": forward_equal, "generation_bitwise_equal": generation_equal,
+                "before_execution_device": str(device), "after_execution_device": str(device),
+                "cross_device_validation": "unknown",
                 "max_abs_error": float((before_logits.float() - after_logits.float()).abs().max()),
                 "forward_shape": list(before_logits.shape), "generation_max_new_tokens": 2,
                 "generation_input_ids": generation_inputs["input_ids"].tolist(),
@@ -1105,6 +1213,11 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                 shutil.rmtree(bank.directory)
                 report["teacher_bank"]["removed_before_export"] = True
                 bank = None
+            report["execution_runtime"] = runtime_metadata(torch, device, merged)
+            if device.type == "cuda":
+                _phase_guard(report["resources"], "export-write",
+                             report["resources"]["export_workspace_bytes"], memory_budget_bytes)
+                move_preserving_dtype(merged, "cpu")
             merged.save_pretrained(staging, safe_serialization=True, max_shard_size="1GB")
             tokenizer.save_pretrained(staging)
             _require(not (staging / "adapter_config.json").exists(), "Export retained adapter dependency")
@@ -1125,13 +1238,14 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
             # second resident full model solely for export verification.
             del student, merged, frozen, adapters, objective, ce, kl, grads
             student = None
-            gc.collect()
-            if device.type == "cuda":
-                torch.cuda.empty_cache()
+            _assert_collected(training_refs, report["resources"], "native-export-reload")
+            release_cuda_cache(torch, device)
             _phase_guard(report["resources"], "export-reload", report["resources"]["export_reload_estimated_bytes"], memory_budget_bytes)
             merged = load_native(staging)
             _require(merged.config.use_cache == deployment_cache, "Saved deployment use_cache was not restored")
             _require(not any("lora_" in name for name, _ in merged.named_parameters()), "Reload retained LoRA dependency")
+            _phase_guard(report["resources"], "native-reload-forward",
+                         report["resources"]["export_workspace_bytes"], memory_budget_bytes)
             reloaded_logits = parity_logits(merged, merged)
             reload_close = bool(torch.allclose(after_merge_logits, reloaded_logits, atol=atol, rtol=rtol))
             report["standalone_reload_probe"] = {"passed": reload_close, "atol": atol, "rtol": rtol,
@@ -1139,6 +1253,12 @@ def recover(teacher_dir, student_dir, output_dir, training_path, validation_path
                                                   "max_abs_error": float((after_merge_logits - reloaded_logits).abs().max()),
                                                   "scope": "same teacher-forced position; not full post-export validation"}
             _require(reload_close, "Standalone reload numerical parity probe exceeded tolerance")
+        report["execution_runtime"] = runtime_metadata(torch, device, merged)
+        from .evaluation import _resources, _current_rss
+        report["resources"]["process_measurements"] = dict(_resources(), current_rss_bytes=_current_rss())
+        report["resources"]["gpu_measurements"] = {k: v for k, v in report["execution_runtime"].items()
+                                                 if k.startswith("gpu_")}
+        report["standalone_reload_probe"].update(execution_device=str(device), cross_device_validation="unknown")
         # Include merging/serialization in the immutability window (important for mmap-backed loads).
         report["source_hashes_after"] = _store_hash(source)
         report["student_store_hashes_after"] = _store_hash(candidate)

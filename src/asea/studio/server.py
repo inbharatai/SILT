@@ -44,11 +44,9 @@ from .spring_jobs import SpringManager
 from ._jsonsafe import json_safe
 
 STATIC = Path(__file__).resolve().parent / "static"
-# README.md at the project root (server.py is at src/asea/studio/server.py,
-# so parents[3] is the repo root). Served verbatim at request time so the
-# landing's README view is a single source of truth -- it can never drift
-# from or contradict the real file.
-README_PATH = Path(__file__).resolve().parents[3] / "README.md"
+# Source checkout bytes, or their exact build-time distribution-owned snapshot.
+from .._package_resources import resource_path
+README_PATH = resource_path("README.md")
 WORKSPACES = ROOT / ".studio"
 
 # Public origins that may bridge to this local engine via the hosted SILT Studio.
@@ -145,7 +143,8 @@ app.add_middleware(
 )
 
 # Opt-in extension: no imports or workspace side effects in the legacy default.
-if os.environ.get("SILT_ENABLE_EXPERIMENTAL") == "1":
+_EXPERIMENTAL_ROUTES_MOUNTED = os.environ.get("SILT_ENABLE_EXPERIMENTAL") == "1"
+if _EXPERIMENTAL_ROUTES_MOUNTED:
     from .experimental import router as experimental_router
     app.include_router(experimental_router)
 
@@ -350,13 +349,9 @@ def favicon():
 
 @app.get("/api/readme", include_in_schema=False)
 def readme():
-    """Serve the repo README.md verbatim, at request time. Read-only; the
-    landing renders this so the on-page README is a single source of truth
-    (never a hand-copied copy that could drift or become false)."""
-    if not README_PATH.is_file():
-        raise HTTPException(404, "README.md not found at repo root")
+    """Serve exact README bytes; installed snapshots are verified on each read."""
     return PlainTextResponse(
-        README_PATH.read_text(encoding="utf-8"),
+        resource_path("README.md").read_bytes(),
         media_type="text/markdown; charset=utf-8",
     )
 
@@ -368,7 +363,15 @@ def readme():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "service": "silt-studio", "mock_free": True}
+    # Code/route availability only: never consult an experimental manager,
+    # import model dependencies, probe providers or create jobs/workspaces here.
+    return {"ok": True, "service": "silt-studio", "mock_free": True,
+            "experimental": {
+                "code_available": True,
+                "routes_mounted": _EXPERIMENTAL_ROUTES_MOUNTED,
+                "enabled": (_EXPERIMENTAL_ROUTES_MOUNTED and
+                            os.environ.get("SILT_ENABLE_EXPERIMENTAL") == "1"),
+            }}
 
 
 @app.get("/api/catalog")

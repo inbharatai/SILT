@@ -10,5 +10,19 @@ include architecture.md
 include risk_report.md
 recursive-include docs *
 recursive-include configs *
-recursive-include data *
 recursive-include examples *.py *.md
+include build_support.py
+include scripts/run_specialist_quality_experiment.py
+include tests/test_specialist_workflow.py
+include tests/test_specialist_quality_experiment_runner.py
+include tests/test_hardware_dispatch.py
+include tests/test_controller_integrity_review.py
+include tests/test_installed_package_contract.py
+recursive-include src/asea/studio/static *.html *.svg
+# Datasets, weights, keys and local state are not distribution resources.
+prune data
+prune models
+prune .studio
+prune src/asea/_audit_support
+global-exclude *.safetensors *.bin *.pt *.pth *.onnx *.pem *.key
+global-exclude __pycache__ *.py[cod]

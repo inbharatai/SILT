@@ -38,7 +38,10 @@ is a planned v2.)
 from __future__ import annotations
 
 import hashlib
+import math
+from collections.abc import Mapping
 from dataclasses import dataclass
+from numbers import Real
 from typing import Dict, List, Optional, Sequence
 
 import torch
@@ -48,6 +51,43 @@ from .errors import SiltStreamError
 from .functional import block_forward
 from .model import StreamedCausalLM
 from .quant import dequantize_state, packed_bytes, quantize_state, state_bytes
+
+
+class CertificationError(SiltStreamError):
+    """Certification evidence is not a finite real numeric measurement."""
+
+
+def _finite_real(value: object, context: str) -> float:
+    """Validate before float coercion: bool/string/complex are not loss values."""
+    if isinstance(value, torch.Tensor):
+        if value.numel() != 1:
+            raise CertificationError(f"{context} must be a finite real number")
+        try:
+            value = value.item()
+        except (TypeError, ValueError, RuntimeError) as exc:
+            raise CertificationError(f"{context} must be a finite real number") from exc
+    if isinstance(value, bool) or not isinstance(value, Real):
+        raise CertificationError(f"{context} must be a finite real number")
+    try:
+        numeric = float(value)
+    except (OverflowError, ValueError, TypeError) as exc:
+        raise CertificationError(f"{context} must be a finite real number") from exc
+    if not math.isfinite(numeric):
+        raise CertificationError(f"{context} must be a finite real number")
+    return numeric
+
+
+def _validate_suites(suites: object) -> None:
+    if not isinstance(suites, Mapping) or any(not isinstance(k, str) for k in suites):
+        raise CertificationError("suites must map string skill keys to input batches")
+
+
+def _relative_degradation(loss: float, reference: float, context: str) -> float:
+    # Finite operands can still overflow in subtraction OR division. Keep the
+    # historical denominator floor and signed comparison, but reject either
+    # non-finite intermediate rather than certifying an apparent improvement.
+    delta = _finite_real(loss - reference, f"{context} loss delta")
+    return _finite_real(delta / max(abs(reference), 1e-12), f"{context} degradation")
 
 
 class BudgetError(SiltStreamError):
@@ -183,10 +223,18 @@ class SpringModel:
         `tolerance` (relative). Certificates are bound to the current LoRA
         fingerprint; any later skill change makes them stale.
         """
+        # A failed re-certification must not leave old or partially published
+        # certificates usable, even when the LoRA fingerprint has not changed.
+        self.certificates = {}
+        self._certified_lora_fp = None
+        tolerance = _finite_real(tolerance, "tolerance")
+        _validate_suites(suites)
+        certificates: Dict[str, StateCertificate] = {}
         fp = self.lora_fingerprint()
         with torch.no_grad():
             reference = {
-                name: float(self.loss(batch, state=FULL).item())
+                name: _finite_real(self.loss(batch, state=FULL),
+                                   f"reference loss for {name!r}")
                 for name, batch in suites.items()
             }
             for level in self.levels:
@@ -197,13 +245,14 @@ class SpringModel:
                 certified: List[str] = []
                 revoked: List[str] = []
                 for name, batch in suites.items():
-                    ls = float(self.loss(batch, state=level).item())
+                    ls = _finite_real(self.loss(batch, state=level),
+                                      f"{level} loss for {name!r}")
                     state_loss[name] = ls
                     ref = reference[name]
-                    degradation = (ls - ref) / max(abs(ref), 1e-12)
+                    degradation = _relative_degradation(ls, ref, f"{level}/{name}")
                     rel[name] = degradation
                     (certified if degradation <= tolerance else revoked).append(name)
-                self.certificates[level] = StateCertificate(
+                certificates[level] = StateCertificate(
                     state=level,
                     bytes_actual=self._bytes[level],
                     bytes_packed=self._bytes_packed[level],
@@ -215,6 +264,7 @@ class SpringModel:
                     tolerance=tolerance,
                     lora_fingerprint=fp,
                 )
+        self.certificates = certificates
         self._certified_lora_fp = fp
         return self.certificates
 
