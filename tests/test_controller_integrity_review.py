@@ -93,15 +93,28 @@ def test_outer_controller_death_kills_direct_child(tmp_path):
     marker = tmp_path / 'ready.json'
     outer = tmp_path / 'outer.py'
     outer.write_text('from pathlib import Path\nfrom scripts.run_specialist_quality_experiment import run\nimport sys\nrun([sys.executable,' + repr(str(child)) + ',' + repr(str(marker)) + '],Path(' + repr(str(tmp_path)) + '),timeout=25)\n')
-    proc = subprocess.Popen([sys.executable, str(outer)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    # outer.py lives outside the checkout; python -m pytest's sys.path is not
+    # inherited by it. Pin both source roots instead of relying on the caller.
+    env = dict(os.environ, PYTHONPATH=os.pathsep.join((str(REPO), str(REPO / 'src'))))
+    proc = subprocess.Popen([sys.executable, str(outer)], stdout=subprocess.DEVNULL,
+                            stderr=subprocess.PIPE, text=True, env=env, start_new_session=True)
     info = None
     try:
         end = time.monotonic() + 5
         while not marker.exists() and time.monotonic() < end:
+            if proc.poll() is not None:
+                break
             time.sleep(.02)
+        if not marker.exists():
+            if proc.poll() is None:
+                proc.kill()
+            _, stderr = proc.communicate(timeout=3)
+            pytest.fail(f'outer controller did not become ready (exit {proc.returncode}):\n{stderr}')
         info = json.loads(marker.read_text())
+        assert info['ppid'] == proc.pid
         proc.kill()
         proc.wait(timeout=3)
+        assert proc.returncode == -signal.SIGKILL
         time.sleep(.2)
         proc_stat = Path('/proc/' + str(info['pid']) + '/stat')
         state = proc_stat.read_text().split(') ')[1].split()[0] if proc_stat.exists() else 'GONE'
@@ -112,6 +125,7 @@ def test_outer_controller_death_kills_direct_child(tmp_path):
         if proc.poll() is None:
             proc.kill()
             proc.wait()
+        proc.stderr.close()
         if info:
             try:
                 os.killpg(info['pgid'], signal.SIGKILL)

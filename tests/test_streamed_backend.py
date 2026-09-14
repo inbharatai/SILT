@@ -311,20 +311,30 @@ def test_group1_requesting_cuda_on_cpu_raises_backend_unavailable():
         StreamedCausalLM(ModelConfig(), StreamConfig(compute_device="cuda"))
 
 
-def test_group1_requesting_cuda_in_train_blocks_without_fallback():
-    """train() asked for cuda on a CPU host -> named DeepApplyBlocked, no
-    silent CPU fallback. (Uses a mock receiver; the cuda check fires after the
-    receiver check, so the mock is blocked first -- to isolate the cuda path we
-    point the receiver at a real-ish model_id and assert the cuda block.)"""
+def test_group1_requesting_cuda_in_train_blocks_without_fallback(tmp_path, monkeypatch):
+    """Real local config parsing reaches the CUDA guard with no cache or weights;
+    train() must raise a named block, never silently fall back to CPU."""
     import torch
 
     if torch.cuda.is_available():
         pytest.skip("CUDA host")
+    from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaConfig
     from asea.deepapply.backends import SiltStreamBackend
+
+    model_dir = tmp_path / "config-only"
+    LlamaConfig(vocab_size=32, hidden_size=16, intermediate_size=32,
+                num_hidden_layers=1, num_attention_heads=2,
+                num_key_value_heads=2, max_position_embeddings=32).save_pretrained(model_dir)
+
+    def forbidden_load(*args, **kwargs):
+        pytest.fail("CUDA refusal must precede weight/tokenizer loading or CPU fallback")
+
+    monkeypatch.setattr(AutoModelForCausalLM, "from_pretrained", forbidden_load)
+    monkeypatch.setattr(AutoTokenizer, "from_pretrained", forbidden_load)
 
     class _FakeHFReceiver:
         module_id = "fake"
-        model_id = "HuggingFaceTB/SmolLM2-135M"
+        model_id = str(model_dir)
 
         def manifest(self):
             class M:
@@ -337,9 +347,11 @@ def test_group1_requesting_cuda_in_train_blocks_without_fallback():
     with pytest.raises(DeepApplyBlocked) as exc:
         SiltStreamBackend().train(
             _FakeHFReceiver(), ds, {"compute_device": "cuda", "storage_tier": "disk"},
-            Path(os.path.join(os.path.dirname(__file__), "_unused_out")),
+            tmp_path / "unused-out",
         )
     assert "cuda" in str(exc.value).lower()
+    assert "asked for cuda but no CUDA GPU is available" in str(exc.value)
+    assert not (tmp_path / "unused-out").exists()
 
 
 # ===========================================================================

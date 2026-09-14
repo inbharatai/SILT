@@ -47,7 +47,18 @@ jobs:
           OPENBLAS_NUM_THREADS: "1"
         # `python -m pytest` (not bare `pytest`) so the `tests` package is
         # importable for cross-test fixtures (e.g. tests.conftest, tests.test_promotion_gate).
-        run: python -m pytest -q
+        run: |
+          mkdir -p reports
+          python -m pytest -q -ra --junitxml=reports/pytest-python-${{ matrix.python-version }}.xml
+
+      - name: Retain test results including failures and skip reasons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-python-${{ matrix.python-version }}
+          path: reports/pytest-python-${{ matrix.python-version }}.xml
+          if-no-files-found: warn
+          retention-days: 14
 
   lint-check:
     name: sanity (imports clean, no real-weight escape)
