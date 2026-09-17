@@ -4,6 +4,8 @@
 
 This report summarizes locally recorded evidence from the frozen V5 implementation. It does not announce deployment, model-weight availability, a new quality certificate or third-party authentication. It supplements rather than replaces SILT's general skill-interchange architecture: inspectable packets, held-out admission, double gating, removable LoRA, SiltStream, ZeroForge, SiltSpring, audit, rollback and skill-layer unlearning remain separate, existing mechanisms.
 
+**Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. Fresh governed data and a frozen, verified effective-policy protocol are required for new quality claims; the consumed final set is not a retry set. The original evidence and counts below are preserved with the [2026-09-12 generation-policy correction](GENERATION_POLICY_NOTICE.md), not replaced by a new evaluation.
+
 ## What the experimental path implements
 
 The optional source-weight pipeline performs calibration, coherent Qwen MLP reconstruction or native Switch-to-dense-T5 conversion, real teacher-guided recovery, teacher-independent export, functional validation and a once-only final comparison. It physically constructs smaller models; it is neither prompt-only packet transfer nor a masked full checkpoint. This source-derived path must not be confused with the default L3 packet path, which does not copy teacher weights.
@@ -56,7 +58,9 @@ All six models were frozen before the same 16 new local final tasks were evaluat
 | Uniform-channel reconstruction, same size, unrepaired | **0/16** |
 | Off-the-shelf SmolLM2-360M-Instruct | **8/16** |
 
-Relative to the source, the recovered model has **eight both-pass, four both-fail, four source-only passes and zero recovered-only passes**. Recovery did not improve the aggregate final total over unrepaired activation reconstruction. SmolLM2 matched that total; competitive superiority is not established.
+**Critical historical generation-policy correction — 2026-09-12.** Archived V5 logs record sampling-default overrides for the reconstructed and recovered Qwen students and the random-MLP and uniform-channel controls, despite receipts reporting requested greedy settings. Source-Qwen and SmolLM2 logs do not show that override; historical per-case actual modes were not instrumented. Original counts remain unchanged. This is not a certified matched-greedy retention or competitive comparison, and the four source-only passes cannot be attributed solely to compression or recovery training. No corrected score, final rerun or rescore is claimed. See [the full correction](GENERATION_POLICY_NOTICE.md) for the saved 4.43.1/4.42.3 versus 4.51.3 version metadata and default-merging mechanism.
+
+Relative to the source, the recovered model has **eight both-pass, four both-fail, four source-only passes and zero recovered-only passes**. In these unchanged historical observations, recovery did not improve the aggregate final total over unrepaired activation reconstruction. SmolLM2 matched that total; competitive superiority and matched-greedy retention are not established.
 
 The random control tests initialization dependence with a retained pretrained backbone and a limited LoRA budget. It is not a competitive full-from-scratch distillation baseline. Uniform reconstruction received no recovery training. SmolLM2 differs in architecture and pretraining. The comparisons therefore do not isolate a universal algorithmic advantage.
 
@@ -64,11 +68,13 @@ This is a small local cohort, **not official HumanEval/MBPP accuracy**, a statis
 
 ### What the later read-only case analysis adds
 
-Archived-output analysis corroborated three substantive program-semantics failures and one termination-policy failure among the four source-pass/recovered-fail tasks. The latter retained a plausible correct body but exhausted the output cap without established EOS and was rejected before execution; it remains a failure under the frozen policy.
+Archived-output analysis corroborated three substantive program-semantics failures and one termination-policy failure among the four source-pass/recovered-fail tasks. The latter retained a plausible correct body but exhausted the output cap without established EOS and was rejected before execution; it remains a failure under the frozen policy. These three algorithmic defects remain real in the saved outputs, but mismatched decoding prevents attributing the four lost tasks solely to compression or training; the static diagnoses are not matched-greedy causal evidence.
 
-Two tasks improved relative to unrepaired reconstruction through required function-name/API binding and executability repairs, not demonstrated acquisition of new algorithms. Neither win was a token-cap/EOS rescue. Two other previously passing tasks failed after recovery, leaving the total at 8/16. Successful completion, correct API use and correct algorithms are distinct outcomes.
+Two tasks improved relative to unrepaired reconstruction through required function-name/API binding and executability repairs, not demonstrated acquisition of new algorithms. Neither win was a token-cap/EOS rescue. Two other previously passing tasks failed after recovery, leaving the total at 8/16. Successful completion, correct API use and correct algorithms are distinct outcomes. These output-level differences do not isolate a causal recovery benefit under the affected generation policy.
 
 This analysis read archived material without executing candidates, replaying the oracle, changing scores or modifying source/models. It does not identify a causal neuron, factor, training example or optimization step. No case-hardcoded source fix is proposed or applied. Any future improvement study must use **fresh data and a newly governed evaluation**, not train on, retune against or rescore this consumed final set.
+
+The local specialist generation-policy fix is verified on tiny models and a retained recovered-Qwen nonfinal CPU prompt under seeds 0 and 1; this is mechanics evidence, not quality. It requires **Transformers 4.51.3** and, for factor wrappers, **non-prompt PEFT 0.15.2**. Production receipts distinguish requested/resolved policy and do not claim live-mode instrumentation. Subsequent local readiness verification rebuilt the wheel and sdist and confirmed payload equality with the previously tested installed wheel. This is packaging integrity evidence, not new model-quality or CUDA evidence; rebuild and reverify packaged resources after further source/document edits. Teacher-forced CE/KL does not traverse generation resolution, and the strict recovery export/reload probe used direct `do_sample=False` kwargs: those measurements are outside this specific sampling-default defect.
 
 ## Frozen-source verification: what was actually recorded
 

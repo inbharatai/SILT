@@ -216,13 +216,16 @@ def inspect_bundle(path) -> dict:
     return manifest
 
 
-def load_standalone(path, dtype=None, local_only=True) -> StandaloneModel:
+def load_standalone(path, dtype=None, local_only=True, *, execution_device="cpu",
+                    memory_budget_bytes=None, device_memory_budget_bytes=None) -> StandaloneModel:
     """Load verified local base + native PEFT factors, never merge or fetch teacher.
 
     dtype=None preserves the recorded graph; an explicit dtype must match it.
     local_only=False is rejected. Return .model, .tokenizer, .manifest, .base_path.
     Only the recorded exact dependency versions are admitted for arithmetic parity.
     """
+    from .devices import validate_device_request, resolve_device, move_preserving_dtype, device_admission
+    validate_device_request(execution_device)
     _require(local_only is True, "Standalone loader is local-only")
     manifest = inspect_bundle(path)
     root = safe_path(path)
@@ -244,6 +247,24 @@ def load_standalone(path, dtype=None, local_only=True) -> StandaloneModel:
     # Exactly the training loader, including T5's F32 wo and CPU rotary buffers.
     # HF from_pretrained(BF16) can silently round saved F32 wo tensors; it is not
     # interchangeable with this computation graph. No saved base tensor is cast.
+    from .recovery import _header_stats
+    stats = _header_stats(root / "base", manifest["counts"]["rank"], TARGETS[manifest["model_type"]], requested)
+    factors_bytes = manifest["counts"]["factor_parameters"] * 4
+    # Full host base/load transient plus initialized adapters, saved factors and
+    # tokenizer/library reserve; NEVER treat safetensors file size as live RAM.
+    host_peak = stats["load_peak_bytes"] + factors_bytes * 3 + 512 * 1024**2
+    device_peak = stats["loaded_bytes"] + factors_bytes + 128 * 1024**2
+    if execution_device == "auto":
+        from .evaluation import _admit_inference
+        workspace = _admit_inference(config, requested,
+            min(2048, config.get("max_position_embeddings", 2048)), 2,
+            factor_rank=manifest["counts"]["rank"], _estimate_only=True)["estimated_additional_peak_bytes"]
+        device_peak += workspace
+        host_peak = max(host_peak, workspace)
+    selection = resolve_device(execution_device, torch=torch, dtype=requested,
+        host_required_bytes=host_peak, device_required_bytes=device_peak,
+        memory_budget_bytes=memory_budget_bytes, device_memory_budget_bytes=device_memory_budget_bytes,
+        total_process_cap=True)
     model = _load_recovery_model(meta, root / "base", headers, plan, torch)
     # PEFT reads model.name_or_path and overwrites its constructor config with it.
     # Supply only this verified local component, never a provenance/source path.
@@ -265,6 +286,10 @@ def load_standalone(path, dtype=None, local_only=True) -> StandaloneModel:
     _require(not info.unexpected_keys and not any("lora_" in k for k in info.missing_keys), "Incomplete adapter load")
     _require(all(torch.equal(v, state[k]) for k, v in get_peft_model_state_dict(model).items()),
              "Adapter reload changed trained factors")
+    del state, expected
+    if selection["device"] != "cpu":
+        device_admission(torch, selection["device"], device_peak, device_memory_budget_bytes, phase="standalone-transfer")
+        move_preserving_dtype(model, selection["device"])
     model.requires_grad_(False)
     model.eval()
     tokenizer = AutoTokenizer.from_pretrained(root / "base", local_files_only=True, trust_remote_code=False)

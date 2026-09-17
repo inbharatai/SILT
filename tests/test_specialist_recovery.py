@@ -1428,6 +1428,10 @@ def test_large_constant_header_factor_budget_has_no_second_base_or_embedding_cas
         lora_target_loaded_bytes=100000000, largest_tensor_parameters=134217728)
     monkeypatch.setattr(r, "_header_stats", lambda *a, **k: dict(stats))
     monkeypatch.setattr(r, "_available_ram", lambda: 8 * 1024**3)
+    # Synthetic finite capacity for fake 425M headers, not host disk admission.
+    # Keep this function-scoped so resource rejection tests retain their guards.
+    monkeypatch.setattr(r.shutil, "disk_usage", lambda path: r.shutil._ntuple_diskusage(
+        64 * 1024**3, 32 * 1024**3, 32 * 1024**3))
     config = Qwen2Config(vocab_size=151936, hidden_size=896, num_hidden_layers=24,
                          num_attention_heads=14, num_key_value_heads=2)
     kwargs = dict(memory_budget_bytes=2669510247, export_mode="factor_preserving")
@@ -1440,3 +1444,37 @@ def test_large_constant_header_factor_budget_has_no_second_base_or_embedding_cas
     with pytest.raises(RecoveryRejected, match="memory headroom"):
         r._preflight(None, None, tmp_path, config, 8, ["q_proj"], 2, 32, False, torch,
                      memory_budget_bytes=2669510247, export_mode="native_merged")
+
+
+@pytest.mark.parametrize("export_mode", ["native_merged", "factor_preserving"])
+@pytest.mark.parametrize("teacher_mode", ["cached", "resident"])
+def test_insufficient_disk_rejected_before_model_load(tmp_path, monkeypatch, export_mode, teacher_mode):
+    import asea.specialist.recovery as r
+    teacher, student, train, dev = tiny_stores(tmp_path, "causal")
+    before_teacher, before_student = _store_hash(teacher), _store_hash(student)
+    output = tmp_path / "no-disk"
+    disk_paths, model_loads = [], []
+
+    def insufficient_disk(path):
+        disk_paths.append(Path(path))
+        return r.shutil._ntuple_diskusage(1024**3, 1024**3 - 1, 1)
+
+    def forbidden_load(*args, **kwargs):
+        model_loads.append(True)
+        pytest.fail("Insufficient disk reached a model loader")
+
+    # Exercise recover's real _preflight and header arithmetic, not a stubbed guard.
+    monkeypatch.setattr(r, "_available_ram", lambda: 8 * 1024**3)
+    monkeypatch.setattr(r.shutil, "disk_usage", insufficient_disk)
+    monkeypatch.setattr(r, "_load_recovery_model", forbidden_load)
+    for cls in (AutoModelForCausalLM, AutoModelForSeq2SeqLM):
+        monkeypatch.setattr(cls, "from_pretrained", forbidden_load)
+    result = recover(teacher, student, output, train, dev, steps=1, rank=2,
+                     max_length=12, dtype="float32", teacher_mode=teacher_mode,
+                     export_mode=export_mode)
+    assert result["status"] == "rejected" and result["actual_steps"] == 0
+    assert result["error"]["message"] == "Insufficient disk headroom before model loading/cache"
+    assert disk_paths == [output.parent] and not model_loads
+    assert not result["artifact_admitted"] and not output.exists()
+    assert not list(tmp_path.glob(".no-disk.recovery-*"))
+    assert _store_hash(teacher) == before_teacher and _store_hash(student) == before_student

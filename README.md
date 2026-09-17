@@ -4,7 +4,9 @@
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
-> **Experimental reconstruction/recovery checkpoint — quality not certified.** The frozen V5 construction pipeline completed local verification; model quality remains experimental. Optional source-weight reconstruction and teacher-guided recovery now sit alongside capability composition, structural pruning and the existing packet/LoRA/Spring paths. Existing transfer gates and defaults remain unchanged. Read the bounded [September 2026 release evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) for actual training, all six final-comparison arms and verification scope. [HARDENING_PASS2.md](docs/HARDENING_PASS2.md) and [EXPERIMENTAL_HANDOFF.md](docs/EXPERIMENTAL_HANDOFF.md) retain earlier checkpoint context. No claim is made that these new mechanisms are covered by the earlier provisional. The earlier phase labels are historical: the scoped reconstruction/recovery work described here is implemented, while unvalidated model families, latent cross-modal bridges and hardware targets remain outside this release.
+> **Integrated release snapshot — 2026-09-12; quality not certified.** Hardware-adaptive specialist planning/execution, controller and data-binding safeguards, numeric/state-restoration fixes and Studio usability repairs now accompany the existing packet/LoRA/Spring, composition and reconstruction paths. Linux CPU is the supported validation target; single-NVIDIA-CUDA code is implemented but **GPU_UNVERIFIED**. Existing transfer gates and defaults remain unchanged. Read the [integrated release summary](docs/INTEGRATED_RELEASE_2026_09_12.md) for current scope and the independently recorded local verification, and the [historical frozen V5 evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) for all six final-comparison arms. There is no new 3B quality result, automatic model activation or claim of coverage by the earlier provisional. [HARDENING_PASS2.md](docs/HARDENING_PASS2.md) and [EXPERIMENTAL_HANDOFF.md](docs/EXPERIMENTAL_HANDOFF.md) retain historical context.
+
+> **Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. Fresh governed data and a frozen, verified effective-policy protocol are required for new quality claims; the consumed final set is not a retry set. See the [generation-policy notice](docs/GENERATION_POLICY_NOTICE.md). The historical comparison below does not establish matched-greedy retention.
 
 <p align="center"><em>Transfer a specialist skill. Measure the gain. Evaluate hardware-aware adaptation.</em></p>
 
@@ -35,6 +37,29 @@
 The default mechanism is L3 **when you invoke** `asea run`; installing or merging code does not start a transfer. Optional backends require an explicit API/Studio request. Experimental CLIs are separately invoked; the local experimental UI requires **`SILT_ENABLE_EXPERIMENTAL=1` before server startup**, matching runtime/models, loopback access and its session token. Unset, `0` or `true` do not enable it. Restart after an off-start to mount routes. No run, import, plan, selection or specialist build automatically activates a model.
 
 [Full source-cited capability catalog](docs/CAPABILITIES.md) · [local setup](LOCAL_SETUP.md) · [experimental workbench](docs/EXPERIMENTAL_STUDIO.md) · [specialist build](docs/SPECIALIST_STUDIO.md). The public [Studio page](https://silt.inbharat.ai/studio/) is setup/launcher documentation, not hosted model compute. Locally provisioned inference can stay local; remote connectors and cloud-tagged Ollama models can send prompts/payloads off-host. Neither a loopback HTTP endpoint nor “local-first” guarantees zero upload or zero cost.
+
+For a reproducible larger-model quality study, use the public-CLI automation in
+[`scripts/run_specialist_quality_experiment.py`](scripts/run_specialist_quality_experiment.py)
+with a fresh recipe such as
+[`configs/specialist_qwen3b_quality_template.json`](configs/specialist_qwen3b_quality_template.json).
+Read the [hardware planner](docs/HARDWARE_ADAPTIVE.md) and
+[experiment/device-local runbook](docs/SPECIALIST_QUALITY_EXPERIMENT.md).
+The wrapper delegates planning, build and finalize to public SILT modules; it does
+not implement separate model loading, training or grading. Header-only planning
+is distinct from authorized TRAIN/DEV token profiling; unseen FINAL stays
+quarantined. A `READY` estimate is neither owner approval nor a resource reservation.
+A config-only 3B proposal without actual checkpoint/tokenizer/data bindings is not
+READY, and no completed 3B execution or quality-retention result is claimed.
+
+The integrated controller binds the executed recipe/config and the mandatory
+reviewed dataset sidecar, preserves blocked/rejected outcomes, and publishes a
+terminal report plus a separate fsync acknowledgement. Neither exit zero nor a
+terminal snapshot alone proves acknowledged completion or power-loss durability.
+The wrapper keeps the compact baseline `BASELINE_NOT_RUN`; `--compact-baseline`
+does not run it. Final requires explicit reviewed engineering-only acceptance
+waiving that missing comparison and a separate exercised deployment receipt, not
+an automatic four-arm quality certificate. No model weights are included in the
+public source repository, and no model or endpoint is automatically activated.
 
 ### 🎯 The SILT thesis — Transfer → Prove → Adapt
 
@@ -124,8 +149,11 @@ packet, double-gate, SiltStream, ZeroForge or SiltSpring mechanisms.
 | Uniform-channel reconstruction, unrepaired | 0 |
 | Off-the-shelf SmolLM2-360M-Instruct | 8 |
 
-All six arms completed without missing or operationally blocked tasks. Recovery
-did not improve the aggregate total; the compact baseline matched it. This small
+**Critical historical generation-policy correction — 2026-09-12.** Archived V5 logs record sampling-default overrides for the reconstructed and recovered Qwen students and the random-MLP and uniform-channel controls, despite receipts reporting requested greedy settings. Source-Qwen and SmolLM2 logs do not show that override; historical per-case actual modes were not instrumented. Original counts remain unchanged. This is not a certified matched-greedy retention or competitive comparison, and the four source-only passes cannot be attributed solely to compression or recovery training. No corrected score, final rerun or rescore is claimed. See [evidence, runtime compatibility and fix limits](docs/GENERATION_POLICY_NOTICE.md).
+
+All six arms completed without missing or operationally blocked tasks. In the
+unchanged historical observations, recovery did not improve the aggregate total;
+the compact baseline matched it. This small
 local cohort establishes **neither teacher-level quality preservation nor a
 competitive advantage**, and is not official HumanEval/MBPP accuracy. Engine
 completion (`BUILT_UNCERTIFIED`) does not mean quality success or admission.
@@ -139,12 +167,15 @@ for `b583ba0d7de077d4e8594b08f0f77cc29655459e` was green on Python **3.9, 3.11 a
 3.12** plus sanity. CI used `.[dev,studio]`, not the local full-ML environment;
 its per-job counts are not asserted. None is a model-quality result or a rerun
 of this documentation edit. See [verification scope](docs/CAPABILITIES.md#verification-scope).
+
+The local specialist generation-policy fix is verified on tiny models and a retained recovered-Qwen nonfinal CPU prompt under seeds 0 and 1; this is mechanics evidence, not quality. It requires **Transformers 4.51.3** and, for factor wrappers, **non-prompt PEFT 0.15.2**. Production receipts distinguish requested/resolved policy and do not claim live-mode instrumentation. Subsequent local readiness verification rebuilt the wheel and sdist and confirmed payload equality with the previously tested installed wheel. This is packaging integrity evidence, not new model-quality or CUDA evidence; rebuild and reverify packaged resources after further source/document edits.
+
 Earlier approximately 420/421-test references are historical snapshots. The
 [release evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) gives runtime/skip scope,
 the Git-independent frozen source digest and the locally recorded verification
 method; it is not third-party authentication. Later read-only loss/win analysis
 distinguishes API/executability and token-completion failures from algorithmic
-errors. Scores remain unchanged; no case-hardcoded fix was made. Future studies
+errors. Three saved-output algorithmic defects and one termination-policy failure remain real static diagnoses, not causal proof of compression/training damage under matched greedy decoding. Scores remain unchanged; no case-hardcoded fix was made. Future studies
 require fresh data rather than retuning the consumed final set.
 
 LoRA and teacher-guided training are established prior art. These additions are
@@ -169,6 +200,20 @@ PYTHONPATH=src python -m asea.cli report --workspace .work
 
 Optional extras, the full CLI, the mock flows and Windows / PowerShell notes
 are in [Quick start](#quick-start) below.
+
+For source-weight specialist studies, start with the reproducible experiment
+runner instead of ad hoc shell notes:
+
+```bash
+PYTHONPATH=src python scripts/run_specialist_quality_experiment.py \
+  --preflight-only \
+  --candidate Qwen/Qwen2.5-Coder-3B-Instruct \
+  --report .work-specialist/preflight.json
+```
+
+Use `--recipe`, `--workspace`, and finally `--run-final` only with fresh governed
+data and local model stores. `--run-final` deliberately consumes the final suite
+through SILT's one-shot `finalize` command.
 
 📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
 [`docs/teaser.html`](docs/teaser.html).
@@ -650,6 +695,20 @@ trusted-author limitation, not independently authenticated model provenance.
 
 ## Beyond packet transfer — deep-apply, hardware adaptation, and verification
 
+**Integrated specialist hardware adaptation:** `python -m asea.hardware probe`
+and `plan` expose architecture/dtype/phase estimates with explicit device choices.
+Specialist `recover`/`infer`/`evaluate` accept `cpu`, `auto` or canonical `cuda:N`;
+explicit unavailable devices block rather than silently falling back. Reconstruction
+remains CPU-only. Native loading, phase-lifetime memory estimates and guarded
+teacher-cache/data profiles are implemented; CPU staging for CUDA is **not
+out-of-core execution**. Host RAM, device memory and disk must fit independently.
+Linux CPU has bounded real execution evidence; CUDA remains **GPU_UNVERIFIED**.
+Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and offload execution are unsupported
+for this adaptive specialist path. An operator-reported Windows RTX5050 inventory
+is not an independently retained GPU execution receipt. See
+[hardware limits](docs/HARDWARE_ADAPTIVE.md) and the
+[device-local validation runbook](docs/SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook).
+
 ### deep-apply — three gated LoRA backends (`src/asea/deepapply/`)
 
 `DeepApplyRunner` (`runner.py`) builds a training dataset from **only the
@@ -716,9 +775,14 @@ SiltSpring has **two different contracts**:
    dequantized for computation. Deterministic dequantization is not recovery of
    the original unquantized values. Embeddings/head and runtime costs remain.
 5. **Report per (state, skill):**
-   `degradation = (loss_state − loss_ref) / |loss_ref|`; finite measured values
-   ≤ tolerance are certified, worse values revoked; unmeasured/nonfinite
-   comparisons are not certificates. Favorable loss movement does not revoke.
+   `degradation = (loss_state − loss_ref) / max(|loss_ref|, 1e-12)`;
+   finite measured values ≤ tolerance are certified, worse values revoked.
+   Favorable loss movement does not revoke. Both real HF and toy `SpringModel`
+   now reject non-finite/non-real tolerances and losses, malformed suite mappings,
+   and overflow in the derived delta/ratio before publishing usable certificates.
+   Failed toy recertification clears stale/partial certificates. Valid finite
+   comparisons and the .02/.05 defaults are unchanged; these numeric guards do
+   not fix the full-suite/heldout limitation or establish task quality.
 
 **Separate toy-wrapper controls:** `choose_state(budget, required_skills)` picks
 an eligible certified state or raises `BudgetError`/`StateNotCertifiedError`;
@@ -738,7 +802,13 @@ not automatic device adaptation or a weak-hardware fit guarantee. A
 quantized streamer must re-expand to full precision on exit (vendor guard B2:
 a spring that cannot re-expand is a silent compression trap), so the
 full-precision layers are banked once as the `restore_bank` and handed to every
-quantized streamer.
+quantized streamer. On exit, banked parameters **and persistent buffers** restore
+from that original full bank with native dtypes, pre-offload devices and registered
+object ties preserved. This is not rollback of live LoRA updates, nonpersistent
+runtime caches, arbitrary forward side effects, failed entry or storage failure.
+See [numeric regressions](tests/test_spring_nonfinite_guards.py) and
+[state-restoration regressions](tests/test_streamer_state_restore.py); tiny tensor
+mechanics are not pretrained-quality or GPU evidence.
 
 **Architecture discovery, not a compatibility certificate** — the HF path uses
 `AutoModelForCausalLM` and searches for a decoder stack
@@ -1027,6 +1097,15 @@ at every run-creation path — `POST /api/transfers`, `/api/deepapply`,
 `/api/spring`, `/api/skills/test` — and returns 400 with the required capability
 + the model's supported list **before any job spawns**. No "% of knowledge
 transferred" appears anywhere, because no such measurement exists.
+
+The integrated Studio repairs tab-scoped navigation, narrow-screen form layout
+and README table rendering. Health/discovery distinguishes **code available**,
+**routes mounted** and **enabled** without loading models or running a hardware
+probe. “App available” is not model readiness: selected-model dependencies,
+local assets, runtime and quality remain unchecked until separately exercised.
+The public setup page remains documentation, not a hosted compute or token bridge.
+[Product regressions](tests/test_studio_product_fixes.py) exercise these boundaries;
+no new browser-test count or integrated full-suite pass is claimed here.
 
 ### What SILT shows you — live evidence, not a "% transferred" gauge
 

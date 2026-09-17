@@ -78,7 +78,8 @@ def test_real_data_preflight_never_opens_final(monkeypatch):
     monkeypatch.setattr(w, "file_hash", guarded)
     original_read = w._bounded_json
     def guarded_read(path):
-        assert not Path(path).name.startswith("final")
+        if not isinstance(path, bytes):
+            assert not Path(path).name.startswith("final")
         return original_read(path)
     monkeypatch.setattr(w, "_bounded_json", guarded_read)
     result = w.data_preflight(config, files)
@@ -124,6 +125,10 @@ def test_host_verdict_not_return_values_and_digest_default(tmp_path, monkeypatch
 
 
 def fake_build_setup(tmp_path, monkeypatch, reject_recovery=False):
+    # Dispatch/marker tests use fake tensor files; admission is tested separately.
+    import asea.hardware
+    monkeypatch.setattr(asea.hardware, "plan_specialist", lambda *a, **kw: {
+        "schema_version": 1, "status": "READY", "execution_device": "cpu", "reasons": []})
     teacher = tmp_path / "teacher"
     teacher.mkdir()
     put(teacher / "config.json", {"model_type": "qwen2"})
@@ -586,6 +591,7 @@ def test_live_infrastructure_failures_block_and_preserve_all_tasks(tmp_path, mon
         def close(self):
             seen.append("close")
     monkeypatch.setattr(e, "NativeGenerator", Generator)
+    monkeypatch.setattr(e, "profile_local_inputs", lambda *a: {"max_input_tokens": 2})
     report = e.evaluate(tmp_path / "model", suite)
     assert not report["completed"] and not report["engineering_complete"]
     assert report["tasks_total"] == report["tasks_blocked"] == 2
@@ -1511,6 +1517,9 @@ def test_actual_two_step_factor_build_frozen_bundle_independent_infer_validate(t
         assert (root / "recover.receipt.json.history.json").exists()
         assert not (bundle / "recover.receipt.json.history.json").exists()
         assert any(Path(k).name == "standalone.py" for k in result["implementation"]["source_files"])
+        # This fixture stubs governance above, so the final resource planner's
+        # governed inputs do not exist. Actual tensor/generation guards stay real.
+        monkeypatch.setattr(w, "_execution_plan", lambda *a, **kw: ("cpu", None))
         # Even audit-only sidecars belong to the full immutable bundle freeze.
         audit = bundle / "recovery_report.json"
         audit_bytes = audit.read_bytes()

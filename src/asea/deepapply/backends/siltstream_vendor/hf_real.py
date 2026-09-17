@@ -34,6 +34,7 @@ from torch import nn
 
 from .errors import StorageError, UnsupportedModelError
 from .quant import dequantize_state, packed_bytes, quantize_state, state_bytes
+from .spring import _finite_real, _relative_degradation, _validate_suites
 
 
 # --------------------------------------------------------------------------
@@ -64,7 +65,7 @@ def get_decoder_layers(model: nn.Module) -> nn.ModuleList:
 
 
 class HFDiskBank:
-    """Per-layer weight storage on disk; full fp32 or quantized containers."""
+    """Per-layer state on disk; full preserves native dtypes, or quantized containers."""
 
     def __init__(self, layers: nn.ModuleList, disk_dir: str, level: str = "full"):
         self.disk_dir = disk_dir
@@ -114,7 +115,15 @@ class HFDiskBank:
 
 class HFStreamer:
     """Streams a real HF model: decoder-layer weights live on disk and are
-    materialized one layer at a time via pre-forward hooks."""
+    materialized one layer at a time via pre-forward hooks.
+
+    On exit, banked parameters and persistent buffers are restored from the
+    original full bank in their native dtype and pre-offload device. Registered
+    Tensor/Parameter objects are retained, including object ties. Live LoRA
+    adapters and nonpersistent runtime caches are not rolled back; the latter
+    are not in the bank and are never snapshotted here. This is not a transaction
+    for arbitrary forward side effects, storage failure, or failed __enter__.
+    """
 
     def __init__(self, model: nn.Module, bank: HFDiskBank,
                  restore_bank: Optional[HFDiskBank] = None,
@@ -129,10 +138,12 @@ class HFStreamer:
         # silently left the model compressed -- a spring that cannot
         # re-expand). Streaming a full bank may restore from itself.
         self.restore_bank = restore_bank if restore_bank is not None else bank
-        if self.restore_bank.level != "full" and bank.level != "full":
+        if self.restore_bank.level != "full":
             raise UnsupportedModelError(
-                "streaming a quantized bank requires restore_bank at level "
+                "streaming requires restore_bank at level "
                 "'full' -- exiting must re-expand to full precision")
+        if len(self.layers) != self.restore_bank.n_layers:
+            raise UnsupportedModelError("restore bank/model layer count mismatch")
         # Compute device for the resident layer during streaming. The bank
         # always stores on CPU disk (see HFDiskBank); ``_load_layer`` moves each
         # re-materialized layer onto ``device`` just before it runs. ``"cpu"``
@@ -143,6 +154,16 @@ class HFStreamer:
         self.device = device
         self._handles: List = []
         self._offloaded = False
+        self._restore_devices = self._state_devices()
+
+    def _state_devices(self) -> List[Dict[str, torch.device]]:
+        # Metadata only: no resident weight copies, and state_dict excludes
+        # nonpersistent buffers (potentially very large ephemeral caches).
+        return [
+            {name: tensor.device for name, tensor in layer.state_dict().items()
+             if "lora_" not in name}
+            for layer in self.layers
+        ]
 
     # -- weight materialization ------------------------------------------------
 
@@ -172,6 +193,10 @@ class HFStreamer:
             param.data = torch.empty(0, dtype=param.dtype)
 
     def offload_all(self) -> None:
+        if not self._offloaded:
+            # Capture every layer before freeing any: tied objects may appear
+            # in multiple layers. Refresh on re-entry after a caller moves them.
+            self._restore_devices = self._state_devices()
         for i in range(len(self.layers)):
             self._free_layer(i)
         self._offloaded = True
@@ -180,11 +205,18 @@ class HFStreamer:
         for i in range(len(self.layers)):
             state = self.restore_bank.load(i)
             layer = self.layers[i]
+            devices = self._restore_devices[i]
             for name, param in layer.named_parameters():
                 if "lora_" in name:
                     continue
                 if name in state:
-                    param.data = state[name].to(param.dtype).to(self.device)
+                    param.data = state[name].to(devices[name])
+            for name, buf in layer.named_buffers():
+                if name in state and name in devices:
+                    # Use the FULL bank's native dtype, not buf.dtype: loading
+                    # a quantized bank changes buffers to float32. Assign data
+                    # rather than replacing the object to retain registered ties.
+                    buf.data = state[name].to(devices[name])
         self._offloaded = False
 
     def resident_layer_bytes(self) -> int:
@@ -310,7 +342,8 @@ def texts_to_batch(tokenizer, texts: Sequence[str], max_len: int = 96) -> torch.
 
 @torch.no_grad()
 def suite_loss(model: nn.Module, input_ids: torch.Tensor) -> float:
-    return float(model(input_ids=input_ids, labels=input_ids).loss.item())
+    # Validate the raw scalar before coercion can disguise a bool as 0/1.
+    return _finite_real(model(input_ids=input_ids, labels=input_ids).loss, "suite loss")
 
 
 def certify_hf_states(
@@ -332,14 +365,20 @@ def certify_hf_states(
     quantized level -- it had never actually run). ``device`` is inferred from
     the model so a cuda model streams layers onto the GPU (else the freed
     layers would land on CPU and break the forward against cuda embeddings)."""
+    tolerance = _finite_real(tolerance, "tolerance")
+    _validate_suites(suites)
     # Infer the compute device from the model's first parameter.
     try:
-        device = next(model.parameters()).device
-        device = str(device.type)
+        device = str(next(model.parameters()).device)
     except StopIteration:
         device = "cpu"
 
-    reference = {name: suite_loss(model, b) for name, b in suites.items()}
+    reference = {
+        name: _finite_real(suite_loss(model, b), f"reference loss for {name!r}")
+        for name, b in suites.items()
+    }
+    # Full is deliberately certified by convention, but only AFTER validating
+    # every reference loss. Invalid evidence must never produce a certificate.
     results: Dict[str, Dict[str, object]] = {
         "full": {
             "loss": reference,
@@ -358,9 +397,13 @@ def certify_hf_states(
         bank = HFDiskBank(layers, disk_dir=os.path.join(disk_dir, level), level=level)
         streamer = HFStreamer(model, bank, restore_bank=full_bank, device=device)
         with streamer:
-            losses = {name: suite_loss(model, b) for name, b in suites.items()}
+            losses = {
+                name: _finite_real(suite_loss(model, b), f"{level} loss for {name!r}")
+                for name, b in suites.items()
+            }
         degradation = {
-            k: (losses[k] - reference[k]) / max(abs(reference[k]), 1e-12) for k in suites
+            k: _relative_degradation(losses[k], reference[k], f"{level}/{k}")
+            for k in suites
         }
         certified = sorted(k for k, d in degradation.items() if d <= tolerance)
         revoked = sorted(k for k, d in degradation.items() if d > tolerance)
