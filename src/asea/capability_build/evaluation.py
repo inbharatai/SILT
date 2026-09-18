@@ -21,7 +21,7 @@ from __future__ import annotations
 import platform
 from typing import Any, Dict, List
 
-from .errors import BlockedResource
+from .errors import BlockedResource, InterventionInvalid
 
 
 def sandbox_supported() -> bool:
@@ -123,19 +123,29 @@ def evaluate_code_cases(
 
 
 def functional_judge(case: Dict[str, Any], _state_note: Dict[str, Any]) -> bool:
-    """Adapt a pre-judged case to the intervention ``judge`` contract.
+    """REFUSED on purpose (audit 2026-09-18): this used to replay a
+    pre-judged ``case['expected_verdict']`` and was documented as the
+    intervention ``judge``. A replay judge CANNOT serve an intervention:
+    ``run_intervention`` scores the base and masked arms with the same
+    judge, so replayed verdicts are identical in both arms and every
+    intervention silently reports ``target_drop == 0`` -- fabricated
+    non-causality, the exact defect class this project refuses.
 
-    The cases used by causal interventions are judged ONCE by the host
-    oracle (or recorded teacher-repair ground truth) and carry their verdict
-    in ``case['expected_verdict']``; the intervention replays the SAME
-    verdicts per case, varying only which teacher component is masked.
-    This keeps intervention scoring deterministic and identical across arms
-    without re-invoking the sandbox per token.
+    A real intervention judge must REGENERATE the teacher's output under
+    the current (base or masked) state and grade it against the case's
+    expected output through the host oracle. Wiring that regeneration
+    loop (inside the GLM worker) is the open operational chain work; the
+    CLI's ``intervene`` command already refuses to report an intervention
+    that was not measured. This stub refuses the same trap at the
+    library boundary so no future wiring can reach for the replay
+    shortcut and get silent zeros.
     """
-    verdict = case.get("expected_verdict")
-    if not isinstance(verdict, bool):
-        raise ValueError(
-            "intervention cases must carry a pre-judged boolean "
-            "'expected_verdict' (host-owned; the teacher never grades itself)"
-        )
-    return verdict
+    raise InterventionInvalid(
+        "functional_judge cannot be used as an intervention judge: replaying "
+        "pre-judged verdicts is blind to the masked state, so base and masked "
+        "arms score identically and every drop would silently be 0. An "
+        "intervention judge must regenerate the teacher's output under the "
+        "current state and grade it against the case's expected output "
+        "(regeneration loop not yet wired; the CLI refuses unmeasured "
+        "interventions)"
+    )

@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import re
 import sys
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -37,6 +38,7 @@ from . import (
 from .errors import (
     BlockedResource,
     CapabilityBuildError,
+    EvidenceClassError,
     RemoteConsentRequired,
 )
 from .schema import CapabilityBuildReceipt, ReceiptStatus
@@ -66,6 +68,13 @@ def _emit(payload: Dict[str, Any]) -> int:
     return 0
 
 
+#: Case sample ids are embedded verbatim in trace artifact names
+#: (``"<capability>-<sample_id>"``), so they must satisfy the same portable
+#: filename contract as CapabilityTrace.sample_id (no ':', no Windows-illegal
+#: chars -- audit 2026-09-18).
+_CASE_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+
 def _load_cases(path: str) -> List[Dict[str, Any]]:
     resolved = Path(path)
     try:
@@ -82,6 +91,13 @@ def _load_cases(path: str) -> List[Dict[str, Any]]:
                 raise CapabilityBuildError("case missing required field %r" % field)
         if case["group"] not in ("target", "control"):
             raise CapabilityBuildError("case group must be target/control")
+        if not isinstance(case["sample_id"], str) or not _CASE_ID_RE.match(case["sample_id"]):
+            raise CapabilityBuildError(
+                "case sample_id %r is not a portable id: 1-128 chars of "
+                "[A-Za-z0-9._-], starting alphanumeric (a ':' or other "
+                "platform-illegal char would corrupt the trace artifact "
+                "filename this id is embedded in)" % (case.get("sample_id"),)
+            )
     return raw
 
 
@@ -383,7 +399,31 @@ def _cmd_footprint(args) -> Dict[str, Any]:
                    "for internal evidence)",
         )
     traces = [load_trace(store.root / "traces" / ("%s.json" % n)) for n in names]
+    # A footprint binds to ONE spec: a trace recorded under a different
+    # capability belongs to a different footprint. Refuse rather than
+    # silently aggregate another capability's evidence under this spec.
+    foreign = sorted({t.capability_id for t in traces
+                      if t.capability_id != spec.capability_id})
+    if foreign:
+        raise CapabilityBuildError(
+            "workspace holds traces for other capability id(s) %s; this "
+            "footprint is for '%s'. Use one workspace per capability "
+            "(the store is per-capability by design)." % (
+                ", ".join(foreign), spec.capability_id)
+        )
     trace_class = traces_same_class(traces)
+    if trace_class is None:
+        # Non-empty traces + no single class = MIXED. Refuse (audit
+        # 2026-09-18): before this guard a mixed workspace silently
+        # produced a BEHAVIOURAL footprint (`or TRACE_CLASS_BEHAVIOURAL`),
+        # erasing the internal traces' class and violating the
+        # never-mix-evidence-classes constraint.
+        classes = sorted({t.trace_class for t in traces})
+        raise EvidenceClassError(
+            "workspace holds MIXED evidence classes (%s); one artifact may "
+            "carry exactly one class. Record behavioural and internal "
+            "traces in separate workspaces." % ", ".join(classes)
+        )
     target_cases = sum(1 for t in traces if t.group == "target")
     control_cases = sum(1 for t in traces if t.group == "control")
     if trace_class == TRACE_CLASS_INTERNAL:
@@ -477,7 +517,12 @@ def _cmd_student_baseline(args) -> Dict[str, Any]:
     def judge(case, output):
         expected = case.get("expected")
         if expected is None:
-            return False  # UNJUDGED cases never count as passes
+            # ABSTAIN (None), not False: the StudentJudge contract treats
+            # None as unjudged -- excluded from the pass rate and counted
+            # separately -- whereas False would fold an ungradable case
+            # into the failures and manufacture a lower pass rate no
+            # verdict ever issued (audit 2026-09-18).
+            return None
         return output.strip() == expected.strip()
 
     summary = measure_student_baseline(student, cases, infer=infer, judge=judge)
@@ -742,14 +787,32 @@ def _cmd_intervene(args) -> Dict[str, Any]:
 
 def _cmd_evaluate(args) -> Dict[str, Any]:
     from .evaluation import evaluate_code_cases
+    from .errors import BlockedResource
 
     source = Path(args.source).read_text(encoding="utf-8")
     cases = _load_cases(args.cases)
     result = evaluate_code_cases(source, cases)
+    if result.get("blocked"):
+        # A BLOCKED oracle run is a blocked resource, not a completed
+        # evaluation: emit it through the exit-2 discipline (requirement +
+        # remedy) instead of ok:true with a status string the operator has
+        # to notice by eye. The full oracle detail rides along in the error.
+        raise BlockedResource(
+            requirement=(
+                "the host oracle could not grade the candidate on this host "
+                "(oracle status: %s)"
+                % (result.get("oracle", {}).get("status")
+                   or result.get("oracle", {}).get("returncode"))
+            ),
+            remedy="run the evaluate stage where the Linux code sandbox works "
+                   "(WSL2 or a Linux container, as CI and the live pilot do); "
+                   "native Windows runs must report BLOCKED, never a weaker "
+                   "local execution path",
+        )
     return {
         "ok": True,
         "command": "evaluate",
-        "status": "BLOCKED_RESOURCE" if result["blocked"] else "completed",
+        "status": "completed",
         "platform": platform.system(),
         "result": result,
     }
@@ -765,8 +828,20 @@ def _cmd_receipt(args) -> Dict[str, Any]:
         raise CapabilityBuildError("receipt must be a JSON object")
     if raw.get("schema") != "silt.capability_receipt.v1":
         raise CapabilityBuildError("input is not a capability receipt")
+    # The input is the MATERIALISED (signed, on-disk) form: unmeasured
+    # fields carry the literal NOT_MEASURED token. Dematerialise before the
+    # strict schema sees it, exactly as receipt.verify_receipt does -- the
+    # signed bytes keep the token, validation sees the typed Optional
+    # (receipt.py contract). Stripping the signature fields here means they
+    # are re-signed fresh for THIS workspace (the input's signature is not
+    # carried over or trusted).
+    payload = CapabilityBuildReceipt.dematerialise(raw)
     receipt = CapabilityBuildReceipt.model_validate(
-        {k: v for k, v in raw.items() if k not in ("signature", "signature_alg", "key_fingerprint")}
+        {
+            k: v
+            for k, v in payload.items()
+            if k not in ("signature", "signature_alg", "key_fingerprint")
+        }
     )
     signed = sign_receipt(workspace, receipt)
     store = CapabilityStore(workspace)

@@ -86,6 +86,20 @@ def preflight(parameter_count: int) -> dict:
 
 
 def main() -> int:
+    # Frames are UTF-8 JSONL by protocol contract, but the interpreter's
+    # default stdio encoding follows the container locale (a C-locale or
+    # cp1252 image would make a non-ASCII prompt fail mid-frame with
+    # UnicodeEncodeError -- a protocol fault that looks like a crash).
+    # Reconfigure BEFORE the loop touches a single frame.
+    for stream in (sys.stdin, sys.stdout):
+        try:
+            stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError, OSError):
+            # Pre-3.7 or unsupported stream: the Docker image pins a modern
+            # Python, so this never fires in practice; the encode/decode
+            # layer below still validates every frame.
+            pass
+
     if not _CHECKPOINT:
         print(json.dumps({
             "protocol": proto.PROTOCOL, "protocol_version": proto.PROTOCOL_VERSION,
@@ -198,10 +212,10 @@ def main() -> int:
                         "routing": adapter.collect_routing(reset=True),
                     })
         finally:
-            if adapter._telemetry:
-                for handle in adapter._telemetry:
-                    handle.remove()
-                adapter._telemetry = None
+            # Public adapter API, not private internals: a routing pass that
+            # raised must never leave live telemetry hooks on a teacher whose
+            # parameter hashes still verify clean.
+            adapter.remove_router_hooks()
         return {
             "per_prompt": per_prompt,
             "usage_evidence_not_causal_importance": True,
@@ -277,9 +291,18 @@ def main() -> int:
         try:
             handler = handlers.get(operation)
             if handler is None:
-                raise InterventionInvalid("unknown op: %r" % operation)
-            result = handler(request.get("payload") or {})
-            response = proto.make_response(request, ok=True, result=result)
+                # The protocol defines its own error kind for this: an
+                # unknown op is an invalid_op, not an arch_mismatch -- kind
+                # mapping that lies makes the client's diagnostics lie too
+                # (audit 2026-09-18).
+                response = proto.make_response(request, ok=False, error={
+                    "kind": "invalid_op",
+                    "message": "unknown op: %r (known: %s)"
+                               % (operation, ", ".join(sorted(handlers))),
+                })
+            else:
+                result = handler(request.get("payload") or {})
+                response = proto.make_response(request, ok=True, result=result)
         except BlockedResource as exc:
             response = proto.blocked_response(request, exc.requirement, exc.remedy)
         except InterventionInvalid as exc:

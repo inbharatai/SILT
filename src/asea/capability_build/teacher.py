@@ -99,7 +99,9 @@ class BehaviouralOllamaTeacher:
     # -- transport -----------------------------------------------------------
 
     def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        from ...modules.real.ollama import urlopen_no_redirect
+        from ...modules.real.ollama import (
+            OllamaConnectionError, urlopen_no_redirect
+        )
 
         request = urllib.request.Request(
             "{}{}".format(self.host, path),
@@ -107,8 +109,23 @@ class BehaviouralOllamaTeacher:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urlopen_no_redirect(request, timeout=self.timeout) as response:
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with urlopen_no_redirect(request, timeout=self.timeout) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            # HTTPError carries the status line and, for the refused-redirect
+            # case, the exact target URL -- surface it as the module's typed
+            # connection error instead of a raw urllib escape that callers
+            # would have to know to catch by name (audit 2026-09-18).
+            raise OllamaConnectionError(
+                "Ollama at %s refused %s: %s"
+                % (self.host, path, exc)
+            ) from exc
+        except urllib.error.URLError as exc:
+            raise OllamaConnectionError(
+                "cannot reach Ollama at {}: {}. Is `ollama serve` "
+                "running?".format(self.host, exc)
+            ) from exc
 
     def health(self) -> Dict[str, Any]:
         """Check the daemon is up and the exact model tag is present.
@@ -116,11 +133,19 @@ class BehaviouralOllamaTeacher:
         Exact-match only (a ``startswith`` match made the historical
         connector report a false-positive model_present).
         """
-        from ...modules.real.ollama import urlopen_no_redirect
+        from ...modules.real.ollama import (
+            OllamaConnectionError, urlopen_no_redirect
+        )
 
         request = urllib.request.Request("{}/api/tags".format(self.host))
-        with urlopen_no_redirect(request, timeout=10) as response:
-            tags = json.loads(response.read().decode("utf-8"))
+        try:
+            with urlopen_no_redirect(request, timeout=10) as response:
+                tags = json.loads(response.read().decode("utf-8"))
+        except urllib.error.URLError as exc:
+            raise OllamaConnectionError(
+                "cannot reach Ollama at {}: {}. Is `ollama serve` "
+                "running?".format(self.host, exc)
+            ) from exc
         available = [m.get("name") for m in tags.get("models", [])]
         present = self.model in available
         return {

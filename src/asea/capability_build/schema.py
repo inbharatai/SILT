@@ -157,7 +157,12 @@ class CapabilityTrace(StrictModel):
         default=CAPABILITY_TRACE_SCHEMA, alias="schema"
     )
     capability_id: str = Field(min_length=1, max_length=128)
-    sample_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
+    #: No ':' (or other Windows-illegal filename chars): the sample id is
+    #: embedded verbatim in trace artifact names ("<capability>-<sample_id>"),
+    #: and a ':' would make the workspace un-check-outable on Windows
+    #: (audit 2026-09-18). Must stay compatible with the dataset builder's
+    #: stricter lowercase contract in asea.capability_build.dataset._ID_RE.
+    sample_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     model_revision: str = Field(min_length=1, max_length=256)
     prompt_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     trace_class: TraceClass
@@ -304,6 +309,21 @@ class CapabilityBuildReceipt(StrictModel):
     def _blocked_needs_error(self):
         if self.status == BLOCKED_RESOURCE and not self.error:
             raise ValueError("BLOCKED_RESOURCE requires an error naming requirement and remedy")
+        return self
+
+    @model_validator(mode="after")
+    def _placeholder_spec_hash_only_on_blocked(self):
+        # The CLI fills spec_sha256 with 64 zeros when a run was blocked
+        # before ANY spec could be loaded. That placeholder may ride ONLY
+        # on a BLOCKED_RESOURCE receipt; a completed or rejected receipt
+        # carrying it would claim to describe a spec it never read
+        # (audit 2026-09-18).
+        if self.spec_sha256 == "0" * 64 and self.status != BLOCKED_RESOURCE:
+            raise ValueError(
+                "spec_sha256 is the all-zero placeholder, which only a "
+                "BLOCKED_RESOURCE receipt (no spec was loadable) may carry; "
+                "a %r receipt must name the real spec hash" % self.status
+            )
         return self
 
     def materialised(self) -> Dict[str, Any]:

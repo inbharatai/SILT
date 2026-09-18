@@ -81,16 +81,24 @@ class InterventionTarget:
 
 
 def _mean_performance(
-    judge: Judge, cases: Sequence[Dict[str, Any]], adapter, seed: int
+    judge: Judge, cases: Sequence[Dict[str, Any]], adapter, seed: int,
+    state_note: Dict[str, Any],
 ) -> float:
-    """Mean functional verdict over cases, evaluated in seeded order."""
+    """Mean functional verdict over cases, evaluated in seeded order.
+
+    ``state_note`` tells the judge WHICH teacher state it is scoring
+    ({"phase": "base"|"masked", "masked_component": key-or-None}). A judge
+    that regenerates the teacher's output under the current state NEEDS
+    this to score the masked arm differently from the base arm; a judge
+    that ignores it is a replay judge and will (correctly) surface as a
+    zero-drop result the operator must not mistake for evidence."""
     order = list(cases)
     random.Random(seed).shuffle(order)
     verdicts = 0
     if not order:
         raise InterventionInvalid("cannot score an empty case set")
     for case in order:
-        if judge(case, {}):
+        if judge(case, dict(state_note)):
             verdicts += 1
     return verdicts / len(order)
 
@@ -125,16 +133,35 @@ def run_intervention(
             "the intervention; refusing to touch a modified teacher "
             "(detail: %s)" % before.get("detail")
         )
+    # Parameter hashes cannot see suppression hooks, so adapters also
+    # report their active-mask registry: a still-masked teacher (a leaked
+    # restore, a double run) must never verify as clean for a NEW
+    # intervention -- every measurement under it is contaminated
+    # (audit 2026-09-18).
+    active = before.get("active_masks")
+    if active:
+        raise InterventionInvalid(
+            "teacher has active mask(s) %s; restore them before running a "
+            "new intervention -- a masked teacher's baseline is not a "
+            "baseline" % sorted(active)
+        )
 
     # 2. Baseline performance, both groups, seeded order.
-    base_target = _mean_performance(judge, target_cases, adapter, seed)
-    base_control = _mean_performance(judge, control_cases, adapter, seed)
+    base_note = {"phase": "base", "masked_component": None}
+    base_target = _mean_performance(
+        judge, target_cases, adapter, seed, base_note)
+    base_control = _mean_performance(
+        judge, control_cases, adapter, seed, base_note)
 
-    # 3. Mask, measure, unmask -- the ONLY mutation window.
+    # 3. Mask, measure, unmask -- the ONLY mutation window. The judge sees
+    # the masked-component note so it can regenerate under the current state.
     adapter.temporary_mask(target)
     try:
-        masked_target = _mean_performance(judge, target_cases, adapter, seed)
-        masked_control = _mean_performance(judge, control_cases, adapter, seed)
+        masked_note = {"phase": "masked", "masked_component": target.key}
+        masked_target = _mean_performance(
+            judge, target_cases, adapter, seed, masked_note)
+        masked_control = _mean_performance(
+            judge, control_cases, adapter, seed, masked_note)
     finally:
         # 5. Restore happens even if measurement raised.
         adapter.restore_mask(target)

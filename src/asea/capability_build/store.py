@@ -13,11 +13,37 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 from typing import Any, Dict, List
 
 from asea.artifacts import digest, safe_path
 
 from .errors import CapabilityBuildError
+
+#: Artifact names become real files (``<name>.json``) in the workspace, so
+#: the full Windows-illegal set matters -- a ``:`` in a name would write fine
+#: on Linux and then make the workspace unreadable on Windows, exactly the
+#: class of latent cross-platform corruption the data/ .gitattributes fix
+#: closed. DOS reserved device names (CON, PRN, AUX, NUL, COM1-9, LPT1-9)
+#: are refused with or without an extension, and trailing dots/spaces are
+#: stripped silently by Win32 (a write that "succeeds" under a name the
+#: directory listing then shows differently).
+_BAD_NAME_CHARS = re.compile(r'[:*?"<>|\x00-\x1f]')
+_RESERVED_NAMES = re.compile(r"^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$", re.IGNORECASE)
+
+
+def _require_portable_name(name: str) -> None:
+    if not isinstance(name, str) or not name:
+        raise CapabilityBuildError("artifact name must be a non-empty string")
+    if _BAD_NAME_CHARS.search(name) or name != name.strip() or name.endswith("."):
+        raise CapabilityBuildError(
+            "artifact name %r contains characters that are illegal or "
+            "unstable in filenames on some supported platform" % name
+        )
+    if _RESERVED_NAMES.match(name.split(".")[0]):
+        raise CapabilityBuildError(
+            "artifact name %r collides with a reserved device name on Windows" % name
+        )
 
 LAYOUT = {
     "specs": "specs",
@@ -49,6 +75,7 @@ class CapabilityStore:
             raise CapabilityBuildError("unknown artifact kind: %s" % kind)
         if "/" in name or "\\" in name or ".." in name or name in (".", ""):
             raise CapabilityBuildError("artifact name must be a single path segment")
+        _require_portable_name(name)
         path = safe_path(self.root / LAYOUT[kind] / ("%s.json" % name))
         if must_exist and not path.is_file():
             raise CapabilityBuildError("artifact does not exist: %s" % path)
@@ -84,11 +111,19 @@ class CapabilityStore:
         if not isinstance(raw, dict):
             raise CapabilityBuildError("artifact must be a JSON object")
         stored = raw.pop("artifact_sha256", None)
-        if stored is not None:
-            if digest(raw) != stored:
-                raise CapabilityBuildError(
-                    "artifact content hash mismatch (edited after write): %s" % path
-                )
+        if stored is None:
+            # Fail closed: every artifact written by :meth:`put` carries this
+            # marker, so its absence means the file was not written by the
+            # store (or the marker was stripped after write) -- an integrity
+            # failure, not a legacy artifact to trust silently.
+            raise CapabilityBuildError(
+                "artifact has no artifact_sha256 integrity marker (foreign or "
+                "tampered): %s" % path
+            )
+        if digest(raw) != stored:
+            raise CapabilityBuildError(
+                "artifact content hash mismatch (edited after write): %s" % path
+            )
         return raw
 
     def list(self, kind: str) -> List[str]:

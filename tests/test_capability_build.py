@@ -9,6 +9,7 @@ this file says anything about any teacher's behaviour.
 
 from __future__ import annotations
 
+import copy
 import json
 import subprocess
 import sys
@@ -445,7 +446,10 @@ def _receipt_object(status="completed", error=None):
         command="trace",
         status=status,
         capability_id="cap",
-        spec_sha256="0" * 64,
+        # A real-looking digest: the all-zero form is the CLI's no-spec-
+        # loaded placeholder and may only ride on BLOCKED_RESOURCE receipts
+        # (enforced by the schema since audit 2026-09-18).
+        spec_sha256="a" * 64,
         evidence_class=TRACE_CLASS_BEHAVIOURAL,
         error=error,
         limitations=["Implementation success is not model-quality success."],
@@ -479,6 +483,32 @@ def test_blocked_receipt_requires_error():
             spec_sha256="0" * 64, evidence_class=TRACE_CLASS_INTERNAL,
             limitations=["l"],
         )
+
+
+def test_placeholder_spec_hash_only_on_blocked_receipts():
+    """Defect fix (audit 2026-09-18): the CLI fills spec_sha256 with 64
+    zeros when a run is blocked before any spec could be loaded. That
+    placeholder may ride ONLY on a BLOCKED_RESOURCE receipt -- a completed
+    receipt carrying it would claim to describe a spec it never read."""
+    with pytest.raises(Exception):
+        CapabilityBuildReceipt(
+            command="trace", status="completed", capability_id="cap",
+            spec_sha256="0" * 64, evidence_class=TRACE_CLASS_INTERNAL,
+            limitations=["l"],
+        )
+    with pytest.raises(Exception):
+        CapabilityBuildReceipt(
+            command="trace", status="rejected", capability_id="cap",
+            spec_sha256="0" * 64, evidence_class=TRACE_CLASS_INTERNAL,
+            limitations=["l"],
+        )
+    # the placeholder is legal exactly where it means something: BLOCKED
+    CapabilityBuildReceipt(
+        command="trace", status=BLOCKED_RESOURCE, capability_id="cap",
+        spec_sha256="0" * 64, evidence_class=TRACE_CLASS_INTERNAL,
+        error="blocked before the spec could be loaded",
+        limitations=["l"],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1801,3 +1831,628 @@ def test_evaluate_code_cases_real_oracle_rejects_extra_group_key_in_oracle_frame
     assert result["blocked"] is False
     assert result["judged_cases"] == 1
     assert result["groups"]["target"]["pass_rate"] == 1.0
+
+# ---------------------------------------------------------------------------
+# Audit 2026-09-18 fixes: mixed-evidence-class and foreign-capability
+# footprint refusal, replay-judge refusal, active-mask honesty, proxy-proof
+# transport, blocked-evaluate exit discipline, portable ids, receipt
+# dematerialisation, shapeless-prompt refusal, worker hardening.
+# Every test below was verified to FAIL on the pre-fix code (stash
+# comparison) unless marked otherwise in its docstring.
+# ---------------------------------------------------------------------------
+
+
+def _store_trace(store, trace):
+    return store.put(
+        "traces",
+        "%s-%s" % (trace.capability_id, trace.sample_id),
+        trace.model_dump(mode="json", by_alias=True),
+    )
+
+
+def test_cli_footprint_refuses_mixed_evidence_classes(tmp_path, capsys):
+    """Defect fix (C1): a workspace holding BOTH a behavioural and an
+    internal trace used to silently produce a behavioural footprint
+    (``trace_class or TRACE_CLASS_BEHAVIOURAL``), erasing the internal
+    traces' class and violating the never-mix-evidence-classes constraint.
+    The footprint command must REFUSE with the exact class names."""
+    from asea.capability_build.__main__ import main
+
+    ws = CapabilityStore(tmp_path / "ws")
+    # both traces belong to the SPEC's capability, so the foreign-capability
+    # refusal does not preempt the mixed-class one
+    _store_trace(ws, make_behavioural_trace(
+        capability_id="python_repo_debugging_v1", sample_id="b1",
+        model_revision="rev", prompt="p", group="target",
+        outcome=TraceOutcome(success=True),
+        behavioural=BehaviouralRecord(prompt="p", response="r"),
+    ))
+    _store_trace(ws, make_internal_trace(
+        capability_id="python_repo_debugging_v1", sample_id="i1",
+        model_revision="rev", prompt="p", group="control",
+        outcome=TraceOutcome(success=True),
+        internal=InternalRecord(layers={"0": {"usage_mass": 1.0}}),
+    ))
+    code = main(["footprint", "--spec", _write_spec(tmp_path),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["ok"] is False
+    assert "MIXED" in payload["error"]
+    assert "behavioural_remote" in payload["error"]
+    assert "internal_open_weight" in payload["error"]
+    # no footprint artifact was written from contaminated evidence
+    assert ws.list("footprints") == []
+
+
+def test_cli_footprint_refuses_foreign_capability_traces(tmp_path, capsys):
+    """Defect fix (C1): traces recorded under a DIFFERENT capability id
+    used to be silently aggregated into this spec's footprint. A footprint
+    binds to one spec; foreign evidence is refused by name."""
+    from asea.capability_build.__main__ import main
+
+    ws = CapabilityStore(tmp_path / "ws")
+    _store_trace(ws, make_behavioural_trace(
+        capability_id="python_repo_debugging_v1", sample_id="b1",
+        model_revision="rev", prompt="p", group="target",
+        outcome=TraceOutcome(success=True),
+        behavioural=BehaviouralRecord(prompt="p", response="r"),
+    ))
+    _store_trace(ws, make_behavioural_trace(
+        capability_id="another_capability_entirely", sample_id="x1",
+        model_revision="rev", prompt="p", group="target",
+        outcome=TraceOutcome(success=True),
+        behavioural=BehaviouralRecord(prompt="p", response="r"),
+    ))
+    code = main(["footprint", "--spec", _write_spec(tmp_path),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["ok"] is False
+    assert "another_capability_entirely" in payload["error"]
+    assert ws.list("footprints") == []
+
+
+def test_functional_judge_stub_refuses_replay():
+    """Defect fix (F5): the old ``functional_judge`` replayed pre-judged
+    verdicts and was documented as THE intervention judge. A replay judge
+    scores base and masked arms identically, so every intervention would
+    report target_drop == 0 -- fabricated non-causality. The library
+    boundary must refuse it with the reason named."""
+    from asea.capability_build.evaluation import functional_judge
+
+    with pytest.raises(InterventionInvalid) as excinfo:
+        functional_judge({"expected_verdict": True}, {"phase": "base"})
+    assert "regenerate" in str(excinfo.value)
+
+
+def test_intervention_judge_receives_state_note_per_case():
+    """Defect fix (F5/state contract): the judge MUST be told WHICH teacher
+    state it is scoring ({"phase": "base"|"masked", "masked_component":
+    key-or-None}), a fresh dict per case -- a regenerating judge needs this
+    to score the masked arm differently; mutating one shared dict would
+    let a sloppy judge contaminate the base arm."""
+    adapter = FakeAdapter()
+    seen = []
+
+    def judge(case, note):
+        seen.append(dict(note))
+        return True
+
+    run_intervention(
+        adapter,
+        InterventionTarget("expert", 2, 3),
+        target_cases=_cases(3),
+        control_cases=_cases(2, group="control"),
+        judge=judge,
+        seed=5,
+    )
+    # every case in both groups was scored in BOTH phases, with the note
+    # naming the phase and (when masked) the exact component
+    assert len(seen) == 10
+    assert all(n["phase"] in ("base", "masked") for n in seen)
+    assert all(
+        n["masked_component"] == ("expert:2/3" if n["phase"] == "masked" else None)
+        for n in seen
+    )
+    # fresh dicts: no shared mutable state between judge calls
+    assert len({id(n) for n in seen}) == 10
+
+
+class MaskedLeakAdapter(FakeAdapter):
+    """Stands in for a teacher whose previous intervention's mask was never
+    restored (a leaked hook or a crashed run): parameter hashes verify
+    clean, but the mask registry is not empty."""
+
+    def verify_unchanged(self):
+        result = super().verify_unchanged()
+        result["active_masks"] = ["expert:0/1"]
+        return result
+
+
+def test_intervention_refuses_masked_teacher_baseline():
+    """Defect fix (F6): parameter hashes cannot see suppression hooks. A
+    still-masked teacher used to verify as clean and serve as the BASELINE
+    for a new intervention -- every measurement under it contaminated. The
+    adapter's active-mask registry must abort the run by name."""
+    adapter = MaskedLeakAdapter()
+    with pytest.raises(InterventionInvalid) as excinfo:
+        run_intervention(
+            adapter,
+            InterventionTarget("expert", 3, 7),
+            target_cases=_cases(2),
+            control_cases=_cases(2, group="control"),
+            judge=_judge,
+            seed=0,
+        )
+    assert "active mask" in str(excinfo.value)
+    assert "expert:0/1" in str(excinfo.value)
+    assert adapter.masked is None  # nothing was touched
+
+
+def test_glm_verify_reports_active_masks_and_hooks_are_idempotent():
+    """Defect fix (F6, adapter): (a) ``verify_unchanged`` reports
+    ``active_masks`` so hook contamination is visible to parameter hashes;
+    (b) re-registering router hooks no longer leaks the previous
+    registration's live handles (the old code reassigned the handle list,
+    leaving hooks whose entry-pointers wrote into a dict nobody read)."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    # (a) clean teacher: no active masks reported
+    assert adapter.verify_unchanged()["active_masks"] == []
+    adapter.temporary_mask(InterventionTarget("expert", 0, 4))
+    # registry keys are layer-prefixed ("<true layer index>:<target.key>");
+    # layers[0] is the first SPARSE layer, layer 3 of the real stack
+    assert adapter.verify_unchanged()["active_masks"] == ["3:expert:0/4"]
+    adapter.restore_mask(InterventionTarget("expert", 0, 4))
+    assert adapter.verify_unchanged()["active_masks"] == []
+
+    # (b) hook idempotence: register twice, ONE forward pass, the collected
+    # token count must reflect the model ONCE, not double-counted by a
+    # leaked first registration.
+    _, block = adapter.layers[0]
+    router = adapter._router_of(block)[1]
+    hidden = torch.ones(3, 8)
+    adapter.register_router_hooks()
+    with torch.no_grad():
+        router(hidden)
+    first = adapter.collect_routing(reset=True)
+    adapter.register_router_hooks()  # re-register: old handles must be gone
+    with torch.no_grad():
+        router(hidden)
+    second = adapter.collect_routing(reset=True)
+    # keys are TRUE layer indices: layers[0] is sparse layer 3 of 45
+    assert first["3"]["tokens"] == 3
+    assert second["3"]["tokens"] == 3  # not 6: no stale duplicate hook
+    adapter.remove_router_hooks()
+    assert adapter.remove_router_hooks() is False  # idempotent, nothing left
+
+
+def test_glm_restore_failure_keeps_mask_active():
+    """Defect fix (F6, adapter): a restore whose handle cannot be removed
+    must keep the mask record ACTIVE -- the mask still suppresses the
+    expert, so the teacher must never verify as clean. The old code popped
+    the registry entry before removing the hook: a failed remove left the
+    hook live with no record of it."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    target = InterventionTarget("expert", 0, 9)
+    adapter.temporary_mask(target)
+
+    class _BrokenHandle:
+        def remove(self):
+            raise RuntimeError("hook removal failed")
+
+    # sabotage exactly the failure the fix guards: the handle cannot be
+    # removed (the hook stays live on the router). The registry key is
+    # layer-prefixed ("<true layer index>:<target.key>").
+    adapter._masked["3:expert:0/9"]["handle"] = _BrokenHandle()
+    with pytest.raises(Exception):
+        adapter.restore_mask(target)
+    # the mask is still ACTIVE and reported as such -- never "restored"
+    assert adapter.verify_unchanged()["active_masks"] == ["3:expert:0/9"]
+    # and a second mask of the same component is refused (already masked)
+    with pytest.raises(InterventionInvalid):
+        adapter.temporary_mask(target)
+
+
+def test_ollama_transport_ignores_environment_proxies(monkeypatch):
+    """Defect fix (F7): ``urllib.request.build_opener`` installs a
+    ProxyHandler from the environment by DEFAULT -- an HTTP_PROXY pointing
+    at an attacker-controlled (or merely broken) hop silently routed these
+    "direct to this URL" requests through it. The transport must carry NO
+    proxy handler even when the environment sets one. REAL socket test
+    against a loopback HTTP server, not a mock."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    reached = {"handler": None}
+
+    class _Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            reached["handler"] = self.path
+            body = b"direct-ok"
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), _Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        port = server.server_address[1]
+        # every proxy env var points at a dead port: honoring ANY of them
+        # fails the request; the fix must bypass them all
+        for var in ("HTTP_PROXY", "http_proxy", "HTTPS_PROXY",
+                    "https_proxy", "ALL_PROXY", "all_proxy"):
+            monkeypatch.setenv(var, "http://127.0.0.1:9/")
+        import urllib.request
+
+        from asea.modules.real.ollama import urlopen_no_redirect
+
+        request = urllib.request.Request("http://127.0.0.1:%d/api/tags" % port)
+        with urlopen_no_redirect(request, timeout=10) as response:
+            assert response.read() == b"direct-ok"
+        # the request reached the loopback server DIRECTLY, not a proxy hop
+        assert reached["handler"] == "/api/tags"
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_cli_evaluate_blocked_reports_exit_2(tmp_path, capsys):
+    """Defect fix (F8): a BLOCKED oracle run used to return ok:true with
+    ``status: "BLOCKED_RESOURCE"`` -- a blocked evaluation reported as a
+    successful command the operator had to notice by eye. The blocked
+    outcome must go through the exit-2 discipline: ok:false, status
+    BLOCKED_RESOURCE, requirement + remedy present."""
+    import platform as _platform
+
+    if _platform.system() == "Linux":
+        pytest.skip("on Linux the real sandbox runs; the blocked path is "
+                    "exercised by the non-Linux hosts and CI matrix")
+    from asea.capability_build.__main__ import main
+
+    source = tmp_path / "candidate.py"
+    source.write_text("def f():\n    return 42\n", encoding="utf-8")
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps([
+        {"id": "t1", "group": "target", "function": "f",
+         "args": [], "kwargs": {}, "expected": 42},
+    ]), encoding="utf-8")
+    code = main(["evaluate", "--source", str(source),
+                "--cases", str(cases), "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["ok"] is False
+    assert payload["status"] == BLOCKED_RESOURCE
+    assert payload["requirement"]
+    assert payload["remedy"]
+    assert "sandbox" in payload["remedy"] or "WSL2" in payload["remedy"]
+
+
+def test_trace_schema_forbids_platform_illegal_sample_ids(tmp_path):
+    """Defect fix (F2): the sample-id pattern allowed ':' (and the id is
+    embedded verbatim in trace artifact filenames, ``<cap>-<sample_id>``),
+    so a ':' would write fine on Linux and make the workspace
+    un-checkoutable on Windows. The schema, the case loader and the store
+    all refuse it."""
+    import pydantic
+
+    with pytest.raises(pydantic.ValidationError) as excinfo:
+        make_behavioural_trace(
+            capability_id="cap",
+            sample_id="s:1",
+            model_revision="rev",
+            prompt="p",
+            group="target",
+            outcome=TraceOutcome(success=True),
+            behavioural=BehaviouralRecord(prompt="p", response="r"),
+        )
+    assert "sample_id" in str(excinfo.value)
+
+    # the CLI's case loader refuses the same before any artifact name is
+    # built from it
+    from asea.capability_build.__main__ import _load_cases
+
+    case_file = tmp_path / "cases.json"
+    case_file.write_text(json.dumps([
+        {"sample_id": "s:1", "group": "target", "prompt": "p"},
+    ]), encoding="utf-8")
+    with pytest.raises(CapabilityBuildError) as excinfo:
+        _load_cases(str(case_file))
+    assert "portable" in str(excinfo.value)
+
+    # the store refuses the full Windows-illegal set for artifact names
+    store = CapabilityStore(tmp_path / "ws")
+    for name in ("a:b", 'q"uote', "star*", "less<more", "pipe|",
+                 "trailing.", " leading", "CON", "com1", "aux.txt"):
+        with pytest.raises(CapabilityBuildError):
+            store.put("specs", name, {"a": 1})
+    # legal names still pass (a regression guard against over-refusal)
+    store.put("specs", "good-name.2", {"a": 1})
+
+
+def test_store_get_fails_closed_without_integrity_marker(tmp_path):
+    """Defect fix (store honesty): ``get`` used to silently ACCEPT an
+    artifact whose artifact_sha256 marker was absent -- a foreign or
+    tampered file trusting itself. Every put-written artifact carries the
+    marker; its absence is an integrity failure."""
+    store = CapabilityStore(tmp_path / "ws")
+    store.put("specs", "one", {"a": 1})
+    raw = tmp_path / "ws" / "specs" / "one.json"
+    payload = json.loads(raw.read_text(encoding="utf-8"))
+    del payload["artifact_sha256"]
+    raw.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(CapabilityBuildError) as excinfo:
+        store.get("specs", "one")
+    assert "integrity marker" in str(excinfo.value)
+
+
+def test_cli_receipt_dematerialises_not_measured_tokens(tmp_path, capsys):
+    """Defect fix (F3): the receipt input file is the MATERIALISED (signed,
+    on-disk) form -- unmeasured fields carry the literal NOT_MEASURED token.
+    The CLI used to validate that form against the strict schema directly,
+    so every honest receipt with unmeasured resources failed validation.
+    It must dematerialise first (the receipt.py verify contract) and
+    re-sign fresh for THIS workspace without trusting the input signature."""
+    from asea.capability_build.__main__ import main
+
+    sign_ws = tmp_path / "sign-ws"
+    signed = sign_receipt(sign_ws, _receipt_object())
+    assert signed["capability_retention"] == NOT_MEASURED
+    receipt_file = tmp_path / "receipt.json"
+    receipt_file.write_text(json.dumps(signed), encoding="utf-8")
+
+    store_ws = tmp_path / "store-ws"
+    code = main(["receipt", "--receipt", str(receipt_file),
+                "--workspace", str(store_ws)])
+    assert code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["ok"] is True
+    # the stored artifact verifies against the NEW workspace's key
+    stored = json.loads(Path(payload["artifact"]["path"]).read_text(encoding="utf-8"))
+    verified = verify_receipt(store_ws, stored)
+    assert verified["valid"] is True
+
+
+def test_dataset_refuses_shapeless_prompts(spec):
+    """Defect fix (F9): a prompt whose token shape is EMPTY (punctuation-
+    only) silently bypassed the near-duplicate leakage guard -- the shape
+    is the guard's key, and an all-punctuation prompt collides with
+    nothing. Such a case cannot be guarded, so it is refused at build time
+    (dataset) and at teaching time (distillation)."""
+    from asea.capability_build.dataset import validate_case
+
+    with pytest.raises(DatasetInvalid) as excinfo:
+        validate_case({
+            "sample_id": "s1", "split": "training", "group": "target",
+            "prompt": "???!", "family_id": "f", "provenance": "p",
+            "license": "MIT",
+        })
+    assert "token shape" in str(excinfo.value)
+
+    from asea.capability_build.distillation import build_sequence_pairs
+
+    with pytest.raises(CapabilityBuildError) as excinfo:
+        build_sequence_pairs([
+            _judged_behavioural_trace("t-1", "!!!???", "r1", True),
+        ])
+    assert "token shape" in str(excinfo.value)
+
+
+def test_dataset_build_is_atomic_no_staging_leftover(tmp_path, spec):
+    """Defect fix: the build used to write directly into the output dir; a
+    crash mid-build left a corpse that looked like a dataset. The build
+    now stages in a sibling and renames once -- the output either does not
+    exist or IS the complete frozen build, and no staging leftover
+    remains."""
+    from asea.capability_build.dataset import build_dataset, validate_dataset
+
+    def _case(sid, split, family):
+        return {
+            "sample_id": sid, "split": split, "group": "target",
+            "prompt": "fix the bug numbered %s" % sid,
+            "expected": "patch for %s" % sid,
+            "family_id": family, "provenance": "synthetic", "license": "MIT",
+        }
+
+    cases = (
+        [_case("t%d" % i, "training", "fam-t%d" % i) for i in range(4)]
+        + [_case("d%d" % i, "development", "fam-d%d" % i) for i in range(2)]
+        + [_case("h%d" % i, "heldout", "fam-h%d" % i) for i in range(2)]
+        + [_case("f%d" % i, "final", "fam-f%d" % i) for i in range(2)]
+        + [_case("c%d" % i, "controls", "fam-c%d" % i) for i in range(2)]
+    )
+    out = tmp_path / "dataset"
+    build_dataset(cases, output_dir=out, spec=spec)
+    # the complete frozen build appeared; no staging sibling remains
+    validate_dataset(out)
+    siblings = [p.name for p in tmp_path.iterdir() if "building-" in p.name]
+    assert siblings == []
+
+    # (b) the crash property the atomic build exists for: a build that
+    # dies mid-write must leave NO output directory -- the old code wrote
+    # directly into output_dir, so its corpse looked exactly like a
+    # dataset minus its selection lock. A case carrying a value that
+    # validates but cannot be JSON-serialised dies inside the first split
+    # write, after the directory was created.
+    crash = copy.deepcopy(cases)
+    crash[0]["unserialisable"] = {1, 2, 3}  # a set: json.dumps raises
+    out2 = tmp_path / "corpse"
+    with pytest.raises(TypeError):
+        build_dataset(crash, output_dir=out2, spec=spec)
+    assert not out2.exists()  # the old code left a half-written dataset here
+    # and the leftover staging dir is named as a crash leftover, never as
+    # the dataset
+    leftovers = [p.name for p in tmp_path.iterdir()
+                 if "building-" in p.name and p.is_dir()]
+    assert all(name.startswith("corpse.building-") for name in leftovers)
+
+
+def test_worker_request_ids_are_monotonic_not_id_of_payload():
+    """Defect fix: request ids were built from ``id(payload)`` -- a memory
+    address. Two requests sharing one payload object silently reused the
+    same id, defeating the echo check between interleaved consumers. The
+    ids are now a process-lifetime monotonic counter."""
+    first = proto.make_request("hello", {"x": 1})
+    # the EXACT object the old id()-based scheme would have collided on
+    payload = {"x": 1}
+    second = proto.make_request("hello", payload)
+    third = proto.make_request("hello", payload)
+    ids = [first["id"], second["id"], third["id"]]
+    assert len(set(ids)) == 3  # id()-based scheme: second == third here
+    # monotonic: each op's counter suffix strictly increases
+    def _suffix(frame_id):
+        return int(frame_id.rsplit("-", 1)[1])
+    assert _suffix(second["id"]) > _suffix(first["id"])
+    assert _suffix(third["id"]) > _suffix(second["id"])
+
+
+def test_student_baseline_judge_abstention_is_not_a_failure():
+    """Defect fix: an abstaining judge (None) used to be coerced to False,
+    folding ungradable cases into the failures and manufacturing a lower
+    pass rate no verdict ever issued. Abstentions are excluded from the
+    rate and counted separately."""
+    from asea.capability_build.student import measure_student_baseline
+
+    student = {"kind": "ollama_local", "model": "toy"}
+    cases = [
+        {"sample_id": "a", "group": "target", "prompt": "p1"},
+        {"sample_id": "b", "group": "target", "prompt": "p2"},
+        {"sample_id": "c", "group": "control", "prompt": "p3"},
+    ]
+
+    def infer(_student, case):
+        return "answer-for-%s" % case["sample_id"]
+
+    def judge(case, output):
+        if case["sample_id"] == "b":
+            return None  # ABSTAIN: no expected output for this case
+        return output == "answer-for-%s" % case["sample_id"]
+
+    summary = measure_student_baseline(student, cases, infer=infer, judge=judge)
+    assert summary["groups"]["target"] == {"passed": 1, "total": 1, "pass_rate": 1.0}
+    assert summary["unjudged_excluded"] == 1
+    unjudged_rows = [row for row in summary["per_case"] if row.get("unjudged")]
+    assert len(unjudged_rows) == 1 and unjudged_rows[0]["sample_id"] == "b"
+
+
+def test_worker_client_respawns_after_deadline_kill(tmp_path):
+    """Defect fix: after the watchdog killed the worker, the dead process
+    handle stayed registered, so the next request wrote to a corpse and
+    surfaced a generic WorkerCrashed. The client must reap the dead
+    handle and start a FRESH worker for the next request."""
+    from asea.capability_build.worker import GlmWorkerClient
+
+    hanging = tmp_path / "hang.py"
+    hanging.write_text("import time\ntime.sleep(600)\n", encoding="utf-8")
+    answering = tmp_path / "answer.py"
+    answering.write_text(
+        "import json, sys\n"
+        "for line in sys.stdin:\n"
+        "    if not line.strip():\n"
+        "        continue\n"
+        "    request = json.loads(line)\n"
+        "    sys.stdout.write(json.dumps({\n"
+        "        'protocol': %r, 'protocol_version': 1,\n"
+        "        'op': request['op'], 'id': request['id'], 'ok': True,\n"
+        "        'result': {'fresh': True},\n"
+        "    }) + '\\n')\n"
+        "    sys.stdout.flush()\n" % proto.PROTOCOL,
+        encoding="utf-8",
+    )
+    client = GlmWorkerClient(
+        repo_root=tmp_path, checkpoint=str(tmp_path), use_docker=False,
+        python=sys.executable, timeout=3600.0,
+    )
+    client._command = lambda: [sys.executable, str(hanging)]
+    with pytest.raises(Exception):
+        client.request("hello", timeout=0.5)
+    # the deadline killed the worker; the NEXT request must respawn a
+    # working one instead of writing to the corpse
+    client._command = lambda: [sys.executable, str(answering)]
+    # request() returns the RESULT dict directly (unwrapped), so the
+    # fresh-worker marker lives at the top level
+    assert client.request("hello")["fresh"] is True
+    client.stop()
+
+
+def test_worker_unknown_op_reports_invalid_op_kind(tmp_path):
+    """Defect fix: an unknown op used to surface as ``arch_mismatch``
+    (it raised InterventionInvalid, and the worker mapped the whole class
+    to that kind). The protocol defines ``invalid_op`` for this; the error
+    kind must not lie. Runs the REAL worker script with a dummy checkpoint
+    env: the unknown-op path builds its response before any handler or
+    model load, so no GLM runtime is touched."""
+    import os
+    import subprocess as _sp
+
+    worker = Path(__file__).resolve().parents[1] / "workers" / "glm53" / "worker.py"
+    if not worker.is_file():
+        pytest.skip("worker script not present in this checkout")
+    env = dict(os.environ)
+    env["GLM_CHECKPOINT"] = str(tmp_path / "dummy-checkpoint")
+    frame = proto.encode({
+        "protocol": proto.PROTOCOL, "protocol_version": proto.PROTOCOL_VERSION,
+        "op": "definitely_not_an_op", "id": "x1", "payload": {},
+    })
+    proc = _sp.run(
+        [sys.executable, str(worker)], input=frame, capture_output=True,
+        env=env, timeout=60,
+    )
+    response = json.loads(proc.stdout.decode("utf-8").strip())
+    assert response["ok"] is False
+    assert response["error"]["kind"] == "invalid_op"
+    assert "definitely_not_an_op" in response["error"]["message"]
+
+
+def test_glm_adapter_refuses_bias_corrected_router_configs():
+    """Defect fix (F10): a config with ``e_score_correction_bias=True``
+    biases expert scores before top-k, so plain sigmoid-mass telemetry
+    would accumulate usage under a scoring rule that was never in effect.
+    The adapter refuses the config instead of misreporting usage
+    evidence. MECHANISM test on the exact-shape fake stack."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    # the accepted config carries the flag False
+    assert adapter.inspection["e_score_correction_bias"] is False
+    # an otherwise-exact config with the bias enabled is refused by name
+    cfg = adapter.config
+    cfg.e_score_correction_bias = True
+    with pytest.raises(InterventionInvalid) as excinfo:
+        from asea.capability_build.adapters.glm53_flash import detect_architecture
+
+        detect_architecture(adapter.model, cfg)
+    assert "e_score_correction_bias" in str(excinfo.value)
+
+
+def test_glm_hook_names_non_tensor_router_output():
+    """Defect fix (F10): a router returning a non-tensor (a transformers
+    revision changing the router's return contract) used to surface as an
+    opaque AttributeError deep inside the forward pass. The hook must
+    refuse with the layer, the router and the actual type named."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    adapter.register_router_hooks()
+    _, block = adapter.layers[0]
+    router = adapter._router_of(block)[1]
+    original_forward = router.forward
+
+    def broken_forward(x):
+        return {"logits": original_forward(x)}  # a dict, not a tensor
+
+    router.forward = broken_forward
+    with pytest.raises(InterventionInvalid) as excinfo:
+        with torch.no_grad():
+            router(torch.ones(2, 8))
+    message = str(excinfo.value)
+    assert "not a tensor" in message
+    # the layer named is the TRUE layer index (layers[0] is sparse layer 3)
+    assert "layer 3" in message
+    assert "dict" in message
+    adapter.remove_router_hooks()

@@ -26,6 +26,7 @@ Failure honesty (binding):
 
 from __future__ import annotations
 
+import itertools
 import json
 from typing import Any, Dict, Optional
 
@@ -56,6 +57,15 @@ ERROR_KINDS = ("invalid_op", "invalid_frame", "blocked", "arch_mismatch",
                "worker_error")
 
 
+#: Process-lifetime monotonic request ids. ``id(payload)`` was a memory
+#: address: two requests sharing one payload object would silently reuse an
+#: id (defeating the echo check between interleaved consumers), and ids
+#: carried no ordering information. A counter is collision-free per process
+#: and monotonic -- a response with an out-of-order id is immediately
+#: visible (audit 2026-09-18).
+_REQUEST_COUNTER = itertools.count()
+
+
 def make_request(op: str, payload: Optional[Dict[str, Any]] = None,
                  request_id: Optional[str] = None) -> Dict[str, Any]:
     """Build one request envelope."""
@@ -65,7 +75,7 @@ def make_request(op: str, payload: Optional[Dict[str, Any]] = None,
         "protocol": PROTOCOL,
         "protocol_version": PROTOCOL_VERSION,
         "op": op,
-        "id": request_id or ("%s-%d" % (op, id(payload or {}))),
+        "id": request_id or ("%s-%d" % (op, next(_REQUEST_COUNTER))),
         "payload": payload or {},
     }
 

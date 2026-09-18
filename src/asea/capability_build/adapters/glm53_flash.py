@@ -106,6 +106,19 @@ def detect_architecture(model, config) -> Dict[str, Any]:
         "router scoring_func %r is not sigmoid"
         % getattr(text, "scoring_func", None),
     )
+    # Sigmoid-mass telemetry assumes plain sigmoid router scores. A config
+    # with e_score_correction_bias=True applies an additive bias to the
+    # expert scores BEFORE top-k selection (and, in some revisions, renormal-
+    # ises), so the hook would accumulate probability mass under a scoring
+    # rule that was never in effect -- usage evidence computed from the
+    # wrong router equation. Refuse the config rather than misreport it
+    # (audit 2026-09-18). False (or absent) is the expected value.
+    _require(
+        not bool(getattr(text, "e_score_correction_bias", False)),
+        "e_score_correction_bias is enabled: this router biases expert "
+        "scores before top-k, so plain sigmoid-mass telemetry would "
+        "misattribute routing usage; refusing to instrument this config",
+    )
     _require(
         int(getattr(text, "first_k_dense_replace", -1)) == EXPECTED["first_k_dense_replace"],
         "first_k_dense_replace %r != 3 (first 3 MLP layers must be dense)"
@@ -135,6 +148,7 @@ def detect_architecture(model, config) -> Dict[str, Any]:
         "class": type(model).__name__,
         "detected": True,
         "quantization": quantized,
+        "e_score_correction_bias": bool(getattr(text, "e_score_correction_bias", False)),
         "quantization_note": (
             "quantized checkpoints change the parameter-hash contract; "
             "interventions on quantized weights are refused"
@@ -262,7 +276,16 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
         raise InterventionInvalid("no router module found in a GLM sparse layer")
 
     def register_router_hooks(self) -> None:
-        """Sigmoid-mass + top-k usage telemetry (USAGE EVIDENCE ONLY)."""
+        """Sigmoid-mass + top-k usage telemetry (USAGE EVIDENCE ONLY).
+
+        Idempotent (audit 2026-09-18): a previous registration's hook
+        handles are removed first. Re-registering used to reassign
+        ``self._telemetry`` without removing the old handles, leaking
+        live hooks whose entry-pointers wrote into a dict nobody read
+        anymore -- a second trace on the same adapter silently doubled
+        ``tokens`` in the stale dict while the fresh one stayed empty."""
+        for handle in self._telemetry or []:
+            handle.remove()
         torch = self.torch
         n = self.n_experts
         k = self.experts_per_tok
@@ -271,6 +294,19 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
         def hook(layer_index, router_name):
             def collect(module, inputs, output):
                 logits = output[0] if isinstance(output, tuple) else output
+                # A hook that reaches for tensor methods on a non-tensor
+                # output would raise an AttributeError deep inside the
+                # forward pass with no hint which router broke the assumed
+                # contract. Fail with the layer and the actual type named
+                # (audit 2026-09-18).
+                if not torch.is_tensor(logits):
+                    raise InterventionInvalid(
+                        "GLM-5.3-Flash detection failed: router %r at layer "
+                        "%d returned %r, not a tensor of router logits; the "
+                        "sigmoid-mass telemetry contract is broken by this "
+                        "transformers revision" % (router_name, layer_index,
+                                                   type(logits).__name__)
+                    )
                 entry = self._stats.setdefault(
                     layer_index,
                     {
@@ -300,6 +336,20 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
             self._telemetry.append(
                 router.register_forward_hook(hook(index, router_name))
             )
+
+    def remove_router_hooks(self) -> bool:
+        """Remove the telemetry hooks if any are live (idempotent, returns
+        whether live handles were removed). The worker calls this in a
+        ``finally`` so a routing pass that raised never leaves live hooks
+        attached to a teacher whose parameter hashes still verify clean --
+        the exact contamination ``active_masks`` reporting exists to catch
+        (audit 2026-09-18)."""
+        removed = False
+        for handle in self._telemetry or []:
+            handle.remove()
+            removed = True
+        self._telemetry = None
+        return removed
 
     def collect_routing(self, reset: bool = True) -> Dict[str, Any]:
         _require(self._stats is not None, "register_router_hooks first")
@@ -351,7 +401,6 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
     def verify_unchanged(self) -> Dict[str, Any]:
         if self._baseline_hashes is None:
             self.freeze_baseline()
-            return {"unchanged": True, "detail": "baseline frozen on first use"}
         current = self._current_hashes()
         changed = [
             name
@@ -359,11 +408,17 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
             if current.get(name) != digest
         ]
         changed.extend(name for name in current if name not in self._baseline_hashes)
+        # Parameter hashes CANNOT see suppression hooks (masks rewrite the
+        # router OUTPUT at forward time and never touch a parameter), so the
+        # active-mask registry rides along: a masked teacher must never
+        # verify as "unchanged" for the purposes of a NEW intervention even
+        # though its weights are untouched (audit 2026-09-18).
         return {
             "unchanged": not changed,
             "detail": "hash-identical to baseline"
             if not changed
             else "modified parameters: %s" % sorted(changed)[:16],
+            "active_masks": sorted(self._masked),
         }
 
     def temporary_mask(self, target, *, scale: float = 0.0) -> Dict[str, Any]:
@@ -443,12 +498,19 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
         _require(0 <= target.layer < len(self.layers), "layer index out of range")
         index, block = self.layers[target.layer]
         registry_key = "%d:%s" % (index, target.key)
-        record = self._masked.pop(registry_key, None)
+        record = self._masked.get(registry_key)
         _require(
             record is not None,
             "no recorded mask; cannot restore what was never masked",
         )
+        # Remove the hook BEFORE dropping the registry record (audit
+        # 2026-09-18): if handle.remove() raises, the record stays so the
+        # adapter keeps reporting the mask ACTIVE. The old order popped
+        # first -- a failed remove left the suppression hook live while the
+        # adapter believed the teacher restored (and parameter hashes
+        # cannot see hooks), silently corrupting every later measurement.
         record["handle"].remove()
+        self._masked.pop(registry_key)
         return {
             "key": registry_key,
             "restored": True,

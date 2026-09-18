@@ -56,9 +56,16 @@ class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
         )
 
 
-#: One shared opener whose handler chain has the default redirect
-#: follower replaced by :class:`_NoRedirectHandler`.
-_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirectHandler)
+#: One shared opener whose handler chain has the default redirect follower
+#: replaced by :class:`_NoRedirectHandler` AND the environment-proxy
+#: handler removed (audit 2026-09-18: ``build_opener`` installs
+#: ProxyHandler by default, so an HTTP_PROXY in the environment silently
+#: routed these "direct to this URL" requests through a proxy -- the same
+#: second-hop class the redirect refusal exists to close).
+_NO_REDIRECT_OPENER = urllib.request.build_opener(
+    urllib.request.ProxyHandler({}),  # empty mapping = no proxies, ever
+    _NoRedirectHandler,
+)
 
 
 def urlopen_no_redirect(request, timeout):

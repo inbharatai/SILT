@@ -1,0 +1,19 @@
+# Hash-pinned data (selection locks, SHA256SUMS, frozen fixtures, per-file
+# provenance): every checkout must yield the EXACT bytes the pins were
+# computed from. Windows autocrlf converted the LF text sources to CRLF on
+# checkout, silently breaking frozen-fixture reproducibility (audit
+# 2026-09-18: data/pilot-v2/sources/HumanEval-LICENSE.txt failed its pinned
+# sha256 locally while CI -- a fresh LF checkout -- passed).
+data/** -text
+
+# Frozen manifests pin the sha256 of these builders' ON-DISK bytes
+# (``digest(Path(__file__).read_bytes())`` -- line-ending dependent). The
+# pins were computed from LF files (Linux CI); a Windows autocrlf checkout
+# hands the builders CRLF copies, their self-hash no longer matches the
+# frozen manifest, and byte-reproducibility fails locally while CI passes
+# (audit 2026-09-18: data/pilot-v2/manifest.json builder_sha256=fada6301 is
+# the LF form of scripts/prepare_coding_pilot.py; data/specialist-v1 pins
+# the same file as audited_parser_sha256 and prepare_specialist_data.py as
+# builder_sha256). Force LF working-tree bytes for exactly these scripts.
+scripts/prepare_coding_pilot.py text eol=lf
+scripts/prepare_specialist_data.py text eol=lf

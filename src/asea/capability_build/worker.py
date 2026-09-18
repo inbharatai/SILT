@@ -101,7 +101,22 @@ class GlmWorkerClient:
 
     def start(self) -> None:
         if self._process is not None:
-            return
+            # The watchdog's kill (or an unnoticed crash) leaves a DEAD
+            # process handle here. Treating it as live wedges the client:
+            # the next request would write to a corpse and surface a
+            # generic WorkerCrashed instead of the honest restart-or-refuse
+            # path. Reap the dead handle and respawn fresh below; a respawned
+            # worker has no mask state, and its restore/verify ops refuse
+            # honestly rather than silently reporting a clean teacher
+            # (audit 2026-09-18).
+            if self._process.poll() is None:
+                return
+            try:
+                self._process.wait(timeout=5)
+            except (OSError, ValueError, subprocess.TimeoutExpired):
+                pass
+            self._process = None
+            self._close_stderr()
         try:
             # stderr goes to a TEMP FILE, not a PIPE: an un-drained PIPE
             # deadlocks a chatty worker once the OS buffer fills, and a

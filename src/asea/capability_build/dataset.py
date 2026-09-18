@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
@@ -102,6 +103,16 @@ def validate_case(case: Dict[str, Any]) -> Dict[str, Any]:
         )
     if not isinstance(case["prompt"], str) or not case["prompt"].strip():
         raise DatasetInvalid("sample %s: empty prompt" % case["sample_id"])
+    # A prompt whose token shape is EMPTY (punctuation-only) is refused:
+    # the near-duplicate guard keys on the shape, and an all-punctuation
+    # prompt would collide with NOTHING -- silently exempting it from the
+    # leakage discipline every other case is held to (audit 2026-09-18).
+    if not _token_shape(case["prompt"]):
+        raise DatasetInvalid(
+            "sample %s: prompt has an empty token shape (no alphanumeric "
+            "content); it cannot be guarded against near-duplicate leakage"
+            % case["sample_id"]
+        )
     for field in ("family_id", "provenance", "license"):
         if not isinstance(case[field], str) or not case[field].strip():
             raise DatasetInvalid("sample %s: empty %s" % (case["sample_id"], field))
@@ -202,10 +213,25 @@ def build_dataset(
     if missing:
         raise DatasetInvalid("splits with no cases: %s" % ", ".join(missing))
     _check_disjointness(by_split)
-    output_dir.mkdir(parents=True)
+    # Atomic build (audit 2026-09-18): everything is written into a
+    # temporary SIBLING directory and the dataset appears at output_dir by a
+    # single rename. A crash mid-build used to leave a half-written dataset
+    # directory that looked exactly like a frozen one minus the selection
+    # lock -- validate_dataset refuses it, but the operator sees a corpse
+    # named like a dataset. With the rename, output_dir either does not
+    # exist or IS the complete frozen build.
+    staging = output_dir.with_name(
+        "%s.building-%d" % (output_dir.name, os.getpid())
+    )
+    if staging.exists() or staging.is_symlink():
+        raise DatasetInvalid(
+            "staging path %s already exists; remove it (it is a crash "
+            "leftover, never a dataset)" % staging
+        )
+    staging.mkdir(parents=True)
     files: Dict[str, str] = {}
     for split in SPLITS:
-        path = output_dir / ("%s.jsonl" % split)
+        path = staging / ("%s.jsonl" % split)
         with path.open("w", encoding="utf-8", newline="\n") as handle:
             for case in by_split[split]:
                 record = dict(case)
@@ -253,7 +279,7 @@ def build_dataset(
             "runs and no grading, and confers no capability on anything"
         ),
     }
-    manifest_path = output_dir / "manifest.json"
+    manifest_path = staging / "manifest.json"
     with manifest_path.open("w", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     lock = {
@@ -263,10 +289,14 @@ def build_dataset(
         "model_outputs_consulted": False,
         "final_opened": False,
     }
-    with (output_dir / "selection-lock.json").open(
+    with (staging / "selection-lock.json").open(
         "w", encoding="utf-8", newline="\n"
     ) as handle:
         handle.write(json.dumps(lock, indent=2, sort_keys=True) + "\n")
+    # The single atomic appearance of the frozen dataset. Same-parent
+    # rename: one filesystem operation, no window in which output_dir
+    # exists but is incomplete.
+    staging.rename(output_dir)
     return manifest
 
 

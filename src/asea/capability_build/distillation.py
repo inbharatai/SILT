@@ -105,6 +105,16 @@ def build_sequence_pairs(
             continue
         prompt = trace.behavioural.prompt
         response = trace.behavioural.response
+        shape = _token_shape(prompt)
+        if not shape:
+            # An unguardable prompt is not teaching material: the shape is
+            # the near-duplicate key, and a shapeless prompt would be exempt
+            # from the leakage discipline every other trace is held to
+            # (audit 2026-09-18). Unverifiable is not safe.
+            raise CapabilityBuildError(
+                "trace %r has a prompt with an empty token shape; it cannot "
+                "be checked for near-duplicate leakage" % trace.sample_id
+            )
         content = _content_hash(prompt + "\x00" + response)
         if trace.sample_id in protected_sample_ids:
             raise LeakageError(
@@ -121,7 +131,7 @@ def build_sequence_pairs(
                 "protected-split case" % trace.sample_id
             )
         shape = _token_shape(prompt)
-        if shape and shape in protected_prompt_shapes:
+        if shape in protected_prompt_shapes:
             raise LeakageError(
                 "trace prompt at sample %r is a near-duplicate (token-shape "
                 "collision) of a protected-split prompt; a protected prompt "
@@ -144,8 +154,7 @@ def build_sequence_pairs(
                 )
         if content in seen_hashes:
             raise LeakageError("duplicate training pair at sample %r" % trace.sample_id)
-        shape = _token_shape(prompt)
-        if shape in seen_shapes and shape:
+        if shape in seen_shapes:
             raise LeakageError(
                 "near-duplicate training prompt (token-shape collision) at "
                 "sample %r" % trace.sample_id

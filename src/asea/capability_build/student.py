@@ -20,14 +20,16 @@ Honesty rules (binding):
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence
 from urllib.parse import urlsplit
 
 from .errors import BlockedResource
 from .schema import EvaluationSplits
 
-#: Judge contract: (case, student_output) -> bool (host-owned verdict).
-StudentJudge = Callable[[Dict[str, Any], str], bool]
+#: Judge contract: (case, student_output) -> True/False (host-owned
+#: verdict) or None to ABSTAIN (unjudged). Abstentions are excluded from
+#: the pass rate and counted separately -- never folded into failures.
+StudentJudge = Callable[[Dict[str, Any], str], Optional[bool]]
 
 #: The ONLY hostnames a student connector may use. Literal loopback names
 #: and addresses -- no DNS names at all, because a resolvable name is not
@@ -135,9 +137,24 @@ def measure_student_baseline(
         )
     groups: Dict[str, Dict[str, int]] = {}
     per_case = []
+    unjudged = 0
     for case in cases:
         output = infer(student, case)
-        verdict = bool(judge(case, output))
+        verdict = judge(case, output)
+        if verdict is None:
+            # An abstaining judge is NOT a failing verdict: folding unjudged
+            # cases into "passed: 0" would manufacture a lower pass rate the
+            # judge never issued (audit 2026-09-18). Exclude from the rate
+            # and count them separately, honestly.
+            unjudged += 1
+            per_case.append({
+                "sample_id": case.get("sample_id"),
+                "group": case.get("group"),
+                "verdict": None,
+                "unjudged": True,
+            })
+            continue
+        verdict = bool(verdict)
         bucket = groups.setdefault(case["group"], {"passed": 0, "total": 0})
         bucket["total"] += 1
         bucket["passed"] += int(verdict)
@@ -156,6 +173,7 @@ def measure_student_baseline(
             for group, counts in groups.items()
         },
         "per_case": per_case,
+        "unjudged_excluded": unjudged,
         "note": "baseline numbers only; not a capability claim",
     }
     return summary
