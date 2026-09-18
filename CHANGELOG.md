@@ -9,6 +9,55 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## Capability-build review fixes, round 2 — 2026-09-18
+
+A second external review pass over the round-1 fixes found five further
+defects (reproduced by the reviewer with isolated in-memory probes). All five
+are fixed, each with new tests that were verified to FAIL on the previous
+commit's code and pass on the fixed code. No frozen result, Gate or existing
+mechanism was weakened; the module suite grew from 71 to 78 tests.
+
+### Fixed
+- **The worker Docker image still had a build blocker.** `build_support.py`'s
+  build hook requires every file in `src/asea/_package_resources.py::AUDIT_ORIGINS`
+  (README, `docs/SPECIALIST_WORKFLOW.md`, the specialist experiment script, four
+  audit test files); the Dockerfile copied none of them, so `pip install /silt`
+  inside the image failed. The image now copies its complete build inputs, and a
+  clean `docker build` of `workers/glm53/Dockerfile` was verified on this
+  machine (the wheel builds inside the image with every audit snapshot
+  embedded; image tagged `silt-glm53-worker`). A `.dockerignore` keeps the
+  build context lean without excluding any build input.
+- **"Local-only, no redirects" was not enforced by the transport.** urllib's
+  default `HTTPRedirectHandler` silently follows a 3xx to ANY location, so a
+  "local" host answering with a redirect could have smuggled a request
+  off-host. The shared transport (`modules/real/ollama.py`) now refuses
+  redirects outright — the refusal raises with the redirect target named and
+  the request is never re-sent — and the behavioural teacher connector and
+  the student availability check + inference both go through it. Tested
+  through the actual connector against throwaway loopback servers: the
+  redirect target is provably never contacted.
+- **Training traces were not fully bound to approved dataset content.** A
+  training sample ID is an identity claim, not a free pass: `distill` now
+  requires each behavioural trace's prompt to equal its approved training row
+  byte for byte, and the pair builder enforces protected PROMPT TOKEN SHAPES,
+  so a protected prompt rewritten only in capitalisation or punctuation is
+  still refused. `dataset validate` now also REQUIRES the `selection-lock.json`
+  and verifies the manifest's sha256 against it — a dataset without its lock
+  was never frozen by a build, and a manifest edited after freezing no longer
+  matches the lock; both are refusals.
+- **Search still accepted invalid measurements.** A NaN control score passes
+  every regression comparison (it shows "zero regression") and an infinite
+  target score satisfies any threshold. `search_with_reference` now requires
+  FINITE measured numbers everywhere — teacher target score, control
+  baselines, candidate target and every control score — refusing non-finite
+  values before any arithmetic.
+- **The worker deadline excluded request transmission.** The watchdog was
+  armed after the request write, so a worker that stopped reading stdin could
+  stall the write before timeout protection began. The watchdog is now armed
+  BEFORE the request is transmitted; a never-reading worker is killed at the
+  deadline and the failure is reported as a typed `WorkerTimeout` ("it
+  stopped reading its stdin and was killed; the request was never accepted").
+
 ## Capability-build review fixes — 2026-09-18
 
 An external review of the 2026-09-17 capability-build layer found five

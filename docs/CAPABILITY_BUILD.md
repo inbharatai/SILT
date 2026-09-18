@@ -47,7 +47,14 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   * `behavioural_remote` — Ollama connector (default `http://localhost:11434`),
     per-run explicit remote consent (`--allow-remote` or
     `remote_connector_selected` in the spec; never carries over between runs;
-    no silent fallback if the remote path is unavailable).
+    no silent fallback if the remote path is unavailable). Both the teacher
+    and the student talk through the SAME shared transport
+    (`modules/real/ollama.py`), which refuses HTTP redirects outright
+    (review round 2: urllib's default handler silently follows a 3xx to any
+    location, so a "local" host answering with a redirect could have
+    smuggled the request off-host; the transport now raises with the target
+    named and the request is never re-sent — tested through the actual
+    connector against throwaway loopback servers).
   * `internal_open_weight` — instrumented router telemetry via the isolated GLM
     worker only (see below). Refused on quantized checkpoints (the main HF repo
     is FP8; the remedy names the BF16 variant).
@@ -83,13 +90,22 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   memory preflight before load (a small host is honestly `BLOCKED`, which is
   the correct outcome, not a bug), partial-frame preservation on crash —
   a lost generation is never fabricated. The client **enforces** the request
-  deadline: a watchdog timer kills the worker process group at the deadline
-  and raises a typed `WorkerTimeout` carrying every preserved frame plus the
+  deadline over the WHOLE exchange, not just the read (review round 2): the
+  watchdog timer is armed BEFORE the request is transmitted, so a worker that
+  stops reading its stdin cannot stall the write unboundedly — it is killed
+  at the deadline and the failure is reported as a typed `WorkerTimeout`
+  ("the request was never accepted") carrying every preserved frame plus the
   worker's stderr tail (drained from a temp file — an undrained stderr PIPE
   both deadlocks a chatty worker and throws the crash diagnostic away). The
   Docker build context copies `build_support.py` (the single root-level module
-  `pyproject.toml` declares under `[tool.setuptools]`), so
-  `pip install /silt` inside the worker image succeeds.
+  `pyproject.toml` declares under `[tool.setuptools]`) AND every file in
+  `src/asea/_package_resources.py::AUDIT_ORIGINS` the build hook snapshots
+  into the wheel (`README.md`, `docs/SPECIALIST_WORKFLOW.md`, the specialist
+  experiment script, the four audit test files) — the hook fails the build if
+  any input is missing, so `pip install /silt` inside the worker image
+  succeeds with the full audit trail embedded. A clean image build was
+  verified on this machine on 2026-09-18 (wheel built inside the image with
+  every audit snapshot included; image tagged `silt-glm53-worker`).
 * Fresh dataset builder (`dataset.py`, CLI `dataset build --spec`): five splits
   (training/development/heldout/final/controls), per-case unique ID, content
   hash, family ID, provenance, license; cross-split ID/content/family
@@ -98,13 +114,22 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   inputs; manifest + selection lock frozen before any model sees a case. The
   spec is REQUIRED: the manifest binds capability ID, teacher provider/model/
   revision/access and the spec fingerprint, and `dataset validate` refuses a
-  manifest whose identity fields are missing or altered.
+  manifest whose identity fields are missing or altered. Review round 2:
+  `dataset validate` also REQUIRES the `selection-lock.json` and verifies the
+  manifest's sha256 against it — a dataset directory without its lock was
+  never frozen by a build (or the lock was removed), and a manifest edited
+  after the dataset was frozen no longer matches the lock; both are refusals,
+  no matter how internally consistent the remaining files look.
 * Student baselines: LOCAL connectors only — the student host URL is PARSED
   and its actual hostname validated (`localhost`, `127.0.0.1`, `::1`,
   `0.0.0.0` only; non-http schemes, userinfo, query strings, fragments,
   non-root paths and lookalike hosts such as
   `http://localhost.example.invalid:11434` are typed `BLOCKED_RESOURCE`
-  refusals; no redirects are followed); no remote student path exists. The
+  refusals; and redirects are refused at the TRANSPORT level (review round 2:
+  the shared `urllib` opener rejects 3xx instead of following them, tested
+  through the actual connector — a redirecting local daemon can never smuggle
+  a request off-host, and the redirect target is provably never contacted));
+  no remote student path exists. The
   measured gap `Gap = TeacherScore − StudentScore` is the only justification
   for any transfer work.
 * Sequence-level KD pair builder + DeepApply hand-off: `distill` REQUIRES a
@@ -112,7 +137,14 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   spec (capability ID, teacher model + revision, spec fingerprint), builds
   the protected sets (protected sample IDs, content hashes, prompt hashes and
   families from every non-training split) and refuses any trace outside the
-  training split. Pairs come only from host-judged successful traces (failures
+  training split. Review round 2 closes the content gap: a training sample ID
+  is an IDENTITY CLAIM, not a free pass — each behavioural trace's prompt must
+  equal its approved training row byte for byte (a trace filed under a
+  training ID with a rewritten prompt was never approved teaching material),
+  and the pair builder additionally enforces protected PROMPT TOKEN SHAPES, so
+  a protected prompt rewritten only in capitalisation or punctuation still
+  poisons the whole set. Pairs come only from host-judged successful traces
+  (failures
   kept as labelled negatives; UNJUDGED traces contribute nothing); a leakage
   collision — protected family, protected prompt or protected content —
   poisons the whole set; training itself is DeepApply's (LoRA via Gate 2) —
@@ -124,9 +156,14 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   measured `teacher_control_baselines` are REQUIRED (a control regression
   against an assumed 1.0 baseline is a fabrication and the search refuses to
   run on one), every candidate's target score, control results and
-  `size_bytes` must be MEASURED (an unmeasured control result, a missing or
-  non-positive size, or a size over `hardware_budget.max_model_storage_bytes`
-  is a recorded rejection), the ENTIRE candidate plan is evaluated (never
+  `size_bytes` must be MEASURED and FINITE (review round 2: a NaN control
+  score passes every regression comparison — i.e. it showed "zero
+  regression" — and an infinite target score satisfies any threshold, so all
+  non-finite teacher scores, baselines, candidate targets and control scores
+  are refused before any arithmetic; an unmeasured control result, a missing
+  or non-positive size, or a size over
+  `hardware_budget.max_model_storage_bytes` is a recorded rejection), the
+  ENTIRE candidate plan is evaluated (never
   stops at the first passing candidate), and the smallest passing candidate
   by measured `size_bytes` is selected. Every iteration is recorded including
   failures and explicit rejection reasons; a parameter decrease is never
@@ -182,8 +219,13 @@ Ollama cloud connector (`glm-5.3-flash:cloud`, remote consent given per run):
 
 The open-weight teacher path on this laptop reports `BLOCKED_RESOURCE`
 honestly: the worker's memory preflight cannot admit a ~320B-parameter teacher
-on this hardware, and Docker-on-Windows is itself unverified — both are the
-correct outcomes, never silently skipped.
+on this hardware, and no worker RUN has been executed here — both are the
+correct outcomes, never silently skipped. (The worker IMAGE itself has been
+built cleanly on this machine, 2026-09-18: `docker build` of
+`workers/glm53/Dockerfile` completed with the wheel — including every
+`AUDIT_ORIGINS` audit snapshot — built and installed inside the image. A
+verified image build is not a verified worker run, and no checkpoint has ever
+been mounted here.)
 
 ## Boundary rules (binding, all verified in review)
 
@@ -202,23 +244,35 @@ experiments stay visible.
 
 ## Tests
 
-`tests/test_capability_build.py` — 71 tests: schema validation, evidence-class
+`tests/test_capability_build.py` — 78 tests: schema validation, evidence-class
 separation, consent gating (no network without per-run consent), enrichment
 scoring with correlation limitation, intervention protocol (mask-measure-
 restore-verify on a fake adapter; unrestorable never causal), store/receipt
 integrity + tamper detection, worker IPC crash/blocked frames and deadline
 enforcement (a hanging fake worker is killed at the deadline with a typed
-`WorkerTimeout` carrying preserved frames + the drained stderr tail), dataset
-identity binding, leakage/near-duplicate/quarantine guards, distill
-dataset/training-split/protected-set enforcement, student host URL-parse
-validation (lookalike hosts, userinfo, query/fragment, non-http schemes all
-refused), router-output-hook masking on both a fake GLM stack and a real tiny
+`WorkerTimeout` carrying preserved frames + the drained stderr tail; the
+deadline also covers REQUEST TRANSMISSION — a worker that never reads stdin
+cannot stall the write, and the request is reported as never accepted), dataset
+identity binding, leakage/near-duplicate/quarantine guards (including the
+selection lock: a dataset without `selection-lock.json`, and a manifest edited
+after freezing, are both refusals), distill dataset/training-split/protected-
+set enforcement (including trace-content binding: a trace filed under a
+training ID whose prompt does not equal the frozen training row byte for byte
+is refused, and a protected prompt rewritten only in capitalisation or
+punctuation still poisons the set through the token-shape guard), student
+host URL-parse validation (lookalike hosts, userinfo, query/fragment,
+non-http schemes all refused), transport-level redirect refusal through the
+ACTUAL connector (a 302 from a loopback server is refused with the target
+named and the redirect target provably never contacted), router-output-hook
+masking on both a fake GLM stack and a real tiny
 Switch model (a negative-sum hidden state — where the old write-−30-rows
 mechanism would have produced a POSITIVE masked-expert logit — proves which
 expert was suppressed and that restoration succeeds), student gap bookkeeping,
 KD pair leakage poisoning, search contract enforcement (measured baselines,
 full-plan evaluation, smallest-passing selection, size/budget/measurement
-rejections), CLI exit codes, and two REAL Linux-sandbox oracle integration
+rejections, and FINITENESS: NaN control scores, infinite target scores and
+non-finite teacher scores/baselines are all refused before arithmetic),
+CLI exit codes, and two REAL Linux-sandbox oracle integration
 tests (they probe for Linux containment and skip where it is unavailable —
 GitHub CI containers and Windows both honestly skip; the skip is a probe
 result, not an assumption). Every test is a MECHANISM test unless its docstring

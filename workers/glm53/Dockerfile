@@ -29,10 +29,22 @@ RUN pip install --no-cache-dir -r /tmp/requirements.lock
 # adapters, intervention, errors) -- never the localmodels extras.
 # build_support.py (the custom build command declared in pyproject.toml
 # under [tool.setuptools] build_support) is a single MODULE at the repo
-# root, not a directory: ``pip install /silt`` fails without it.
-COPY pyproject.toml README.md /silt/
+# root, not a directory: ``pip install /silt`` fails without it. Its
+# build hook additionally snapshots every file in
+# src/asea/_package_resources.py AUDIT_ORIGINS into the wheel and FAILS
+# if any of them is missing from the build context -- so the image must
+# copy those exact inputs too (docs/SPECIALIST_WORKFLOW.md, the
+# specialist experiment script, and the four audit test files), or the
+# wheel build inside the image dies with "required source audit input
+# missing".
+COPY pyproject.toml README.md build_support.py /silt/
 COPY src/ /silt/src/
-COPY build_support.py /silt/build_support.py
+COPY docs/SPECIALIST_WORKFLOW.md /silt/docs/SPECIALIST_WORKFLOW.md
+COPY scripts/run_specialist_quality_experiment.py /silt/scripts/run_specialist_quality_experiment.py
+COPY tests/test_specialist_workflow.py /silt/tests/test_specialist_workflow.py
+COPY tests/test_specialist_quality_experiment_runner.py /silt/tests/test_specialist_quality_experiment_runner.py
+COPY tests/test_hardware_dispatch.py /silt/tests/test_hardware_dispatch.py
+COPY tests/test_controller_integrity_review.py /silt/tests/test_controller_integrity_review.py
 RUN pip install --no-cache-dir /silt
 
 COPY workers/glm53/worker.py /worker/worker.py

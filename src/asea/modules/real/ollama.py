@@ -35,6 +35,42 @@ class OllamaConnectionError(RuntimeError):
     pass
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Redirects are REFUSED at the transport level.
+
+    urllib's default redirect handler silently follows a 3xx response to
+    ANY location -- including from ``http://localhost:11434`` out to an
+    external host. Every contract that promises "posts directly to this
+    URL, no redirects" (the capability-build student contract above all)
+    is enforced HERE, in the transport, not by hoping no caller ever uses
+    plain ``urlopen`` again: the redirect raises with the target URL
+    named, and the request is never silently re-sent anywhere."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(
+            req.full_url,
+            code,
+            "redirect refused (%s): %s -> %s" % (msg, req.full_url, newurl),
+            headers,
+            fp,
+        )
+
+
+#: One shared opener whose handler chain has the default redirect
+#: follower replaced by :class:`_NoRedirectHandler`.
+_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirectHandler)
+
+
+def urlopen_no_redirect(request, timeout):
+    """``urllib.request.urlopen`` with redirect following disabled.
+
+    Every Ollama HTTP request in this module (and the capability-build
+    teacher/student connectors that follow its transport) goes through
+    this: a 3xx from the daemon surfaces as an error naming the redirect
+    target, never as a silent second hop to an unvalidated host."""
+    return _NO_REDIRECT_OPENER.open(request, timeout=timeout)
+
+
 class OllamaConnector(ModuleAdapter):
     is_mock = False
 
@@ -98,7 +134,7 @@ class OllamaConnector(ModuleAdapter):
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+            with urlopen_no_redirect(request, timeout=self.timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as exc:
             raise OllamaConnectionError(
@@ -111,7 +147,7 @@ class OllamaConnector(ModuleAdapter):
         """Check the server is up and the model is present. Call before a run."""
         try:
             request = urllib.request.Request("{}/api/tags".format(self.host))
-            with urllib.request.urlopen(request, timeout=10) as response:
+            with urlopen_no_redirect(request, timeout=10) as response:
                 tags = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as exc:
             raise OllamaConnectionError(

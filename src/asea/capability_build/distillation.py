@@ -60,6 +60,7 @@ def build_sequence_pairs(
     protected_sample_ids: Optional[set] = None,
     protected_families: Optional[set] = None,
     protected_prompts: Optional[set] = None,
+    protected_prompt_shapes: Optional[set] = None,
     sample_families: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     """Build sequence-level KD pairs from JUDGED behavioural traces.
@@ -70,18 +71,24 @@ def build_sequence_pairs(
     refuses the WHOLE pair set -- one collision poisons the build.
 
     Protected means: sample ids, full content hashes, PROMPT hashes,
-    and FAMILIES of every non-training split. ``protected_families`` is
-    enforced, not advisory: when it is supplied, every trace's family must
-    be resolvable through ``sample_families`` (a trace whose family cannot
-    be verified is refused -- unverifiable is not safe), and a trace whose
-    family belongs to a protected split raises :class:`LeakageError`.
-    ``protected_prompts`` are sha256 hex digests of protected prompts and
-    catch exact prompt reuse even when the response differs.
+    PROMPT TOKEN SHAPES, and FAMILIES of every non-training split.
+    ``protected_families`` is enforced, not advisory: when it is supplied,
+    every trace's family must be resolvable through ``sample_families``
+    (a trace whose family cannot be verified is refused -- unverifiable
+    is not safe), and a trace whose family belongs to a protected split
+    raises :class:`LeakageError`. ``protected_prompts`` are sha256 hex
+    digests of protected prompts and catch exact prompt reuse even when
+    the response differs; ``protected_prompt_shapes`` are the
+    lowercased token shapes of those prompts and catch the near-duplicate
+    the exact hash misses -- a protected prompt rewritten only in
+    capitalisation or punctuation is still a protected prompt, and a
+    training trace whose prompt merely *resembles* one is refused.
     """
     protected_content_hashes = protected_content_hashes or set()
     protected_sample_ids = protected_sample_ids or set()
     protected_families = protected_families or set()
     protected_prompts = protected_prompts or set()
+    protected_prompt_shapes = protected_prompt_shapes or set()
     if protected_families and sample_families is None:
         raise CapabilityBuildError(
             "protected families were supplied without a sample->family "
@@ -112,6 +119,14 @@ def build_sequence_pairs(
             raise LeakageError(
                 "trace prompt at sample %r is the exact prompt of a "
                 "protected-split case" % trace.sample_id
+            )
+        shape = _token_shape(prompt)
+        if shape and shape in protected_prompt_shapes:
+            raise LeakageError(
+                "trace prompt at sample %r is a near-duplicate (token-shape "
+                "collision) of a protected-split prompt; a protected prompt "
+                "rewritten only in capitalisation or punctuation is still "
+                "protected" % trace.sample_id
             )
         if protected_families:
             family = (sample_families or {}).get(trace.sample_id)
@@ -165,8 +180,9 @@ def build_sequence_pairs(
         ),
         "leakage_checks": [
             "sample_id disjointness", "exact content hash",
-            "protected prompt hash", "protected family",
-            "token-shape near-duplicate", "within-set duplicate",
+            "protected prompt hash", "protected prompt token shape",
+            "protected family", "token-shape near-duplicate",
+            "within-set duplicate",
         ],
     }
 

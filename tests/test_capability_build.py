@@ -574,6 +574,43 @@ def test_worker_client_enforces_deadline_kills_and_drains_stderr(tmp_path):
     client.stop()
 
 
+def test_worker_deadline_covers_request_transmission(tmp_path):
+    """Defect fix: the watchdog is armed BEFORE the request is written, not
+    after it. A worker that NEVER reads stdin cannot stall the write past
+    the deadline: it is killed at the deadline and the failure is reported
+    as a timeout (the request was never accepted), not an unbounded hang.
+    MECHANISM test against a script fake, not the GLM worker."""
+    from asea.capability_build.errors import WorkerTimeout
+    from asea.capability_build.worker import GlmWorkerClient
+
+    fake = tmp_path / "never_reads_stdin.py"
+    fake.write_text(
+        "import time\n"
+        "time.sleep(600)\n",
+        encoding="utf-8",
+    )
+    client = GlmWorkerClient(
+        repo_root=tmp_path, checkpoint=str(tmp_path), use_docker=False,
+        python=sys.executable, timeout=3600.0,
+    )
+    client._command = lambda: [sys.executable, str(fake)]
+    # ~4 MiB: far past the OS pipe buffer, so the write itself blocks
+    # while no reader consumes it -- transmission must be inside the
+    # protected window, not before it.
+    payload = {"blobs": ["x" * (512 * 1024)] * 8}
+    with pytest.raises(WorkerTimeout) as excinfo:
+        client.request("routing", payload, timeout=0.5)
+    message = str(excinfo.value)
+    assert "deadline" in message
+    assert "stopped reading its stdin" in message
+    # the request was never accepted: no complete frames were recorded
+    assert client._frames == []
+    # the worker process is dead and reaped
+    assert client._process is not None
+    assert client._process.wait(timeout=30) != 0
+    client.stop()
+
+
 # ---------------------------------------------------------------------------
 # Router-output masking (MECHANISM TEST: random fake routers, not GLM or
 # Switch capability results)
@@ -989,6 +1026,26 @@ def test_sequence_pairs_enforce_protected_prompts():
         )
 
 
+def test_sequence_pairs_enforce_protected_prompt_shapes():
+    """Defect fix: a protected prompt rewritten only in capitalisation or
+    punctuation is STILL protected. The exact content-hash guard misses
+    that; the token-shape comparison catches it."""
+    from asea.capability_build.distillation import _token_shape, build_sequence_pairs
+
+    traces = [_judged_behavioural_trace("t-1", "Fix, BUG: body!", "r1", True)]
+    # "fix bug body" is the protected prompt with case/punctuation rewritten
+    with pytest.raises(LeakageError) as excinfo:
+        build_sequence_pairs(
+            traces, protected_prompt_shapes={_token_shape("fix bug body")},
+        )
+    assert "token-shape" in str(excinfo.value)
+    # a genuinely different prompt is untouched by the guard
+    pairs = build_sequence_pairs(
+        traces, protected_prompt_shapes={_token_shape("an unrelated prompt")},
+    )
+    assert pairs["positives"][0]["sample_id"] == "t-1"
+
+
 def test_sequence_pairs_reject_duplicate_and_near_duplicate():
     from asea.capability_build.distillation import build_sequence_pairs
 
@@ -1195,6 +1252,125 @@ def test_search_refuses_unmeasured_teacher_and_empty_plan(spec):
                               build=build, evaluate=evaluate)
 
 
+def test_search_rejects_non_finite_scores(spec):
+    """Defect fix: NaN and infinity are not measurements. A NaN control
+    score passes every regression comparison (``nan <= x`` is always
+    False, so it showed ZERO regression) and an infinite target score
+    satisfies any threshold; both are refused BEFORE arithmetic, and a
+    non-finite teacher score or control baseline refuses to run at all."""
+    from asea.capability_build.search import search_with_reference
+
+    nan = float("nan")
+    inf = float("inf")
+    build = lambda plan: plan  # noqa: E731
+
+    # non-finite teacher score / control baseline: the search refuses to run
+    with pytest.raises(CapabilityBuildError):
+        search_with_reference(
+            spec, teacher_target_score=nan,
+            teacher_control_baselines={"math_reasoning": 1.0},
+            candidate_plan=[{"keep": 1}], build=build,
+            evaluate=lambda c: {},
+        )
+    with pytest.raises(CapabilityBuildError):
+        search_with_reference(
+            spec, teacher_target_score=1.0,
+            teacher_control_baselines={"math_reasoning": inf},
+            candidate_plan=[{"keep": 1}], build=build,
+            evaluate=lambda c: {},
+        )
+    # NaN control score: "zero regression" must NOT sneak the candidate in
+    result = search_with_reference(
+        spec, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 1.0},
+        candidate_plan=[{"name": "nan-control"}], build=build,
+        evaluate=lambda c: {"target_score": 0.9,
+                            "control_scores": {"math_reasoning": nan},
+                            "size_bytes": 10},
+    )
+    assert result["accepted"] is None
+    assert result["iterations"][0]["status"] == "rejected"
+    assert "finite" in result["iterations"][0]["reason"]
+    # infinite target score satisfies any retention threshold: still rejected
+    result = search_with_reference(
+        spec, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 1.0},
+        candidate_plan=[{"name": "inf-target"}], build=build,
+        evaluate=lambda c: {"target_score": inf,
+                            "control_scores": {"math_reasoning": 1.0},
+                            "size_bytes": 10},
+    )
+    assert result["accepted"] is None
+    assert result["iterations"][0]["status"] == "rejected"
+    assert "finite" in result["iterations"][0]["reason"]
+
+
+def test_ollama_transport_refuses_redirects():
+    """Defect fix: 'local-only, no redirects' is enforced by the TRANSPORT,
+    not just the URL parse. urllib's default handler silently follows a
+    3xx to ANY location (including off-host); the shared transport now
+    refuses redirects outright, so a redirecting "local" host can never
+    smuggle the request elsewhere. MECHANISM test through the ACTUAL
+    connector against throwaway loopback servers -- no real model, no
+    real external host."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    from asea.modules.real.ollama import OllamaConnector, OllamaConnectionError
+
+    hits = {"evil": 0}
+
+    class Evil(BaseHTTPRequestHandler):
+        def do_POST(self):
+            hits["evil"] += 1
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"{}")
+
+        do_GET = do_POST
+
+        def log_message(self, *args):
+            pass
+
+    class Redirect(BaseHTTPRequestHandler):
+        def _redirect(self):
+            self.send_response(302)
+            self.send_header("Location", self.server.redirect_target)
+            self.end_headers()
+
+        do_POST = _redirect
+        do_GET = _redirect
+
+        def log_message(self, *args):
+            pass
+
+    evil = HTTPServer(("127.0.0.1", 0), Evil)
+    redirect = HTTPServer(("127.0.0.1", 0), Redirect)
+    redirect.redirect_target = "http://127.0.0.1:%d/" % evil.server_address[1]
+    servers = [evil, redirect]
+    for server in servers:
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        connector = OllamaConnector(
+            "student-model", [],
+            host="http://127.0.0.1:%d" % redirect.server_address[1],
+        )
+        # a chat POST answered with 302 must surface the refusal, never
+        # follow it
+        with pytest.raises(OllamaConnectionError) as excinfo:
+            connector._chat([{"role": "user", "content": "hi"}])
+        assert "redirect" in str(excinfo.value)
+        # the availability probe (GET) is refused the same way
+        with pytest.raises(OllamaConnectionError) as excinfo:
+            connector.health()
+        assert "redirect" in str(excinfo.value)
+        # the redirect target was never contacted
+        assert hits["evil"] == 0
+    finally:
+        for server in servers:
+            server.shutdown()
+
+
 # ---------------------------------------------------------------------------
 # CLI wiring for student-baseline and distill
 # ---------------------------------------------------------------------------
@@ -1336,6 +1512,30 @@ def test_cli_distill_refuses_identity_mismatch(tmp_path, capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "rejected"
     assert "identity mismatch" in payload["error"]
+
+
+def test_cli_distill_refuses_prompt_mismatch_with_training_row(tmp_path, capsys):
+    """Defect fix: a training sample ID is an identity claim, not a free
+    pass. A trace filed under a training ID whose prompt does not equal
+    the frozen training row byte for byte is refused: the rewritten
+    prompt was never approved teaching material."""
+    from asea.capability_build.__main__ import main
+
+    out = _built_dataset(tmp_path)
+    capsys.readouterr()
+    _seed_traces(tmp_path / "ws", [
+        _training_trace(
+            sample_id="training-0",
+            prompt="TAMPERED prompt body for training-0",
+        ),
+    ])
+    code = main(["distill", "--spec", _write_spec(tmp_path),
+                 "--dataset", str(out),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "rejected"
+    assert "does not match the approved training row" in payload["error"]
 
 
 def test_cli_distill_happy_path_builds_pairs_and_handoff(tmp_path, capsys):
@@ -1483,6 +1683,39 @@ def test_dataset_validate_detects_post_build_tampering(tmp_path, spec):
         "ok-training-0", "edited"), encoding="utf-8")
     with pytest.raises(DatasetInvalid):
         validate_dataset(out)
+
+
+def test_dataset_validate_requires_selection_lock(tmp_path, spec):
+    """Defect fix: a dataset directory without its selection lock was
+    never frozen by a build (or the lock was removed) and may never back
+    training pairs, no matter how internally consistent the remaining
+    files look."""
+    from asea.capability_build.dataset import build_dataset, validate_dataset
+
+    out = tmp_path / "capability_v1"
+    build_dataset(_full_case_list(), output_dir=out, spec=spec)
+    (out / "selection-lock.json").unlink()
+    with pytest.raises(DatasetInvalid) as excinfo:
+        validate_dataset(out)
+    assert "selection-lock" in str(excinfo.value)
+
+
+def test_dataset_validate_binds_manifest_to_selection_lock(tmp_path, spec):
+    """Defect fix: the manifest is verified against the selection lock
+    byte for byte. A manifest edited AFTER the dataset was frozen is
+    refused even when the edit leaves the per-file content hashes
+    internally consistent."""
+    from asea.capability_build.dataset import build_dataset, validate_dataset
+
+    out = tmp_path / "capability_v1"
+    build_dataset(_full_case_list(), output_dir=out, spec=spec)
+    manifest_path = out / "manifest.json"
+    raw = json.loads(manifest_path.read_text(encoding="utf-8"))
+    raw["notes"] = "edited after the dataset was frozen"
+    manifest_path.write_text(json.dumps(raw, indent=2), encoding="utf-8")
+    with pytest.raises(DatasetInvalid) as excinfo:
+        validate_dataset(out)
+    assert "manifest_sha256" in str(excinfo.value)
 
 
 def test_cli_dataset_build_and_validate(tmp_path, capsys):

@@ -1,0 +1,13 @@
+# Build-context exclusions for the worker image build. Everything the
+# Dockerfile COPYs must stay OUT of this list: src/, workers/,
+# pyproject.toml, README.md, build_support.py, docs/SPECIALIST_WORKFLOW.md,
+# scripts/run_specialist_quality_experiment.py and the four audit test
+# files named in src/asea/_package_resources.py AUDIT_ORIGINS.
+.git
+.capability-build
+dist-vercel
+data
+node_modules
+__pycache__
+*.pyc
+.pytest_cache

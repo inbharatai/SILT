@@ -17,7 +17,10 @@ Failure honesty (binding):
     :class:`WorkerCrashed` subclass): a watchdog kills the worker process
     group at the deadline, and the lost portion is reported as lost. The
     ``timeout`` argument is therefore ENFORCED -- it is never accepted
-    and silently ignored, and the read is never allowed to block forever.
+    and silently ignored, and neither the request write nor the read is
+    allowed to block forever: the watchdog is armed BEFORE the request is
+    transmitted, so a worker that stops reading its stdin is killed at
+    the deadline too.
   * A ``blocked`` frame -> :class:`BlockedResource` with the worker's
     exact requirement + remedy (a small host gets an honest
     ``BLOCKED_RESOURCE``, never a local weaker path).
@@ -192,29 +195,46 @@ class GlmWorkerClient:
 
         ``timeout`` (seconds) is ENFORCED with a watchdog that kills the
         worker tree at the deadline; the read can never block unboundedly.
-        The default is the client-level ``timeout``. Whatever the worker
-        had not produced by the deadline is reported as lost, never
+        The watchdog is armed BEFORE the request is written: a worker that
+        stops reading stdin cannot block the write past the deadline
+        either -- transmission is inside the protected window, not before
+        it. The default is the client-level ``timeout``. Whatever the
+        worker had not produced by the deadline is reported as lost, never
         fabricated."""
         self.start()
         assert self._process is not None
         request = proto.make_request(op, payload)
         line = proto.encode(request)
-        try:
-            self._process.stdin.write(line)  # type: ignore[union-attr]
-            self._process.stdin.flush()  # type: ignore[union-attr]
-        except (BrokenPipeError, OSError) as exc:
-            raise WorkerCrashed(
-                "worker died before accepting %r (partial frames: %d). "
-                "The lost request was never executed.%s"
-                % (op, len(self._frames), self._stderr_suffix())
-            ) from exc
         deadline = float(timeout) if timeout is not None else float(self.timeout)
         watchdog = threading.Timer(deadline, self._kill_worker)
         watchdog.daemon = True
         self._deadline_fired = False
         watchdog.start()
         try:
-            response_line = self._process.stdout.readline()  # type: ignore[union-attr]
+            try:
+                self._process.stdin.write(line)  # type: ignore[union-attr]
+                self._process.stdin.flush()  # type: ignore[union-attr]
+            except (BrokenPipeError, OSError) as exc:
+                # The write itself is inside the deadline window: if the
+                # watchdog already killed a worker that stopped reading
+                # stdin, the deadline (not a generic pipe failure) is the
+                # honest diagnosis.
+                if self._deadline_fired:
+                    raise WorkerTimeout(
+                        "worker exceeded the %.1fs deadline during %r "
+                        "(it stopped reading its stdin and was killed); the "
+                        "request was never accepted.%s"
+                        % (deadline, op, self._stderr_suffix())
+                    ) from exc
+                raise WorkerCrashed(
+                    "worker died before accepting %r (partial frames: %d). "
+                    "The lost request was never executed.%s"
+                    % (op, len(self._frames), self._stderr_suffix())
+                ) from exc
+            try:
+                response_line = self._process.stdout.readline()  # type: ignore[union-attr]
+            finally:
+                watchdog.cancel()
         finally:
             watchdog.cancel()
         if self._deadline_fired:

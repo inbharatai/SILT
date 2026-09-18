@@ -22,7 +22,9 @@ calling a cloud API.
 Transport follows :class:`asea.modules.real.ollama.OllamaConnector`:
 deterministic options (temperature 0, fixed seed), stdlib ``urllib`` only --
 no ML dependencies, so this module is safe for the bare ``import asea``
-sanity gate.
+sanity gate. Redirects are refused at the transport level
+(:func:`asea.modules.real.ollama.urlopen_no_redirect`): a 3xx from the
+daemon is an error naming the target, never a silent second hop.
 """
 
 from __future__ import annotations
@@ -97,13 +99,15 @@ class BehaviouralOllamaTeacher:
     # -- transport -----------------------------------------------------------
 
     def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        from ...modules.real.ollama import urlopen_no_redirect
+
         request = urllib.request.Request(
             "{}{}".format(self.host, path),
             data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:
+        with urlopen_no_redirect(request, timeout=self.timeout) as response:
             return json.loads(response.read().decode("utf-8"))
 
     def health(self) -> Dict[str, Any]:
@@ -112,8 +116,10 @@ class BehaviouralOllamaTeacher:
         Exact-match only (a ``startswith`` match made the historical
         connector report a false-positive model_present).
         """
+        from ...modules.real.ollama import urlopen_no_redirect
+
         request = urllib.request.Request("{}/api/tags".format(self.host))
-        with urllib.request.urlopen(request, timeout=10) as response:
+        with urlopen_no_redirect(request, timeout=10) as response:
             tags = json.loads(response.read().decode("utf-8"))
         available = [m.get("name") for m in tags.get("models", [])]
         present = self.model in available

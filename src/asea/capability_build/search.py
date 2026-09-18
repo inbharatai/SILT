@@ -21,6 +21,7 @@ Every rule inherited from the compiler's discipline:
 
 from __future__ import annotations
 
+import math
 from typing import Any, Callable, Dict, List, Sequence
 
 from .errors import CapabilityBuildError
@@ -51,12 +52,15 @@ def search_with_reference(
       * ``min size_bytes`` over every ACCEPTED candidate -- the whole plan
         is evaluated; the search never stops at the first passing
         candidate when a smaller passing one follows.
-      * A candidate is accepted ONLY with: a MEASURED target score, a
-        MEASURED result for EVERY control group named in the spec, a
-        MEASURED positive size in bytes, and size within the spec's
+      * A candidate is accepted ONLY with: a MEASURED finite target score,
+        a MEASURED finite result for EVERY control group named in the spec,
+        a MEASURED positive size in bytes, and size within the spec's
         ``max_model_storage_bytes`` budget (when set). Anything less is
         recorded as ``rejected`` with the reason -- missing measurements
-        are never treated as passing.
+        are never treated as passing, and neither are NaN or infinite
+        "scores" (NaN comparisons are always False, so a NaN control score
+        would otherwise pass with zero regression; an infinite target
+        would otherwise satisfy any threshold).
       * Control regression is computed against the MEASURED
         ``teacher_control_baselines`` (the same control cases scored on
         the teacher/reference). A baseline of ``1.0`` is never assumed; a
@@ -67,6 +71,16 @@ def search_with_reference(
     if not candidate_plan:
         raise CapabilityBuildError(
             "the reduction candidate plan is empty; nothing to search"
+        )
+    if (
+        not isinstance(teacher_target_score, (int, float))
+        or isinstance(teacher_target_score, bool)
+        or not math.isfinite(teacher_target_score)
+    ):
+        raise CapabilityBuildError(
+            "teacher reference score must be a finite MEASURED number; a "
+            "search against an unmeasured (or non-finite) teacher score is "
+            "meaningless"
         )
     if teacher_target_score <= 0:
         raise CapabilityBuildError(
@@ -80,9 +94,13 @@ def search_with_reference(
             "fabrication and this search refuses to run"
         )
     for group, baseline in teacher_control_baselines.items():
-        if not isinstance(baseline, (int, float)) or isinstance(baseline, bool):
+        if (
+            not isinstance(baseline, (int, float))
+            or isinstance(baseline, bool)
+            or not math.isfinite(baseline)
+        ):
             raise CapabilityBuildError(
-                "control baseline for %r is not a measured number" % group
+                "control baseline for %r is not a finite measured number" % group
             )
     missing_baselines = [g for g in spec.controls if g not in teacher_control_baselines]
     if missing_baselines:
@@ -106,9 +124,13 @@ def search_with_reference(
             continue
         rejection_reasons: List[str] = []
         target = scores.get("target_score")
-        if not isinstance(target, (int, float)) or isinstance(target, bool):
+        if (
+            not isinstance(target, (int, float))
+            or isinstance(target, bool)
+            or not math.isfinite(target)
+        ):
             iteration["status"] = "rejected"
-            iteration["reason"] = "target score not measured"
+            iteration["reason"] = "target score not a finite measured number"
             iterations[-1] = iteration
             continue
         target = float(target)
@@ -124,11 +146,13 @@ def search_with_reference(
                     rejection_reasons.append(
                         "control group %r not measured" % group
                     )
-                elif not isinstance(control_scores[group], (int, float)) or isinstance(
-                    control_scores[group], bool
+                elif (
+                    not isinstance(control_scores[group], (int, float))
+                    or isinstance(control_scores[group], bool)
+                    or not math.isfinite(control_scores[group])
                 ):
                     rejection_reasons.append(
-                        "control group %r score is not a number" % group
+                        "control group %r score is not a finite number" % group
                     )
             for group in control_scores:
                 if group not in teacher_control_baselines:

@@ -435,7 +435,12 @@ def _cmd_student_baseline(args) -> Dict[str, Any]:
     """Local-student baseline: run every case through a LOCAL Ollama model
     and judge each output against the case's exact ``expected`` output when
     present (deterministic textual verdict -- a MECHANISM, not the host
-    oracle). Cases without ``expected`` are recorded UNJUDGED."""
+    oracle). Cases without ``expected`` are recorded UNJUDGED.
+
+    Both the availability check and every inference go through the REAL
+    OllamaConnector transport, which refuses redirects at the transport
+    level -- a 3xx from the daemon is an error naming the target, never a
+    silent second hop to an unvalidated host."""
     loaded = load_spec(args.spec)
     spec = loaded["spec"]
     from .student import local_ollama_student, measure_student_baseline
@@ -445,36 +450,28 @@ def _cmd_student_baseline(args) -> Dict[str, Any]:
         max_new_tokens=args.max_new_tokens,
     )
     cases = _load_cases(args.cases)
-    import urllib.error
+    from asea.modules.real.ollama import OllamaConnector, OllamaConnectionError
 
-    import urllib.request
-
+    connector = OllamaConnector(
+        student["model"], [], host=student["host"],
+        max_new_tokens=student["max_new_tokens"],
+    )
     try:
-        request = urllib.request.Request(
-            "%s/api/tags" % student["host"].rstrip("/")
-        )
-        with urllib.request.urlopen(request, timeout=10) as response:
-            tags = json.loads(response.read().decode("utf-8"))
-    except urllib.error.URLError as exc:
+        health = connector.health()
+    except OllamaConnectionError as exc:
         raise BlockedResource(
             requirement="local Ollama daemon unreachable at %s (%s)"
             % (student["host"], exc),
             remedy="start it with `ollama serve`; student runs are local "
                    "only (no remote student path exists)",
         )
-    available = [m.get("name") for m in tags.get("models", [])]
-    if student["model"] not in available:
+    if not health["model_present"]:
         raise BlockedResource(
             requirement="student model %r not present locally" % student["model"],
             remedy="ollama pull %s" % student["model"],
         )
-    from asea.modules.real.ollama import OllamaConnector
 
     def infer(_student, case):
-        connector = OllamaConnector(
-            student["model"], [], host=student["host"],
-            max_new_tokens=student["max_new_tokens"],
-        )
         return connector._chat([{"role": "user", "content": case["prompt"]}])
 
     def judge(case, output):
@@ -527,13 +524,21 @@ def _cmd_distill(args) -> Dict[str, Any]:
         fingerprint as ``--spec`` -- identity is verified, never assumed
         from a path.
       * The protected splits (development/heldout/final/controls) supply
-        protected sample ids, content hashes, PROMPT hashes and families
-        to the pair builder; any collision poisons the whole build.
+        protected sample ids, content hashes, PROMPT hashes, PROMPT
+        token-shapes and families to the pair builder; any collision
+        poisons the whole build.
       * Every trace's capability id and teacher revision must match the
         spec -- traces from another teacher are refused.
+      * A behavioural trace's PROMPT must match, byte for byte, the
+        approved training row bearing that sample id: a trace under a
+        training id whose prompt is not the frozen training prompt is
+        refused. This closes the "training id, different content" hole
+        (the sample id is an identity claim, not a free pass).
     """
     import hashlib
     import json as _json
+
+    from .distillation import _token_shape
 
     loaded = load_spec(args.spec)
     spec = loaded["spec"]
@@ -590,13 +595,16 @@ def _cmd_distill(args) -> Dict[str, Any]:
             if line.strip():
                 training_rows.append(_json.loads(line))
     training_ids = {row["sample_id"] for row in training_rows}
+    training_prompts = {row["sample_id"]: row["prompt"] for row in training_rows}
     sample_families = {row["sample_id"]: row["family_id"] for row in training_rows}
 
     # Protected splits: every non-training split contributes ids, content
-    # hashes, prompt hashes and families that must never appear in pairs.
+    # hashes, prompt hashes, PROMPT TOKEN SHAPES and families that must
+    # never appear in pairs.
     protected_ids: set = set()
     protected_hashes: set = set()
     protected_prompts: set = set()
+    protected_prompt_shapes: set = set()
     protected_families: set = set()
     for split in SPLITS:
         if split == "training":
@@ -611,6 +619,7 @@ def _cmd_distill(args) -> Dict[str, Any]:
                 protected_prompts.add(
                     hashlib.sha256(row["prompt"].encode("utf-8")).hexdigest()
                 )
+                protected_prompt_shapes.add(_token_shape(row["prompt"]))
                 protected_families.add(row["family_id"])
 
     store = CapabilityStore(workspace)
@@ -643,12 +652,23 @@ def _cmd_distill(args) -> Dict[str, Any]:
                 "split; only training-split traces may become pairs"
                 % trace.sample_id
             )
+        if trace.behavioural is not None:
+            approved_prompt = training_prompts.get(trace.sample_id)
+            if approved_prompt is None or trace.behavioural.prompt != approved_prompt:
+                raise CapabilityBuildError(
+                    "trace %r claims training sample %r but its prompt does "
+                    "not match the approved training row byte for byte; a "
+                    "sample id is an identity claim, not a free pass -- the "
+                    "frozen training prompt is the only teaching material"
+                    % (trace.sample_id, trace.sample_id)
+                )
     pairs = build_sequence_pairs(
         traces,
         protected_sample_ids=protected_ids,
         protected_content_hashes={h for h in protected_hashes if h},
         protected_families=protected_families,
         protected_prompts=protected_prompts,
+        protected_prompt_shapes=protected_prompt_shapes,
         sample_families=sample_families,
     )
     handoff = hand_to_deepapply(pairs) if pairs["positives"] else None

@@ -271,12 +271,45 @@ def build_dataset(
 
 
 def validate_dataset(dataset_dir: Path) -> Dict[str, Any]:
-    """Re-read a built dataset and re-check every invariant and file hash."""
+    """Re-read a built dataset and re-check every invariant and file hash.
+
+    The selection lock is REQUIRED, not optional: a dataset directory whose
+    ``selection-lock.json`` is missing was never frozen by a build (or the
+    lock was deleted), and its manifest cannot be trusted -- the lock's
+    ``manifest_sha256`` must match the manifest byte for byte, and the
+    frozen flags it pins must hold. A manifest that changed after the
+    lock is a tampered dataset, refused here."""
     dataset_dir = Path(dataset_dir)
     manifest_path = dataset_dir / "manifest.json"
     if not manifest_path.is_file():
         raise DatasetInvalid("no manifest.json in %s" % dataset_dir)
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    lock_path = dataset_dir / "selection-lock.json"
+    if not lock_path.is_file():
+        raise DatasetInvalid(
+            "no selection-lock.json in %s; a dataset without its selection "
+            "lock was never frozen by a build (or the lock was removed), "
+            "and may not back any training pairs" % dataset_dir
+        )
+    manifest_bytes = manifest_path.read_bytes()
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    if lock.get("schema") != SELECTION_LOCK_SCHEMA:
+        raise DatasetInvalid("selection lock is not %s" % SELECTION_LOCK_SCHEMA)
+    if lock.get("manifest_sha256") != hashlib.sha256(manifest_bytes).hexdigest():
+        raise DatasetInvalid(
+            "selection-lock manifest_sha256 does not match manifest.json; "
+            "the manifest changed after the dataset was frozen"
+        )
+    if not lock.get("frozen_before_model_generation"):
+        raise DatasetInvalid(
+            "selection lock does not record frozen_before_model_generation"
+        )
+    if lock.get("model_outputs_consulted"):
+        raise DatasetInvalid(
+            "selection lock records model_outputs_consulted: true; cases "
+            "selected with model outputs consulted may never be teaching "
+            "material"
+        )
+    manifest = json.loads(manifest_bytes.decode("utf-8"))
     if manifest.get("schema") != MANIFEST_SCHEMA:
         raise DatasetInvalid("manifest is not %s" % MANIFEST_SCHEMA)
     for identity_field in ("capability_id", "teacher", "spec_fingerprint"):
@@ -323,4 +356,5 @@ def validate_dataset(dataset_dir: Path) -> Dict[str, Any]:
         "counts": manifest["counts"],
         "leakage_checks": manifest["leakage_checks"],
         "final_opened": manifest["final_opened"],
+        "selection_lock_verified": True,
     }
