@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="docs/logo.svg" width="240" alt="SILT wordmark: the gate slit in the T, with a particle passing through">
+  <img src="https://raw.githubusercontent.com/inbharatai/SILT/main/docs/logo.svg" width="240" alt="SILT wordmark: the gate slit in the T, with a particle passing through">
 </p>
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
-> **Integrated release snapshot — 2026-09-12; quality not certified.** Hardware-adaptive specialist planning/execution, controller and data-binding safeguards, numeric/state-restoration fixes and Studio usability repairs now accompany the existing packet/LoRA/Spring, composition and reconstruction paths. Linux CPU is the supported validation target; single-NVIDIA-CUDA code is implemented but **GPU_UNVERIFIED**. Existing transfer gates and defaults remain unchanged. Read the [integrated release summary](docs/INTEGRATED_RELEASE_2026_09_12.md) for current scope and the independently recorded local verification, and the [historical frozen V5 evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) for all six final-comparison arms. There is no new 3B quality result, automatic model activation or claim of coverage by the earlier provisional. [HARDENING_PASS2.md](docs/HARDENING_PASS2.md) and [EXPERIMENTAL_HANDOFF.md](docs/EXPERIMENTAL_HANDOFF.md) retain historical context.
+> **Integrated release snapshot — 2026-09-12; quality not certified.** Hardware-adaptive specialist planning/execution, controller and data-binding safeguards, numeric/state-restoration fixes and Studio usability repairs now accompany the existing packet/LoRA/Spring, composition and reconstruction paths. Linux CPU is the supported validation target; single-NVIDIA-CUDA code is implemented but **GPU_UNVERIFIED**. Existing transfer gates and defaults remain unchanged. Read the [integrated release summary](/INTEGRATED_RELEASE_2026_09_12.md) for current scope and the independently recorded local verification, and the [historical frozen V5 evidence](/EXPERIMENTAL_RELEASE_2026_09.md) for all six final-comparison arms. There is no new 3B quality result, automatic model activation or claim of coverage by the earlier provisional. [HARDENING_PASS2.md](/HARDENING_PASS2.md) and [EXPERIMENTAL_HANDOFF.md](/EXPERIMENTAL_HANDOFF.md) retain historical context.
 
-> **Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. Fresh governed data and a frozen, verified effective-policy protocol are required for new quality claims; the consumed final set is not a retry set. See the [generation-policy notice](docs/GENERATION_POLICY_NOTICE.md). The historical comparison below does not establish matched-greedy retention.
+> **Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. Fresh governed data and a frozen, verified effective-policy protocol are required for new quality claims; the consumed final set is not a retry set. See the [generation-policy notice](/GENERATION_POLICY_NOTICE.md). The historical comparison below does not establish matched-greedy retention.
 
 <p align="center"><em>Transfer a specialist skill. Measure the gain. Evaluate hardware-aware adaptation.</em></p>
 
@@ -28,7 +28,7 @@
 > **2026-08-21** by Reeturaj Goswami, assignee **Uni Guru Technologies LLP**.
 > Title: *Trust-Gated Skill Packet Transfer and Hardware-Aware Adaptation
 > Across Heterogeneous Artificial Intelligence Systems*. Full notice in
-> [`PATENT.md`](PATENT.md).
+> [`PATENT.md`](https://github.com/inbharatai/SILT/blob/main/PATENT.md).
 
 ### Capability status and activation
 
@@ -36,14 +36,14 @@
 
 The default mechanism is L3 **when you invoke** `asea run`; installing or merging code does not start a transfer. Optional backends require an explicit API/Studio request. Experimental CLIs are separately invoked; the local experimental UI requires **`SILT_ENABLE_EXPERIMENTAL=1` before server startup**, matching runtime/models, loopback access and its session token. Unset, `0` or `true` do not enable it. Restart after an off-start to mount routes. No run, import, plan, selection or specialist build automatically activates a model.
 
-[Full source-cited capability catalog](docs/CAPABILITIES.md) · [local setup](LOCAL_SETUP.md) · [experimental workbench](docs/EXPERIMENTAL_STUDIO.md) · [specialist build](docs/SPECIALIST_STUDIO.md). The public [Studio page](https://silt.inbharat.ai/studio/) is setup/launcher documentation, not hosted model compute. Locally provisioned inference can stay local; remote connectors and cloud-tagged Ollama models can send prompts/payloads off-host. Neither a loopback HTTP endpoint nor “local-first” guarantees zero upload or zero cost.
+[Full source-cited capability catalog](/CAPABILITIES.md) · [local setup](https://github.com/inbharatai/SILT/blob/main/LOCAL_SETUP.md) · [experimental workbench](/EXPERIMENTAL_STUDIO.md) · [specialist build](/SPECIALIST_STUDIO.md). The public [Studio page](https://silt.inbharat.ai/studio/) is setup/launcher documentation, not hosted model compute. Locally provisioned inference can stay local; remote connectors and cloud-tagged Ollama models can send prompts/payloads off-host. Neither a loopback HTTP endpoint nor “local-first” guarantees zero upload or zero cost.
 
 For a reproducible larger-model quality study, use the public-CLI automation in
-[`scripts/run_specialist_quality_experiment.py`](scripts/run_specialist_quality_experiment.py)
+[`scripts/run_specialist_quality_experiment.py`](https://github.com/inbharatai/SILT/blob/main/scripts/run_specialist_quality_experiment.py)
 with a fresh recipe such as
-[`configs/specialist_qwen3b_quality_template.json`](configs/specialist_qwen3b_quality_template.json).
-Read the [hardware planner](docs/HARDWARE_ADAPTIVE.md) and
-[experiment/device-local runbook](docs/SPECIALIST_QUALITY_EXPERIMENT.md).
+[`configs/specialist_qwen3b_quality_template.json`](https://github.com/inbharatai/SILT/blob/main/configs/specialist_qwen3b_quality_template.json).
+Read the [hardware planner](/HARDWARE_ADAPTIVE.md) and
+[experiment/device-local runbook](/SPECIALIST_QUALITY_EXPERIMENT.md).
 The wrapper delegates planning, build and finalize to public SILT modules; it does
 not implement separate model loading, training or grading. Header-only planning
 is distinct from authorized TRAIN/DEV token profiling; unseen FINAL stays
@@ -93,31 +93,31 @@ useful.*
 
 | Group / named mechanisms | Default / invocation | Evidence and detail |
 | :-- | :-- | :-- |
-| **Core L3:** inspectable skill packets; measured gaps and relevance; capability-specific distillation; safety tripwires; held-out A/B, regression and control checks | Normal `asea run` / `Pipeline.run`; library similarity lexical, Studio embedding. Rule/metric and declared-suite limits apply. | [L01–L05 catalog](docs/CAPABILITIES.md#core-packet-transfer) · [recorded packet runs](docs/real_run_findings.md) |
-| **Admission:** Double Gate, trainer-independent admission, high-risk named approval, provenance/synthetic-depth/mock containment | Gate 1 on transfer; Gate 2 only on explicit packet-derived deep-apply. Named approver is caller-supplied, not authenticated human presence. | [L06–L07](docs/CAPABILITIES.md#l06), [L15](docs/CAPABILITIES.md#l15) · [gate source](src/asea/promotion/gate.py) |
-| **State and reports:** audit chain, isolated stores, approved-set rollback; Signed Capability Diff; Verified skill-layer Unlearning | Logging on pipeline operations; explicit `rollback`, `diff`/`diff-verify`, `unlearn`/`unlearn-verify`. Local hash chain is distinct from local HMAC reports. | [L13–L16](docs/CAPABILITIES.md#l13) · [audit/rollback tests](tests/test_memory_audit_rollback.py) |
-| **Extensibility/export:** model/modality plugins; HF causal/seq2seq, Ollama and corpus connectors; L4/L5 dataset/job-spec bundles | Register/configure supported connectors; real models/runtime separately provisioned. `asea export` packages data, not trained weights. | [L17–L18](docs/CAPABILITIES.md#l17) · [connector guide](docs/connector_authoring.md) |
-| **Standard packet-derived LoRA** | Optional `[deep]`; explicit `DeepApplyRunner.run` / Studio, `backend="standard"` default | [L08](docs/CAPABILITIES.md#l08) · [CPU 135M standard run: Gate 2 rejection](docs/deep_apply_real_run_findings.md) |
-| **SiltStream** layer-streamed LoRA | Optional `[deep]`, `backend="streamed"`; sampled pre-training forward parity, full initial loading | [L09](docs/CAPABILITIES.md#l09) · [source](src/asea/deepapply/backends/streamed.py); no learned-weight bitwise claim |
-| **ZeroForge** forward-only SPSA LoRA | Optional `[deep]`, `backend="zeroforge"`; zero backward passes, multiple forwards/update | [L10](docs/CAPABILITIES.md#l10) · [source](src/asea/deepapply/backends/zeroforge.py); GPU probes are not execution receipts |
-| **SiltSpring** int8/int4/int2 loss reports and toy certificate state selection | Explicit `certify_hf_states` / `POST /api/spring`; full reference first; library tolerance .02, Studio .05 | [L11](docs/CAPABILITIES.md#l11) · [Spring details](#siltspring--compress-for-constrained-hardware-certify-what-survives-srcaseaspring); helper does not auto-filter heldout |
-| **Asymmetric SPRT** | **Off by default**; `Evaluator(sprt=SprtConfig(...))`; early-reject, never early-promote | [L12](docs/CAPABILITIES.md#l12) · [tests](tests/test_sprt.py); nominal statistical assumptions apply |
-| **Experimental Studio / CLI bridge, explicit artifact acquisition** | Exact startup flag for UI only; `asea.compose/compiler/specialist/execution/validation/artifacts` CLIs are separate opt-ins | [C02–C03](docs/CAPABILITIES.md#experimental-entry-points) · [workbench](docs/EXPERIMENTAL_STUDIO.md); no auto-download |
-| **Typed linear composition:** text, Whisper ASR, Vits/MMS TTS, matched SmolVLM vision-language and text/audio bridges | Explicit `python -m asea.compose ... run`; compatible local assets and optional ML runtime | [C04–C07](docs/CAPABILITIES.md#composition-and-deployment) · [vision](docs/VISION_LOCAL.md); narrow pilots, no audio-output quality admission or latent fusion |
-| **Compose evaluation/admission, manual activate/rollback, plan/select, dependency export/import-rebind** | Separate `evaluate`, `activate`, `rollback`, `plan`, `select`, `export`; `asea.artifacts import-bundle` | [C08–C11](docs/CAPABILITIES.md#c08) · [bundle import](docs/BUNDLE_IMPORT.md); imported evidence is unadmitted and needs fresh local evaluation |
-| **Structural Switch compiler:** expert pruning, separate seq2seq certificate, diagnostics/identity roundtrip/research REAP | `python -m asea.compiler`; explicit command/options, no repair-training | [C12–C14](docs/CAPABILITIES.md#structural-compiler) · [compiler](docs/COMPILER_V1.md); implementation is not retained coding quality |
-| **Specialist source reconstruction:** coherent Qwen2 MLP / Switch-to-dense T5; real teacher-guided LoRA recovery; native-merged or factor-preserving export; five-stage build/once-only final; Llama evaluation-only baseline | `python -m asea.specialist`; explicit `reconstruct`, `recover`, `build`, `infer`, `evaluate`, `finalize`; local models/data/runtime | [C15–C20](docs/CAPABILITIES.md#source-derived-specialist) · [release evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md); `BUILT_UNCERTIFIED`, not quality admission |
-| **Function-IO external oracle and Linux sandbox; generation/oracle observability and privacy controls** | Explicit validation and `compose preview`; trace options `none`/`digest`/`value`: Compose defaults `none`, specialist evaluate/validate and staged workflow use `digest`; separate storage/reveal/export consent in UI | [C21](docs/CAPABILITIES.md#c21) · [observability](docs/OBSERVABILITY_WORKFLOW.md); not universal code safety or signed telemetry |
-| **Resource probe/profiles; governed validation; waveform/listening evidence** | `asea.execution probe/run`, `asea.validation`; `observe_only` default, explicit `process_as`; voice evidence stays `pending_human` | [C22–C24](docs/CAPABILITIES.md#c22) · [resource controls](docs/RESOURCE_CONTROLS.md); cgroup/Windows enforcement and authenticated voice approval unavailable |
-| **Capability-build research layer:** teacher footprinting (behavioural cloud pilot or isolated open-weight GLM worker), causal mask/measure/restore/verify, fresh five-split datasets with near-duplicate guards, local student baselines, sequence-KD hand-off to DeepApply, minimum-capability search | `silt-capability` (separate console script); per-run remote consent; evidence classes never mixed; nothing auto-activates | [C26–C29](docs/CAPABILITIES.md#capability-build-research-layer) · [capability build](docs/CAPABILITY_BUILD.md); `CANDIDATE_UNADMITTED` — implementation is not capability |
+| **Core L3:** inspectable skill packets; measured gaps and relevance; capability-specific distillation; safety tripwires; held-out A/B, regression and control checks | Normal `asea run` / `Pipeline.run`; library similarity lexical, Studio embedding. Rule/metric and declared-suite limits apply. | [L01–L05 catalog](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#core-packet-transfer) · [recorded packet runs](/real_run_findings.md) |
+| **Admission:** Double Gate, trainer-independent admission, high-risk named approval, provenance/synthetic-depth/mock containment | Gate 1 on transfer; Gate 2 only on explicit packet-derived deep-apply. Named approver is caller-supplied, not authenticated human presence. | [L06–L07](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l06), [L15](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l15) · [gate source](https://github.com/inbharatai/SILT/blob/main/src/asea/promotion/gate.py) |
+| **State and reports:** audit chain, isolated stores, approved-set rollback; Signed Capability Diff; Verified skill-layer Unlearning | Logging on pipeline operations; explicit `rollback`, `diff`/`diff-verify`, `unlearn`/`unlearn-verify`. Local hash chain is distinct from local HMAC reports. | [L13–L16](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l13) · [audit/rollback tests](https://github.com/inbharatai/SILT/blob/main/tests/test_memory_audit_rollback.py) |
+| **Extensibility/export:** model/modality plugins; HF causal/seq2seq, Ollama and corpus connectors; L4/L5 dataset/job-spec bundles | Register/configure supported connectors; real models/runtime separately provisioned. `asea export` packages data, not trained weights. | [L17–L18](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l17) · [connector guide](/connector_authoring.md) |
+| **Standard packet-derived LoRA** | Optional `[deep]`; explicit `DeepApplyRunner.run` / Studio, `backend="standard"` default | [L08](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l08) · [CPU 135M standard run: Gate 2 rejection](/deep_apply_real_run_findings.md) |
+| **SiltStream** layer-streamed LoRA | Optional `[deep]`, `backend="streamed"`; sampled pre-training forward parity, full initial loading | [L09](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l09) · [source](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/backends/streamed.py); no learned-weight bitwise claim |
+| **ZeroForge** forward-only SPSA LoRA | Optional `[deep]`, `backend="zeroforge"`; zero backward passes, multiple forwards/update | [L10](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l10) · [source](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/backends/zeroforge.py); GPU probes are not execution receipts |
+| **SiltSpring** int8/int4/int2 loss reports and toy certificate state selection | Explicit `certify_hf_states` / `POST /api/spring`; full reference first; library tolerance .02, Studio .05 | [L11](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l11) · [Spring details](#siltspring--compress-for-constrained-hardware-certify-what-survives-srcaseaspring); helper does not auto-filter heldout |
+| **Asymmetric SPRT** | **Off by default**; `Evaluator(sprt=SprtConfig(...))`; early-reject, never early-promote | [L12](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#l12) · [tests](https://github.com/inbharatai/SILT/blob/main/tests/test_sprt.py); nominal statistical assumptions apply |
+| **Experimental Studio / CLI bridge, explicit artifact acquisition** | Exact startup flag for UI only; `asea.compose/compiler/specialist/execution/validation/artifacts` CLIs are separate opt-ins | [C02–C03](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#experimental-entry-points) · [workbench](/EXPERIMENTAL_STUDIO.md); no auto-download |
+| **Typed linear composition:** text, Whisper ASR, Vits/MMS TTS, matched SmolVLM vision-language and text/audio bridges | Explicit `python -m asea.compose ... run`; compatible local assets and optional ML runtime | [C04–C07](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#composition-and-deployment) · [vision](/VISION_LOCAL.md); narrow pilots, no audio-output quality admission or latent fusion |
+| **Compose evaluation/admission, manual activate/rollback, plan/select, dependency export/import-rebind** | Separate `evaluate`, `activate`, `rollback`, `plan`, `select`, `export`; `asea.artifacts import-bundle` | [C08–C11](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#c08) · [bundle import](/BUNDLE_IMPORT.md); imported evidence is unadmitted and needs fresh local evaluation |
+| **Structural Switch compiler:** expert pruning, separate seq2seq certificate, diagnostics/identity roundtrip/research REAP | `python -m asea.compiler`; explicit command/options, no repair-training | [C12–C14](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#structural-compiler) · [compiler](/COMPILER_V1.md); implementation is not retained coding quality |
+| **Specialist source reconstruction:** coherent Qwen2 MLP / Switch-to-dense T5; real teacher-guided LoRA recovery; native-merged or factor-preserving export; five-stage build/once-only final; Llama evaluation-only baseline | `python -m asea.specialist`; explicit `reconstruct`, `recover`, `build`, `infer`, `evaluate`, `finalize`; local models/data/runtime | [C15–C20](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#source-derived-specialist) · [release evidence](/EXPERIMENTAL_RELEASE_2026_09.md); `BUILT_UNCERTIFIED`, not quality admission |
+| **Function-IO external oracle and Linux sandbox; generation/oracle observability and privacy controls** | Explicit validation and `compose preview`; trace options `none`/`digest`/`value`: Compose defaults `none`, specialist evaluate/validate and staged workflow use `digest`; separate storage/reveal/export consent in UI | [C21](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#c21) · [observability](/OBSERVABILITY_WORKFLOW.md); not universal code safety or signed telemetry |
+| **Resource probe/profiles; governed validation; waveform/listening evidence** | `asea.execution probe/run`, `asea.validation`; `observe_only` default, explicit `process_as`; voice evidence stays `pending_human` | [C22–C24](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#c22) · [resource controls](/RESOURCE_CONTROLS.md); cgroup/Windows enforcement and authenticated voice approval unavailable |
+| **Capability-build research layer:** teacher footprinting (behavioural cloud pilot or isolated open-weight GLM worker), causal mask/measure/restore/verify, fresh five-split datasets with near-duplicate guards, local student baselines, sequence-KD hand-off to DeepApply, minimum-capability search | `silt-capability` (separate console script); per-run remote consent; evidence classes never mixed; nothing auto-activates | [C26–C29](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#capability-build-research-layer) · [capability build](/CAPABILITY_BUILD.md); `CANDIDATE_UNADMITTED` — implementation is not capability |
 
-All named mechanisms are indexed in the [catalog](docs/CAPABILITIES.md), including the [remaining gaps](docs/CAPABILITIES.md#remaining-gaps). Typed refusals and policy checks make detected failures explicit; they do not guarantee detection of every harmful or degraded outcome.
+All named mechanisms are indexed in the [catalog](/CAPABILITIES.md), including the [remaining gaps](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#remaining-gaps). Typed refusals and policy checks make detected failures explicit; they do not guarantee detection of every harmful or degraded outcome.
 
 The earlier claimed combination is patent-pending (India, app. no.
-**202631101454**) — see [`PATENT.md`](PATENT.md) for the inventive families.
+**202631101454**) — see [`PATENT.md`](https://github.com/inbharatai/SILT/blob/main/PATENT.md) for the inventive families.
 Two adversarial audits tried to break the gates:
-[`docs/loophole_audit.md`](docs/loophole_audit.md) and
-[`docs/audit_2026-08-13.md`](docs/audit_2026-08-13.md).
+[`docs/loophole_audit.md`](/loophole_audit.md) and
+[`docs/audit_2026-08-13.md`](/audit_2026-08-13.md).
 
 ### Experimental source-weight reconstruction and recovery — September 2026
 
@@ -150,7 +150,7 @@ packet, double-gate, SiltStream, ZeroForge or SiltSpring mechanisms.
 | Uniform-channel reconstruction, unrepaired | 0 |
 | Off-the-shelf SmolLM2-360M-Instruct | 8 |
 
-**Critical historical generation-policy correction — 2026-09-12.** Archived V5 logs record sampling-default overrides for the reconstructed and recovered Qwen students and the random-MLP and uniform-channel controls, despite receipts reporting requested greedy settings. Source-Qwen and SmolLM2 logs do not show that override; historical per-case actual modes were not instrumented. Original counts remain unchanged. This is not a certified matched-greedy retention or competitive comparison, and the four source-only passes cannot be attributed solely to compression or recovery training. No corrected score, final rerun or rescore is claimed. See [evidence, runtime compatibility and fix limits](docs/GENERATION_POLICY_NOTICE.md).
+**Critical historical generation-policy correction — 2026-09-12.** Archived V5 logs record sampling-default overrides for the reconstructed and recovered Qwen students and the random-MLP and uniform-channel controls, despite receipts reporting requested greedy settings. Source-Qwen and SmolLM2 logs do not show that override; historical per-case actual modes were not instrumented. Original counts remain unchanged. This is not a certified matched-greedy retention or competitive comparison, and the four source-only passes cannot be attributed solely to compression or recovery training. No corrected score, final rerun or rescore is claimed. See [evidence, runtime compatibility and fix limits](/GENERATION_POLICY_NOTICE.md).
 
 All six arms completed without missing or operationally blocked tasks. In the
 unchanged historical observations, recovery did not improve the aggregate total;
@@ -167,12 +167,12 @@ cases). Separately, [CI run 34330505969](https://github.com/inbharatai/SILT/acti
 for `b583ba0d7de077d4e8594b08f0f77cc29655459e` was green on Python **3.9, 3.11 and
 3.12** plus sanity. CI used `.[dev,studio]`, not the local full-ML environment;
 its per-job counts are not asserted. None is a model-quality result or a rerun
-of this documentation edit. See [verification scope](docs/CAPABILITIES.md#verification-scope).
+of this documentation edit. See [verification scope](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#verification-scope).
 
 The local specialist generation-policy fix is verified on tiny models and a retained recovered-Qwen nonfinal CPU prompt under seeds 0 and 1; this is mechanics evidence, not quality. It requires **Transformers 4.51.3** and, for factor wrappers, **non-prompt PEFT 0.15.2**. Production receipts distinguish requested/resolved policy and do not claim live-mode instrumentation. Subsequent local readiness verification rebuilt the wheel and sdist and confirmed payload equality with the previously tested installed wheel. This is packaging integrity evidence, not new model-quality or CUDA evidence; rebuild and reverify packaged resources after further source/document edits.
 
 Earlier approximately 420/421-test references are historical snapshots. The
-[release evidence](docs/EXPERIMENTAL_RELEASE_2026_09.md) gives runtime/skip scope,
+[release evidence](/EXPERIMENTAL_RELEASE_2026_09.md) gives runtime/skip scope,
 the Git-independent frozen source digest and the locally recorded verification
 method; it is not third-party authentication. Later read-only loss/win analysis
 distinguishes API/executability and token-completion failures from algorithmic
@@ -181,7 +181,7 @@ require fresh data rather than retuning the consumed final set.
 
 LoRA and teacher-guided training are established prior art. These additions are
 not presented as patent novelty or as covered by the existing provisional; the
-existing legal notice is unchanged. See the [bounded release report](docs/EXPERIMENTAL_RELEASE_2026_09.md)
+existing legal notice is unchanged. See the [bounded release report](/EXPERIMENTAL_RELEASE_2026_09.md)
 for the full experimental boundary and implementation links.
 
 ### 🚀 Get started
@@ -217,7 +217,7 @@ data and local model stores. `--run-final` deliberately consumes the final suite
 through SILT's one-shot `finalize` command.
 
 📖 **Public teaser** (the brand page — patent app. no. **202631101454** is on it):
-[`docs/teaser.html`](docs/teaser.html).
+[`docs/teaser.html`](/teaser.html).
 
 <p align="center">
   <a href="#architecture-at-a-glance--transfer--prove--adapt">Architecture</a> ·
@@ -246,7 +246,7 @@ through SILT's one-shot `finalize` command.
 
 | | Guarantee | What it means |
 | :-- | :-- | :-- |
-| 🎯 | **Measured admission** | Admission requires supplied held-out scores and all emitted policy checks; optional [asymmetric SPRT](src/asea/sprt.py) is off by default and can early-reject, never early-promote. |
+| 🎯 | **Measured admission** | Admission requires supplied held-out scores and all emitted policy checks; optional [asymmetric SPRT](https://github.com/inbharatai/SILT/blob/main/src/asea/sprt.py) is off by default and can early-reject, never early-promote. |
 | 🔒 | **All-or-nothing gate** | Gate 1 requires all checks it emits under the selected policy; some checks and thresholds are configurable. No bypass argument is exposed. |
 | 🩺 | **Human sign-off** | Declared high-risk domains require a nonempty named approver. The value and domain metadata are caller-trusted, not authenticated human review. |
 | 📜 | **Tamper-evident audit** | Managed pipeline decisions are recorded in a local hash chain. It is not externally anchored; owner rewrite or trailing truncation is not ruled out. |
@@ -343,7 +343,7 @@ The separate **experimental source-derived path** is:
 `specialist build` freezes these five stages as `BUILT_UNCERTIFIED`; separately
 invoked once-only `finalize` measures the frozen candidate. Compose and compiler
 have distinct admission contracts and workspaces, not this packet diagram.
-See [specialist workflow](docs/SPECIALIST_WORKFLOW.md).
+See [specialist workflow](/SPECIALIST_WORKFLOW.md).
 
 Plus two signed reporting tools: **Capability Diff** (B1a) and **Verified
 Unlearning** (B3) — both locally HMAC-signed, both honest about their limits.
@@ -384,9 +384,9 @@ because no such measurement exists.
 > when all other checks pass; other failures reject, and an initial approver
 > can allow immediate promotion. Approval is caller-supplied, not authenticated.
 > Packet-derived adapters remain separate from base weights; specialist recovery
-> separately supports `native_merged` and explicit `factor_preserving` exports. See [`docs/deep_apply_design.md`](docs/deep_apply_design.md)
+> separately supports `native_merged` and explicit `factor_preserving` exports. See [`docs/deep_apply_design.md`](/deep_apply_design.md)
 > and the as-built real-run numbers in
-> [`docs/deep_apply_real_run_findings.md`](docs/deep_apply_real_run_findings.md).
+> [`docs/deep_apply_real_run_findings.md`](/deep_apply_real_run_findings.md).
 
 ---
 
@@ -396,14 +396,14 @@ because no such measurement exists.
 all-emitted-check admission, separated stores, approved-set snapshots and a local
 hash chain; optional LoRA backends and compression reports; and separately invoked
 experimental composition, compiler, specialist, validation, artifacts and execution
-namespaces. [Catalog](docs/CAPABILITIES.md) distinguishes source/tests from outcomes.
+namespaces. [Catalog](/CAPABILITIES.md) distinguishes source/tests from outcomes.
 
 **It is not:** AGI, autonomous self-training, universal capability copying or a
 universal quality/safety certificate. L3 copies no teacher weights and changes no
 learner weights. Packet-derived deep-apply trains only from promoted packets;
 experimental specialist reconstruction/recovery uses source weights and separate
 training data. Installing extras starts neither. Historical
-[feasibility review](docs/feasibility_review.md) describes the earlier packet scope.
+[feasibility review](/feasibility_review.md) describes the earlier packet scope.
 
 > ### Real models are supported — and were actually run
 > `src/asea/modules/real/` contains working connectors for **Ollama** (configured HTTP endpoint/model tag),
@@ -411,28 +411,28 @@ training data. Installing extras starts neither. Historical
 > (NLLB-200, which genuinely covers Assamese), plus real embedding similarity.
 > Recorded real runs (verbatim in `docs/`):
 > - **Packet mode** — NLLB-600M teacher → Qwen2.5 student, strict policy, no mock
->   bypass: [`docs/real_run_findings.md`](docs/real_run_findings.md) (a rejected
+>   bypass: [`docs/real_run_findings.md`](/real_run_findings.md) (a rejected
 >   packet, a promoted one, two bugs the exercise exposed).
 > - **Assamese TTS G2P** — cloud-tagged Ollama GLM teacher → Qwen3.5 learner,
->   **PROMOTED** on six illustrative held-out IPA-text cases, not synthesized audio: [`docs/SILT_TTS_G2P_TEST.md`](docs/SILT_TTS_G2P_TEST.md).
+>   **PROMOTED** on six illustrative held-out IPA-text cases, not synthesized audio: [`docs/SILT_TTS_G2P_TEST.md`](/SILT_TTS_G2P_TEST.md).
 > - **deep-apply** — the checked-in report records **CPU / SmolLM2-135M / standard**,
 >   three LoRA steps, 230,400 trainable parameters, finite loss 7.4639573,
 >   evaluator .27, gain 0 and **Gate 2 REJECTED** with intact audit chain. Its
 >   promoted intake was seeded: mechanism evidence, not a natural Gate 1→2 win.
->   [Recorded report](docs/deep_apply_real_run_findings.md). GPU streamed/ZeroForge
->   [probe scripts](scripts/real_streamed_4bit_gpu.py) exist; matching Qwen2.5-7B /
+>   [Recorded report](/deep_apply_real_run_findings.md). GPU streamed/ZeroForge
+>   [probe scripts](https://github.com/inbharatai/SILT/blob/main/scripts/real_streamed_4bit_gpu.py) exist; matching Qwen2.5-7B /
 >   RTX 5050 execution/parity receipts are not included in this repository.
-> - **SiltSpring** — [opt-in real-HF probe](scripts/real_siltspring_1p5b.py) exists;
+> - **SiltSpring** — [opt-in real-HF probe](https://github.com/inbharatai/SILT/blob/main/scripts/real_siltspring_1p5b.py) exists;
 >   raw Qwen0.5B/1.5B certification/revocation receipts are not included here.
 >   Script availability is not an executed outcome, nor evidence that a full
->   7B reference fits 8 GB. See [the actual resource boundary](docs/CAPABILITIES.md#hardware-and-receipt-boundary).
+>   7B reference fits 8 GB. See [the actual resource boundary](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#hardware-and-receipt-boundary).
 >
 
 > The historical medical sample used a calibrated relevance floor **.35 rather
 > than default .75**; its +.2697 aggregate improvement is not clinical efficacy
-> or default-policy generalization ([report](docs/real_run_findings.md)).
+> or default-policy generalization ([report](/real_run_findings.md)).
 >
-> See [`LOCAL_SETUP.md`](LOCAL_SETUP.md) to run it yourself.
+> See [`LOCAL_SETUP.md`](https://github.com/inbharatai/SILT/blob/main/LOCAL_SETUP.md) to run it yourself.
 
 > ### ⚠️ The four `flow_a..d` demos use mocks — read their numbers accordingly
 > Those examples use deterministic lookup-table modules in
@@ -524,7 +524,7 @@ into base weights in v1. The experimental source-derived path is separate. See
 
 > Recorded real run: NLLB-200 (genuinely covers Hindi + Assamese) → Qwen2.5
 > student, strict policy, no mock bypass — honest held-out delta **+0.053**
-> ([`docs/real_run_findings.md`](docs/real_run_findings.md)).
+> ([`docs/real_run_findings.md`](/real_run_findings.md)).
 
 ---
 
@@ -533,8 +533,8 @@ into base weights in v1. The experimental source-derived path is separate. See
 **The CLI run below and A–D flows are deterministic mock demos:**
 `configs/assamese_transfer.json` sets `strict_no_mock=false` for this demo only.
 Do not use their gains as real-model evidence or as strict-default admission.
-For real connectors use [LOCAL_SETUP.md](LOCAL_SETUP.md); for explicit
-experimental setup see [the catalog](docs/CAPABILITIES.md#experimental-entry-points).
+For real connectors use [LOCAL_SETUP.md](https://github.com/inbharatai/SILT/blob/main/LOCAL_SETUP.md); for explicit
+experimental setup see [the catalog](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#experimental-entry-points).
 
 ```bash
 git clone https://github.com/inbharatai/SILT.git
@@ -707,8 +707,8 @@ Linux CPU has bounded real execution evidence; CUDA remains **GPU_UNVERIFIED**.
 Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and offload execution are unsupported
 for this adaptive specialist path. An operator-reported Windows RTX5050 inventory
 is not an independently retained GPU execution receipt. See
-[hardware limits](docs/HARDWARE_ADAPTIVE.md) and the
-[device-local validation runbook](docs/SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook).
+[hardware limits](/HARDWARE_ADAPTIVE.md) and the
+[device-local validation runbook](https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook).
 
 ### deep-apply — three gated LoRA backends (`src/asea/deepapply/`)
 
@@ -796,7 +796,7 @@ choose, serve and simulated admit operations append to their configured local
 VRAM peak or device fit. Current full-reference loading/evaluation means this
 path does **not** establish 7B certification on an 8 GB GPU. Provision enough
 reference residency, host RAM, disk-bank/restoration space and runtime headroom.
-The [1.5B probe](scripts/real_siltspring_1p5b.py) explicitly warns about this.
+The [1.5B probe](https://github.com/inbharatai/SILT/blob/main/scripts/real_siltspring_1p5b.py) explicitly warns about this.
 
 The **spring metaphor** describes packed storage and expanded computation,
 not automatic device adaptation or a weak-hardware fit guarantee. A
@@ -807,8 +807,8 @@ quantized streamer. On exit, banked parameters **and persistent buffers** restor
 from that original full bank with native dtypes, pre-offload devices and registered
 object ties preserved. This is not rollback of live LoRA updates, nonpersistent
 runtime caches, arbitrary forward side effects, failed entry or storage failure.
-See [numeric regressions](tests/test_spring_nonfinite_guards.py) and
-[state-restoration regressions](tests/test_streamer_state_restore.py); tiny tensor
+See [numeric regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_spring_nonfinite_guards.py) and
+[state-restoration regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_streamer_state_restore.py); tiny tensor
 mechanics are not pretrained-quality or GPU evidence.
 
 **Architecture discovery, not a compatibility certificate** — the HF path uses
@@ -835,7 +835,7 @@ at one of the paths `get_decoder_layers` recognises (`siltstream_vendor/hf_real.
 
 Run it from the **Compress** tab (`POST /api/spring`, `levels` ⊆ {int8,int4,int2},
 `device` = auto / cpu / cuda, tolerance default .05), the library API, or explicit
-[`scripts/real_siltspring_1p5b.py`](scripts/real_siltspring_1p5b.py). There is no
+[`scripts/real_siltspring_1p5b.py`](https://github.com/inbharatai/SILT/blob/main/scripts/real_siltspring_1p5b.py). There is no
 legacy `asea spring` subcommand. The Studio job loads
 `AutoModelForCausalLM.from_pretrained(<id>)` (fp16 on GPU, fp32 on CPU), banks
 the full-precision layers once as the re-expand source, streams each quantized
@@ -964,7 +964,7 @@ pydantic — no model, no torch. Real connectors, optional training/compression,
 and separately invoked Compose/compiler/specialist adapters use their matching
 ML dependencies; help/import does not imply models are installed. To add a
 genuinely new backend, subclass `ModuleAdapter` (`core/interfaces.py:23`) — see
-[`docs/connector_authoring.md`](docs/connector_authoring.md).
+[`docs/connector_authoring.md`](/connector_authoring.md).
 
 ---
 
@@ -980,7 +980,7 @@ high-risk domains). To insert one and run it through the full pipeline:
    new code — the `_ollama(...)` factory in `src/asea/studio/catalog.py` builds an
    `OllamaConnector` from a tag. For a genuinely new backend, subclass
    `ModuleAdapter` (`src/asea/core/interfaces.py:23`); see
-   [`docs/connector_authoring.md`](docs/connector_authoring.md) for worked Qwen
+   [`docs/connector_authoring.md`](/connector_authoring.md) for worked Qwen
    and AI4Bharat examples.
 2. **Add a `CATALOG` entry** (`src/asea/studio/catalog.py:111`) with a `factory`,
    `roles` (`["sender"]`, `["receiver"]`, or both), a `description`, and
@@ -1050,13 +1050,13 @@ edit). The only domain-conditional logic is the deliberate risk-tier policy in
 `core/protocol.py` (`HIGH_RISK_DOMAINS = {MEDICAL, LEGAL, FINANCE}` →
 `RiskTier.HIGH`), which the promotion gate uses to route human approval — not to
 branch the pipeline. The plugin registry is keyed by `Modality` only
-(`src/asea/core/plugins.py:70`), so a new **domain** reuses an existing
+(`src/asea/core/plugins.py:20-22`), so a new **domain** reuses an existing
 modality's extractor/distiller/metric.
 
 Adding a new domain is **mostly writing data files, not editing core code.**
 The full worked example — *a medical-expert AI teaches a weaker medical
 assistant*, reusing the already-wired `Domain.MEDICAL` + `Modality.STRUCTURED`
-scaffolding — is in [`docs/ADDING_A_DOMAIN.md`](docs/ADDING_A_DOMAIN.md).
+scaffolding — is in [`docs/ADDING_A_DOMAIN.md`](/ADDING_A_DOMAIN.md).
 
 **Authoring a new benchmark suite from the Studio.** Suites are pure JSON keyed
 by filename stem (no per-suite Python loader), so you can author one without
@@ -1093,7 +1093,7 @@ and reruns predicates on stored evidence, not inference or human identity
 authentication. Playground has no write path into the memory store; export
 refuses mock/non-approved packets by default. Transfer SSE tails the local
 hash-chained audit; Train/Compress stream runner telemetry, **not** that chain
-or automatically signed reports. A **capability hard-reject** (`_assert_support`, `server.py:321`) runs
+or automatically signed reports. A **capability hard-reject** (`_assert_support`, `server.py:435`) runs
 at every run-creation path — `POST /api/transfers`, `/api/deepapply`,
 `/api/spring`, `/api/skills/test` — and returns 400 with the required capability
 + the model's supported list **before any job spawns**. No "% of knowledge
@@ -1105,7 +1105,7 @@ and README table rendering. Health/discovery distinguishes **code available**,
 probe. “App available” is not model readiness: selected-model dependencies,
 local assets, runtime and quality remain unchecked until separately exercised.
 The public setup page remains documentation, not a hosted compute or token bridge.
-[Product regressions](tests/test_studio_product_fixes.py) exercise these boundaries;
+[Product regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_studio_product_fixes.py) exercise these boundaries;
 no new browser-test count or integrated full-suite pass is claimed here.
 
 ### What SILT shows you — live evidence, not a "% transferred" gauge
@@ -1137,8 +1137,8 @@ is holder-local, not external authorship authentication.
 
 This table lists **legacy endpoints**. For the separate `/experimental`
 workbench and `/api/experimental` session-token/loopback API, enable the exact
-startup flag and follow [EXPERIMENTAL_STUDIO.md](docs/EXPERIMENTAL_STUDIO.md)
-and [SPECIALIST_STUDIO.md](docs/SPECIALIST_STUDIO.md). Merely opening the public
+startup flag and follow [EXPERIMENTAL_STUDIO.md](/EXPERIMENTAL_STUDIO.md)
+and [SPECIALIST_STUDIO.md](/SPECIALIST_STUDIO.md). Merely opening the public
 setup page or a loopback link does not start the server.
 
 | Method | Path | Purpose |
@@ -1225,12 +1225,12 @@ require valid local paths. CLI use does **not** require the Studio feature flag.
 
 | Invocation | Operations / guide |
 |---|---|
-| `python -m asea.compose --help` | run/evaluate/activate/rollback/plan/select/preview/export · [composition](docs/COMPOSITION_V1.md), [observability](docs/OBSERVABILITY_WORKFLOW.md) |
-| `python -m asea.compiler --help` | inspect/prune/evaluate/infer/certify/diagnose/roundtrip · [compiler](docs/COMPILER_V1.md) |
-| `python -m asea.specialist --help` | reconstruct/recover/build/infer/evaluate/finalize · [workflow](docs/SPECIALIST_WORKFLOW.md) |
-| `python -m asea.artifacts --help` | explicit download and safe import-bundle · [import](docs/BUNDLE_IMPORT.md) |
-| `python -m asea.execution --help` | read-only probe and explicit supervised worker · [resource controls](docs/RESOURCE_CONTROLS.md) |
-| `python -m asea.validation --help` | register/freeze/begin/finish/governed-evaluate; voice evidence preparation · [governance](docs/VALIDATION_GOVERNANCE.md) |
+| `python -m asea.compose --help` | run/evaluate/activate/rollback/plan/select/preview/export · [composition](/COMPOSITION_V1.md), [observability](/OBSERVABILITY_WORKFLOW.md) |
+| `python -m asea.compiler --help` | inspect/prune/evaluate/infer/certify/diagnose/roundtrip · [compiler](/COMPILER_V1.md) |
+| `python -m asea.specialist --help` | reconstruct/recover/build/infer/evaluate/finalize · [workflow](/SPECIALIST_WORKFLOW.md) |
+| `python -m asea.artifacts --help` | explicit download and safe import-bundle · [import](/BUNDLE_IMPORT.md) |
+| `python -m asea.execution --help` | read-only probe and explicit supervised worker · [resource controls](/RESOURCE_CONTROLS.md) |
+| `python -m asea.validation --help` | register/freeze/begin/finish/governed-evaluate; voice evidence preparation · [governance](/VALIDATION_GOVERNANCE.md) |
 
 Installed script names are `silt-compose`, `silt-compile`, `silt-specialist`,
 `silt-artifacts`, `silt-execution`, `silt-validate`. `[localmodels]` alone does
@@ -1243,10 +1243,10 @@ execution enforcement and broad quality acceptance remain gaps.
 
 The legacy tree below is a subset. Experimental modules also include
 `compose/`, `compiler/`, `specialist/`, `artifacts/`, `certification/`,
-`execution/` and `validation/`; see the [full catalog](docs/CAPABILITIES.md).
+`execution/` and `validation/`; see the [full catalog](/CAPABILITIES.md).
 
 ```
-adaptive-skill-extraction-adapter/
+SILT/
 ├── README.md  LOCAL_SETUP.md  architecture.md  risk_report.md
 ├── pyproject.toml  requirements.txt          # extras: [dev] [studio] [connectors] [deep]
 ├── configs/            declarative run definitions (assamese_transfer, real_assamese_ollama)
@@ -1297,12 +1297,12 @@ workspaces, not a default replacement for legacy stores or admission.
 
 ## Read this before believing any number
 
-[`risk_report.md`](risk_report.md) — hallucination laundering, model collapse,
+[`risk_report.md`](https://github.com/inbharatai/SILT/blob/main/risk_report.md) — hallucination laundering, model collapse,
 benchmark self-deception, weak language evaluation, and the specific things this
-system does **not** protect against. [`architecture.md`](architecture.md) is the
+system does **not** protect against. [`architecture.md`](https://github.com/inbharatai/SILT/blob/main/architecture.md) is the
 deeper design rationale (one protocol, many mechanisms; the trust contract).
-[`docs/loophole_audit.md`](docs/loophole_audit.md) and
-[`docs/audit_2026-08-13.md`](docs/audit_2026-08-13.md) record the adversarial
+[`docs/loophole_audit.md`](/loophole_audit.md) and
+[`docs/audit_2026-08-13.md`](/audit_2026-08-13.md) record the adversarial
 audits (13 attacks A1–A13; an 8-dimension multi-agent audit, 44 confirmed /
 0 refuted).
 

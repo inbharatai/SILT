@@ -2,7 +2,7 @@
 
 **Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. This date identifies the correction, not a new benchmark. A fresh, governed, matched-policy protocol is required before making a quality-retention or competitive-comparison claim; the consumed final set is not a retry or tuning set.
 
-[README](../README.md) · [Historical release](EXPERIMENTAL_RELEASE_2026_09.md) · [Integrated snapshot](INTEGRATED_RELEASE_2026_09_12.md) · [Capability catalog](CAPABILITIES.md)
+[README](https://github.com/inbharatai/SILT/blob/main/README.md) · [Historical release](EXPERIMENTAL_RELEASE_2026_09.md) · [Integrated snapshot](INTEGRATED_RELEASE_2026_09_12.md) · [Capability catalog](CAPABILITIES.md)
 
 ## What the archived evidence establishes
 
@@ -51,7 +51,7 @@ The same warnings were retained in reconstructed/recovered DEV arms of both the 
 
 ## Local fix and its bounded verification
 
-The readiness `NativeGenerator` now disables checkpoint-policy default merging with explicit `use_model_defaults=False`, validates requested versus resolved policy, and derives the greedy flag from the verified resolver result. Supported compatibility is deliberately strict: **Transformers 4.51.3**, and **non-prompt PEFT 0.15.2** for the factor-wrapper path. Other versions/APIs fail closed pending compatibility validation; this is not a promise for all versions permitted by older setup guidance. See [current evaluation source](../src/asea/specialist/evaluation.py) and [targeted regression definitions](../tests/test_specialist_generation_policy.py).
+The readiness `NativeGenerator` now disables checkpoint-policy default merging with explicit `use_model_defaults=False`, validates requested versus resolved policy, and derives the greedy flag from the verified resolver result. Supported compatibility is deliberately strict: **Transformers 4.51.3**, and **non-prompt PEFT 0.15.2** for the factor-wrapper path. Other versions/APIs fail closed pending compatibility validation; this is not a promise for all versions permitted by older setup guidance. See [current evaluation source](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/evaluation.py) and [targeted regression definitions](https://github.com/inbharatai/SILT/blob/main/tests/test_specialist_generation_policy.py).
 
 Production receipts now distinguish requested and resolved settings and identify their stage before native input-length bookkeeping and special-token device-tensor preparation. They explicitly say `live_generation_mode_observed=False`; production does not pretend a diagnostic hook ran.
 

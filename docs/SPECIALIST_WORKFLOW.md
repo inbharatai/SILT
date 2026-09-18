@@ -50,11 +50,11 @@ python -m asea.specialist finalize --study /local/new-study \
 ```
 
 The reproducible operator wrapper in
-[`../scripts/run_specialist_quality_experiment.py`](../scripts/run_specialist_quality_experiment.py)
+[`../scripts/run_specialist_quality_experiment.py`](https://github.com/inbharatai/SILT/blob/main/scripts/run_specialist_quality_experiment.py)
 collects hardware/runtime evidence and then invokes the same public commands.
 It does not load models or grade outputs itself. See
 [`SPECIALIST_QUALITY_EXPERIMENT.md`](SPECIALIST_QUALITY_EXPERIMENT.md) and
-[`../configs/specialist_qwen3b_quality_template.json`](../configs/specialist_qwen3b_quality_template.json)
+[`../configs/specialist_qwen3b_quality_template.json`](https://github.com/inbharatai/SILT/blob/main/configs/specialist_qwen3b_quality_template.json)
 for the Qwen2.5-Coder-3B recipe template, pre-training acceptance criteria and
 current local admission boundary.
 

@@ -16,7 +16,7 @@ are listed separately below and are not added to this total.
 
 **Later local readiness snapshot:** the byte-identical 421-file source recorded **2,816 passed, 18 skipped and 92 warnings** on Linux CPU: ten GPU-required skips (six specialist, four streamer), six optional pretrained-model skips and two host-enforcement templates. These retained results were not rerun by the publication reviewer; they establish neither model quality nor remote CI success.
 
-[README](../README.md) · [Capability catalog](CAPABILITIES.md) ·
+[README](https://github.com/inbharatai/SILT/blob/main/README.md) · [Capability catalog](CAPABILITIES.md) ·
 [Hardware contract](HARDWARE_ADAPTIVE.md) ·
 [Experiment and device-local runbook](SPECIALIST_QUALITY_EXPERIMENT.md)
 
@@ -68,9 +68,9 @@ bounds. Host RAM, VRAM and disk are separate constraints. Source and input files
 must remain immutable during the trusted-owner workflow.
 
 See [hardware planning and evidence](HARDWARE_ADAPTIVE.md),
-[native-loading tests](../tests/test_native_evaluation_loading.py),
-[memory-envelope tests](../tests/test_specialist_envelopes.py) and
-[device tests](../tests/test_specialist_devices.py). Those regression definitions
+[native-loading tests](https://github.com/inbharatai/SILT/blob/main/tests/test_native_evaluation_loading.py),
+[memory-envelope tests](https://github.com/inbharatai/SILT/blob/main/tests/test_specialist_envelopes.py) and
+[device tests](https://github.com/inbharatai/SILT/blob/main/tests/test_specialist_devices.py). Those regression definitions
 are not additional execution receipts.
 
 ## Planning, data and controller truth
@@ -97,10 +97,10 @@ and summary-file fsync returned. A terminal snapshot is not its own acknowledgem
 Missing acknowledgement remains missing evidence. This is not an arbitrary
 power-loss survival guarantee, and interruption may prevent any final receipt.
 See the [controller contract](SPECIALIST_QUALITY_EXPERIMENT.md),
-[wrapper](../scripts/run_specialist_quality_experiment.py),
-[workflow](../src/asea/specialist/workflow.py),
-[controller regressions](../tests/test_controller_integrity_review.py) and
-[data-binding regressions](../tests/test_data_binding_review.py).
+[wrapper](https://github.com/inbharatai/SILT/blob/main/scripts/run_specialist_quality_experiment.py),
+[workflow](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/workflow.py),
+[controller regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_controller_integrity_review.py) and
+[data-binding regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_data_binding_review.py).
 
 The wrapper does **not** implement a compact-baseline evaluation arm. Its status
 remains `BASELINE_NOT_RUN`, even when `--compact-baseline` is supplied. Final needs
@@ -129,10 +129,10 @@ serving/selection semantics to real HF reports.
 original full bank, retaining native dtypes, pre-offload devices and registered
 object ties. It does not roll back live LoRA updates or nonpersistent runtime
 caches and is not a transaction for arbitrary forward side effects, failed entry
-or storage failure. See [HF implementation](../src/asea/deepapply/backends/siltstream_vendor/hf_real.py),
-[toy implementation](../src/asea/deepapply/backends/siltstream_vendor/spring.py),
-[numeric tests](../tests/test_spring_nonfinite_guards.py) and
-[restoration tests](../tests/test_streamer_state_restore.py). Scripted scalar losses
+or storage failure. See [HF implementation](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/backends/siltstream_vendor/hf_real.py),
+[toy implementation](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/backends/siltstream_vendor/spring.py),
+[numeric tests](https://github.com/inbharatai/SILT/blob/main/tests/test_spring_nonfinite_guards.py) and
+[restoration tests](https://github.com/inbharatai/SILT/blob/main/tests/test_streamer_state_restore.py). Scripted scalar losses
 and tiny tensor tests are engineering evidence, not pretrained model results.
 
 ## Studio and readiness
@@ -146,7 +146,7 @@ quality have been verified. Remote/cloud-backed connectors can still send data
 off-host. Experimental Studio requires exactly `SILT_ENABLE_EXPERIMENTAL=1` before
 startup; an off-start needs a restart. The public setup page is documentation,
 not hosted compute or a public-to-local token bridge. See
-[product regression definitions](../tests/test_studio_product_fixes.py).
+[product regression definitions](https://github.com/inbharatai/SILT/blob/main/tests/test_studio_product_fixes.py).
 
 ## Evidence: keep these snapshots separate
 
@@ -191,6 +191,6 @@ throughput gain or clean-machine portability follows. For a larger experiment,
 use the [device-local runbook](SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook)
 with fresh governed data and actual device evidence, not a consumed final set.
 
-[LICENSE](../LICENSE), [NOTICE](../NOTICE) and [PATENT.md](../PATENT.md) are unchanged.
+[LICENSE](https://github.com/inbharatai/SILT/blob/main/LICENSE), [NOTICE](https://github.com/inbharatai/SILT/blob/main/NOTICE) and [PATENT.md](https://github.com/inbharatai/SILT/blob/main/PATENT.md) are unchanged.
 LoRA and teacher-guided training are established prior art; this integration makes
 no new novelty or patent-coverage claim.

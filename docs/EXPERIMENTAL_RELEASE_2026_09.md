@@ -12,7 +12,7 @@ The optional source-weight pipeline performs calibration, coherent Qwen MLP reco
 
 The completed Studio build has five stages: source validation, reconstruction, reconstructed validation, recovery and recovered validation. All five completed successfully in the recorded V5 build. Its status is `BUILT_UNCERTIFIED`, with `engineering_complete=true`, `candidate_frozen=true`, `certificate=false` and `quality_pass=false`. Engine completion does not establish quality, admission or promotion.
 
-See the implementation in [`reconstruction.py`](../src/asea/specialist/reconstruction.py), [`recovery.py`](../src/asea/specialist/recovery.py), [`standalone.py`](../src/asea/specialist/standalone.py) and [`workflow.py`](../src/asea/specialist/workflow.py). The separate public namespace is `python -m asea.specialist`; existing core transfer defaults are unchanged.
+See the implementation in [`reconstruction.py`](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/reconstruction.py), [`recovery.py`](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/recovery.py), [`standalone.py`](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/standalone.py) and [`workflow.py`](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/workflow.py). The separate public namespace is `python -m asea.specialist`; existing core transfer defaults are unchanged.
 
 ## Physical construction and real training
 
@@ -43,7 +43,7 @@ The earlier BF16 native-merge attempt failed its numerical gate. That failure is
 
 Fresh public CLI probes loaded and generated from both recovered models without a teacher input. These are bounded loader/generation smoke successes, not scored functional passes. A separate recorded Qwen check hid the known teacher/reconstruction paths; it does not prove absence of every alternate path or resistance to a hostile program.
 
-**Prior art and legal scope:** LoRA, low-rank adaptation and teacher-guided training are established techniques, not newly invented here. This report claims no patent novelty for these additions and no coverage of the new reconstruction/recovery mechanisms by the existing provisional. The existing [`PATENT.md`](../PATENT.md), [`LICENSE`](../LICENSE) and [`NOTICE`](../NOTICE) remain unchanged.
+**Prior art and legal scope:** LoRA, low-rank adaptation and teacher-guided training are established techniques, not newly invented here. This report claims no patent novelty for these additions and no coverage of the new reconstruction/recovery mechanisms by the existing provisional. The existing [`PATENT.md`](https://github.com/inbharatai/SILT/blob/main/PATENT.md), [`LICENSE`](https://github.com/inbharatai/SILT/blob/main/LICENSE) and [`NOTICE`](https://github.com/inbharatai/SILT/blob/main/NOTICE) remain unchanged.
 
 ## All six final-comparison arms
 

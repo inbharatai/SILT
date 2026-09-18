@@ -6,14 +6,20 @@
 <title>SILT — Transfer the Skill. Prove the Gain. Adapt for the Hardware You Have.</title>
 <meta name="description" content="SILT is a hardware-aware skill-transfer and trust layer for AI: transfer a narrow specialist capability, prove the gain on held-out tests, and adapt/certify the resulting system for constrained hardware.">
 <link rel="canonical" href="https://silt.inbharat.ai/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://silt.inbharat.ai/">
 <meta property="og:title" content="SILT — Skill Interchange Layer with Trust-gating">
 <meta property="og:description" content="Transfer a specialist skill. Prove the gain. Adapt and certify for constrained hardware.">
 <meta property="og:site_name" content="SILT">
+<meta property="og:image" content="https://silt.inbharat.ai/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SILT — Skill Interchange Layer with Trust-gating">
 <meta name="twitter:description" content="Transfer the skill. Prove the gain. Adapt for the hardware you have.">
+<meta name="twitter:image" content="https://silt.inbharat.ai/og-image.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -39,7 +45,7 @@ header{position:sticky;top:0;z-index:20;background:rgba(7,16,25,.9);backdrop-fil
 .ctas{margin-top:28px;display:flex;gap:13px;justify-content:center;flex-wrap:wrap}.btn{display:inline-block;padding:13px 24px;border-radius:10px;font-weight:700;border:1px solid var(--line)}.btn.primary{background:var(--teal);border-color:var(--teal);color:#04231f}.btn.ghost{color:var(--ink)}.patent{margin-top:22px;color:var(--faint);font:12px var(--mono)}
 
 /* ---------- animated transfer stage ---------- */
-.stage{display:flex;align-items:center;gap:14px;justify-content:center;margin:44px auto 6px;max-width:980px;overflow-x:auto;padding:6px 2px}
+.stage{display:flex;align-items:center;gap:14px;justify-content:safe center;margin:44px auto 6px;max-width:980px;overflow-x:auto;padding:6px 2px}
 .actor{flex:0 0 auto;text-align:center;width:118px}.actor svg{width:72px;height:auto;display:block;margin:0 auto}
 .actor .name{display:block;margin-top:6px;font:700 12px var(--mono);letter-spacing:.1em}
 .actor.teacher{color:var(--blue)}.actor.student{color:var(--green)}
@@ -51,13 +57,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(7,16,25,.9);backdrop-fil
 .station{align-self:center;justify-self:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font:600 12px var(--mono);text-align:center;min-width:104px;color:var(--dim)}
 .station .ico{display:block;font-size:19px;line-height:1.2}
 .station.gate{border-color:#2e6f68;color:var(--ink)}
-.station.lit{border-color:var(--teal);box-shadow:0 0 0 3px rgba(33,212,189,.16);color:var(--ink)}
 .packet{position:absolute;top:40px;left:0;width:16px;height:16px;border-radius:5px;background:var(--teal);box-shadow:0 0 14px rgba(33,212,189,.7)}
 .hero .packet{animation:fly 6.4s cubic-bezier(.4,0,.6,1) infinite}
-.station:nth-child(1){animation:spark 6.4s infinite}.station:nth-child(2){animation:spark 6.4s infinite .53s}.station:nth-child(3){animation:spark 6.4s infinite 1.06s}
+/* The packet (fly, cubic-bezier(.4,0,.6,1), 6.4s) crosses the three station
+   centres at ~1.7s / ~3.2s / ~4.6s of each cycle, so each spark's lit window
+   (2%..11% of the cycle after its delay) opens as the packet arrives. */
+.station:nth-child(1){animation:spark 6.4s infinite 1.6s}.station:nth-child(2){animation:spark 6.4s infinite 3.1s}.station:nth-child(3){animation:spark 6.4s infinite 4.5s}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes fly{0%{left:0;opacity:0}6%{opacity:1}82%{opacity:1}94%,100%{left:calc(100% - 16px);opacity:0}}
-@keyframes spark{0%,28%{border-color:var(--line);box-shadow:none;color:var(--dim)}8%,16%{border-color:var(--teal);box-shadow:0 0 0 4px rgba(33,212,189,.18);color:var(--ink)}}
+@keyframes spark{0%{border-color:var(--line);box-shadow:none;color:var(--dim)}2%,11%{border-color:var(--teal);box-shadow:0 0 0 4px rgba(33,212,189,.18);color:var(--ink)}14%,100%{border-color:var(--line);box-shadow:none;color:var(--dim)}}
 .stage-cap{font:11px var(--mono);color:var(--faint);margin:6px 0 0}
 
 /* ---------- interactive gate demo ---------- */
@@ -154,7 +162,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
 .reveal.on{opacity:1;transform:none}
 @media(max-width:900px){.grid3,.runs,.split,.caps{grid-template-columns:1fr}.hero{padding-top:60px}nav{display:none}.brow{grid-template-columns:120px 1fr 52px}.brow .lab{font-size:11px}}
-@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.brow .bar i{width:var(--w)!important}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.brow .bar i{width:var(--w)!important}}
 </style>
 </head>
 <body>
@@ -166,7 +174,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       </svg>
     </a>
     <nav aria-label="Main navigation">
-      <a href="#play">Play the gate</a><a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#capability-research">Research</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio/">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a>
+      <a href="#play">Play the gate</a><a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#capability-research">Research</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a>
     </nav>
   </div>
 </header>
@@ -197,7 +205,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       </div>
     </div>
     <p class="stage-cap">Skill packets travel from teacher to learner — the gate decides whether they arrive.</p>
-    <div class="ctas"><a class="btn primary" href="#play">Play the gate ↓</a><a class="btn ghost" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">View the open-source repo</a></div>
+    <div class="ctas"><a class="btn primary" href="#play">Play the gate ↓</a><a class="btn ghost" href="/studio">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">View the open-source repo</a></div>
     <div class="patent">Indian Provisional Patent Application No. 202631101454 · Built in Assam, India 🇮🇳</div>
   </div>
 </section>
@@ -209,11 +217,11 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
     <p class="lead">The whole of SILT in one move: a skill packet may only enter the learner when held-out tests, safety checks and regression sweeps say so. Try sending two different packets through the gate.</p>
     <div class="playbox">
       <div class="playrow">
-        <div class="pbot t"><svg viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="36" rx="10" fill="#13273a" stroke="#2e4a63"/><circle cx="24" cy="33" r="4" fill="#7cc7ff"/><circle cx="40" cy="33" r="4" fill="#7cc7ff"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2e4a63" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#7cc7ff" fill="none" stroke-width="2"/></svg><span class="tag">TEACHER</span></div>
+        <div class="pbot t"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="16" width="44" height="36" rx="10" fill="#13273a" stroke="#2e4a63"/><circle cx="24" cy="33" r="4" fill="#7cc7ff"/><circle cx="40" cy="33" r="4" fill="#7cc7ff"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2e4a63" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#7cc7ff" fill="none" stroke-width="2"/></svg><span class="tag">TEACHER</span></div>
         <div class="pstation" id="ps1"><span class="ico">🔍</span>EXTRACT</div><span class="parrow">→</span>
         <div class="pstation" id="ps2"><span class="ico">🧪</span>PROVE</div><span class="parrow">→</span>
         <div class="pstation" id="ps3"><span class="ico">⚖️</span>GATE</div><span class="parrow">→</span>
-        <div class="pbot s" id="pstudent"><svg viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="36" rx="10" fill="#12291f" stroke="#2c5a46"/><circle cx="24" cy="33" r="4" fill="#6ee7a8"/><circle cx="40" cy="33" r="4" fill="#6ee7a8"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2c5a46" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#6ee7a8" fill="none" stroke-width="2"/></svg><span class="tag">STUDENT</span></div>
+        <div class="pbot s" id="pstudent"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="16" width="44" height="36" rx="10" fill="#12291f" stroke="#2c5a46"/><circle cx="24" cy="33" r="4" fill="#6ee7a8"/><circle cx="40" cy="33" r="4" fill="#6ee7a8"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2c5a46" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#6ee7a8" fill="none" stroke-width="2"/></svg><span class="tag">STUDENT</span></div>
       </div>
       <div class="verdict" id="verdict" aria-live="polite">The gate is armed. Send a packet.</div>
       <div class="playbtns">
@@ -396,7 +404,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       <li>Optional workbench: set <code>SILT_ENABLE_EXPERIMENTAL=1</code> before startup, then open <code>/experimental</code>. Off by default; restart after changing an off-start.</li>
     </ol>
     <p style="color:var(--faint);font-size:13px">"App available" is not verified model readiness. Experimental CLI commands are separately explicit and never use the Studio flag. <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Activation catalog and prerequisites →</a></p>
-    <div class="ctas" style="justify-content:flex-start"><a class="btn primary" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Open running local engine</a></div>
+    <div class="ctas" style="justify-content:flex-start"><a class="btn primary" href="/studio">SILT Studio setup</a><a class="btn ghost" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Open running local engine</a></div>
   </div>
 </section>
 
@@ -406,12 +414,12 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
     <h2>Don't take the landing page at face value. Clone it, run it, test the gate, challenge the assumptions.</h2>
     <p class="lead">The repository carries the architecture, Studio, tests, recorded findings — including every rejected and blocked outcome. Start with the <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">capability catalog</a> so availability is never mistaken for evidence.</p>
     <div class="repo"><a href="https://github.com/inbharatai/SILT">https://github.com/inbharatai/SILT</a></div>
-    <div class="ctas"><a class="btn primary" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">Open SILT on GitHub</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md">Runbook</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/architecture.md">Read the architecture</a></div>
+    <div class="ctas"><a class="btn primary" href="/studio">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">Open SILT on GitHub</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md">Runbook</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/architecture.md">Read the architecture</a></div>
   </div>
 </section>
 </main>
 
-<footer><div class="wrap"><div>SILT — Skill Interchange Layer with Trust-gating · © 2026 Uni Guru Technologies LLP</div><div>Indian Provisional Patent Application No. 202631101454 · Assam, India 🇮🇳 · <a href="/studio/">SILT Studio</a> · <a href="https://inbharat.ai">InBharat.ai</a></div></div></footer>
+<footer><div class="wrap"><div>SILT — Skill Interchange Layer with Trust-gating · © 2026 Uni Guru Technologies LLP</div><div>Indian Provisional Patent Application No. 202631101454 · Assam, India 🇮🇳 · <a href="/studio">SILT Studio</a> · <a href="https://inbharat.ai">InBharat.ai</a></div></div></footer>
 
 <script>
 (function () {
@@ -436,7 +444,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
         entries.forEach(function (e) {
           if (e.isIntersecting) { arms.classList.add("on"); bo.disconnect(); }
         });
-      }, { threshold: 0.4 });
+      }, { threshold: 0.2, rootMargin: "0px 0px -10% 0px" });
       bo.observe(arms);
     }
   } else {
@@ -454,7 +462,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
   function say(text, cls) {
     verdict.textContent = "";
     verdict.className = "verdict" + (cls ? " " + cls : "");
-    if (cls) {
+    if (cls === "ok" || cls === "no") {
       var stamp = document.createElement("span");
       stamp.className = "stamp " + cls;
       stamp.textContent = text;
@@ -469,26 +477,27 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
   }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  function send(evaluated) {
+  function send(evaluated, trigger) {
     reset();
     btnGood.disabled = true; btnBad.disabled = true;
     var steps = evaluated
-      ? [function () { return "Extraction: rules + exemplars packaged. Nothing copied from weights."; },
-         function () { return "Proof: held-out A/B scored, regression sweep clean, safety tripwires armed."; },
+      ? [function () { say("Extraction: rules + exemplars packaged. Nothing copied from weights.", "wait"); },
+         function () { say("Proof: held-out A/B scored, regression sweep clean, safety tripwires armed.", "wait"); },
          function () { say("PROMOTED", "ok"); student.classList.add("won"); }]
-      : [function () { return "Extraction: packet built."; },
-         function () { return "Proof: …no held-out evaluation recorded."; },
+      : [function () { say("Extraction: packet built.", "wait"); },
+         function () { say("Proof: …no held-out evaluation recorded.", "wait"); },
          function () { say("REJECTED", "no"); }];
     var chain = Promise.resolve();
     steps.forEach(function (step, i) {
       chain = chain.then(function () {
         if (reduced) {
           stations[i].classList.add(i === 2 && !evaluated ? "hot" : "lit");
-          return step();
+          step();
+          return;
         }
         return sleep(i === 0 ? 250 : 900).then(function () {
           stations[i].classList.add(i === 2 && !evaluated ? "hot" : "lit");
-          return step();
+          step();
         });
       });
     });
@@ -505,10 +514,18 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
         say("REJECTED — no held-out evidence, no entry. The student never sees it.", "no");
       });
     }
-    chain.then(function () { btnGood.disabled = false; btnBad.disabled = false; });
+    chain = chain.then(function () {
+      btnGood.disabled = false; btnBad.disabled = false;
+      if (trigger && document.activeElement === document.body) trigger.focus();
+    });
+    chain = chain.catch(function () {
+      reset();
+      say("Something went wrong mid-run. The gate refuses to guess — try again.");
+      btnGood.disabled = false; btnBad.disabled = false;
+    });
   }
-  btnGood.addEventListener("click", function () { send(true); });
-  btnBad.addEventListener("click", function () { send(false); });
+  btnGood.addEventListener("click", function () { send(true, this); });
+  btnBad.addEventListener("click", function () { send(false, this); });
 })();
 </script>
 </body>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SILT">
+  <!-- Compact SILT glyph: the broken-T gate with the particle mid-passage. -->
+  <g fill="#334155">
+    <rect x="4"  y="10" width="22" height="14" rx="2"/>
+    <rect x="38" y="10" width="22" height="14" rx="2"/>
+    <rect x="24" y="24" width="16" height="34" rx="2"/>
+  </g>
+  <rect x="27" y="12" width="10" height="10" rx="2" fill="#14b8a6"/>
+</svg>

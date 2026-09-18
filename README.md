@@ -1050,7 +1050,7 @@ edit). The only domain-conditional logic is the deliberate risk-tier policy in
 `core/protocol.py` (`HIGH_RISK_DOMAINS = {MEDICAL, LEGAL, FINANCE}` →
 `RiskTier.HIGH`), which the promotion gate uses to route human approval — not to
 branch the pipeline. The plugin registry is keyed by `Modality` only
-(`src/asea/core/plugins.py:70`), so a new **domain** reuses an existing
+(`src/asea/core/plugins.py:20-22`), so a new **domain** reuses an existing
 modality's extractor/distiller/metric.
 
 Adding a new domain is **mostly writing data files, not editing core code.**
@@ -1093,7 +1093,7 @@ and reruns predicates on stored evidence, not inference or human identity
 authentication. Playground has no write path into the memory store; export
 refuses mock/non-approved packets by default. Transfer SSE tails the local
 hash-chained audit; Train/Compress stream runner telemetry, **not** that chain
-or automatically signed reports. A **capability hard-reject** (`_assert_support`, `server.py:321`) runs
+or automatically signed reports. A **capability hard-reject** (`_assert_support`, `server.py:435`) runs
 at every run-creation path — `POST /api/transfers`, `/api/deepapply`,
 `/api/spring`, `/api/skills/test` — and returns 400 with the required capability
 + the model's supported list **before any job spawns**. No "% of knowledge
@@ -1246,7 +1246,7 @@ The legacy tree below is a subset. Experimental modules also include
 `execution/` and `validation/`; see the [full catalog](docs/CAPABILITIES.md).
 
 ```
-adaptive-skill-extraction-adapter/
+SILT/
 ├── README.md  LOCAL_SETUP.md  architecture.md  risk_report.md
 ├── pyproject.toml  requirements.txt          # extras: [dev] [studio] [connectors] [deep]
 ├── configs/            declarative run definitions (assamese_transfer, real_assamese_ollama)

@@ -18,7 +18,7 @@ changing core transfer gates or defaults. Independent integrated local regressio
 recorded **2,695 passed, 18 skipped and 92 warnings**. Historical component runs
 below remain separate; this local result is not GPU validation or a remote CI result.
 
-[README overview](../README.md#capability-status-and-activation) ·
+[README overview](https://github.com/inbharatai/SILT/blob/main/README.md#capability-status-and-activation) ·
 [Core packets](#core-packet-transfer) · [Optional adaptation](#optional-adaptation-and-diagnostics) ·
 [Experimental setup](#experimental-entry-points) · [Composition/deployment](#composition-and-deployment) ·
 [Compiler](#structural-compiler) · [Specialist](#source-derived-specialist) ·
@@ -216,7 +216,7 @@ Legacy code similarity is not the later function-IO oracle.
 
 **Integrated numeric/state fixes:** real `certify_hf_states` and toy `SpringModel.certify` both validate finite real tolerances, reference/candidate losses and derived delta/ratio, reject malformed suite mappings and refuse invalid certificates. Toy recertification clears old/partial certificates on failure. This supersedes earlier static cautions about missing finite guards; it does not change valid finite comparisons, the denominator floor `max(abs(reference), 1e-12)`, .02/.05 defaults or the full-suite/heldout limitation. `HFStreamer` restores banked parameters and persistent buffers from the original full bank, preserving native dtype, pre-offload device and registered object ties on exit. Live LoRA, nonpersistent caches, failed entry, arbitrary forward side effects and storage failure are outside that guarantee.
 
-**Integrated source / regression definitions:** [HF numeric and restoration path](../src/asea/deepapply/backends/siltstream_vendor/hf_real.py) · [toy numeric path](../src/asea/deepapply/backends/siltstream_vendor/spring.py) · [numeric tests](../tests/test_spring_nonfinite_guards.py) · [state tests](../tests/test_streamer_state_restore.py). Scripted losses and tiny tensors test mechanics, not model quality or GPU execution.
+**Integrated source / regression definitions:** [HF numeric and restoration path](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/backends/siltstream_vendor/hf_real.py) · [toy numeric path](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/backends/siltstream_vendor/spring.py) · [numeric tests](https://github.com/inbharatai/SILT/blob/main/tests/test_spring_nonfinite_guards.py) · [state tests](https://github.com/inbharatai/SILT/blob/main/tests/test_streamer_state_restore.py). Scripted losses and tiny tensors test mechanics, not model quality or GPU execution.
 
 **Pinned source / tests / recorded reports:** [src/asea/spring/certifier.py:46-79](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/spring/certifier.py#L46-L79) · [src/asea/spring/certifier.py:119-305](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/spring/certifier.py#L119-L305) · [src/asea/deepapply/backends/siltstream_vendor/spring.py:177-267](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/deepapply/backends/siltstream_vendor/spring.py#L177-L267) · [src/asea/deepapply/backends/siltstream_vendor/hf_real.py:312-374](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/deepapply/backends/siltstream_vendor/hf_real.py#L312-L374) · [src/asea/studio/spring_jobs.py:198-315](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/studio/spring_jobs.py#L198-L315) · [src/asea/studio/server.py:260-271](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/studio/server.py#L260-L271) · [tests/test_siltspring_certification.py:85-93](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_siltspring_certification.py#L85-L93) · [tests/test_siltspring_certification.py:101-273](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_siltspring_certification.py#L101-L273) · [scripts/real_siltspring_1p5b.py:28-81](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/scripts/real_siltspring_1p5b.py#L28-L81)
 
@@ -342,7 +342,7 @@ Rollback is a whole approved-set restoration and can undo later unrelated skills
 
 **Limits:** Unset, 0 and true do not enable it. Public landing origin is rejected by experimental routes even though legacy CORS may allow it. Merge/restart without exact flag cannot enable it. Tokens/operator names are local workflow controls, not independent human authentication.
 
-**Integrated product fixes:** health reports distinguish code availability, startup-mounted routes and current enablement without model loading, hardware probing or creating an experimental manager. An off-start requires restart with the exact flag; “App available” is not model readiness. Tab-scoped navigation, mobile form layout and the bounded README table reader are repaired, with catalog selections still marked unverified and cloud-backed connectors disclosed. Public setup remains documentation, not hosted compute or a public-to-local token bridge. See [server](../src/asea/studio/server.py), [local UI](../src/asea/studio/static/index.html), [setup page](studio/index.html) and [actual-browser regression definitions](../tests/test_studio_product_fixes.py). No fixed README cell count is a feature guarantee.
+**Integrated product fixes:** health reports distinguish code availability, startup-mounted routes and current enablement without model loading, hardware probing or creating an experimental manager. An off-start requires restart with the exact flag; “App available” is not model readiness. Tab-scoped navigation, mobile form layout and the bounded README table reader are repaired, with catalog selections still marked unverified and cloud-backed connectors disclosed. Public setup remains documentation, not hosted compute or a public-to-local token bridge. See [server](https://github.com/inbharatai/SILT/blob/main/src/asea/studio/server.py), [local UI](https://github.com/inbharatai/SILT/blob/main/src/asea/studio/static/index.html), [setup page](studio/index.html) and [actual-browser regression definitions](https://github.com/inbharatai/SILT/blob/main/tests/test_studio_product_fixes.py). No fixed README cell count is a feature guarantee.
 
 **Evidence kind:** Fresh-process GET-only setup checks observed unset/0/true → 404, exact 1 → workbench 200; API without token → 403 and with token → schema 200; public Host/Origin → 403. Legacy OpenAPI remained identical, ML libraries were not imported, and no active pointer was created. These are setup boundaries, not model functionality.
 
@@ -679,7 +679,7 @@ The local specialist generation-policy fix is verified on tiny models and a reta
 
 **Integrated controller contract:** executed recipe/config and the mandatory reviewed five-file data sidecar are hash/identity-bound and rechecked; an editable manifest or hash-less READY plan is not approval. Header-only planning differs from authorized TRAIN/DEV profiling, which keeps unseen FINAL quarantined. Linux worker containment, bounded capture, exact receipt/status classification and pre-effect output admission repair the earlier unmerged wrapper issues. A `<report>.terminal.json` result requires its separate `<report>.ack.json` fsync acknowledgement; neither alone guarantees power-loss survival. Missing, blocked or rejected evidence is not success. These are scoped controls for trusted-owner immutable inputs, not protection against every same-owner file race or escaped descendant.
 
-The wrapper's compact baseline remains `BASELINE_NOT_RUN`, even with `--compact-baseline`; it does not automate a four-arm quality experiment. Final requires explicit reviewed engineering-only acceptance waiving the missing baseline, current READY admission, an exclusion ledger and a separate exercised teacher-unavailable deployment receipt. This does not admit model quality or activate a deployment. See [current wrapper](../scripts/run_specialist_quality_experiment.py), [workflow](../src/asea/specialist/workflow.py), [worker](../src/asea/specialist/controller_worker.py), [controller regressions](../tests/test_controller_integrity_review.py), [data-binding regressions](../tests/test_data_binding_review.py) and the [runbook](SPECIALIST_QUALITY_EXPERIMENT.md).
+The wrapper's compact baseline remains `BASELINE_NOT_RUN`, even with `--compact-baseline`; it does not automate a four-arm quality experiment. Final requires explicit reviewed engineering-only acceptance waiving the missing baseline, current READY admission, an exclusion ledger and a separate exercised teacher-unavailable deployment receipt. This does not admit model quality or activate a deployment. See [current wrapper](https://github.com/inbharatai/SILT/blob/main/scripts/run_specialist_quality_experiment.py), [workflow](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/workflow.py), [worker](https://github.com/inbharatai/SILT/blob/main/src/asea/specialist/controller_worker.py), [controller regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_controller_integrity_review.py), [data-binding regressions](https://github.com/inbharatai/SILT/blob/main/tests/test_data_binding_review.py) and the [runbook](SPECIALIST_QUALITY_EXPERIMENT.md).
 
 **Evidence kind:** Recorded V5 Studio five-stage completion BUILT_UNCERTIFIED, engineering_complete=true, candidate_frozen=true, certificate=false, quality_pass=false. Audit did not call build/finalize.
 
@@ -746,9 +746,9 @@ The wrapper's compact baseline remains `BASELINE_NOT_RUN`, even with `--compact-
 
 **Evidence kind:** Historical model target Linux x86_64 CPU/Python3.9, roughly4.18GiB and2 CPUs, no NVIDIA GPU. Largest exercised source619M in that record; size ceilings are refusal guards, not full model/device support declarations.
 
-**Integrated specialist hardware path:** [asea.hardware](../src/asea/hardware/__init__.py) exposes explicit `probe`/`plan` with native inventory, dtype, phase-lifetime, host/device/disk and authorized data-profile estimates. `READY` is pure feasibility planning, not approval, reservation, execution or quality. Config-only estimates cannot be READY. Current specialist `recover`/`infer`/`evaluate` accept `cpu`, `auto`, `cuda:N`; an explicit unavailable device blocks, without fallback or hidden dtype reduction. Reconstruction stays CPU-only. Strict native loading and cache/workspace lifetimes are bounded by actual admitted inputs; CUDA CPU staging is not out-of-core loading or unlimited memory. Linux CPU is supported and exercised; single-NVIDIA-CUDA code is **GPU_UNVERIFIED**, not an execution receipt. Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and offload execution remain unsupported for this path.
+**Integrated specialist hardware path:** [asea.hardware](https://github.com/inbharatai/SILT/blob/main/src/asea/hardware/__init__.py) exposes explicit `probe`/`plan` with native inventory, dtype, phase-lifetime, host/device/disk and authorized data-profile estimates. `READY` is pure feasibility planning, not approval, reservation, execution or quality. Config-only estimates cannot be READY. Current specialist `recover`/`infer`/`evaluate` accept `cpu`, `auto`, `cuda:N`; an explicit unavailable device blocks, without fallback or hidden dtype reduction. Reconstruction stays CPU-only. Strict native loading and cache/workspace lifetimes are bounded by actual admitted inputs; CUDA CPU staging is not out-of-core loading or unlimited memory. Linux CPU is supported and exercised; single-NVIDIA-CUDA code is **GPU_UNVERIFIED**, not an execution receipt. Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and offload execution remain unsupported for this path.
 
-See [hardware/CLI contract](HARDWARE_ADAPTIVE.md), [native-loading regression definitions](../tests/test_native_evaluation_loading.py), [memory-envelope definitions](../tests/test_specialist_envelopes.py), [device definitions](../tests/test_specialist_devices.py) and [device-local validation](SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook). These additions do not replace the distinct `execution` worker-control contract above.
+See [hardware/CLI contract](HARDWARE_ADAPTIVE.md), [native-loading regression definitions](https://github.com/inbharatai/SILT/blob/main/tests/test_native_evaluation_loading.py), [memory-envelope definitions](https://github.com/inbharatai/SILT/blob/main/tests/test_specialist_envelopes.py), [device definitions](https://github.com/inbharatai/SILT/blob/main/tests/test_specialist_devices.py) and [device-local validation](SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook). These additions do not replace the distinct `execution` worker-control contract above.
 
 **Pinned source:** [src/asea/execution/controls.py:31–81](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/execution/controls.py#L31-L81) · [src/asea/execution/controls.py:106–154](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/execution/controls.py#L106-L154) · [src/asea/compose/__main__.py:33–39](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/compose/__main__.py#L33-L39) · [src/asea/specialist/workflow.py:618–619](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/src/asea/specialist/workflow.py#L618-L619)
 
@@ -835,7 +835,7 @@ admitted by installing/merging the source**. Nothing in it auto-activates.
 
 **Evidence kind:** Implemented (source_code_verified) with 78 offline mechanism tests plus one executed 8-case behavioural pilot (2026-09-17, Ollama cloud `glm-5.3-flash:cloud`, consent per run): traces + footprint recorded with UNJUDGED outcomes; the four target repairs then passed all six host-oracle checks in the Linux sandbox. That is a judged functional outcome on 4 target cases — not a capability certificate and not a quality claim about the teacher.
 
-**Pinned source / tests:** [src/asea/capability_build/](../src/asea/capability_build/) (schema/spec/trace/footprint/teacher/receipt/store) · [tests/test_capability_build.py](../tests/test_capability_build.py) · [docs/CAPABILITY_BUILD.md](CAPABILITY_BUILD.md)
+**Pinned source / tests:** [src/asea/capability_build/](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/) (schema/spec/trace/footprint/teacher/receipt/store) · [tests/test_capability_build.py](https://github.com/inbharatai/SILT/blob/main/tests/test_capability_build.py) · [docs/CAPABILITY_BUILD.md](CAPABILITY_BUILD.md)
 
 <a id="c27"></a>
 ### C27 — Causal intervention machinery and isolated GLM worker
@@ -850,7 +850,7 @@ admitted by installing/merging the source**. Nothing in it auto-activates.
 
 **Evidence kind:** Implemented + mechanism-tested offline (fake adapters, protocol round-trips, crash/blocked frames). No open-weight run has been executed on any host yet.
 
-**Pinned source / tests:** [src/asea/capability_build/intervention.py](../src/asea/capability_build/intervention.py) · [src/asea/capability_build/adapters/](../src/asea/capability_build/adapters/) · [src/asea/capability_build/worker.py](../src/asea/capability_build/worker.py) · [workers/glm53/](../workers/glm53/) · [tests/test_capability_build.py](../tests/test_capability_build.py)
+**Pinned source / tests:** [src/asea/capability_build/intervention.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/intervention.py) · [src/asea/capability_build/adapters/](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/adapters/) · [src/asea/capability_build/worker.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/worker.py) · [workers/glm53/](https://github.com/inbharatai/SILT/blob/main/workers/glm53/) · [tests/test_capability_build.py](https://github.com/inbharatai/SILT/blob/main/tests/test_capability_build.py)
 
 <a id="c28"></a>
 ### C28 — Fresh capability datasets, student baselines and KD hand-off
@@ -865,7 +865,7 @@ admitted by installing/merging the source**. Nothing in it auto-activates.
 
 **Evidence kind:** Implemented + mechanism-tested offline. No student baseline, no DeepApply training run and no dataset build has been executed against real model material yet.
 
-**Pinned source / tests:** [src/asea/capability_build/dataset.py](../src/asea/capability_build/dataset.py) · [src/asea/capability_build/student.py](../src/asea/capability_build/student.py) · [src/asea/capability_build/distillation.py](../src/asea/capability_build/distillation.py) · [tests/test_capability_build.py](../tests/test_capability_build.py)
+**Pinned source / tests:** [src/asea/capability_build/dataset.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/dataset.py) · [src/asea/capability_build/student.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/student.py) · [src/asea/capability_build/distillation.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/distillation.py) · [tests/test_capability_build.py](https://github.com/inbharatai/SILT/blob/main/tests/test_capability_build.py)
 
 <a id="c29"></a>
 ### C29 — Minimum-capability search (library; CLI refuses honestly)
@@ -880,7 +880,7 @@ admitted by installing/merging the source**. Nothing in it auto-activates.
 
 **Evidence kind:** Implemented + mechanism-tested offline with synthetic candidates (a mechanism test, not a reduced-model quality result).
 
-**Pinned source / tests:** [src/asea/capability_build/search.py](../src/asea/capability_build/search.py) · [tests/test_capability_build.py](../tests/test_capability_build.py)
+**Pinned source / tests:** [src/asea/capability_build/search.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/search.py) · [tests/test_capability_build.py](https://github.com/inbharatai/SILT/blob/main/tests/test_capability_build.py)
 
 ## Recorded evidence and measurement units
 
@@ -948,9 +948,9 @@ not validate voice synthesis or local-GPU inference.
 - The [retained deep-apply report](deep_apply_real_run_findings.md) documents
   **CPU SmolLM2-135M standard training**, seeded promoted input and Gate 2
   rejection. Its old streamed limitation is historical, not current CPU support.
-  [GPU probe code](../scripts/real_streamed_4bit_gpu.py) is not a Qwen7B/RTX5050
+  [GPU probe code](https://github.com/inbharatai/SILT/blob/main/scripts/real_streamed_4bit_gpu.py) is not a Qwen7B/RTX5050
   streamed or ZeroForge execution receipt.
-- [Spring probe code](../scripts/real_siltspring_1p5b.py) has no saved Qwen0.5B /
+- [Spring probe code](https://github.com/inbharatai/SILT/blob/main/scripts/real_siltspring_1p5b.py) has no saved Qwen0.5B /
   Qwen1.5B state-loss stdout in this repository. A hand-built Studio test report
   is a fixture, not a captured run. Unsupported citation means receipts are not
   included here, **not** proof those runs never occurred.
@@ -966,7 +966,7 @@ not validate voice synthesis or local-GPU inference.
 - Restore stronger claims only with an exact model revision, backend/device/dtype,
   command and retained output binding steps/suites/tolerance, finite loss/parity,
   admission/certification result and a named measured memory metric. Do not
-  substitute Soup's hardware numbers for SILT measurements; preserve [NOTICE](../NOTICE).
+  substitute Soup's hardware numbers for SILT measurements; preserve [NOTICE](https://github.com/inbharatai/SILT/blob/main/NOTICE).
 
 ## Verification scope
 
@@ -1018,8 +1018,8 @@ and native Windows execution/security backends, frontier arbitrary-model
 reconstruction, clean-machine universal portability, teacher-level final quality
 and competitive advantage remain unimplemented or unproven as specified above.
 
-Legal context is not execution evidence: [PATENT.md](../PATENT.md),
-[LICENSE](../LICENSE) and [NOTICE](../NOTICE) are preserved. Established LoRA,
+Legal context is not execution evidence: [PATENT.md](https://github.com/inbharatai/SILT/blob/main/PATENT.md),
+[LICENSE](https://github.com/inbharatai/SILT/blob/main/LICENSE) and [NOTICE](https://github.com/inbharatai/SILT/blob/main/NOTICE) are preserved. Established LoRA,
 SPSA and teacher-guided methods are not claimed here as novel; no coverage of
 new reconstruction/recovery by the earlier provisional is asserted. Earlier
 legal or architecture wording does not override the current technical boundaries

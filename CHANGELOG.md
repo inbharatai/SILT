@@ -61,9 +61,12 @@ mechanism was weakened; the module suite grew from 71 to 78 tests.
 ## Capability-build review fixes — 2026-09-18
 
 An external review of the 2026-09-17 capability-build layer found five
-defects that the then-green tests did not catch. All five are fixed, each with
-new tests that fail on the old behaviour. No frozen result, Gate or existing
-mechanism was weakened; the module suite grew from 57 to 71 tests.
+code defects that the then-green tests did not catch, plus one
+repository-hygiene defect (the invention disclosure, below). All five
+code defects are fixed, each with new tests that fail on the old
+behaviour; the disclosure was removed from the tree. No frozen result,
+Gate or existing mechanism was weakened; the module suite grew from 57
+to 71 tests.
 
 ### Fixed
 - **Student "local-only" check accepted remote hosts.** The check matched a

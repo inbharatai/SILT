@@ -13,9 +13,15 @@ Emits dist-vercel/ with:
 Vercel deploys docs/ directly (vercel.json outputDirectory: "docs",
 no build command), so the extras that must be reachable in production
 are ALSO synced into docs/:
-  - docs/sitemap.xml, docs/robots.txt   (generated here)
+  - docs/sitemap.xml, docs/robots.txt, docs/favicon.svg (generated/copied here)
   - docs/PATENT.md, docs/README.md      (copied from the repo root,
                                          which stays the single source)
+
+dist-vercel/ is a LOCAL PREVIEW bundle only -- it is never deployed.
+Note the deliberate deployment split: docs/studio/index.html (the
+deployed /studio/ page) is a hand-authored "Run locally" launcher;
+the full studio UI built into dist-vercel/studio/ with the bridge
+injection ships only to the local engine at 127.0.0.1:8377.
 
 The script is intentionally hermetic: no network, no secrets, no build-time
 parameter injection. Canonical host is https://silt.inbharat.ai.
@@ -24,13 +30,49 @@ docs/ copies stay in sync.
 """
 from __future__ import annotations
 
+import re
 import shutil
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "dist-vercel"
+DOCS = REPO / "docs"
 CANONICAL = "https://silt.inbharat.ai"
+GITHUB = "https://github.com/inbharatai/SILT/blob/main"
+GITHUB_RAW = "https://raw.githubusercontent.com/inbharatai/SILT/main"
+
+# Markdown link/image targets that are never repo-relative
+_EXTERNAL = ("http://", "https://", "//", "#", "mailto:", "data:")
+
+_MD_LINK = re.compile(r"\]\(([^)\s]+)(#[^)\s]*)?\)")
+_MD_IMG = re.compile(r'src="(docs/[^"]+)"')
+
+
+def rewrite_readme_for_serving(text: str) -> str:
+    """Adapt root-README links for the raw-served docs/ copy.
+
+    docs/ IS the deployment root, so a link like ``docs/CAPABILITIES.md``
+    would 404 at /docs/CAPABILITIES.md, and repo-root targets like
+    ``src/...`` or ``CHANGELOG.md`` do not exist under docs/ at all.
+    Targets under docs/ become site-relative (they serve raw at /name);
+    everything else becomes an absolute GitHub URL, which works everywhere.
+    The root README.md itself is never modified.
+    """
+    def link(m: "re.Match[str]") -> str:
+        target, anchor = m.group(1), m.group(2) or ""
+        if target.startswith(_EXTERNAL):
+            return m.group(0)
+        if target.startswith("docs/"):
+            rest = target[len("docs/"):]
+            if (DOCS / rest).exists():
+                return f"](/{rest}{anchor})"
+        return f"]({GITHUB}/{target}{anchor})"
+
+    def img(m: "re.Match[str]") -> str:
+        return f'src="{GITHUB_RAW}/{m.group(1)}"'
+
+    return _MD_IMG.sub(img, _MD_LINK.sub(link, text))
 
 
 def write(path: Path, content: str) -> None:
@@ -86,11 +128,15 @@ def build() -> None:
         if src.exists():
             shutil.copy2(src, OUT / asset)
 
-    # Static docs
+    # Static docs (README links are adapted for raw-served HTML contexts;
+    # PATENT.md has no repo-relative links and copies verbatim)
     for name in ("PATENT.md", "README.md"):
         src = REPO / name
         if src.exists():
-            shutil.copy2(src, OUT / name)
+            content = src.read_text(encoding="utf-8")
+            if name == "README.md":
+                content = rewrite_readme_for_serving(content)
+            write(OUT / name, content)
 
     # Sitemap + robots (shared by dist-vercel/ and docs/; /studio is the
     # canonical clean URL -- trailingSlash:false 308s /studio/)
@@ -124,13 +170,18 @@ Sitemap: {CANONICAL}/sitemap.xml
     DOCS = REPO / "docs"
     write(DOCS / "sitemap.xml", sitemap_xml)
     write(DOCS / "robots.txt", robots_txt)
-    for name in ("PATENT.md", "README.md"):
-        src = REPO / name
-        if src.exists():
-            shutil.copy2(src, DOCS / name)
+    shutil.copy2(REPO / "src" / "asea" / "studio" / "static" / "favicon.svg", DOCS / "favicon.svg")
+    patent_src = REPO / "PATENT.md"
+    if patent_src.exists():
+        shutil.copy2(patent_src, DOCS / "PATENT.md")
+    readme_src = REPO / "README.md"
+    if readme_src.exists():
+        # The served copy gets site-relative/GitHub-absolute links; the root
+        # README.md stays the canonical GitHub version.
+        write(DOCS / "README.md", rewrite_readme_for_serving(readme_src.read_text(encoding="utf-8")))
 
     print(f"Built SILT public site at {OUT}")
-    print(f"Synced deployable extras into {DOCS} (sitemap.xml, robots.txt, PATENT.md, README.md)")
+    print(f"Synced deployable extras into {DOCS} (sitemap.xml, robots.txt, favicon.svg, PATENT.md, README.md)")
 
 
 if __name__ == "__main__":

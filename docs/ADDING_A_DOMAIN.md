@@ -7,7 +7,7 @@ SILT is built to be **domain-agnostic**: the pipeline core has no `if domain ==
 with the medical example, reusing the scaffolding that is already wired.
 
 > Read alongside [`connector_authoring.md`](connector_authoring.md) (how to add
-> a *connector* / a new *modality*) and the main [`../README.md`](../README.md)
+> a *connector* / a new *modality*) and the main [`../README.md`](https://github.com/inbharatai/SILT/blob/main/README.md)
 > for the pipeline overview.
 
 ## The two extension axes

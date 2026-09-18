@@ -108,7 +108,18 @@
 
       const target = bridgeUrl(url);
       const cfg = { ...init };
-      cfg.headers = cfg.headers ? new Headers(cfg.headers) : new Headers();
+      const isRequest = typeof resource === 'object' && resource && typeof resource.clone === 'function';
+      // A Request object carries its own method/body/headers; fetch() only
+      // takes those from init when init provides them, so carry them over
+      // explicitly instead of letting empty defaults override them.
+      if (isRequest) {
+        cfg.method = cfg.method || resource.method;
+        if (cfg.body === undefined && resource.body) {
+          cfg.body = resource.body;
+          cfg.duplex = 'half';
+        }
+      }
+      cfg.headers = new Headers(init.headers || (isRequest ? resource.headers : undefined));
       cfg.headers.set('X-SILT-Bridge-Origin', window.location.origin);
       cfg.credentials = 'omit';
       return originalFetch(target, cfg);
