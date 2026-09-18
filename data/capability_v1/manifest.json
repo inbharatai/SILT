@@ -1,0 +1,94 @@
+{
+  "capability_id": "python_repo_debugging_v1",
+  "counts": {
+    "controls": 4,
+    "development": 3,
+    "final": 3,
+    "heldout": 3,
+    "training": 6
+  },
+  "families": {
+    "controls": [
+      "date_label_iso",
+      "greeting_join",
+      "initials_extract",
+      "price_total_cents"
+    ],
+    "development": [
+      "count_words_whitespace",
+      "merge_intervals_max_end",
+      "rotate_direction"
+    ],
+    "final": [
+      "bracket_balance",
+      "pad_center",
+      "running_sum"
+    ],
+    "heldout": [
+      "binary_search_index",
+      "capitalize_first_letter",
+      "running_max"
+    ],
+    "training": [
+      "chunk_remainder",
+      "dedupe_stable",
+      "flatten_recursive",
+      "median_sorted_center",
+      "slugify_hyphen_runs",
+      "transpose_matrix"
+    ]
+  },
+  "files": {
+    "controls.jsonl": "cdae6cf925526424828e4409639f81f5ae9bb7d4a89a63f2b2eb8caacaf440b4",
+    "development.jsonl": "37361aa41f641f57ca9d28d56dd455dfa7b0c108f73b5806f0a67a3f8ec0b2e0",
+    "final.jsonl": "957027f1963d2e403ffa743c5c143faef1b0f09f426558432e0502793decf21c",
+    "heldout.jsonl": "07c97359d0aec66216bb48768073d9ddfbb5f0dea7f1aaf177d7bb508ccaf2b0",
+    "training.jsonl": "2bfb2facc0d5e4aa1dc8c0db482ee55dd0e5a331e9c654057c7b1ef3bbff8666"
+  },
+  "final_opened": false,
+  "frozen_before_model_generation": true,
+  "groups": {
+    "controls": {
+      "control": 4,
+      "target": 0
+    },
+    "development": {
+      "control": 0,
+      "target": 3
+    },
+    "final": {
+      "control": 0,
+      "target": 3
+    },
+    "heldout": {
+      "control": 0,
+      "target": 3
+    },
+    "training": {
+      "control": 0,
+      "target": 6
+    }
+  },
+  "leakage_checks": [
+    "cross-split sample_id disjointness",
+    "cross-split exact content hash disjointness",
+    "cross-split family disjointness",
+    "within-split id/content uniqueness",
+    "near-duplicate token-shape guard (within and across splits)",
+    "frozen September sets quarantined as inputs"
+  ],
+  "licenses": [
+    "CC0-1.0"
+  ],
+  "model_outputs_consulted": false,
+  "note": "cases are data only; building this dataset involved no model runs and no grading, and confers no capability on anything",
+  "schema": "silt.capability_dataset_manifest.v1",
+  "schema_version": 1,
+  "spec_fingerprint": "1101de73ea9f1ad2ce412626735e9fda8a04c229edecd59514ae7266662fcd9b",
+  "teacher": {
+    "access": "behavioural_remote",
+    "model": "glm-5.3-flash:cloud",
+    "provider": "ollama",
+    "revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5"
+  }
+}

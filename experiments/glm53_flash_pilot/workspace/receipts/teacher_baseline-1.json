@@ -1,0 +1,49 @@
+{
+  "artifact_hashes": {},
+  "artifact_sha256": "6b6d26375a22411d12f54580516ec9121b583fc8df371ebb26b871a2cfafdfea",
+  "capability_id": "python_repo_debugging_v1",
+  "capability_retention": "NOT_MEASURED",
+  "command": "teacher baseline",
+  "control_regressions": {},
+  "data_split_hashes": {
+    "cases": "experiments\\glm53_flash_pilot\\trace_cases.json"
+  },
+  "error": null,
+  "evidence_class": "behavioural_remote",
+  "failure_history": [],
+  "gates": {
+    "gate1_status": null,
+    "gate2_status": null,
+    "siltspring_states": {}
+  },
+  "hardware_identity": {},
+  "honesty_note": "Signature is a local HMAC over the report bytes with a workspace-local key. It proves the report was not modified after generation to the holder of that same key. It is NOT a portable attestation, NOT proof of authorship to third parties, and NOT a quality certificate.",
+  "key_fingerprint": "d83edb3218cde8d1",
+  "limitations": [
+    "Implementation success is not model-quality success.",
+    "Failed experiments remain recorded and visible.",
+    "Evidence is behavioural (remote/API): no internal router or expert claims are made."
+  ],
+  "measurements": {},
+  "resources": {
+    "disk_bytes": "NOT_MEASURED",
+    "energy_joules": "NOT_MEASURED",
+    "latency_ms_p50": "NOT_MEASURED",
+    "ram_peak_bytes": "NOT_MEASURED",
+    "tokens_per_second": "NOT_MEASURED",
+    "vram_peak_bytes": "NOT_MEASURED"
+  },
+  "runtime_versions": {},
+  "schema": "silt.capability_receipt.v1",
+  "schema_version": 1,
+  "signature": "0acff4e99b67fdd354408a227679dc2add59860ecf1ca294d2c85f9e0817ffac",
+  "signature_alg": "hmac-sha256-local",
+  "spec_sha256": "1101de73ea9f1ad2ce412626735e9fda8a04c229edecd59514ae7266662fcd9b",
+  "status": "completed",
+  "student": {},
+  "teacher": {
+    "model": "glm-5.3-flash:cloud",
+    "provider": "ollama",
+    "revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "artifact_sha256": "66db82c62d8ca0583c5a5707e018baee46502db81cbfd71915e0cf383f18dc6f",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2056.706,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: transpose accepts a rectangular matrix (a non-empty list of non-empty equal-length rows) and returns its transpose: rows become columns and columns become rows, with element [j][i] of the output equal to element [i][j] of the input.\n\n```python\ndef transpose(matrix):\n    return [list(col) for col in matrix]\n```",
+    "prompt_tokens": 129,
+    "response": "The user wants me to fix a buggy `transpose` function. The current implementation:\n\n```python\ndef transpose(matrix):\n    return [list(col) for col in matrix]\n```\n\nThis just copies the matrix \u2014 it returns a list of rows, each row being a copy of the original row. That's not a transpose at all. The transpose should make rows into columns.\n\nThe specification: transpose accepts a rectangular matrix (non-empty list of non-empty equal-length rows) and returns its transpose: element [j][i] of output equals element [i][j] of input.\n\nThe standard fix:\n\n```python\ndef transpose(matrix):\n    return [list(row) for row in zip(*matrix)]\n```\n\n`zip(*matrix)` gives tuples of columns; converting each to a list gives the transpose. Since the matrix is non-empty with non-empty rows, zip works fine.\n\nAlternatively:\n\n```python\ndef transpose(matrix):\n    rows = len(matrix)\n    cols = len(matrix[0])\n    return [[matrix[i][j] for i in range(rows)] for j in range(cols)]\n```\n\nBoth work. The zip version is cleaner. Let me verify: for matrix = [[1, 2, 3], [4, 5, 6]], zip(*matrix) yields (1, 4), (2, 5), (3, 6). Output: [[1, 4], [2, 5], [3, 6]]. Check: output[0][1] = 4, input[1][0] = 4. Correct.\n\nThe instruction says: return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should output just the code block.</think>```python\ndef transpose(matrix):\n    return [list(row) for row in zip(*matrix)]\n```",
+    "response_tokens": 379,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "78a187382ed6f9645cbdb4695a4ef55268ea0d29ba124d24a3edeaca821d88a8",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "single_row": true,
+        "square": true,
+        "tall": true
+      }
+    },
+    "success": true,
+    "tests_passed": 3,
+    "tests_total": 3
+  },
+  "prompt_hash": "6cf74bebc24a1031923d9d9e592785841e01f7e9c2f0d2f2ce059a8ac6b46d7c",
+  "sample_id": "transpose_rows_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

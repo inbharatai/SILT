@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "3e9da0e6fcbf88999886c6bbdaac7c33321bedf01d19bfbefb0dc9973946da8f",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 3429.758,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: merge_intervals accepts a non-empty list of [start, end] pairs with start <= end, and merges overlapping or touching intervals: processing in ascending start order, an interval is merged into the previous one when its start is less than or equal to the current merged end, and the merged end is the MAXIMUM of the two ends. Returns a list of merged pairs in ascending order.\n\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = end\n        else:\n            merged.append([start, end])\n    return merged\n```",
+    "prompt_tokens": 196,
+    "response": "Let me analyze the bug in this function.\n\nThe specification says:\n- merge_intervals accepts a non-empty list of [start, end] pairs with start <= end\n- merges overlapping or touching intervals\n- processing in ascending start order, an interval is merged into the previous one when its start is less than or equal to the current merged end\n- the merged end is the MAXIMUM of the two ends\n- Returns a list of merged pairs in ascending order\n\nThe current code:\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = end\n        else:\n            merged.append([start, end])\n    return merged\n```\n\nThe bug: `merged[-1][1] = end` sets the merged end to the new interval's end, but it should be the MAXIMUM of the two ends: `merged[-1][1] = max(merged[-1][1], end)`.\n\nWhy does this matter? Consider intervals like [[1, 10], [2, 3]]. Sorted: [[1, 10], [2, 3]]. First: merged = [[1, 10]]. Second: start=2 <= 10, so merged[-1][1] = 3, giving [[1, 3]]. But the correct answer is [[1, 10]] because the merged end should be max(10, 3) = 10.\n\nSo the fix is:\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], end)\n        else:\n            merged.append([start, end])\n    return merged\n```\n\nAlso, one subtle point: `sorted(intervals)` sorts by start, then by end. The specification says \"processing in ascending start order\". Sorting by (start, end) tuples is fine \u2014 for intervals with the same start, the order between them doesn't affect the result since the max handles it. Actually, let me verify: intervals [[1, 5], [1, 3]]. Sorted: [[1, 3], [1, 5]]. First: merged = [[1, 3]]. Second: start=1 <= 3, merged[-1][1] = max(3, 5) = 5. Result: [[1, 5]]. Correct.\n\nIf sorted the other way: [[1, 5], [1, 3]]. First: merged = [[1, 5]]. Second: start=1 <= 5, merged[-1][1] = max(5, 3) = 5. Result: [[1, 5]]. Same. So sorting by tuple is fine.\n\nAnother subtle point: the input intervals might be tuples or lists. `merged.append([start, end])` creates lists, so `merged[-1][1] = ...` works. If the input contains lists, sorted returns the same list objects, but we append them directly \u2014 wait, no. In the else branch, `merged.append([start, end])` creates a new list from the unpacked values, so we don't mutate the input. Good.\n\nWait, actually there's a potential issue: if the input intervals are lists, `sorted(intervals)` returns a list of the same list objects. But in the else branch, we create a new list `[start, end]`, so we never mutate the original input lists. Good.\n\nAlso, the specification says \"non-empty list\", so we don't need to handle empty input specially. The current code handles empty input by returning [], which is fine anyway.\n\nThe fix is just changing `merged[-1][1] = end` to `merged[-1][1] = max(merged[-1][1], end)`.\n\nLet me also double check the merge condition: \"an interval is merged into the previous one when its start is less than or equal to the current merged end\" \u2014 the code has `if merged and start <= merged[-1][1]`. That matches.\n\n\"Returns a list of merged pairs in ascending order\" \u2014 since we process in ascending start order and only merge (which keeps starts ascending), the result is in ascending order. Good.\n\nFinal answer:\n\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], end)\n        else:\n            merged.append([start, end])\n    return merged\n```\n\nThe instruction says to return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should just output the code block.</think>```python\ndef",
+    "response_tokens": 1024,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 5828.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "8af8c40325301550c4431046473d3a7a2f28447701288d73ed12564020d6ddde",
+  "sample_id": "merge_intervals_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

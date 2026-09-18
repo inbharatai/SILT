@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "77a39542f76ed93e36c6a789091639432863afa49cb109f18783962ef3f50edc",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 1709.568,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: chunk accepts a list and a positive size, and splits the list into consecutive groups of exactly `size` elements, except that the LAST group may be shorter. No element is ever dropped. An empty list yields an empty result.\n\n```python\ndef chunk(items, size):\n    end = len(items) // size * size\n    return [items[i:i + size] for i in range(0, end, size)]\n```",
+    "prompt_tokens": 145,
+    "response": "Let me analyze the buggy function:\n\n```python\ndef chunk(items, size):\n    end = len(items) // size * size\n    return [items[i:i + size] for i in range(0, end, size)]\n```\n\nThe specification: chunk accepts a list and a positive size, and splits the list into consecutive groups of exactly `size` elements, except that the LAST group may be shorter. No element is ever dropped. An empty list yields an empty result.\n\nThe bug: `end = len(items) // size * size` truncates to a multiple of size, so the last partial group is dropped. For example, `chunk([1,2,3,4,5], 2)` gives `[[1,2],[3,4]]` \u2014 dropping 5.\n\nFix: iterate over the full length:\n\n```python\ndef chunk(items, size):\n    return [items[i:i + size] for i in range(0, len(items), size)]\n```\n\nCheck: empty list \u2192 range(0, 0, size) \u2192 empty \u2192 []. Good.\n`chunk([1,2,3,4,5], 2)` \u2192 i=0: [1,2], i=2: [3,4], i=4: [5]. Good.\n`chunk([1,2,3], 3)` \u2192 [[1,2,3]]. Good.\n`chunk([1,2,3,4], 3)` \u2192 [[1,2,3],[4]]. Good.\n\nThat's the fix. Return only the code block.</think>```python\ndef chunk(items, size):\n    return [items[i:i + size] for i in range(0, len(items), size)]\n```",
+    "response_tokens": 360,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 4234.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "efb8f147f4d307b3f3f46c8d8c43e2cc30e47e3a4ad303cfaa4f162b5e545d64",
+  "sample_id": "chunk_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

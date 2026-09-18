@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "fd5d5a5ea5184b0c9660f4a78bd358f8c8b737027e25ecf8b5f6471c0cf312ee",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2288.113,
+    "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: date_label accepts a year, month and day as integers and returns the ISO-style label 'YYYY-MM-DD' with the year as four digits and month and day each as two digits (zero padded).\n\nRequired signature: def date_label(year, month, day):",
+    "prompt_tokens": 104,
+    "response": "The task is to write a Python function `date_label(year, month, day)` that returns an ISO-style date string 'YYYY-MM-DD' with the year as four digits and month/day as two digits, zero-padded.\n\nThe simplest approach is to use an f-string with format specifiers:\n\n```python\ndef date_label(year, month, day):\n    return f\"{year:04d}-{month:02d}-{day:02d}\"\n```\n\nThis handles:\n- Year as four digits: `{year:04d}` \u2014 zero-pads to 4 digits. If year is e.g. 2024, gives \"2024\". If year is 987, gives \"0987\". If year is 12345, gives \"12345\" (5 digits, but that's an edge case beyond spec).\n- Month as two digits: `{month:02d}` \u2014 e.g., 3 \u2192 \"03\".\n- Day as two digits: `{day:02d}` \u2014 e.g., 7 \u2192 \"07\".\n\nAlternative approaches:\n- `'%04d-%02d-%02d' % (year, month, day)`\n- `'{:04d}-{:02d}-{:02d}'.format(year, month, day)`\n- Using `str(year).zfill(4)` etc.\n- Using `datetime.date(year, month, day).isoformat()` \u2014 but this would raise ValueError for invalid dates, and the spec doesn't say to validate, so the f-string approach is safer and simpler.\n\nThe f-string approach is clean and meets the specification exactly. The spec says \"Return ONLY the complete function inside a single ```python code block, with no other text.\" So I should return just the code block.\n\nLet me write the final answer:\n\n```python\ndef date_label(year, month, day):\n    return f\"{year:04d}-{month:02d}-{day:02d}\"\n```\n\nThat's it. Simple, exact, meets the signature.</think>```python\ndef date_label(year, month, day):\n    return f\"{year:04d}-{month:02d}-{day:02d}\"\n```",
+    "response_tokens": 444,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "control",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 4844.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "d9569633f444c9e431e5aa54a20bed0935aa383a77e547a8cf70c27f737d69cc",
+  "sample_id": "date_label_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

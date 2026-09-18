@@ -240,6 +240,62 @@ def test_reasoning_model_empty_content_uses_thinking(spec):
     assert record.response == "the answer is 4"
 
 
+def test_teacher_transport_live_loopback_health_and_chat(spec):
+    """REAL defect fix (GLM-5.3-Flash pilot, 2026-09-18): the teacher's
+    transport methods lazily imported ``asea.modules.real.ollama`` with a
+    THREE-dot relative import, which escapes the top-level package and
+    raises ImportError at CALL time -- every prior teacher test exercised
+    only behavioural_record, so nothing executed the import until the first
+    live remote run crashed. This MECHANISM test drives the ACTUAL
+    health()/chat() transport against a loopback socket server: no network,
+    no model, but the lazy imports really execute."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    from asea.capability_build.teacher import BehaviouralOllamaTeacher
+
+    class Handler(BaseHTTPRequestHandler):
+        def _json(self, payload):
+            body = json.dumps(payload).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            self._json({"models": [{"name": "glm-5.3-flash:cloud"}]})
+
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            self._json({
+                "message": {"content": "loopback"},
+                "prompt_eval_count": 1,
+                "eval_count": 1,
+                "total_duration": 1_000_000,
+            })
+
+        def log_message(self, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        teacher = BehaviouralOllamaTeacher(
+            spec, "glm-5.3-flash:cloud", allow_remote=True,
+            host="http://127.0.0.1:%d" % server.server_address[1],
+        )
+        health = teacher.health()  # ImportError here before the fix
+        assert health["model_present"] is True
+        assert health["model"] == "glm-5.3-flash:cloud"
+        response = teacher.chat("ping")  # and here
+        assert response["message"]["content"] == "loopback"
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
 # ---------------------------------------------------------------------------
 # Footprint: correlation-only enrichment
 # ---------------------------------------------------------------------------

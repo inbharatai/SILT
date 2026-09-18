@@ -1,0 +1,43 @@
+{
+  "artifact_hashes": {},
+  "artifact_sha256": "1d17f4cf12cb5a20e1583a1c63e2ea6a9eb6c54b80cd0c1af830ab30427c2d25",
+  "capability_id": "python_repo_debugging_v1",
+  "capability_retention": "NOT_MEASURED",
+  "command": "trace",
+  "control_regressions": {},
+  "data_split_hashes": {},
+  "error": null,
+  "evidence_class": "behavioural_remote",
+  "failure_history": [],
+  "gates": {
+    "gate1_status": null,
+    "gate2_status": null,
+    "siltspring_states": {}
+  },
+  "hardware_identity": {},
+  "honesty_note": "Signature is a local HMAC over the report bytes with a workspace-local key. It proves the report was not modified after generation to the holder of that same key. It is NOT a portable attestation, NOT proof of authorship to third parties, and NOT a quality certificate.",
+  "key_fingerprint": "d83edb3218cde8d1",
+  "limitations": [
+    "Implementation success is not model-quality success.",
+    "Failed experiments remain recorded and visible.",
+    "Evidence is behavioural (remote/API): no internal router or expert claims are made."
+  ],
+  "measurements": {},
+  "resources": {
+    "disk_bytes": "NOT_MEASURED",
+    "energy_joules": "NOT_MEASURED",
+    "latency_ms_p50": "NOT_MEASURED",
+    "ram_peak_bytes": "NOT_MEASURED",
+    "tokens_per_second": "NOT_MEASURED",
+    "vram_peak_bytes": "NOT_MEASURED"
+  },
+  "runtime_versions": {},
+  "schema": "silt.capability_receipt.v1",
+  "schema_version": 1,
+  "signature": "fa7386b46ddab7a44def4058f1a96b679f456d6397c33578db103ded1718a80e",
+  "signature_alg": "hmac-sha256-local",
+  "spec_sha256": "1101de73ea9f1ad2ce412626735e9fda8a04c229edecd59514ae7266662fcd9b",
+  "status": "completed",
+  "student": {},
+  "teacher": {}
+}

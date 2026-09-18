@@ -9,6 +9,49 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## GLM-5.3-Flash judged capability pilot + fixes — 2026-09-18
+
+The capability-build layer's first real end-to-end judged pilot
+(`python_repo_debugging_v1`, `experiments/glm53_flash_pilot/`), every stage a
+real command: frozen five-split dataset (final split never opened), 16
+behavioural teacher traces from the operator-consented `glm-5.3-flash:cloud`
+connector, host-oracle judgment of BOTH teacher and local student
+(`qwen2.5:0.5b`) through the real Linux code sandbox on identical checks
+(teacher 0.8649 vs student 0.4595 target-check pass rate — a measurement of
+this case set only, never a model-quality claim), sequence-level distillation
+of the 6 judged training traces into KD pairs bound byte-exactly to the frozen
+dataset with the DeepApply handoff descriptor (no auto-activation, no
+training run — retention stays `NOT_MEASURED`), a REAL SiltSpring compression
+proof on `Qwen/Qwen2.5-0.5B-Instruct` (real per-layer int8/int4/int2
+quantization; per-skill certificates with genuine revocations; weights
+verified read-only by dtype-exact sha256 before/after; the int4
+negative-degradation anomaly investigated and explained, never claimed as an
+improvement), and a signed + verified run receipt. Full record in
+`docs/CAPABILITY_BUILD.md`.
+
+### Fixed
+- **`teacher.py`'s lazy transport import escaped the top-level package.**
+  `from ...modules.real.ollama import ...` raises `ImportError` at call time;
+  the unit tests mock the transport, so only a real network run caught it
+  (the pilot's first teacher run failed with exactly this). Fixed to the
+  correct two-dot form and covered by a live-loopback regression test that
+  starts a real HTTP server and exercises `health` + `chat` through the real
+  transport (verified to fail on the previous code).
+- **CI `test_kernel_cpu_limit_not_bandwidth_claim` raced host load.** The
+  4-second wall safety window can expire before the child accumulates its
+  1-CPU-second RLIMIT_CPU on a contended runner, reporting TIMEOUT instead of
+  RESOURCE_LIMIT (py3.12 job, run 35359937603). The window is now 30s and the
+  fixture's own finite fallback 20s; the kernel-limit assertions are
+  unchanged, so the test still measures the limit, not the host's load.
+
+### Added
+- `experiments/glm53_flash_pilot/`: spec, 19-case/54-check authored case set
+  with authoring self-check, trace/judge/distill/compression-proof/receipt
+  driver scripts, teacher and student oracle-judged verdicts, compression
+  proof with the anomaly investigation, and the signed pilot receipt.
+- `data/capability_v1/`: the frozen five-split dataset with manifest and
+  selection-lock (final split untouched).
+
 ## Capability-build review fixes, round 2 — 2026-09-18
 
 A second external review pass over the round-1 fixes found five further

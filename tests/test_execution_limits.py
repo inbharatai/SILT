@@ -188,7 +188,14 @@ def test_monotonic_deadline_and_actual_returncode():
 
 @linux
 def test_kernel_cpu_limit_not_bandwidth_claim():
-    result = _run_test_child("cpu", timeout=4, cpu_seconds=1)
+    # The wall deadline is only the supervisor's safety net; the assertion
+    # under test is that the KERNEL RLIMIT_CPU fires (SIGXCPU) on CPU-time,
+    # not on wall-clock bandwidth. A tight 4s window made a contended CI
+    # runner (child scheduled under ~25% of a core) reach the wall deadline
+    # first and report TIMEOUT -- measuring host load, not the limit
+    # (CI failure 2026-09-18, run 35359937603). 30s still bounds the
+    # broken-limit failure path: the fixture self-ends after 20 wall seconds.
+    result = _run_test_child("cpu", timeout=30, cpu_seconds=1)
     assert result["status"] == "RESOURCE_LIMIT", result
     assert result["returncode"] == -signal.SIGXCPU
     assert result["resource_cause"] == "kernel_SIGXCPU"

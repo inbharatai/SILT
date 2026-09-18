@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "eeb9da925547745296009307421f178bd9adcb9f55fd726af7cbe42f0ec59e74",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 963.944,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: flatten accepts a list whose elements are integers or arbitrarily nested lists of integers, and returns a flat list of the integers in left-to-right order. Empty nested lists contribute nothing. Non-list scalars are kept as-is.\n\n```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(item)\n        else:\n            result.append(item)\n    return result\n```",
+    "prompt_tokens": 144,
+    "response": "The bug: when item is a list, it extends with the item directly, but the item may be nested arbitrarily. Need to recursively flatten.\n\nFix:\n\n```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(flatten(item))\n        else:\n            result.append(item)\n    return result\n```\n\nThat handles arbitrary nesting. Empty nested lists contribute nothing \u2014 flatten([]) returns [], extend with [] adds nothing. Good.\n\nReturn only the code block.</think>```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(flatten(item))\n        else:\n            result.append(item)\n    return result\n```",
+    "response_tokens": 152,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 3344.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "fae78700d8892cddae98e2aafa79f091d58f3e1ac76959af01afc7b5adf9ee33",
+  "sample_id": "flatten_recursive_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

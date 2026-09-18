@@ -217,6 +217,77 @@ Ollama cloud connector (`glm-5.3-flash:cloud`, remote consent given per run):
   certificate, not a quality claim about GLM-5.3-Flash in general, and
   involves no student at all.
 
+## Judged capability pilot (recorded 2026-09-18; real end-to-end)
+
+The full measured chain, every stage a real command in this repository tree
+(`experiments/glm53_flash_pilot/`; evidence committed alongside):
+
+* **Spec + frozen dataset.** `python_repo_debugging_v1` spec pinned to the
+  exact teacher revision; 19 authored cases / 54 oracle checks across five
+  splits (training 6, development 3, heldout 3, final 3, controls 4), CC0,
+  self-verified before any model ran (`authoring_selfcheck.py`: every seeded
+  bug is real — the buggy function fails ≥1 check — and every check set is
+  satisfiable by a reference implementation, args-arity asserted). Built
+  with `dataset build` into `data/capability_v1/` with selection-lock frozen
+  before model generation. **The final split was never traced, never judged,
+  never used — `final_opened` stays false for this pilot.**
+* **Teacher traces.** 16 non-final cases asked of `glm-5.3-flash:cloud`
+  (per-run `--allow-remote` consent), stored UNJUDGED by design; behavioural
+  footprint built with zero internal-component claims.
+* **Host-oracle judgment (both models, identical checks).** Judged through
+  the real Linux code sandbox (`silt-capability evaluate` in WSL; the sandbox
+  fails closed on native Windows). Strict deterministic extraction: last
+  fenced ```python block, else the whole response when it is itself a
+  def-containing source, else `no_code_block` failure — never repaired,
+  never re-asked. Measured check pass rates:
+
+  | Split (target checks) | teacher `glm-5.3-flash:cloud` | student `qwen2.5:0.5b` |
+  |---|---|---|
+  | training | 1.0000 (19/19) | 0.5263 |
+  | development | 0.7778 | 0.4444 |
+  | heldout | 0.6667 | 0.3333 |
+  | controls (utility writing) | 1.0000 | 0.7500 |
+
+  Two genuine teacher failures stayed visible: `capitalize_words_v1`
+  answered in reasoning prose with no code block (0/3), and `rotate_list_v1`
+  returned the same buggy left-rotation (1/3). The measured gap on
+  identical target checks is 0.8649 − 0.4595 = **0.4054** — a measurement of
+  this case set only, not a quality claim about any model.
+* **Distill.** The 6 judged training-split traces (all success) became
+  sequence-level KD pairs — 6 positives, 0 negatives — bound byte-exactly to
+  the frozen dataset, protected splits enforced, DeepApply handoff descriptor
+  emitted (`autoactivated: false`; Gate 2 is the intake; the trainer never
+  certifies itself). No DeepApply training was run, so capability retention
+  is `NOT_MEASURED`.
+* **SiltSpring compression proof (REAL).** `certify_hf_states` — real
+  per-layer int8/int4/int2 quantization, one layer resident at a time,
+  full-precision re-expand on exit — on `Qwen/Qwen2.5-0.5B-Instruct`
+  (`7ae5576…`, 494M parameters; the base-0.5B snapshot in the shared cache
+  has no weight files), with certification suites built from the pilot's own
+  heldout / development / controls prompts (final never touched):
+  int8 packed 359,325,696 bytes (certified development; **revoked** heldout
+  and control at 2.1–4.3% loss degradation), int4 180,412,416 (all three
+  certified), int2 90,955,776 (all revoked, 117–148%). Weights proved
+  read-only: sha256 over every decoder-layer tensor before certification
+  equals after, byte-exact. **The int4 negative degradation was investigated
+  before any claim** (`diag_quant.py`): the in-place round-trip path with no
+  streamer reproduces the streamed losses to 4 decimals, so it is a real
+  property of loss-as-proxy on template-less prompts (coarse int4 zeroes
+  ~25% of layer weights), not a pipeline defect — and it is exactly why the
+  oracle, not suite loss, is SILT's truth signal. No "compression improves
+  the model" claim is made anywhere.
+* **Receipt.** Signed and stored through the real CLI (`receipt` +
+  `receipt-verify`): valid HMAC, unmeasured fields materialised as
+  `NOT_MEASURED`, failure history visible. Local tamper-evidence only — not a
+  portable attestation and not a quality certificate.
+* **A real run caught a real production bug.** `teacher.py`'s lazy import
+  used three dots (`from ...modules.real.ollama`), which escapes the
+  top-level package and raises `ImportError` at CALL time — the unit tests
+  mock the transport, so only this real network run exposed it. Fixed to two
+  dots with a live-loopback regression test that starts a real HTTP server
+  and exercises health + chat through the real transport (verified to fail
+  on the old code).
+
 The open-weight teacher path on this laptop reports `BLOCKED_RESOURCE`
 honestly: the worker's memory preflight cannot admit a ~320B-parameter teacher
 on this hardware, and no worker RUN has been executed here — both are the

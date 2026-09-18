@@ -1,0 +1,424 @@
+{
+  "capability_id": "python_repo_debugging_v1",
+  "cases": [
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 4401.713,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: binary_search accepts a list sorted ascending and a target, and returns the INDEX of the first occurrence of the target if present, or -1 if absent. Never raises.\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n```",
+        "prompt_tokens": 164,
+        "response": "Let me analyze the given function against the specification.\n\nSpecification: binary_search accepts a list sorted ascending and a target, and returns the INDEX of the first occurrence of the target if present, or -1 if absent. Never raises.\n\nThe given function:\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n```\n\nBugs:\n1. Empty list: `lo = 0`, `hi = -1`, loop doesn't run, returns `lo = 0`. But for an empty list, the target is absent, so it should return -1. Currently returns 0 \u2014 wrong.\n2. Target absent: The function returns `lo` which is the insertion point (leftmost position where target could be inserted), not -1. E.g., items = [1, 3, 5], target = 2: lo ends at 1 (index of 3), returns 1 \u2014 wrong, should return -1.\n3. Target present: The loop finds the leftmost index where items[lo] >= target. If target present, lo is the first occurrence \u2014 that part is correct. But wait, need to check: with `hi = len(items) - 1` and loop `while lo < hi`, does it correctly find the first occurrence?\n\nLet's trace: items = [1, 2, 2, 3], target = 2. lo=0, hi=3. mid=1, items[1]=2, not < 2, so hi=1. lo=0, hi=1: mid=0, items[0]=1 < 2, lo=1. Now lo == hi == 1, loop ends. Return 1. Correct \u2014 first occurrence of 2 is at index 1.\n\nitems = [2, 2], target = 2: lo=0, hi=1. mid=0, items[0]=2 not < 2, hi=0. lo==hi==0, return 0. Correct.\n\nitems = [2], target = 2: lo=0, hi=0, loop doesn't run, return 0. Correct.\n\nitems = [1], target = 2: lo=0, hi=0, loop doesn't run, return 0. Wrong \u2014 should be -1.\n\nitems = [3], target = 2: return 0. Wrong \u2014 should be -1.\n\nSo the fix: after the loop, check if lo is within bounds and items[lo] == target; return lo if so, else -1. Also handle empty list (lo=0, hi=-1; items[0] would raise IndexError \u2014 \"Never raises\" requirement).\n\nFixed version:\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo < len(items) and items[lo] == target:\n        return lo\n    return -1\n```\n\nWait \u2014 but there's a subtlety. With `hi = len(items) - 1` and the loop condition `lo < hi`, the search space is [lo, hi]. When the loop ends, lo == hi. But does lo correctly point to the leftmost occurrence or the insertion point?\n\nStandard leftmost binary search: lo=0, hi=len(items) (exclusive). While lo < hi: mid=(lo+hi)//2; if items[mid] < target: lo = mid+1 else hi = mid. Result: lo is the leftmost index where items[lo] >= target (or len(items) if all < target).\n\nWith hi = len(items) - 1 (inclusive), the loop `while lo < hi` never examines the case where lo == len(items) - 1... Let me think. Actually with inclusive hi and condition lo < hi, when lo == hi the loop stops. The invariant: all indices < lo have items < target; all indices > hi have items >= target. When lo == hi, that index is the first index with items[index] >= target, provided such index exists within [0, len-1]. If all items < target, then lo would converge to... let's check: items = [1, 2], target = 3. lo=0, hi=1. mid=0, items[0]=1 < 3, lo=1. lo==hi==1, stop. Return 1. But items[",
+        "response_tokens": 1024,
+        "tool_calls": []
+      },
+      "candidate_sha256": "d2e7a3afe66e77ea6fcbba0463b046a9d2da99aff9f2502eef69d5640b40a982",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "absent": true,
+        "present": true,
+        "singleton": true
+      },
+      "sample_id": "binary_search_v1",
+      "split": "heldout",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 5819.777,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: capitalize_words accepts a string of single-space-separated words and returns the same string with the FIRST letter of every word uppercased, leaving all other characters of every word unchanged. A word with no letters is left alone.\n\n```python\ndef capitalize_words(text):\n    words = text.split(' ')\n    out = []\n    for w in words:\n        out.append(w.upper() if w else w)\n    return ' '.join(out)\n```",
+        "prompt_tokens": 145,
+        "response": "The bug: `w.upper()` uppercases the entire word, but the spec says only the FIRST letter of every word should be uppercased, leaving all other characters unchanged.\n\nFix: use `w[:1].upper() + w[1:]` \u2014 but careful: if the first character is not a letter, `.upper()` leaves it unchanged, which is fine. Also, \"A word with no letters is left alone\" \u2014 using `w[:1].upper() + w[1:]` handles that naturally since upper() on non-letters is a no-op.\n\nWait, but there's a subtlety: what about a word like \"3abc\"? The first letter... spec says \"FIRST letter of every word uppercased\". Hmm, does \"first letter\" mean the first character, or the first alphabetic character? Let's read: \"returns the same string with the FIRST letter of every word uppercased, leaving all other characters of every word unchanged. A word with no letters is left alone.\"\n\nHmm, \"A word with no letters is left alone\" \u2014 this suggests that if a word has no letters, nothing changes. If a word has letters, the first letter is uppercased. The question is whether \"first letter\" means the first character if it's a letter, or the first alphabetic character in the word.\n\nConsider \"3abc\" \u2014 the first letter is 'a'. Should it become \"3Abc\"? Or should it stay \"3abc\" because the first character isn't a letter?\n\nThe typical interpretation of such a spec (like str.capitalize vs title-like behavior)... Actually, Python's `str.capitalize()` uppercases the first character and lowercases the rest. The spec says \"leaving all other characters of every word unchanged\" \u2014 so we shouldn't lowercase the rest.\n\nThe phrase \"A word with no letters is left alone\" is a hint about edge cases like \"\" or \"123\" or \"!!!\". For a word like \"123\", there are no letters, so it stays \"123\". With `w[:1].upper() + w[1:]`, \"123\" stays \"123\" since '1'.upper() == '1'. Good.\n\nFor \"3abc\": with `w[:1].upper() + w[1:]`, it stays \"3abc\". Is that correct per spec? The spec says \"the FIRST letter of every word uppercased\". If we interpret \"first letter\" strictly as the first alphabetic character, then \"3abc\" \u2192 \"3Abc\". Hmm.\n\nThis is ambiguous. Let me think about what the intended fix is. The original buggy code uses `w.upper()` which uppercases everything. The minimal fix that meets the spec: uppercase only the first character. The common idiom is `w.capitalize()` but that lowercases the rest, violating \"leaving all other characters of every word unchanged\". E.g., \"hELLO\" \u2192 capitalize gives \"Hello\" but spec wants \"HELLO\" (first letter uppercased, rest unchanged: 'H' + 'ELLO' = \"HELLO\").\n\nSo the fix: `w[:1].upper() + w[1:]`.\n\nNow, about \"first letter\": I think the intended reading is the first character of the word, and the note \"A word with no letters is left alone\" covers words like \"123\" or \"\" \u2014 with `w[:1].upper() + w[1:]`, those are naturally left alone. Actually wait \u2014 for a word like \"123\", the first character is '1', which has no uppercase, so it's left alone. That satisfies \"a word with no letters is left alone\".\n\nBut what about \"3abc\"? It has letters. If the spec intends the first letter (alphabetic) to be uppercased, then \"3Abc\". Hmm. The phrase \"A word with no letters is left alone\" specifically addresses words with NO letters. It doesn't say anything about words where the first character isn't a letter. This suggests the spec writer considered the case where uppercasing the first character does nothing (no letters at all). If they intended \"first alphabetic character\", they'd probably say \"the first letter in the word\" or handle \"3abc\" explicitly.\n\nActually, let me reconsider. \"the FIRST letter of every word uppercased\" \u2014 the emphasis on FIRST suggests first character. And \"A word with no letters is left alone\" clarifies that for words like \"123\" or symbols, nothing happens (which naturally follows from upper() being a no-op on non-letters, but the spec makes it explicit).\n\nHmm, but there's another possible interpretation issue: maybe the spec intends that if the first character is not a letter, the word is left alone entirely? Like \"3abc\" stays \"3abc\"? That's what `w[:1].upper() + w[1:]` does anyway (since '3'.upper() == '3', the rest unchanged). So both",
+        "response_tokens": 1024,
+        "tool_calls": []
+      },
+      "candidate_sha256": null,
+      "extraction": "no_code_block",
+      "group": "target",
+      "oracle_status": "no_candidate",
+      "passed": 0,
+      "per_check": {},
+      "sample_id": "capitalize_words_v1",
+      "split": "heldout",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 1709.568,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: chunk accepts a list and a positive size, and splits the list into consecutive groups of exactly `size` elements, except that the LAST group may be shorter. No element is ever dropped. An empty list yields an empty result.\n\n```python\ndef chunk(items, size):\n    end = len(items) // size * size\n    return [items[i:i + size] for i in range(0, end, size)]\n```",
+        "prompt_tokens": 145,
+        "response": "Let me analyze the buggy function:\n\n```python\ndef chunk(items, size):\n    end = len(items) // size * size\n    return [items[i:i + size] for i in range(0, end, size)]\n```\n\nThe specification: chunk accepts a list and a positive size, and splits the list into consecutive groups of exactly `size` elements, except that the LAST group may be shorter. No element is ever dropped. An empty list yields an empty result.\n\nThe bug: `end = len(items) // size * size` truncates to a multiple of size, so the last partial group is dropped. For example, `chunk([1,2,3,4,5], 2)` gives `[[1,2],[3,4]]` \u2014 dropping 5.\n\nFix: iterate over the full length:\n\n```python\ndef chunk(items, size):\n    return [items[i:i + size] for i in range(0, len(items), size)]\n```\n\nCheck: empty list \u2192 range(0, 0, size) \u2192 empty \u2192 []. Good.\n`chunk([1,2,3,4,5], 2)` \u2192 i=0: [1,2], i=2: [3,4], i=4: [5]. Good.\n`chunk([1,2,3], 3)` \u2192 [[1,2,3]]. Good.\n`chunk([1,2,3,4], 3)` \u2192 [[1,2,3],[4]]. Good.\n\nThat's the fix. Return only the code block.</think>```python\ndef chunk(items, size):\n    return [items[i:i + size] for i in range(0, len(items), size)]\n```",
+        "response_tokens": 360,
+        "tool_calls": []
+      },
+      "candidate_sha256": "4962d4fbdad6b5565a03e8515999438ef1e19f8b19ef79e07dec3506109d4417",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "empty": true,
+        "exact": true,
+        "remainder": true
+      },
+      "sample_id": "chunk_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 496.363,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: count_words accepts a string and returns the number of words, where a word is a maximal run of non-whitespace characters. Any whitespace (spaces, tabs, newlines) separates words, and leading or trailing whitespace is ignored. A blank string yields 0.\n\n```python\ndef count_words(text):\n    return len(text.split(' '))\n```",
+        "prompt_tokens": 127,
+        "response": "The bug: `text.split(' ')` splits only on single spaces, so tabs, newlines, and multiple consecutive spaces produce empty strings that get counted as words. The fix: use `text.split()` with no arguments, which splits on any whitespace and discards empty strings. Blank string yields 0 since `''.split()` returns `[]`.</think>```python\ndef count_words(text):\n    return len(text.split())\n```",
+        "response_tokens": 88,
+        "tool_calls": []
+      },
+      "candidate_sha256": "c0c79466dd66b8cc313dca00662e388e1be4f5620ffcc426914e694d7396838e",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "blank": true,
+        "double_space": true,
+        "simple": true
+      },
+      "sample_id": "count_words_v1",
+      "split": "development",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2288.113,
+        "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: date_label accepts a year, month and day as integers and returns the ISO-style label 'YYYY-MM-DD' with the year as four digits and month and day each as two digits (zero padded).\n\nRequired signature: def date_label(year, month, day):",
+        "prompt_tokens": 104,
+        "response": "The task is to write a Python function `date_label(year, month, day)` that returns an ISO-style date string 'YYYY-MM-DD' with the year as four digits and month/day as two digits, zero-padded.\n\nThe simplest approach is to use an f-string with format specifiers:\n\n```python\ndef date_label(year, month, day):\n    return f\"{year:04d}-{month:02d}-{day:02d}\"\n```\n\nThis handles:\n- Year as four digits: `{year:04d}` \u2014 zero-pads to 4 digits. If year is e.g. 2024, gives \"2024\". If year is 987, gives \"0987\". If year is 12345, gives \"12345\" (5 digits, but that's an edge case beyond spec).\n- Month as two digits: `{month:02d}` \u2014 e.g., 3 \u2192 \"03\".\n- Day as two digits: `{day:02d}` \u2014 e.g., 7 \u2192 \"07\".\n\nAlternative approaches:\n- `'%04d-%02d-%02d' % (year, month, day)`\n- `'{:04d}-{:02d}-{:02d}'.format(year, month, day)`\n- Using `str(year).zfill(4)` etc.\n- Using `datetime.date(year, month, day).isoformat()` \u2014 but this would raise ValueError for invalid dates, and the spec doesn't say to validate, so the f-string approach is safer and simpler.\n\nThe f-string approach is clean and meets the specification exactly. The spec says \"Return ONLY the complete function inside a single ```python code block, with no other text.\" So I should return just the code block.\n\nLet me write the final answer:\n\n```python\ndef date_label(year, month, day):\n    return f\"{year:04d}-{month:02d}-{day:02d}\"\n```\n\nThat's it. Simple, exact, meets the signature.</think>```python\ndef date_label(year, month, day):\n    return f\"{year:04d}-{month:02d}-{day:02d}\"\n```",
+        "response_tokens": 444,
+        "tool_calls": []
+      },
+      "candidate_sha256": "94b59f043859d9cd2f323e4d5f7b6725b681347bcbdefccc87abedc9ea14a860",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "double_digit": true,
+        "padded": true
+      },
+      "sample_id": "date_label_v1",
+      "split": "controls",
+      "total": 2
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 5770.13,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: dedupe accepts a list and returns a new list with duplicate elements removed, keeping the FIRST occurrence of each element and preserving the original relative order. The input list must not be mutated.\n\n```python\ndef dedupe(items):\n    return list(set(items))\n```",
+        "prompt_tokens": 110,
+        "response": "The task: fix the `dedupe` function so it removes duplicates keeping first occurrence and preserving order, without mutating input.\n\nThe buggy version `list(set(items))` loses order (sets are unordered) and also can't handle unhashable items potentially. The specification says \"accepts a list\" \u2014 elements could be unhashable? The spec says \"duplicate elements removed, keeping the FIRST occurrence of each element and preserving the original relative order.\" To be safe, handle unhashable elements too? The typical fix is:\n\n```python\ndef dedupe(items):\n    seen = set()\n    result = []\n    for item in items:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n    return result\n```\n\nBut if items may be unhashable (like lists), `seen` set would fail. A more robust approach uses a list for seen, but that's O(n\u00b2). The spec doesn't mention unhashable elements. However, to \"meet its specification exactly,\" the safest is to handle both hashable and unhashable. But typically the expected answer is the seen-set approach. Let me consider: the original bug is order loss. The fix: preserve order. Using a set for seen is standard. But if the test includes unhashable items like `[1, [2, 3], [2, 3]]`, the set approach fails. To be safe, I could use a fallback:\n\n```python\ndef dedupe(items):\n    seen = set()\n    seen_unhashable = []\n    result = []\n    for item in items:\n        try:\n            if item not in seen:\n                seen.add(item)\n                result.append(item)\n        except TypeError:\n            if item not in seen_unhashable:\n                seen_unhashable.append(item)\n                result.append(item)\n    return result\n```\n\nHmm, but that adds complexity. The spec says \"accepts a list\" \u2014 a list of anything. Equality-based dedup should work for unhashable too. But typical exercise expects the simple seen-set solution. The instruction: \"Fix it so it meets its specification exactly.\" The specification: dedupe accepts a list and returns a new list with duplicate elements removed, keeping FIRST occurrence, preserving order, input not mutated.\n\nI think the robust version handling unhashable is safer for hidden tests. But it might be overkill. Many test suites for this kind of problem test with hashable items only. However, handling unhashable gracefully doesn't break hashable cases. Let me write the robust version but keep it clean.\n\nActually, a simpler robust approach: use a list for seen with `in` check \u2014 O(n\u00b2) but correct for all. For typical test sizes, fine. But performance could matter for large lists. The try/except hybrid is best.\n\nLet me write:\n\n```python\ndef dedupe(items):\n    seen = set()\n    result = []\n    for item in items:\n        try:\n            if item not in seen:\n                seen.add(item)\n                result.append(item)\n        except TypeError:\n            if item not in result:\n                result.append(item)\n    return result\n```\n\nWait \u2014 in the except branch, checking `item not in result` works since result contains first occurrences; but if item is unhashable, it was never added to seen, so checking result is fine. However, there's a subtle issue: `item not in seen` for unhashable item raises TypeError before adding \u2014 good, caught. But what if item is hashable and `in` works \u2014 fine.\n\nEdge: mixed hashable/unhashable duplicates \u2014 e.g., `[1, [2], [2], 1]` \u2192 `[1, [2]]`. Works.\n\nAlso, equality quirks: `1 == 1.0 == True` \u2014 set treats them as same; that's consistent with `==` semantics, fine.\n\nThe input not mutated \u2014 we don't mutate. Good.\n\nReturn only the code block. I'll go with the robust version. Actually, let me reconsider simplicity vs robustness. The prompt says \"meets its specification exactly\" \u2014 the spec doesn't restrict element types, so handling unhashable is more correct. I'll include the try/except.\n\nOne more consideration: `item not in seen` where item is unhashable raises TypeError \u2014 yes, `in` on a set with unhashable key raises TypeError. Good.\n\nFinal answer:\n\n```python\ndef dedupe(items):\n    seen = set()\n    result = []\n    for item in items:\n        try:\n            if item not in seen:\n                seen.add(item)\n                result.append(item)\n        except TypeError:\n            # Unhashable element: fall back to equality check on result\n            if item not in result:\n                result.append(item)\n    return result\n```\n\nComments are fine inside the code block. Return only the code block.</think>```python\ndef dedupe(items):\n    seen = set()",
+        "response_tokens": 1024,
+        "tool_calls": []
+      },
+      "candidate_sha256": "1b8c69d1f381386b84abbd75293e9d4fb3eb5fb7ff461005ba51f3eda806884c",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "all_same": true,
+        "empty": true,
+        "order_kept": true
+      },
+      "sample_id": "dedupe_stable_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 963.944,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: flatten accepts a list whose elements are integers or arbitrarily nested lists of integers, and returns a flat list of the integers in left-to-right order. Empty nested lists contribute nothing. Non-list scalars are kept as-is.\n\n```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(item)\n        else:\n            result.append(item)\n    return result\n```",
+        "prompt_tokens": 144,
+        "response": "The bug: when item is a list, it extends with the item directly, but the item may be nested arbitrarily. Need to recursively flatten.\n\nFix:\n\n```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(flatten(item))\n        else:\n            result.append(item)\n    return result\n```\n\nThat handles arbitrary nesting. Empty nested lists contribute nothing \u2014 flatten([]) returns [], extend with [] adds nothing. Good.\n\nReturn only the code block.</think>```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(flatten(item))\n        else:\n            result.append(item)\n    return result\n```",
+        "response_tokens": 152,
+        "tool_calls": []
+      },
+      "candidate_sha256": "0863cb551106c30bae491e3a647fc7c5206f134f9a9ded5db3cd77e3e50d40d9",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 4,
+      "per_check": {
+        "already_flat": true,
+        "deep_nesting": true,
+        "empty": true,
+        "nested_empty": true
+      },
+      "sample_id": "flatten_recursive_v1",
+      "split": "training",
+      "total": 4
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 584.476,
+        "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: greeting accepts a non-empty name string and a one-character punctuation string, and returns exactly 'Hello, ' followed by the name followed by the punctuation, with no extra spaces.\n\nRequired signature: def greeting(name, punct):",
+        "prompt_tokens": 96,
+        "response": "The user wants a Python function called `greeting` that takes a `name` (non-empty string) and `punct` (one-character punctuation string), and returns 'Hello, ' + name + punct.\n\nSimple string concatenation:\n\n```python\ndef greeting(name, punct):\n    return 'Hello, ' + name + punct\n```\n\nThat's it. Return only the code block.```python\ndef greeting(name, punct):\n    return 'Hello, ' + name + punct\n```",
+        "response_tokens": 104,
+        "tool_calls": []
+      },
+      "candidate_sha256": "0901701b792824ab70ddf0534a7130d19e0d4f4a8d49dd106fa36a8cef920ace",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "exclaim": true,
+        "question": true
+      },
+      "sample_id": "greeting_format_v1",
+      "split": "controls",
+      "total": 2
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 720.4,
+        "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: initials accepts a non-empty name of one or more whitespace-separated words, and returns the first letter of each word uppercased, joined with periods, with a trailing period.\n\nRequired signature: def initials(full_name):",
+        "prompt_tokens": 94,
+        "response": "The task: write a function `initials(full_name)` that takes a non-empty name of one or more whitespace-separated words, and returns the first letter of each word uppercased, joined with periods, with a trailing period.\n\nExample: \"john ronald reuel tolkien\" -> \"J.R.R.T.\"\n\nImplementation:\n\n```python\ndef initials(full_name):\n    return \".\".join(word[0].upper() for word in full_name.split()) + \".\"\n```\n\nThat handles whitespace-separated words (split() handles multiple spaces, tabs, etc.). Each word's first character uppercased, joined with periods, plus trailing period.\n\nEdge cases: words might have leading punctuation? Spec says just first letter of each word. Using word[0] is fine.\n\nReturn only the code block.</think>```python\ndef initials(full_name):\n    return \".\".join(word[0].upper() for word in full_name.split()) + \".\"\n```",
+        "response_tokens": 194,
+        "tool_calls": []
+      },
+      "candidate_sha256": "923614eaa8eb4b363d290750d1e9065b939f3fb7855f71ca8632e8a6605b5bea",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "one_name": true,
+        "two_names": true
+      },
+      "sample_id": "initials_v1",
+      "split": "controls",
+      "total": 2
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2173.431,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: median_odd accepts a non-empty list of integers with an ODD number of elements, sorts it ascending, and returns the middle element. The input list must not be mutated.\n\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return numbers[n // 2]\n```",
+        "prompt_tokens": 116,
+        "response": "Let me analyze the bug in this function.\n\nThe specification says:\n1. `median_odd` accepts a non-empty list of integers with an ODD number of elements\n2. Sorts it ascending\n3. Returns the middle element\n4. The input list must not be mutated\n\nThe current implementation:\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return numbers[n // 2]\n```\n\nThe bug: The function doesn't sort the list before returning the middle element. It just returns the element at index `n // 2` of the original (unsorted) list.\n\nFor example, `median_odd([3, 1, 2])` should return `2` (sorted: [1, 2, 3], middle is 2), but the current implementation returns `1` (the element at index 1 of [3, 1, 2]).\n\nAlso, the specification says the input list must not be mutated. So I should use `sorted()` instead of `.sort()` to avoid mutating the input.\n\nThe fix:\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return sorted(numbers)[n // 2]\n```\n\nThis:\n1. Sorts the list ascending using `sorted()` (which creates a new list, so the input is not mutated)\n2. Returns the middle element at index `n // 2` (for odd n, this is the correct middle index: e.g., n=5, n//2=2, which is the middle of indices 0-4)\n\nLet me verify with an example:\n- `median_odd([3, 1, 2])`: sorted is [1, 2, 3], n=3, n//2=1, returns 2. Correct.\n- `median_odd([5, 2, 8, 1, 9])`: sorted is [1, 2, 5, 8, 9], n=5, n//2=2, returns 5. Correct.\n- Input list is not mutated since `sorted()` returns a new list.\n\nThe fix is straightforward. Return only the fixed function in a code block.</think>```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return sorted(numbers)[n // 2]\n```",
+        "response_tokens": 483,
+        "tool_calls": []
+      },
+      "candidate_sha256": "f7d8131543ea4c150625b69cf1d15afb0af1a634935724fb368a09beacac4491",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "single": true,
+        "unsorted_five": true,
+        "unsorted_three": true
+      },
+      "sample_id": "median_odd_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 3429.758,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: merge_intervals accepts a non-empty list of [start, end] pairs with start <= end, and merges overlapping or touching intervals: processing in ascending start order, an interval is merged into the previous one when its start is less than or equal to the current merged end, and the merged end is the MAXIMUM of the two ends. Returns a list of merged pairs in ascending order.\n\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = end\n        else:\n            merged.append([start, end])\n    return merged\n```",
+        "prompt_tokens": 196,
+        "response": "Let me analyze the bug in this function.\n\nThe specification says:\n- merge_intervals accepts a non-empty list of [start, end] pairs with start <= end\n- merges overlapping or touching intervals\n- processing in ascending start order, an interval is merged into the previous one when its start is less than or equal to the current merged end\n- the merged end is the MAXIMUM of the two ends\n- Returns a list of merged pairs in ascending order\n\nThe current code:\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = end\n        else:\n            merged.append([start, end])\n    return merged\n```\n\nThe bug: `merged[-1][1] = end` sets the merged end to the new interval's end, but it should be the MAXIMUM of the two ends: `merged[-1][1] = max(merged[-1][1], end)`.\n\nWhy does this matter? Consider intervals like [[1, 10], [2, 3]]. Sorted: [[1, 10], [2, 3]]. First: merged = [[1, 10]]. Second: start=2 <= 10, so merged[-1][1] = 3, giving [[1, 3]]. But the correct answer is [[1, 10]] because the merged end should be max(10, 3) = 10.\n\nSo the fix is:\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], end)\n        else:\n            merged.append([start, end])\n    return merged\n```\n\nAlso, one subtle point: `sorted(intervals)` sorts by start, then by end. The specification says \"processing in ascending start order\". Sorting by (start, end) tuples is fine \u2014 for intervals with the same start, the order between them doesn't affect the result since the max handles it. Actually, let me verify: intervals [[1, 5], [1, 3]]. Sorted: [[1, 3], [1, 5]]. First: merged = [[1, 3]]. Second: start=1 <= 3, merged[-1][1] = max(3, 5) = 5. Result: [[1, 5]]. Correct.\n\nIf sorted the other way: [[1, 5], [1, 3]]. First: merged = [[1, 5]]. Second: start=1 <= 5, merged[-1][1] = max(5, 3) = 5. Result: [[1, 5]]. Same. So sorting by tuple is fine.\n\nAnother subtle point: the input intervals might be tuples or lists. `merged.append([start, end])` creates lists, so `merged[-1][1] = ...` works. If the input contains lists, sorted returns the same list objects, but we append them directly \u2014 wait, no. In the else branch, `merged.append([start, end])` creates a new list from the unpacked values, so we don't mutate the input. Good.\n\nWait, actually there's a potential issue: if the input intervals are lists, `sorted(intervals)` returns a list of the same list objects. But in the else branch, we create a new list `[start, end]`, so we never mutate the original input lists. Good.\n\nAlso, the specification says \"non-empty list\", so we don't need to handle empty input specially. The current code handles empty input by returning [], which is fine anyway.\n\nThe fix is just changing `merged[-1][1] = end` to `merged[-1][1] = max(merged[-1][1], end)`.\n\nLet me also double check the merge condition: \"an interval is merged into the previous one when its start is less than or equal to the current merged end\" \u2014 the code has `if merged and start <= merged[-1][1]`. That matches.\n\n\"Returns a list of merged pairs in ascending order\" \u2014 since we process in ascending start order and only merge (which keeps starts ascending), the result is in ascending order. Good.\n\nFinal answer:\n\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], end)\n        else:\n            merged.append([start, end])\n    return merged\n```\n\nThe instruction says to return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should just output the code block.</think>```python\ndef",
+        "response_tokens": 1024,
+        "tool_calls": []
+      },
+      "candidate_sha256": "6e685d6d49848a776bcd71a63558d43b30ea4b41a2087c9cfc3727f16e056b3d",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "contained": true,
+        "disjoint_unsorted": true,
+        "touching": true
+      },
+      "sample_id": "merge_intervals_v1",
+      "split": "development",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 3160.716,
+        "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: total_cents accepts a list of integer prices in cents and a non-negative integer quantity, and returns the sum of all prices multiplied by the quantity. An empty price list yields 0.\n\nRequired signature: def total_cents(prices, quantity):",
+        "prompt_tokens": 102,
+        "response": "The user wants a simple Python function. Let me analyze the specification:\n\n- Function name: `total_cents`\n- Parameters: `prices` (a list of integer prices in cents) and `quantity` (a non-negative integer)\n- Returns: the sum of all prices multiplied by the quantity\n- Edge case: an empty price list yields 0\n\nSo the logic is:\n1. Sum all prices in the list\n2. Multiply that sum by the quantity\n3. If the list is empty, the sum is 0, and 0 * quantity = 0, which satisfies the empty list requirement naturally.\n\nLet me verify: if prices = [100, 200] and quantity = 3, then sum = 300, and 300 * 3 = 900. That matches \"the sum of all prices multiplied by the quantity.\"\n\nIf prices = [] and quantity = 5, then sum = 0, and 0 * 5 = 0. Correct.\n\nThe implementation is straightforward:\n\n```python\ndef total_cents(prices, quantity):\n    return sum(prices) * quantity\n```\n\nThis handles all cases:\n- Empty list: sum([]) = 0, so 0 * quantity = 0 \u2713\n- Normal case: sum of prices times quantity \u2713\n- quantity = 0: sum * 0 = 0 (which is consistent with the spec \u2014 quantity is non-negative, so 0 is allowed, and multiplying by 0 gives 0)\n\nShould I add type hints? The signature given is `def total_cents(prices, quantity):` \u2014 I should use the exact signature given, so no type hints, no default values.\n\nShould I add a docstring? The instruction says \"Return ONLY the complete function inside a single ```python code block, with no other text.\" A docstring is part of the function, so it's fine to include one, but it's also fine to keep it minimal. I'll include a brief docstring for clarity \u2014 it's still \"only the function.\" Actually, to be safe and minimal, I could just include the function with a short docstring. That's still within the function definition.\n\nLet me write the final answer:\n\n```python\ndef total_cents(prices, quantity):\n    \"\"\"Return the sum of all prices multiplied by the quantity.\n\n    An empty price list yields 0.\n    \"\"\"\n    return sum(prices) * quantity\n```\n\nThat's complete and correct. The user asked for ONLY the code block with no other text, so my response should be just the code block.```python\ndef total_cents(prices, quantity):\n    \"\"\"Return the sum of all prices multiplied by the quantity.\n\n    An empty price list yields 0.\n    \"\"\"\n    return sum(prices) * quantity\n```",
+        "response_tokens": 581,
+        "tool_calls": []
+      },
+      "candidate_sha256": "bfcddf7123d9e7c4b03cb943bb4ef197514dd59bfd34c4678879737412b323fe",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "empty": true,
+        "two_items": true
+      },
+      "sample_id": "price_total_v1",
+      "split": "controls",
+      "total": 2
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 3053.928,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: rotate accepts a non-empty list and a non-negative integer k, and rotates the list to the RIGHT by k positions: the last k elements (modulo the list length) move to the front in their original order, and the rest follow. k may exceed the length. The input list must not be mutated.\n\n```python\ndef rotate(items, k):\n    n = len(items)\n    k = k % n\n    return items[k:] + items[:k]\n```",
+        "prompt_tokens": 153,
+        "response": "Let me analyze the function against the specification.\n\nSpecification: rotate accepts a non-empty list and a non-negative integer k, and rotates the list to the RIGHT by k positions: the last k elements (modulo the list length) move to the front in their original order, and the rest follow. k may exceed the length. The input list must not be mutated.\n\nThe current code:\n```python\ndef rotate(items, k):\n    n = len(items)\n    k = k % n\n    return items[k:] + items[:k]\n```\n\nLet's test: items = [1, 2, 3, 4, 5], k = 2. Right rotation by 2 means the last 2 elements [4, 5] move to the front: [4, 5, 1, 2, 3].\n\nCurrent code: items[2:] + items[:2] = [3, 4, 5] + [1, 2] = [3, 4, 5, 1, 2]. That's a LEFT rotation by 2, not a right rotation. So the bug is that it rotates left instead of right.\n\nTo rotate right by k: the last k elements move to the front. So the result should be items[-k:] + items[:-k] when k > 0, but careful: when k % n == 0, items[-0:] is items[0:] which is the whole list, and items[:-0] is items[:0] which is empty. So items[-0:] + items[:-0] = whole list + empty = whole list. Wait, items[-0:] = items[0:] = full list, items[:-0] = items[:0] = []. So result = full list + [] = full list. That's actually correct! Wait, let me check: if k = 0, right rotation by 0 should return the list unchanged. items[-0:] + items[:-0] = items[0:] + items[:0] = items + [] = items. Hmm, that's actually correct because -0 == 0 in Python.\n\nWait, but let me double check: items[-k:] when k=0 is items[-0:] = items[0:] = full list. items[:-k] = items[:-0] = items[:0] = []. So result = full list. Correct!\n\nBut wait, what if k % n == 0 but k > 0? E.g., n=5, k=5. Then k % n = 0, and same as above, result is the full list. Correct.\n\nHmm, but actually there's a subtlety: items[-k:] with k=0 gives the full list, and items[:-k] gives empty. So the concatenation is full list + empty = full list. That's correct for k=0.\n\nActually wait, let me reconsider. For k=0: right rotation by 0 = original list. items[-0:] + items[:-0] = items + [] = items. Yes correct.\n\nFor k=2, n=5: items[-2:] + items[:-2] = [4,5] + [1,2,3] = [4,5,1,2,3]. Correct!\n\nSo the fix is to change `items[k:] + items[:k]` to `items[-k:] + items[:-k]`. But wait, there's the edge case with k=0 where -k = 0, and slicing behaves differently: items[-0:] = items[0:] (full list) and items[:-0] = items[:0] (empty). The concatenation is still the full list, so it works out.\n\nHmm, but actually let me be careful. Some people write it as items[n-k:] + items[:n-k] to avoid the -0 issue. With k=0: items[n-0:] = items[n:] = [] and items[:n-0] = items[:n] = full list. Result = [] + full list = full list. Correct.\n\nWith k=2, n=5: items[3:] + items[:3] = [4,5] + [1,2,3] = [4,5,1,2,3]. Correct.\n\nBoth approaches work. Let me use items[n-k:] + items[:n-k] to be safe, or items[-k:] + items[:-k]. Both are fine.\n\nActually, let me verify items[-k:] + items[:-k] for k=0 again very carefully:\n- k = 0\n- items[-0:] \u2014 in Python, -0 == 0, so this is items[0:] = full list\n- items[:-0] \u2014 items[:0] = []\n- Result: full list + [] = full list \u2713\n\nYes, it works. But it's a bit subtle",
+        "response_tokens": 1024,
+        "tool_calls": []
+      },
+      "candidate_sha256": "c30e177ce3abf66fbb5c740690f2308aacfa5d78a73686b97f9ab49bd39a71c3",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 1,
+      "per_check": {
+        "by_one": false,
+        "wrapped": false,
+        "zero": true
+      },
+      "sample_id": "rotate_list_v1",
+      "split": "development",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2003.18,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: running_max accepts a non-empty list of integers and returns a list of the same length whose element i is the maximum of the input elements 0 through i inclusive.\n\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(x)\n    return out\n```",
+        "prompt_tokens": 139,
+        "response": "Let me analyze the bug in this function.\n\nThe specification: `running_max` accepts a non-empty list of integers and returns a list of the same length whose element i is the maximum of the input elements 0 through i inclusive.\n\nThe current code:\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(x)\n    return out\n```\n\nThe bug: it appends `x` instead of `biggest` to the output list. So the output is just a copy of the input, not the running maximum.\n\nThe fix: append `biggest` instead of `x`.\n\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(biggest)\n    return out\n```\n\nLet me verify with an example: items = [3, 1, 4, 1, 5]\n- x=3: biggest is None \u2192 biggest=3, out=[3]\n- x=1: 1 > 3? No. out=[3, 3]\n- x=4: 4 > 3? Yes \u2192 biggest=4, out=[3, 3, 4]\n- x=1: 1 > 4? No. out=[3, 3, 4, 4]\n- x=5: 5 > 4? Yes \u2192 biggest=5, out=[3, 3, 4, 4, 5]\n\nCorrect: running max of [3,1,4,1,5] is [3,3,4,4,5]. \n\nThe function name and signature are unchanged. Return only the fixed function in a single python code block.```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(biggest)\n    return out\n```",
+        "response_tokens": 446,
+        "tool_calls": []
+      },
+      "candidate_sha256": "dc93ae4eb3794e880c1a02a98eb311afe81ced275645ffcb2c8f2f6ffff64c33",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "falling": true,
+        "rising": true,
+        "singleton": true
+      },
+      "sample_id": "running_max_v1",
+      "split": "heldout",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 5149.511,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: slugify accepts a string and returns a lowercase slug: every MAXIMAL run of non-alphanumeric characters is replaced by a single hyphen, all letters are lowercased, and leading and trailing hyphens are stripped. The result may be an empty string.\n\n```python\ndef slugify(text):\n    out = []\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n        else:\n            out.append('-')\n    return ''.join(out)\n```",
+        "prompt_tokens": 155,
+        "response": "Let me analyze the specification:\n\n1. Accepts a string, returns a lowercase slug\n2. Every MAXIMAL run of non-alphanumeric characters is replaced by a single hyphen\n3. All letters are lowercased\n4. Leading and trailing hyphens are stripped\n5. Result may be an empty string\n\nThe current code:\n- Lowercases the text\n- Replaces each non-alphanumeric character with a hyphen (not collapsing runs)\n- Doesn't strip leading/trailing hyphens\n\nBugs:\n1. Consecutive non-alphanumeric characters each become a hyphen instead of collapsing to one hyphen\n2. Leading/trailing hyphens are not stripped\n\nFix:\n\n```python\ndef slugify(text):\n    out = []\n    prev_hyphen = False\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n            prev_hyphen = False\n        else:\n            if not prev_hyphen:\n                out.append('-')\n            prev_hyphen = True\n    return ''.join(out).strip('-')\n```\n\nWait, let me think about the \"maximal run\" logic. A maximal run of non-alphanumeric characters should be replaced by a single hyphen. So consecutive non-alnum chars \u2192 one hyphen.\n\nMy approach: track whether the last appended character was a hyphen (from a run). If we encounter a non-alnum char and the previous appended char wasn't already a hyphen from this run, append one hyphen.\n\nActually, simpler: append '-' only if the last character in out is not '-', or out is empty... wait, but that would also prevent hyphens at the start. Actually that's fine because leading hyphens get stripped anyway. But let me be careful: if out is empty and we see a non-alnum char, we could either append '-' or not \u2014 it gets stripped at the end anyway. But to be safe with the \"maximal run\" semantics, appending is fine since stripping handles it.\n\nActually, let me think again. If out is empty and ch is non-alnum, appending '-' then later stripping works. If out's last char is '-', skip. That handles collapsing runs.\n\nBut wait \u2014 there's a subtlety: what if the last appended char is '-' but it came from... no, all hyphens in out come from non-alnum replacements since alnum chars are appended as-is. Well, actually alnum characters could include '-'? No, '-'.isalnum() is False. So hyphens in out only come from replacements. Good.\n\nAlternative approach using regex:\n\n```python\nimport re\n\ndef slugify(text):\n    return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')\n```\n\nHmm, but there's a subtlety: `isalnum()` in Python includes Unicode letters and digits, while `[^a-z0-9]` only covers ASCII. The specification says \"non-alphanumeric characters\" \u2014 to match the original code's behavior with `isalnum()`, I should keep using `isalnum()`. The spec says \"every maximal run of non-alphanumeric characters\" \u2014 alphanumeric presumably means `str.isalnum()` semantics (Unicode-aware). To be safe and match the original intent, I'll use the loop-based approach with `isalnum()`.\n\nAlso, `.lower()` on the whole string vs per-character \u2014 same result for practical purposes. Note: some Unicode characters change length when lowercased? Actually, `str.lower()` can change length in rare cases (e.g., '\u0130'.lower() gives 'i\u0307' which is 2 chars). But iterating over `text.lower()` is fine.\n\nLet me write the loop version:\n\n```python\ndef slugify(text):\n    out = []\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n        elif not out or out[-1] != '-':\n            out.append('-')\n    return ''.join(out).strip('-')\n```\n\nWait, `elif not out or out[-1] != '-'` \u2014 if out is empty and ch is non-alnum, we append '-'. Then leading hyphens get stripped. That's fine.\n\nHmm, but actually, should I avoid appending a leading hyphen at all? It doesn't matter because of the strip. But let me trace: text = \"--hello--\". Lower: \"--hello--\". \n- ch='-': out empty \u2192 append '-'\n- ch='-': out[-1]=='-' \u2192 skip\n- ch='h': append 'h'\n- ... \"hello\"\n- ch='-': out[-1]='o' \u2192 append '-'\n- ch='-': skip\nResult: \"-hello-\" \u2192 strip('-') \u2192 \"hello\". Correct.\n\ntext = \"!!!\": out = \"-\" \u2192 strip \u2192 \"\". Correct, empty string allowed.\n\ntext = \"Hello, World! 123\": lower \"hello, world! 123\"\n- h,e,l,l,o",
+        "response_tokens": 1024,
+        "tool_calls": []
+      },
+      "candidate_sha256": "07388c7238060520020892cc2cd5b374a73efb79832e0e772dad81aa8b44c7fa",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "mixed": true,
+        "padded": true,
+        "runs": true
+      },
+      "sample_id": "slugify_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2056.706,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: transpose accepts a rectangular matrix (a non-empty list of non-empty equal-length rows) and returns its transpose: rows become columns and columns become rows, with element [j][i] of the output equal to element [i][j] of the input.\n\n```python\ndef transpose(matrix):\n    return [list(col) for col in matrix]\n```",
+        "prompt_tokens": 129,
+        "response": "The user wants me to fix a buggy `transpose` function. The current implementation:\n\n```python\ndef transpose(matrix):\n    return [list(col) for col in matrix]\n```\n\nThis just copies the matrix \u2014 it returns a list of rows, each row being a copy of the original row. That's not a transpose at all. The transpose should make rows into columns.\n\nThe specification: transpose accepts a rectangular matrix (non-empty list of non-empty equal-length rows) and returns its transpose: element [j][i] of output equals element [i][j] of input.\n\nThe standard fix:\n\n```python\ndef transpose(matrix):\n    return [list(row) for row in zip(*matrix)]\n```\n\n`zip(*matrix)` gives tuples of columns; converting each to a list gives the transpose. Since the matrix is non-empty with non-empty rows, zip works fine.\n\nAlternatively:\n\n```python\ndef transpose(matrix):\n    rows = len(matrix)\n    cols = len(matrix[0])\n    return [[matrix[i][j] for i in range(rows)] for j in range(cols)]\n```\n\nBoth work. The zip version is cleaner. Let me verify: for matrix = [[1, 2, 3], [4, 5, 6]], zip(*matrix) yields (1, 4), (2, 5), (3, 6). Output: [[1, 4], [2, 5], [3, 6]]. Check: output[0][1] = 4, input[1][0] = 4. Correct.\n\nThe instruction says: return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should output just the code block.</think>```python\ndef transpose(matrix):\n    return [list(row) for row in zip(*matrix)]\n```",
+        "response_tokens": 379,
+        "tool_calls": []
+      },
+      "candidate_sha256": "78a187382ed6f9645cbdb4695a4ef55268ea0d29ba124d24a3edeaca821d88a8",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "single_row": true,
+        "square": true,
+        "tall": true
+      },
+      "sample_id": "transpose_rows_v1",
+      "split": "training",
+      "total": 3
+    }
+  ],
+  "extraction_rule": "last fenced ```python block; whole response if it is itself a def-containing source; else no_code_block failure",
+  "honesty": [
+    "A pass rate on these authored cases is a measurement of THIS case set only; it is not a quality claim about the model.",
+    "Implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it."
+  ],
+  "judge": "host_oracle_function_io_linux_sandbox",
+  "judged_traces_written_to_distill_workspace": [
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_pilot\\workspace-judged\\traces\\python_repo_debugging_v1-chunk_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_pilot\\workspace-judged\\traces\\python_repo_debugging_v1-dedupe_stable_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_pilot\\workspace-judged\\traces\\python_repo_debugging_v1-flatten_recursive_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_pilot\\workspace-judged\\traces\\python_repo_debugging_v1-median_odd_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_pilot\\workspace-judged\\traces\\python_repo_debugging_v1-slugify_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_pilot\\workspace-judged\\traces\\python_repo_debugging_v1-transpose_rows_v1.json"
+  ],
+  "pass_rates": {
+    "cases_fully_passed": 0.875,
+    "control_checks": 1.0,
+    "controls_split_checks": 1.0,
+    "development_checks": 0.7778,
+    "heldout_checks": 0.6667,
+    "overall_checks": 0.8889,
+    "target_checks": 0.8649,
+    "training_checks": 1.0
+  },
+  "run": "teacher glm-5.3-flash:cloud (behavioural_remote)"
+}

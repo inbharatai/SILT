@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "2a4dfba468e8eb392e6573ef8e7463679e567e09f47a2b9c6896845218b4fe4d",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 720.4,
+    "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: initials accepts a non-empty name of one or more whitespace-separated words, and returns the first letter of each word uppercased, joined with periods, with a trailing period.\n\nRequired signature: def initials(full_name):",
+    "prompt_tokens": 94,
+    "response": "The task: write a function `initials(full_name)` that takes a non-empty name of one or more whitespace-separated words, and returns the first letter of each word uppercased, joined with periods, with a trailing period.\n\nExample: \"john ronald reuel tolkien\" -> \"J.R.R.T.\"\n\nImplementation:\n\n```python\ndef initials(full_name):\n    return \".\".join(word[0].upper() for word in full_name.split()) + \".\"\n```\n\nThat handles whitespace-separated words (split() handles multiple spaces, tabs, etc.). Each word's first character uppercased, joined with periods, plus trailing period.\n\nEdge cases: words might have leading punctuation? Spec says just first letter of each word. Using word[0] is fine.\n\nReturn only the code block.</think>```python\ndef initials(full_name):\n    return \".\".join(word[0].upper() for word in full_name.split()) + \".\"\n```",
+    "response_tokens": 194,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "control",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 3187.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "e2edb67384b37edc9a1e7288411845ab6bdd18f09c6c0da96be0a70bcb2cdc60",
+  "sample_id": "initials_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

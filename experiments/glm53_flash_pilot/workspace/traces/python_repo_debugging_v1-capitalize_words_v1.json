@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "99c66ea2d037707f056f3c101d032193b7223ecd5f4db20d92a28746c03a50fa",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 5819.777,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: capitalize_words accepts a string of single-space-separated words and returns the same string with the FIRST letter of every word uppercased, leaving all other characters of every word unchanged. A word with no letters is left alone.\n\n```python\ndef capitalize_words(text):\n    words = text.split(' ')\n    out = []\n    for w in words:\n        out.append(w.upper() if w else w)\n    return ' '.join(out)\n```",
+    "prompt_tokens": 145,
+    "response": "The bug: `w.upper()` uppercases the entire word, but the spec says only the FIRST letter of every word should be uppercased, leaving all other characters unchanged.\n\nFix: use `w[:1].upper() + w[1:]` \u2014 but careful: if the first character is not a letter, `.upper()` leaves it unchanged, which is fine. Also, \"A word with no letters is left alone\" \u2014 using `w[:1].upper() + w[1:]` handles that naturally since upper() on non-letters is a no-op.\n\nWait, but there's a subtlety: what about a word like \"3abc\"? The first letter... spec says \"FIRST letter of every word uppercased\". Hmm, does \"first letter\" mean the first character, or the first alphabetic character? Let's read: \"returns the same string with the FIRST letter of every word uppercased, leaving all other characters of every word unchanged. A word with no letters is left alone.\"\n\nHmm, \"A word with no letters is left alone\" \u2014 this suggests that if a word has no letters, nothing changes. If a word has letters, the first letter is uppercased. The question is whether \"first letter\" means the first character if it's a letter, or the first alphabetic character in the word.\n\nConsider \"3abc\" \u2014 the first letter is 'a'. Should it become \"3Abc\"? Or should it stay \"3abc\" because the first character isn't a letter?\n\nThe typical interpretation of such a spec (like str.capitalize vs title-like behavior)... Actually, Python's `str.capitalize()` uppercases the first character and lowercases the rest. The spec says \"leaving all other characters of every word unchanged\" \u2014 so we shouldn't lowercase the rest.\n\nThe phrase \"A word with no letters is left alone\" is a hint about edge cases like \"\" or \"123\" or \"!!!\". For a word like \"123\", there are no letters, so it stays \"123\". With `w[:1].upper() + w[1:]`, \"123\" stays \"123\" since '1'.upper() == '1'. Good.\n\nFor \"3abc\": with `w[:1].upper() + w[1:]`, it stays \"3abc\". Is that correct per spec? The spec says \"the FIRST letter of every word uppercased\". If we interpret \"first letter\" strictly as the first alphabetic character, then \"3abc\" \u2192 \"3Abc\". Hmm.\n\nThis is ambiguous. Let me think about what the intended fix is. The original buggy code uses `w.upper()` which uppercases everything. The minimal fix that meets the spec: uppercase only the first character. The common idiom is `w.capitalize()` but that lowercases the rest, violating \"leaving all other characters of every word unchanged\". E.g., \"hELLO\" \u2192 capitalize gives \"Hello\" but spec wants \"HELLO\" (first letter uppercased, rest unchanged: 'H' + 'ELLO' = \"HELLO\").\n\nSo the fix: `w[:1].upper() + w[1:]`.\n\nNow, about \"first letter\": I think the intended reading is the first character of the word, and the note \"A word with no letters is left alone\" covers words like \"123\" or \"\" \u2014 with `w[:1].upper() + w[1:]`, those are naturally left alone. Actually wait \u2014 for a word like \"123\", the first character is '1', which has no uppercase, so it's left alone. That satisfies \"a word with no letters is left alone\".\n\nBut what about \"3abc\"? It has letters. If the spec intends the first letter (alphabetic) to be uppercased, then \"3Abc\". Hmm. The phrase \"A word with no letters is left alone\" specifically addresses words with NO letters. It doesn't say anything about words where the first character isn't a letter. This suggests the spec writer considered the case where uppercasing the first character does nothing (no letters at all). If they intended \"first alphabetic character\", they'd probably say \"the first letter in the word\" or handle \"3abc\" explicitly.\n\nActually, let me reconsider. \"the FIRST letter of every word uppercased\" \u2014 the emphasis on FIRST suggests first character. And \"A word with no letters is left alone\" clarifies that for words like \"123\" or symbols, nothing happens (which naturally follows from upper() being a no-op on non-letters, but the spec makes it explicit).\n\nHmm, but there's another possible interpretation issue: maybe the spec intends that if the first character is not a letter, the word is left alone entirely? Like \"3abc\" stays \"3abc\"? That's what `w[:1].upper() + w[1:]` does anyway (since '3'.upper() == '3', the rest unchanged). So both",
+    "response_tokens": 1024,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 8297.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "3e58c2b218a227bc386ae36815deb4e10d5ac4423caaab2d91b764b15fe2670c",
+  "sample_id": "capitalize_words_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

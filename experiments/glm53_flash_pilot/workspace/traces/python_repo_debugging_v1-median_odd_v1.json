@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "b43a0df532b969f5dfd31a033d5fa3c06ff4578ad0a7ddb2ff5e300b29295ff3",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2173.431,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: median_odd accepts a non-empty list of integers with an ODD number of elements, sorts it ascending, and returns the middle element. The input list must not be mutated.\n\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return numbers[n // 2]\n```",
+    "prompt_tokens": 116,
+    "response": "Let me analyze the bug in this function.\n\nThe specification says:\n1. `median_odd` accepts a non-empty list of integers with an ODD number of elements\n2. Sorts it ascending\n3. Returns the middle element\n4. The input list must not be mutated\n\nThe current implementation:\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return numbers[n // 2]\n```\n\nThe bug: The function doesn't sort the list before returning the middle element. It just returns the element at index `n // 2` of the original (unsorted) list.\n\nFor example, `median_odd([3, 1, 2])` should return `2` (sorted: [1, 2, 3], middle is 2), but the current implementation returns `1` (the element at index 1 of [3, 1, 2]).\n\nAlso, the specification says the input list must not be mutated. So I should use `sorted()` instead of `.sort()` to avoid mutating the input.\n\nThe fix:\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return sorted(numbers)[n // 2]\n```\n\nThis:\n1. Sorts the list ascending using `sorted()` (which creates a new list, so the input is not mutated)\n2. Returns the middle element at index `n // 2` (for odd n, this is the correct middle index: e.g., n=5, n//2=2, which is the middle of indices 0-4)\n\nLet me verify with an example:\n- `median_odd([3, 1, 2])`: sorted is [1, 2, 3], n=3, n//2=1, returns 2. Correct.\n- `median_odd([5, 2, 8, 1, 9])`: sorted is [1, 2, 5, 8, 9], n=5, n//2=2, returns 5. Correct.\n- Input list is not mutated since `sorted()` returns a new list.\n\nThe fix is straightforward. Return only the fixed function in a code block.</think>```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return sorted(numbers)[n // 2]\n```",
+    "response_tokens": 483,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 4594.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "c5581325dd5efe8b63f624afbe6cc5ee7bd0920c1e50de44d0d7a1f667216724",
+  "sample_id": "median_odd_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

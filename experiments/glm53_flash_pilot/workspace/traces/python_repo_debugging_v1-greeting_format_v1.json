@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "db7df93aa21e840339bcf3ced8ae25ecc1b672a3493048b11ab00b9b769f8146",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 584.476,
+    "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: greeting accepts a non-empty name string and a one-character punctuation string, and returns exactly 'Hello, ' followed by the name followed by the punctuation, with no extra spaces.\n\nRequired signature: def greeting(name, punct):",
+    "prompt_tokens": 96,
+    "response": "The user wants a Python function called `greeting` that takes a `name` (non-empty string) and `punct` (one-character punctuation string), and returns 'Hello, ' + name + punct.\n\nSimple string concatenation:\n\n```python\ndef greeting(name, punct):\n    return 'Hello, ' + name + punct\n```\n\nThat's it. Return only the code block.```python\ndef greeting(name, punct):\n    return 'Hello, ' + name + punct\n```",
+    "response_tokens": 104,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "control",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 3063.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "259951155d13127c2c17fb0ca95c77b5cbce9fcc7c50fe55d9b8feec38969b79",
+  "sample_id": "greeting_format_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

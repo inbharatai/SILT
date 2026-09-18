@@ -57,7 +57,12 @@ def _fixture(case):
         time.sleep(10)
     elif case == "cpu":
         # Finite fallback deadline, plus the separately installed RLIMIT_CPU.
-        end = time.monotonic() + 5
+        # 20 wall seconds (not 5): under heavy CI-runner contention the child
+        # may get well under a quarter of a core, and must still accumulate its
+        # 1 CPU-second of RLIMIT_CPU before this fallback (or the supervisor's
+        # wall deadline) fires -- otherwise the test measures the host's load,
+        # not the kernel limit (CI failure 2026-09-18, run 35359937603).
+        end = time.monotonic() + 20
         while time.monotonic() < end:
             pass
     elif case in {"descendant", "leave_descendant"}:

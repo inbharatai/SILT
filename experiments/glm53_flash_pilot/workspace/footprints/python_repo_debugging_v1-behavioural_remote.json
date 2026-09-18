@@ -1,0 +1,23 @@
+{
+  "artifact_sha256": "e801dc635130a5fab0e874903bf92c4bb08f63912ed0608bb6e3d7c5adec8e0f",
+  "capability": "python_repo_debugging_v1",
+  "causal_interventions": {},
+  "confidence": {},
+  "evidence": {
+    "control_cases": 4,
+    "target_cases": 12,
+    "trace_class": "behavioural_remote"
+  },
+  "experts": {},
+  "layers": {},
+  "limitations": [
+    "Routing and usage enrichment in 'layers'/'experts' is usage evidence, not causal expert importance (correlation only).",
+    "This footprint rests on behavioural_remote evidence: the teacher exposed prompts/responses only, so no internal component claims are made beyond what causal interventions on an open-weight teacher could verify (none are recorded unless listed under causal_interventions).",
+    "Enrichment statistics are computed over the recorded case counts only and do not support claims beyond this workload and split."
+  ],
+  "schema": "silt.capability_footprint.v1",
+  "schema_version": 1,
+  "spec_fingerprint": "1101de73ea9f1ad2ce412626735e9fda8a04c229edecd59514ae7266662fcd9b",
+  "teacher": "ollama/glm-5.3-flash:cloud",
+  "teacher_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5"
+}

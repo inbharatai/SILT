@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "9abb6fafb661b5bb51068c2836373a305520a2658bb3e112e8b5bd3b60eff51d",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 4401.713,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: binary_search accepts a list sorted ascending and a target, and returns the INDEX of the first occurrence of the target if present, or -1 if absent. Never raises.\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n```",
+    "prompt_tokens": 164,
+    "response": "Let me analyze the given function against the specification.\n\nSpecification: binary_search accepts a list sorted ascending and a target, and returns the INDEX of the first occurrence of the target if present, or -1 if absent. Never raises.\n\nThe given function:\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n```\n\nBugs:\n1. Empty list: `lo = 0`, `hi = -1`, loop doesn't run, returns `lo = 0`. But for an empty list, the target is absent, so it should return -1. Currently returns 0 \u2014 wrong.\n2. Target absent: The function returns `lo` which is the insertion point (leftmost position where target could be inserted), not -1. E.g., items = [1, 3, 5], target = 2: lo ends at 1 (index of 3), returns 1 \u2014 wrong, should return -1.\n3. Target present: The loop finds the leftmost index where items[lo] >= target. If target present, lo is the first occurrence \u2014 that part is correct. But wait, need to check: with `hi = len(items) - 1` and loop `while lo < hi`, does it correctly find the first occurrence?\n\nLet's trace: items = [1, 2, 2, 3], target = 2. lo=0, hi=3. mid=1, items[1]=2, not < 2, so hi=1. lo=0, hi=1: mid=0, items[0]=1 < 2, lo=1. Now lo == hi == 1, loop ends. Return 1. Correct \u2014 first occurrence of 2 is at index 1.\n\nitems = [2, 2], target = 2: lo=0, hi=1. mid=0, items[0]=2 not < 2, hi=0. lo==hi==0, return 0. Correct.\n\nitems = [2], target = 2: lo=0, hi=0, loop doesn't run, return 0. Correct.\n\nitems = [1], target = 2: lo=0, hi=0, loop doesn't run, return 0. Wrong \u2014 should be -1.\n\nitems = [3], target = 2: return 0. Wrong \u2014 should be -1.\n\nSo the fix: after the loop, check if lo is within bounds and items[lo] == target; return lo if so, else -1. Also handle empty list (lo=0, hi=-1; items[0] would raise IndexError \u2014 \"Never raises\" requirement).\n\nFixed version:\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo < len(items) and items[lo] == target:\n        return lo\n    return -1\n```\n\nWait \u2014 but there's a subtlety. With `hi = len(items) - 1` and the loop condition `lo < hi`, the search space is [lo, hi]. When the loop ends, lo == hi. But does lo correctly point to the leftmost occurrence or the insertion point?\n\nStandard leftmost binary search: lo=0, hi=len(items) (exclusive). While lo < hi: mid=(lo+hi)//2; if items[mid] < target: lo = mid+1 else hi = mid. Result: lo is the leftmost index where items[lo] >= target (or len(items) if all < target).\n\nWith hi = len(items) - 1 (inclusive), the loop `while lo < hi` never examines the case where lo == len(items) - 1... Let me think. Actually with inclusive hi and condition lo < hi, when lo == hi the loop stops. The invariant: all indices < lo have items < target; all indices > hi have items >= target. When lo == hi, that index is the first index with items[index] >= target, provided such index exists within [0, len-1]. If all items < target, then lo would converge to... let's check: items = [1, 2], target = 3. lo=0, hi=1. mid=0, items[0]=1 < 3, lo=1. lo==hi==1, stop. Return 1. But items[",
+    "response_tokens": 1024,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 6860.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "85ab1693198a046f00cd4b092d13533265727e8354b397be6293ea2fad751953",
+  "sample_id": "binary_search_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

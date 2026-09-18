@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "c187ee0405710bfe2c5166d172ee810b5e4eefaead12a618afb5f4cdced63ac2",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2003.18,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: running_max accepts a non-empty list of integers and returns a list of the same length whose element i is the maximum of the input elements 0 through i inclusive.\n\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(x)\n    return out\n```",
+    "prompt_tokens": 139,
+    "response": "Let me analyze the bug in this function.\n\nThe specification: `running_max` accepts a non-empty list of integers and returns a list of the same length whose element i is the maximum of the input elements 0 through i inclusive.\n\nThe current code:\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(x)\n    return out\n```\n\nThe bug: it appends `x` instead of `biggest` to the output list. So the output is just a copy of the input, not the running maximum.\n\nThe fix: append `biggest` instead of `x`.\n\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(biggest)\n    return out\n```\n\nLet me verify with an example: items = [3, 1, 4, 1, 5]\n- x=3: biggest is None \u2192 biggest=3, out=[3]\n- x=1: 1 > 3? No. out=[3, 3]\n- x=4: 4 > 3? Yes \u2192 biggest=4, out=[3, 3, 4]\n- x=1: 1 > 4? No. out=[3, 3, 4, 4]\n- x=5: 5 > 4? Yes \u2192 biggest=5, out=[3, 3, 4, 4, 5]\n\nCorrect: running max of [3,1,4,1,5] is [3,3,4,4,5]. \n\nThe function name and signature are unchanged. Return only the fixed function in a single python code block.```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(biggest)\n    return out\n```",
+    "response_tokens": 446,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 4500.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "7204df1155d13d82ece9473836bc8e78eca4e69b204ad91c0959b354c7fcb7d3",
+  "sample_id": "running_max_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

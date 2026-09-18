@@ -99,7 +99,11 @@ class BehaviouralOllamaTeacher:
     # -- transport -----------------------------------------------------------
 
     def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        from ...modules.real.ollama import (
+        # Two dots, not three: this module is asea.capability_build.teacher, so
+        # the target is asea.modules.real.ollama. Three dots escape the top-level
+        # package and raise ImportError at CALL time (the unit tests mock the
+        # transport, so only a REAL network run catches this -- pilot 2026-09-18).
+        from ..modules.real.ollama import (
             OllamaConnectionError, urlopen_no_redirect
         )
 
@@ -133,7 +137,7 @@ class BehaviouralOllamaTeacher:
         Exact-match only (a ``startswith`` match made the historical
         connector report a false-positive model_present).
         """
-        from ...modules.real.ollama import (
+        from ..modules.real.ollama import (
             OllamaConnectionError, urlopen_no_redirect
         )
 

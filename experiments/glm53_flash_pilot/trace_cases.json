@@ -1,0 +1,860 @@
+[
+ {
+  "sample_id": "flatten_recursive_v1",
+  "split": "training",
+  "group": "target",
+  "family_id": "flatten_recursive",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "deep_nesting",
+    "function": "flatten",
+    "args": [
+     [
+      [
+       1,
+       2,
+       [
+        3,
+        4
+       ]
+      ],
+      5
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "id": "empty",
+    "function": "flatten",
+    "args": [
+     []
+    ],
+    "kwargs": {},
+    "expected": []
+   },
+   {
+    "id": "nested_empty",
+    "function": "flatten",
+    "args": [
+     [
+      1,
+      [
+       []
+      ],
+      2
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     1,
+     2
+    ]
+   },
+   {
+    "id": "already_flat",
+    "function": "flatten",
+    "args": [
+     [
+      1,
+      2,
+      3
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     1,
+     2,
+     3
+    ]
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: flatten accepts a list whose elements are integers or arbitrarily nested lists of integers, and returns a flat list of the integers in left-to-right order. Empty nested lists contribute nothing. Non-list scalars are kept as-is.\n\n```python\ndef flatten(items):\n    result = []\n    for item in items:\n        if isinstance(item, list):\n            result.extend(item)\n        else:\n            result.append(item)\n    return result\n```"
+ },
+ {
+  "sample_id": "median_odd_v1",
+  "split": "training",
+  "group": "target",
+  "family_id": "median_sorted_center",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "unsorted_three",
+    "function": "median_odd",
+    "args": [
+     [
+      7,
+      1,
+      5
+     ]
+    ],
+    "kwargs": {},
+    "expected": 5
+   },
+   {
+    "id": "single",
+    "function": "median_odd",
+    "args": [
+     [
+      9
+     ]
+    ],
+    "kwargs": {},
+    "expected": 9
+   },
+   {
+    "id": "unsorted_five",
+    "function": "median_odd",
+    "args": [
+     [
+      3,
+      8,
+      2,
+      10,
+      5
+     ]
+    ],
+    "kwargs": {},
+    "expected": 5
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: median_odd accepts a non-empty list of integers with an ODD number of elements, sorts it ascending, and returns the middle element. The input list must not be mutated.\n\n```python\ndef median_odd(numbers):\n    n = len(numbers)\n    return numbers[n // 2]\n```"
+ },
+ {
+  "sample_id": "slugify_v1",
+  "split": "training",
+  "group": "target",
+  "family_id": "slugify_hyphen_runs",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "mixed",
+    "function": "slugify",
+    "args": [
+     "Hello, World!"
+    ],
+    "kwargs": {},
+    "expected": "hello-world"
+   },
+   {
+    "id": "padded",
+    "function": "slugify",
+    "args": [
+     "  --Over--  "
+    ],
+    "kwargs": {},
+    "expected": "over"
+   },
+   {
+    "id": "runs",
+    "function": "slugify",
+    "args": [
+     "a!!b"
+    ],
+    "kwargs": {},
+    "expected": "a-b"
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: slugify accepts a string and returns a lowercase slug: every MAXIMAL run of non-alphanumeric characters is replaced by a single hyphen, all letters are lowercased, and leading and trailing hyphens are stripped. The result may be an empty string.\n\n```python\ndef slugify(text):\n    out = []\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n        else:\n            out.append('-')\n    return ''.join(out)\n```"
+ },
+ {
+  "sample_id": "chunk_v1",
+  "split": "training",
+  "group": "target",
+  "family_id": "chunk_remainder",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "remainder",
+    "function": "chunk",
+    "args": [
+     [
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     2
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      2
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      5
+     ]
+    ]
+   },
+   {
+    "id": "exact",
+    "function": "chunk",
+    "args": [
+     [
+      1,
+      2,
+      3
+     ],
+     3
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   {
+    "id": "empty",
+    "function": "chunk",
+    "args": [
+     [],
+     2
+    ],
+    "kwargs": {},
+    "expected": []
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: chunk accepts a list and a positive size, and splits the list into consecutive groups of exactly `size` elements, except that the LAST group may be shorter. No element is ever dropped. An empty list yields an empty result.\n\n```python\ndef chunk(items, size):\n    end = len(items) // size * size\n    return [items[i:i + size] for i in range(0, end, size)]\n```"
+ },
+ {
+  "sample_id": "dedupe_stable_v1",
+  "split": "training",
+  "group": "target",
+  "family_id": "dedupe_stable",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "order_kept",
+    "function": "dedupe",
+    "args": [
+     [
+      3,
+      1,
+      3,
+      2,
+      1
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     3,
+     1,
+     2
+    ]
+   },
+   {
+    "id": "all_same",
+    "function": "dedupe",
+    "args": [
+     [
+      "a",
+      "a",
+      "a"
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     "a"
+    ]
+   },
+   {
+    "id": "empty",
+    "function": "dedupe",
+    "args": [
+     []
+    ],
+    "kwargs": {},
+    "expected": []
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: dedupe accepts a list and returns a new list with duplicate elements removed, keeping the FIRST occurrence of each element and preserving the original relative order. The input list must not be mutated.\n\n```python\ndef dedupe(items):\n    return list(set(items))\n```"
+ },
+ {
+  "sample_id": "transpose_rows_v1",
+  "split": "training",
+  "group": "target",
+  "family_id": "transpose_matrix",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "square",
+    "function": "transpose",
+    "args": [
+     [
+      [
+       1,
+       2
+      ],
+      [
+       3,
+       4
+      ]
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      3
+     ],
+     [
+      2,
+      4
+     ]
+    ]
+   },
+   {
+    "id": "single_row",
+    "function": "transpose",
+    "args": [
+     [
+      [
+       1,
+       2,
+       3
+      ]
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1
+     ],
+     [
+      2
+     ],
+     [
+      3
+     ]
+    ]
+   },
+   {
+    "id": "tall",
+    "function": "transpose",
+    "args": [
+     [
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      2
+     ]
+    ]
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: transpose accepts a rectangular matrix (a non-empty list of non-empty equal-length rows) and returns its transpose: rows become columns and columns become rows, with element [j][i] of the output equal to element [i][j] of the input.\n\n```python\ndef transpose(matrix):\n    return [list(col) for col in matrix]\n```"
+ },
+ {
+  "sample_id": "count_words_v1",
+  "split": "development",
+  "group": "target",
+  "family_id": "count_words_whitespace",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "double_space",
+    "function": "count_words",
+    "args": [
+     "hello  world"
+    ],
+    "kwargs": {},
+    "expected": 2
+   },
+   {
+    "id": "blank",
+    "function": "count_words",
+    "args": [
+     "   "
+    ],
+    "kwargs": {},
+    "expected": 0
+   },
+   {
+    "id": "simple",
+    "function": "count_words",
+    "args": [
+     "one two three"
+    ],
+    "kwargs": {},
+    "expected": 3
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: count_words accepts a string and returns the number of words, where a word is a maximal run of non-whitespace characters. Any whitespace (spaces, tabs, newlines) separates words, and leading or trailing whitespace is ignored. A blank string yields 0.\n\n```python\ndef count_words(text):\n    return len(text.split(' '))\n```"
+ },
+ {
+  "sample_id": "rotate_list_v1",
+  "split": "development",
+  "group": "target",
+  "family_id": "rotate_direction",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "by_one",
+    "function": "rotate",
+    "args": [
+     [
+      1,
+      2,
+      3,
+      4
+     ],
+     1
+    ],
+    "kwargs": {},
+    "expected": [
+     4,
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "id": "wrapped",
+    "function": "rotate",
+    "args": [
+     [
+      1,
+      2,
+      3
+     ],
+     5
+    ],
+    "kwargs": {},
+    "expected": [
+     2,
+     3,
+     1
+    ]
+   },
+   {
+    "id": "zero",
+    "function": "rotate",
+    "args": [
+     [
+      1,
+      2
+     ],
+     0
+    ],
+    "kwargs": {},
+    "expected": [
+     1,
+     2
+    ]
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: rotate accepts a non-empty list and a non-negative integer k, and rotates the list to the RIGHT by k positions: the last k elements (modulo the list length) move to the front in their original order, and the rest follow. k may exceed the length. The input list must not be mutated.\n\n```python\ndef rotate(items, k):\n    n = len(items)\n    k = k % n\n    return items[k:] + items[:k]\n```"
+ },
+ {
+  "sample_id": "merge_intervals_v1",
+  "split": "development",
+  "group": "target",
+  "family_id": "merge_intervals_max_end",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "contained",
+    "function": "merge_intervals",
+    "args": [
+     [
+      [
+       1,
+       4
+      ],
+      [
+       2,
+       3
+      ]
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      4
+     ]
+    ]
+   },
+   {
+    "id": "touching",
+    "function": "merge_intervals",
+    "args": [
+     [
+      [
+       1,
+       3
+      ],
+      [
+       3,
+       4
+      ]
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      4
+     ]
+    ]
+   },
+   {
+    "id": "disjoint_unsorted",
+    "function": "merge_intervals",
+    "args": [
+     [
+      [
+       5,
+       6
+      ],
+      [
+       1,
+       2
+      ]
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     [
+      1,
+      2
+     ],
+     [
+      5,
+      6
+     ]
+    ]
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: merge_intervals accepts a non-empty list of [start, end] pairs with start <= end, and merges overlapping or touching intervals: processing in ascending start order, an interval is merged into the previous one when its start is less than or equal to the current merged end, and the merged end is the MAXIMUM of the two ends. Returns a list of merged pairs in ascending order.\n\n```python\ndef merge_intervals(intervals):\n    merged = []\n    for start, end in sorted(intervals):\n        if merged and start <= merged[-1][1]:\n            merged[-1][1] = end\n        else:\n            merged.append([start, end])\n    return merged\n```"
+ },
+ {
+  "sample_id": "capitalize_words_v1",
+  "split": "heldout",
+  "group": "target",
+  "family_id": "capitalize_first_letter",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "two_words",
+    "function": "capitalize_words",
+    "args": [
+     "hello world"
+    ],
+    "kwargs": {},
+    "expected": "Hello World"
+   },
+   {
+    "id": "mixed_case",
+    "function": "capitalize_words",
+    "args": [
+     "pyTHON rocks"
+    ],
+    "kwargs": {},
+    "expected": "PyTHON Rocks"
+   },
+   {
+    "id": "solo",
+    "function": "capitalize_words",
+    "args": [
+     "solo"
+    ],
+    "kwargs": {},
+    "expected": "Solo"
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: capitalize_words accepts a string of single-space-separated words and returns the same string with the FIRST letter of every word uppercased, leaving all other characters of every word unchanged. A word with no letters is left alone.\n\n```python\ndef capitalize_words(text):\n    words = text.split(' ')\n    out = []\n    for w in words:\n        out.append(w.upper() if w else w)\n    return ' '.join(out)\n```"
+ },
+ {
+  "sample_id": "binary_search_v1",
+  "split": "heldout",
+  "group": "target",
+  "family_id": "binary_search_index",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "present",
+    "function": "binary_search",
+    "args": [
+     [
+      1,
+      3,
+      5,
+      7
+     ],
+     5
+    ],
+    "kwargs": {},
+    "expected": 2
+   },
+   {
+    "id": "absent",
+    "function": "binary_search",
+    "args": [
+     [
+      1,
+      3,
+      5,
+      7
+     ],
+     4
+    ],
+    "kwargs": {},
+    "expected": -1
+   },
+   {
+    "id": "singleton",
+    "function": "binary_search",
+    "args": [
+     [
+      2
+     ],
+     2
+    ],
+    "kwargs": {},
+    "expected": 0
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: binary_search accepts a list sorted ascending and a target, and returns the INDEX of the first occurrence of the target if present, or -1 if absent. Never raises.\n\n```python\ndef binary_search(items, target):\n    lo, hi = 0, len(items) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if items[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n```"
+ },
+ {
+  "sample_id": "running_max_v1",
+  "split": "heldout",
+  "group": "target",
+  "family_id": "running_max",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "rising",
+    "function": "running_max",
+    "args": [
+     [
+      3,
+      1,
+      4,
+      1,
+      5
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     3,
+     3,
+     4,
+     4,
+     5
+    ]
+   },
+   {
+    "id": "singleton",
+    "function": "running_max",
+    "args": [
+     [
+      2
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     2
+    ]
+   },
+   {
+    "id": "falling",
+    "function": "running_max",
+    "args": [
+     [
+      5,
+      4,
+      3
+     ]
+    ],
+    "kwargs": {},
+    "expected": [
+     5,
+     5,
+     5
+    ]
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: running_max accepts a non-empty list of integers and returns a list of the same length whose element i is the maximum of the input elements 0 through i inclusive.\n\n```python\ndef running_max(items):\n    out = []\n    biggest = None\n    for x in items:\n        if biggest is None or x > biggest:\n            biggest = x\n        out.append(x)\n    return out\n```"
+ },
+ {
+  "sample_id": "greeting_format_v1",
+  "split": "controls",
+  "group": "control",
+  "family_id": "greeting_join",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "exclaim",
+    "function": "greeting",
+    "args": [
+     "Ada",
+     "!"
+    ],
+    "kwargs": {},
+    "expected": "Hello, Ada!"
+   },
+   {
+    "id": "question",
+    "function": "greeting",
+    "args": [
+     "Bob",
+     "?"
+    ],
+    "kwargs": {},
+    "expected": "Hello, Bob?"
+   }
+  ],
+  "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: greeting accepts a non-empty name string and a one-character punctuation string, and returns exactly 'Hello, ' followed by the name followed by the punctuation, with no extra spaces.\n\nRequired signature: def greeting(name, punct):"
+ },
+ {
+  "sample_id": "price_total_v1",
+  "split": "controls",
+  "group": "control",
+  "family_id": "price_total_cents",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "two_items",
+    "function": "total_cents",
+    "args": [
+     [
+      100,
+      25
+     ],
+     2
+    ],
+    "kwargs": {},
+    "expected": 250
+   },
+   {
+    "id": "empty",
+    "function": "total_cents",
+    "args": [
+     [],
+     3
+    ],
+    "kwargs": {},
+    "expected": 0
+   }
+  ],
+  "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: total_cents accepts a list of integer prices in cents and a non-negative integer quantity, and returns the sum of all prices multiplied by the quantity. An empty price list yields 0.\n\nRequired signature: def total_cents(prices, quantity):"
+ },
+ {
+  "sample_id": "initials_v1",
+  "split": "controls",
+  "group": "control",
+  "family_id": "initials_extract",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "two_names",
+    "function": "initials",
+    "args": [
+     "ada lovelace"
+    ],
+    "kwargs": {},
+    "expected": "A.L."
+   },
+   {
+    "id": "one_name",
+    "function": "initials",
+    "args": [
+     "Grace"
+    ],
+    "kwargs": {},
+    "expected": "G."
+   }
+  ],
+  "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: initials accepts a non-empty name of one or more whitespace-separated words, and returns the first letter of each word uppercased, joined with periods, with a trailing period.\n\nRequired signature: def initials(full_name):"
+ },
+ {
+  "sample_id": "date_label_v1",
+  "split": "controls",
+  "group": "control",
+  "family_id": "date_label_iso",
+  "provenance": "authored 2026-09-18 for the GLM-5.3-Flash capability pilot; original work of the repository operator; no third-party code",
+  "license": "CC0-1.0",
+  "expected": null,
+  "oracle": [
+   {
+    "id": "padded",
+    "function": "date_label",
+    "args": [
+     2026,
+     3,
+     5
+    ],
+    "kwargs": {},
+    "expected": "2026-03-05"
+   },
+   {
+    "id": "double_digit",
+    "function": "date_label",
+    "args": [
+     1999,
+     12,
+     31
+    ],
+    "kwargs": {},
+    "expected": "1999-12-31"
+   }
+  ],
+  "prompt": "Write a Python function that meets the following specification exactly. Use the exact function name and signature given. Return ONLY the complete function inside a single ```python code block, with no other text.\n\nSpecification: date_label accepts a year, month and day as integers and returns the ISO-style label 'YYYY-MM-DD' with the year as four digits and month and day each as two digits (zero padded).\n\nRequired signature: def date_label(year, month, day):"
+ }
+]

@@ -49,3 +49,7 @@ data/runtime/
 Thumbs.db
 .idea/
 .vscode/
+# --- GLM-5.3-Flash pilot scratch ---
+# judging/ holds per-case candidate sources + oracle payloads written during
+# judgment; they are derivative (reproducible from cases.jsonl + judgment-*.json)
+experiments/glm53_flash_pilot/judging/

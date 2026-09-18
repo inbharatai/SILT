@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "12262a96af84ad650299fe343db0e7ca2f86f0654b336b09add93df03e53ce6e",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 496.363,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: count_words accepts a string and returns the number of words, where a word is a maximal run of non-whitespace characters. Any whitespace (spaces, tabs, newlines) separates words, and leading or trailing whitespace is ignored. A blank string yields 0.\n\n```python\ndef count_words(text):\n    return len(text.split(' '))\n```",
+    "prompt_tokens": 127,
+    "response": "The bug: `text.split(' ')` splits only on single spaces, so tabs, newlines, and multiple consecutive spaces produce empty strings that get counted as words. The fix: use `text.split()` with no arguments, which splits on any whitespace and discards empty strings. Blank string yields 0 since `''.split()` returns `[]`.</think>```python\ndef count_words(text):\n    return len(text.split())\n```",
+    "response_tokens": 88,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 2922.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "e470726173ae5b2d563dd37b67bbc693ee948292f3642c2b993455214534c43b",
+  "sample_id": "count_words_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

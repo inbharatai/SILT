@@ -1,0 +1,140 @@
+{
+  "capability_id": "python_repo_debugging_v1",
+  "decoder_layers": 24,
+  "final_opened": false,
+  "honesty": [
+    "The certificate criterion is LOSS degradation vs the full-precision reference on the suite (the certifier's designed contract). It is NOT an oracle pass-rate claim.",
+    "A certificate here is not a claim about the model's coding ability; implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it.",
+    "DeepApply LoRA training on the distilled kd-pairs is the designed next stage; this proof stops at the compression-certification boundary."
+  ],
+  "levels": [
+    "int8",
+    "int4",
+    "int2"
+  ],
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "parameters": 494032768,
+  "quantization": "per-row symmetric int8/int4/int2 containers (siltstream_vendor.quant), one layer resident at a time, full-precision re-expand on exit",
+  "results": {
+    "full": {
+      "bank_bytes_on_disk": 1431692976,
+      "bytes_packed": null,
+      "certified": [
+        "control_utility",
+        "target_debugging_development",
+        "target_debugging_heldout"
+      ],
+      "degradation": {
+        "control_utility": 0.0,
+        "target_debugging_development": 0.0,
+        "target_debugging_heldout": 0.0
+      },
+      "loss": {
+        "control_utility": 11.323122024536133,
+        "target_debugging_development": 7.028947830200195,
+        "target_debugging_heldout": 7.920713424682617
+      },
+      "revoked": []
+    },
+    "int2": {
+      "bank_bytes_on_disk": 359475192,
+      "bytes_packed": 90955776,
+      "certified": [],
+      "degradation": {
+        "control_utility": 0.4116241564793988,
+        "target_debugging_development": 1.481469762913367,
+        "target_debugging_heldout": 1.1737202108971558
+      },
+      "loss": {
+        "control_utility": 15.983992576599121,
+        "target_debugging_development": 17.442121505737305,
+        "target_debugging_heldout": 17.21741485595703
+      },
+      "revoked": [
+        "control_utility",
+        "target_debugging_development",
+        "target_debugging_heldout"
+      ]
+    },
+    "int4": {
+      "bank_bytes_on_disk": 359475192,
+      "bytes_packed": 180412416,
+      "certified": [
+        "control_utility",
+        "target_debugging_development",
+        "target_debugging_heldout"
+      ],
+      "degradation": {
+        "control_utility": -0.3089093681426182,
+        "target_debugging_development": -0.3453680716315265,
+        "target_debugging_heldout": -0.40434436582156097
+      },
+      "loss": {
+        "control_utility": 7.825303554534912,
+        "target_debugging_development": 4.601373672485352,
+        "target_debugging_heldout": 4.718017578125
+      },
+      "revoked": []
+    },
+    "int8": {
+      "bank_bytes_on_disk": 359475192,
+      "bytes_packed": 359325696,
+      "certified": [
+        "target_debugging_development"
+      ],
+      "degradation": {
+        "control_utility": 0.04251869385337712,
+        "target_debugging_development": 0.015467710917718556,
+        "target_debugging_heldout": 0.02136387224323247
+      },
+      "loss": {
+        "control_utility": 11.804566383361816,
+        "target_debugging_development": 7.137669563293457,
+        "target_debugging_heldout": 8.089930534362793
+      },
+      "revoked": [
+        "control_utility",
+        "target_debugging_heldout"
+      ]
+    }
+  },
+  "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "run": "silspring compression proof (REAL)",
+  "suites": {
+    "control_utility": {
+      "cases": 4,
+      "split": "controls"
+    },
+    "target_debugging_development": {
+      "cases": 3,
+      "split": "development"
+    },
+    "target_debugging_heldout": {
+      "cases": 3,
+      "split": "heldout"
+    }
+  },
+  "tolerance": 0.02,
+  "anomaly_investigation": {
+    "finding": "int4 suite losses are LOWER than the full-precision reference (negative degradation) on every suite. Investigated before recording any claim (experiments/glm53_flash_pilot/diag_quant.py, run 2026-09-18, WSL, same model+suite).",
+    "measurements": {
+      "round_trip_relative_frobenius_error": {"int8": 0.01, "int4": 0.179, "int2": 0.8918},
+      "fraction_of_2d_weights_zeroed": {"int8": 0.015, "int4": 0.255, "int2": 0.941},
+      "in_place_round_tripped_weights_no_streamer_heldout_loss": {
+        "full": 7.9207, "int8": 8.0899, "int4": 4.718, "int2": 17.2174
+      },
+      "bank_plus_streamer_heldout_loss": {
+        "int8": 8.0899, "int4": 4.718, "int2": 17.2174
+      },
+      "streamer_restores_layer0_byte_exact": {"int8": true, "int4": true, "int2": true}
+    },
+    "conclusion": "NO pipeline defect: the in-place path (no streamer, no bank) reproduces the streamed losses to 4 decimal places, and the bank+streamer restores weights byte-exact. The negative degradation is a REAL property of the metric on this model: per-row symmetric int4 zeroes ~25% of layer weights (|w| < scale/2 rounds to 0), collapsing the decoder stack toward embedding-similarity behavior, which lowers cross-entropy on these template-less prompt texts (an instruct model evaluated without its chat template). The certificate is still truthful under the certifier's contract (deviation within tolerance), but the int4 'improvement' is an artifact of loss-as-proxy -- which is precisely why SILT's truth signal is the host oracle, not suite loss.",
+    "honest_caveat": "A negative degradation must never be reported as 'compression improves the model'. No such claim is made here."
+  },
+  "weights_read_only_verified": {
+    "byte_exact_restore": true,
+    "method": "sha256 over every decoder-layer tensor, dtype-exact raw bytes, taken before certification and after the final quantized streamer exited",
+    "tensors_hashed": 288
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "silt.capability_spec.v1",
+  "schema_version": 1,
+  "capability_id": "python_repo_debugging_v1",
+  "modality": "code",
+  "description": "Repairing buggy Python functions to an exact written specification: identify the seeded defect in a short function and return a corrected implementation. Judged exclusively by the host function oracle (exact function_io on untouched checks) inside the Linux code sandbox. The teacher is pinned to the exact Ollama cloud tag digest; the evidence class is behavioural_remote (prompt/response only, no internal router or expert claims).",
+  "teacher": {
+    "provider": "ollama",
+    "model": "glm-5.3-flash:cloud",
+    "revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+    "access": "behavioural_remote"
+  },
+  "target_metrics": [
+    "host_oracle_function_io_pass_rate_on_repair_cases"
+  ],
+  "controls": [
+    "host_oracle_function_io_pass_rate_on_non_debugging_utility_cases"
+  ],
+  "minimum_retention_ratio": 0.5,
+  "maximum_control_regression": 0.1,
+  "hardware_budget": {
+    "max_model_storage_bytes": null,
+    "max_peak_ram_bytes": null,
+    "max_peak_vram_bytes": null
+  },
+  "evaluation": {
+    "training": "Authored repair cases whose judged teacher traces may become KD teaching pairs (never any other split)",
+    "development": "Authored repair cases for iterated observation; never teaching material",
+    "heldout": "Authored repair cases untouched by any teaching decision; the honest transfer measurement",
+    "final": "Authored repair cases frozen at dataset build; NEVER opened in this pilot (final_opened stays false)"
+  },
+  "remote_connector_selected": false
+}

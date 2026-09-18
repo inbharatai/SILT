@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "806a2a0a6a6f7537fbdc94b6051d0e612c4e0533a4d1faedcd8abd46653e8445",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 5149.511,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: slugify accepts a string and returns a lowercase slug: every MAXIMAL run of non-alphanumeric characters is replaced by a single hyphen, all letters are lowercased, and leading and trailing hyphens are stripped. The result may be an empty string.\n\n```python\ndef slugify(text):\n    out = []\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n        else:\n            out.append('-')\n    return ''.join(out)\n```",
+    "prompt_tokens": 155,
+    "response": "Let me analyze the specification:\n\n1. Accepts a string, returns a lowercase slug\n2. Every MAXIMAL run of non-alphanumeric characters is replaced by a single hyphen\n3. All letters are lowercased\n4. Leading and trailing hyphens are stripped\n5. Result may be an empty string\n\nThe current code:\n- Lowercases the text\n- Replaces each non-alphanumeric character with a hyphen (not collapsing runs)\n- Doesn't strip leading/trailing hyphens\n\nBugs:\n1. Consecutive non-alphanumeric characters each become a hyphen instead of collapsing to one hyphen\n2. Leading/trailing hyphens are not stripped\n\nFix:\n\n```python\ndef slugify(text):\n    out = []\n    prev_hyphen = False\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n            prev_hyphen = False\n        else:\n            if not prev_hyphen:\n                out.append('-')\n            prev_hyphen = True\n    return ''.join(out).strip('-')\n```\n\nWait, let me think about the \"maximal run\" logic. A maximal run of non-alphanumeric characters should be replaced by a single hyphen. So consecutive non-alnum chars \u2192 one hyphen.\n\nMy approach: track whether the last appended character was a hyphen (from a run). If we encounter a non-alnum char and the previous appended char wasn't already a hyphen from this run, append one hyphen.\n\nActually, simpler: append '-' only if the last character in out is not '-', or out is empty... wait, but that would also prevent hyphens at the start. Actually that's fine because leading hyphens get stripped anyway. But let me be careful: if out is empty and we see a non-alnum char, we could either append '-' or not \u2014 it gets stripped at the end anyway. But to be safe with the \"maximal run\" semantics, appending is fine since stripping handles it.\n\nActually, let me think again. If out is empty and ch is non-alnum, appending '-' then later stripping works. If out's last char is '-', skip. That handles collapsing runs.\n\nBut wait \u2014 there's a subtlety: what if the last appended char is '-' but it came from... no, all hyphens in out come from non-alnum replacements since alnum chars are appended as-is. Well, actually alnum characters could include '-'? No, '-'.isalnum() is False. So hyphens in out only come from replacements. Good.\n\nAlternative approach using regex:\n\n```python\nimport re\n\ndef slugify(text):\n    return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')\n```\n\nHmm, but there's a subtlety: `isalnum()` in Python includes Unicode letters and digits, while `[^a-z0-9]` only covers ASCII. The specification says \"non-alphanumeric characters\" \u2014 to match the original code's behavior with `isalnum()`, I should keep using `isalnum()`. The spec says \"every maximal run of non-alphanumeric characters\" \u2014 alphanumeric presumably means `str.isalnum()` semantics (Unicode-aware). To be safe and match the original intent, I'll use the loop-based approach with `isalnum()`.\n\nAlso, `.lower()` on the whole string vs per-character \u2014 same result for practical purposes. Note: some Unicode characters change length when lowercased? Actually, `str.lower()` can change length in rare cases (e.g., '\u0130'.lower() gives 'i\u0307' which is 2 chars). But iterating over `text.lower()` is fine.\n\nLet me write the loop version:\n\n```python\ndef slugify(text):\n    out = []\n    for ch in text.lower():\n        if ch.isalnum():\n            out.append(ch)\n        elif not out or out[-1] != '-':\n            out.append('-')\n    return ''.join(out).strip('-')\n```\n\nWait, `elif not out or out[-1] != '-'` \u2014 if out is empty and ch is non-alnum, we append '-'. Then leading hyphens get stripped. That's fine.\n\nHmm, but actually, should I avoid appending a leading hyphen at all? It doesn't matter because of the strip. But let me trace: text = \"--hello--\". Lower: \"--hello--\". \n- ch='-': out empty \u2192 append '-'\n- ch='-': out[-1]=='-' \u2192 skip\n- ch='h': append 'h'\n- ... \"hello\"\n- ch='-': out[-1]='o' \u2192 append '-'\n- ch='-': skip\nResult: \"-hello-\" \u2192 strip('-') \u2192 \"hello\". Correct.\n\ntext = \"!!!\": out = \"-\" \u2192 strip \u2192 \"\". Correct, empty string allowed.\n\ntext = \"Hello, World! 123\": lower \"hello, world! 123\"\n- h,e,l,l,o",
+    "response_tokens": 1024,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 7781.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "30fa29e21b2a24e0eb6a3c35023b06fc3e16234dc3cdf4b32d756f3c615dbb4d",
+  "sample_id": "slugify_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

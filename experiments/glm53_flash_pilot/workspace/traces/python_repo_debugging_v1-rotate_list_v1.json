@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "9bd5947e90c69cc1d1772c33fe5379c25cdb0de1e7e33adbfec9608964003bef",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 3053.928,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: rotate accepts a non-empty list and a non-negative integer k, and rotates the list to the RIGHT by k positions: the last k elements (modulo the list length) move to the front in their original order, and the rest follow. k may exceed the length. The input list must not be mutated.\n\n```python\ndef rotate(items, k):\n    n = len(items)\n    k = k % n\n    return items[k:] + items[:k]\n```",
+    "prompt_tokens": 153,
+    "response": "Let me analyze the function against the specification.\n\nSpecification: rotate accepts a non-empty list and a non-negative integer k, and rotates the list to the RIGHT by k positions: the last k elements (modulo the list length) move to the front in their original order, and the rest follow. k may exceed the length. The input list must not be mutated.\n\nThe current code:\n```python\ndef rotate(items, k):\n    n = len(items)\n    k = k % n\n    return items[k:] + items[:k]\n```\n\nLet's test: items = [1, 2, 3, 4, 5], k = 2. Right rotation by 2 means the last 2 elements [4, 5] move to the front: [4, 5, 1, 2, 3].\n\nCurrent code: items[2:] + items[:2] = [3, 4, 5] + [1, 2] = [3, 4, 5, 1, 2]. That's a LEFT rotation by 2, not a right rotation. So the bug is that it rotates left instead of right.\n\nTo rotate right by k: the last k elements move to the front. So the result should be items[-k:] + items[:-k] when k > 0, but careful: when k % n == 0, items[-0:] is items[0:] which is the whole list, and items[:-0] is items[:0] which is empty. So items[-0:] + items[:-0] = whole list + empty = whole list. Wait, items[-0:] = items[0:] = full list, items[:-0] = items[:0] = []. So result = full list + [] = full list. That's actually correct! Wait, let me check: if k = 0, right rotation by 0 should return the list unchanged. items[-0:] + items[:-0] = items[0:] + items[:0] = items + [] = items. Hmm, that's actually correct because -0 == 0 in Python.\n\nWait, but let me double check: items[-k:] when k=0 is items[-0:] = items[0:] = full list. items[:-k] = items[:-0] = items[:0] = []. So result = full list. Correct!\n\nBut wait, what if k % n == 0 but k > 0? E.g., n=5, k=5. Then k % n = 0, and same as above, result is the full list. Correct.\n\nHmm, but actually there's a subtlety: items[-k:] with k=0 gives the full list, and items[:-k] gives empty. So the concatenation is full list + empty = full list. That's correct for k=0.\n\nActually wait, let me reconsider. For k=0: right rotation by 0 = original list. items[-0:] + items[:-0] = items + [] = items. Yes correct.\n\nFor k=2, n=5: items[-2:] + items[:-2] = [4,5] + [1,2,3] = [4,5,1,2,3]. Correct!\n\nSo the fix is to change `items[k:] + items[:k]` to `items[-k:] + items[:-k]`. But wait, there's the edge case with k=0 where -k = 0, and slicing behaves differently: items[-0:] = items[0:] (full list) and items[:-0] = items[:0] (empty). The concatenation is still the full list, so it works out.\n\nHmm, but actually let me be careful. Some people write it as items[n-k:] + items[:n-k] to avoid the -0 issue. With k=0: items[n-0:] = items[n:] = [] and items[:n-0] = items[:n] = full list. Result = [] + full list = full list. Correct.\n\nWith k=2, n=5: items[3:] + items[:3] = [4,5] + [1,2,3] = [4,5,1,2,3]. Correct.\n\nBoth approaches work. Let me use items[n-k:] + items[:n-k] to be safe, or items[-k:] + items[:-k]. Both are fine.\n\nActually, let me verify items[-k:] + items[:-k] for k=0 again very carefully:\n- k = 0\n- items[-0:] \u2014 in Python, -0 == 0, so this is items[0:] = full list\n- items[:-0] \u2014 items[:0] = []\n- Result: full list + [] = full list \u2713\n\nYes, it works. But it's a bit subtle",
+    "response_tokens": 1024,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 5469.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "9727c794678de8500bd180cf56584f4fa4e5eb019d7a924658a4695177b2fd20",
+  "sample_id": "rotate_list_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}
