@@ -32,16 +32,129 @@
 <style>
 :root{--bg:#071019;--panel:#0c1723;--panel2:#101e2c;--line:#203244;--ink:#eff7f7;--dim:#a4b5c3;--faint:#708597;--teal:#21d4bd;--teal2:#0f766e;--green:#6ee7a8;--amber:#f6c85f;--red:#ff7a7a;--blue:#7cc7ff;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans)}a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1120px;margin:auto;padding:0 6%}
-header{position:sticky;top:0;z-index:20;background:rgba(7,16,25,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}header .wrap{min-height:72px;display:flex;align-items:center;gap:20px}.brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-weight:800;letter-spacing:.12em}.brand svg{width:78px;height:auto}.brand svg g{fill:#dce8eb}.brand svg rect[fill="#0f766e"]{fill:var(--teal)}nav{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}nav a{font:12px var(--mono);color:var(--dim);border:1px solid var(--line);padding:6px 11px;border-radius:999px}nav a:hover{color:var(--teal);border-color:var(--teal);text-decoration:none}
-.hero{padding:92px 0 76px;text-align:center}.eyebrow{font:600 12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}h1{max-width:940px;margin:16px auto 0;font-size:clamp(38px,6vw,68px);line-height:1.06;letter-spacing:-.045em}.hero h1 span{color:var(--teal)}.hero .sub{max-width:800px;margin:26px auto 0;color:var(--dim);font-size:clamp(17px,2vw,21px)}.ctas{margin-top:34px;display:flex;gap:13px;justify-content:center;flex-wrap:wrap}.btn{display:inline-block;padding:13px 24px;border-radius:10px;font-weight:700;border:1px solid var(--line)}.btn.primary{background:var(--teal);border-color:var(--teal);color:#04231f}.btn.ghost{color:var(--ink)}.patent{margin-top:24px;color:var(--faint);font:12px var(--mono)}
-section{padding:72px 0;border-top:1px solid var(--line)}.kicker{font:600 12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}h2{font-size:clamp(28px,4vw,42px);line-height:1.14;letter-spacing:-.025em;margin:10px 0 0}.lead{max-width:760px;color:var(--dim);margin:15px 0 0;font-size:17px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}.card{background:linear-gradient(180deg,var(--panel),#09141e);border:1px solid var(--line);border-radius:15px;padding:26px}.card .n{font:700 12px var(--mono);color:var(--teal);letter-spacing:.12em}.card h3{margin:9px 0 0;font-size:21px}.card p{color:var(--dim);margin:9px 0 0;font-size:14.5px}.card code{font-family:var(--mono);font-size:12px}
-.problem{background:var(--panel)}.problem-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}.quote{background:#061019;border:1px solid var(--line);border-radius:14px;padding:24px;font:14px/1.85 var(--mono);color:var(--dim)}.quote strong{color:var(--ink)}.quote .teacher{color:var(--blue)}.quote .skill{color:var(--amber)}.quote .learner{color:var(--green)}
-.arch{margin-top:36px;background:#050d14;border:1px solid var(--line);border-radius:16px;padding:26px;overflow:auto}.flow{min-width:850px;display:grid;grid-template-columns:1fr 38px 1fr 38px 1fr 38px 1fr;align-items:stretch;gap:0}.node{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--panel);text-align:center}.node b{display:block}.node small{display:block;color:var(--dim);margin-top:6px}.arrow{display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:22px}.gate{border-color:#2e6f68}.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}.badge{font:11px var(--mono);padding:5px 8px;border-radius:999px;border:1px solid var(--line)}.ok{color:var(--green)}.wait{color:var(--amber)}.no{color:var(--red)}
-.evidence{background:var(--panel)}.runs{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:34px}.run{background:var(--bg);border:1px solid var(--line);border-radius:13px;padding:22px}.run .tag{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase}.run h3{font-size:18px;margin:9px 0}.run p{color:var(--dim);font-size:14px}.metric{font:700 19px var(--mono);margin-top:10px}.metric.good{color:var(--green)}.metric.bad{color:var(--red)}.metric.wait{color:var(--amber)}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}.panel h3{margin-top:0}.panel ul{padding-left:20px;color:var(--dim)}.panel li+li{margin-top:8px}.scope .panel:first-child{border-color:#2c675f}.scope .panel:last-child{border-color:#58343a}
-.cta{text-align:center}.cta h2{max-width:760px;margin:10px auto 0}.cta .lead{margin:15px auto 0}.repo{margin:28px auto 0;max-width:760px;padding:18px 20px;border:1px solid var(--line);background:#050d14;border-radius:12px;font:14px var(--mono);word-break:break-all}
+header{position:sticky;top:0;z-index:20;background:rgba(7,16,25,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}header .wrap{min-height:72px;display:flex;align-items:center;gap:20px}.brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-weight:800;letter-spacing:.12em}.brand svg{width:78px;height:auto}.brand svg g{fill:#dce8eb}.brand svg rect[fill="#0f766e"]{fill:var(--teal)}nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}nav a{font:12px var(--mono);color:var(--dim);border:1px solid var(--line);padding:6px 11px;border-radius:999px}nav a:hover{color:var(--teal);border-color:var(--teal);text-decoration:none}
+
+/* ---------- hero ---------- */
+.hero{padding:76px 0 56px;text-align:center}.eyebrow{font:600 12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}h1{max-width:900px;margin:16px auto 0;font-size:clamp(36px,6vw,64px);line-height:1.06;letter-spacing:-.045em}.hero h1 span{color:var(--teal)}.hero .sub{max-width:680px;margin:20px auto 0;color:var(--dim);font-size:clamp(16px,2vw,19px)}
+.ctas{margin-top:28px;display:flex;gap:13px;justify-content:center;flex-wrap:wrap}.btn{display:inline-block;padding:13px 24px;border-radius:10px;font-weight:700;border:1px solid var(--line)}.btn.primary{background:var(--teal);border-color:var(--teal);color:#04231f}.btn.ghost{color:var(--ink)}.patent{margin-top:22px;color:var(--faint);font:12px var(--mono)}
+
+/* ---------- animated transfer stage ---------- */
+.stage{display:flex;align-items:center;gap:14px;justify-content:center;margin:44px auto 6px;max-width:980px;overflow-x:auto;padding:6px 2px}
+.actor{flex:0 0 auto;text-align:center;width:118px}.actor svg{width:72px;height:auto;display:block;margin:0 auto}
+.actor .name{display:block;margin-top:6px;font:700 12px var(--mono);letter-spacing:.1em}
+.actor.teacher{color:var(--blue)}.actor.student{color:var(--green)}
+.actor svg{animation:bob 3.4s ease-in-out infinite}
+.actor.student svg{animation-delay:1.7s}
+.track{position:relative;flex:1 1 auto;min-width:420px;height:96px}
+.rail{position:absolute;top:47px;left:0;right:0;height:2px;background:var(--line)}
+.stations{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.station{align-self:center;justify-self:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font:600 12px var(--mono);text-align:center;min-width:104px;color:var(--dim)}
+.station .ico{display:block;font-size:19px;line-height:1.2}
+.station.gate{border-color:#2e6f68;color:var(--ink)}
+.station.lit{border-color:var(--teal);box-shadow:0 0 0 3px rgba(33,212,189,.16);color:var(--ink)}
+.packet{position:absolute;top:40px;left:0;width:16px;height:16px;border-radius:5px;background:var(--teal);box-shadow:0 0 14px rgba(33,212,189,.7)}
+.hero .packet{animation:fly 6.4s cubic-bezier(.4,0,.6,1) infinite}
+.station:nth-child(1){animation:spark 6.4s infinite}.station:nth-child(2){animation:spark 6.4s infinite .53s}.station:nth-child(3){animation:spark 6.4s infinite 1.06s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes fly{0%{left:0;opacity:0}6%{opacity:1}82%{opacity:1}94%,100%{left:calc(100% - 16px);opacity:0}}
+@keyframes spark{0%,28%{border-color:var(--line);box-shadow:none;color:var(--dim)}8%,16%{border-color:var(--teal);box-shadow:0 0 0 4px rgba(33,212,189,.18);color:var(--ink)}}
+.stage-cap{font:11px var(--mono);color:var(--faint);margin:6px 0 0}
+
+/* ---------- interactive gate demo ---------- */
+section{padding:72px 0;border-top:1px solid var(--line)}.kicker{font:600 12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}h2{font-size:clamp(26px,4vw,40px);line-height:1.14;letter-spacing:-.025em;margin:10px 0 0}.lead{max-width:740px;color:var(--dim);margin:15px 0 0;font-size:17px}
+.play{background:var(--panel)}
+.playbox{margin:34px auto 0;max-width:820px;background:#061019;border:1px solid var(--line);border-radius:16px;padding:26px}
+.playrow{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+.pstation{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font:600 12px var(--mono);color:var(--dim);text-align:center;min-width:96px;transition:all .25s}
+.pstation .ico{display:block;font-size:20px}
+.pstation.lit{border-color:var(--teal);color:var(--ink);transform:translateY(-3px);box-shadow:0 6px 22px rgba(33,212,189,.14)}
+.pstation.hot{border-color:var(--red);color:var(--ink);transform:translateY(-3px);box-shadow:0 6px 22px rgba(255,122,122,.16)}
+.parrow{color:var(--teal);font-size:20px}
+.pbot{width:64px;text-align:center}
+.pbot svg{width:54px;height:auto}
+.pbot .tag{display:block;font:700 10px var(--mono);letter-spacing:.08em;margin-top:2px}
+.pbot.t{color:var(--blue)}.pbot.s{color:var(--green)}
+.pbot.s.won svg{animation:cheer 1s ease}
+@keyframes cheer{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg) translateY(-6px)}75%{transform:rotate(8deg) translateY(-6px)}}
+.verdict{margin-top:18px;text-align:center;font:700 15px var(--mono);min-height:26px}
+.verdict.ok{color:var(--green)}.verdict.no{color:var(--red)}.verdict.wait{color:var(--amber)}
+.stamp{display:inline-block;border:2px solid;border-radius:8px;padding:4px 14px;letter-spacing:.14em;transform:rotate(-4deg);animation:stampin .3s ease}
+.stamp.ok{border-color:var(--green);color:var(--green)}.stamp.no{border-color:var(--red);color:var(--red)}
+@keyframes stampin{from{transform:rotate(-4deg) scale(1.8);opacity:0}to{transform:rotate(-4deg) scale(1);opacity:1}}
+.playbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.playbtns button{cursor:pointer;font:700 14px var(--sans);padding:12px 20px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+.playbtns button:hover{border-color:var(--teal)}
+.playbtns button:disabled{opacity:.45;cursor:default}
+.playbtns .good:hover{border-color:var(--green)}.playbtns .bad:hover{border-color:var(--red)}
+.playnote{text-align:center;color:var(--faint);font:11px var(--mono);margin:14px 0 0}
+
+/* ---------- status vocabulary ---------- */
+.vocab{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:30px;justify-content:center}
+.vchip{font:700 12px var(--mono);letter-spacing:.08em;border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--panel2)}
+.vneq{color:var(--teal);font:700 14px var(--mono)}
+
+/* ---------- cards & grids ---------- */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
+.card{background:linear-gradient(180deg,var(--panel),#09141e);border:1px solid var(--line);border-radius:15px;padding:24px}
+.card .ico{font-size:26px;line-height:1}
+.card .n{font:700 12px var(--mono);color:var(--teal);letter-spacing:.12em;margin-top:10px}
+.card h3{margin:8px 0 0;font-size:20px}.card p{color:var(--dim);margin:9px 0 0;font-size:14px}.card code{font-family:var(--mono);font-size:12px}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.badge{font:11px var(--mono);padding:5px 9px;border-radius:999px;border:1px solid var(--line)}
+.ok{color:var(--green)}.wait{color:var(--amber)}.no{color:var(--red)}
+details{margin-top:14px;border:1px solid var(--line);border-radius:10px;background:#050d14}
+details summary{cursor:pointer;list-style:none;padding:10px 14px;font:600 12px var(--mono);color:var(--teal)}
+details summary::-webkit-details-marker{display:none}
+details summary:before{content:"▸ "}
+details[open] summary:before{content:"▾ "}
+details .body{padding:0 16px 14px;color:var(--dim);font-size:14px}
+details .body p{margin:8px 0}
+
+/* ---------- capability grid ---------- */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.cap{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px}
+.cap .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cap h4{margin:0;font-size:15px}
+.cap .st{font:700 9.5px var(--mono);letter-spacing:.08em;padding:3px 8px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.cap .st.d{color:var(--green)}.cap .st.o{color:var(--teal)}.cap .st.e{color:var(--amber)}.cap .st.l{color:var(--dim)}
+.cap p{margin:7px 0 0;font-size:13px;color:var(--dim);line-height:1.5}
+
+/* ---------- evidence ---------- */
+.evidence{background:var(--panel)}
+.bars{margin:30px auto 0;max-width:760px}
+.brow{display:grid;grid-template-columns:190px 1fr 64px;gap:12px;align-items:center;margin:9px 0}
+.brow .lab{font:12.5px var(--mono);color:var(--dim);text-align:right}
+.brow .bar{height:14px;background:#050d14;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.brow .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal2),var(--teal));transition:width 1s cubic-bezier(.2,.7,.3,1)}
+.brow .bar i.zero{background:var(--red);opacity:.55}
+.bars.on .brow .bar i{width:var(--w)}
+.brow .num{font:700 13px var(--mono);color:var(--ink)}
+.runs{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:34px}
+.run{background:var(--bg);border:1px solid var(--line);border-radius:13px;padding:22px}
+.run .tag{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.run h3{font-size:17px;margin:9px 0}
+.run p{color:var(--dim);font-size:13.5px}
+.metric{font:700 18px var(--mono);margin-top:10px}.metric.good{color:var(--green)}.metric.bad{color:var(--red)}.metric.wait{color:var(--amber)}
+.run details{margin-top:10px}
+
+/* ---------- scope checklist ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:34px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}.panel h3{margin-top:0}
+.scope .panel:first-child{border-color:#2c675f}.scope .panel:last-child{border-color:#58343a}
+.check{list-style:none;padding:0;margin:0}.check li{display:flex;gap:10px;color:var(--dim);padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.check li:last-child{border-bottom:0}
+.check .y{color:var(--green);font-weight:800}.check .x{color:var(--red);font-weight:800}
+
+/* ---------- misc ---------- */
+.steps{counter-reset:s;list-style:none;padding:0;margin:18px 0 0}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;color:var(--dim);font-size:14.5px;padding:8px 0}
+.steps li:before{content:counter(s);flex:0 0 26px;height:26px;border-radius:999px;background:var(--teal);color:#04231f;font:800 13px var(--mono);display:flex;align-items:center;justify-content:center}
+.cta{text-align:center}.cta h2{max-width:760px;margin:10px auto 0}.cta .lead{margin:15px auto 0}
+.repo{margin:28px auto 0;max-width:760px;padding:18px 20px;border:1px solid var(--line);background:#050d14;border-radius:12px;font:14px var(--mono);word-break:break-all}
 footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-size:13px}footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-@media(max-width:900px){.grid3,.runs,.split,.problem-grid{grid-template-columns:1fr}.hero{padding-top:70px}nav{display:none}}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+@media(max-width:900px){.grid3,.runs,.split,.caps{grid-template-columns:1fr}.hero{padding-top:60px}nav{display:none}.brow{grid-template-columns:120px 1fr 52px}.brow .lab{font-size:11px}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.brow .bar i{width:var(--w)!important}}
 </style>
 </head>
 <body>
@@ -53,7 +166,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       </svg>
     </a>
     <nav aria-label="Main navigation">
-      <a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#capability-research">Research</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio/">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a><a href="https://inbharat.ai">InBharat.ai</a>
+      <a href="#play">Play the gate</a><a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#capability-research">Research</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio/">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a>
     </nav>
   </div>
 </header>
@@ -63,38 +176,84 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
   <div class="wrap">
     <div class="eyebrow">SILT · Skill Interchange Layer with Trust-gating</div>
     <h1>Transfer the skill. <span>Prove the gain.</span> Adapt for the hardware you have.</h1>
-    <p class="sub">A powerful model can still be missing one specialist capability. Another AI may already have it. SILT pursues reusable narrow capabilities across models: inspectable skill transfer, measured admission, and hardware-aware adaptation. Its separate experimental source-weight path constructs smaller specialists, trains recovery factors, and exports teacher-independent serving bundles. Construction is implemented; retained quality remains unproven.</p>
-    <div class="ctas"><a class="btn primary" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">View the open-source repo</a><a class="btn ghost" href="#architecture">See the architecture</a></div>
+    <p class="sub">A model strong everywhere except one capability? SILT moves that narrow skill from a teacher to a learner — and admits it <em>only</em> if held-out evidence shows the learner improved.</p>
+    <div class="stage" aria-hidden="true">
+      <div class="actor teacher">
+        <svg viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="36" rx="10" fill="#13273a" stroke="#2e4a63"/><circle cx="24" cy="33" r="4" fill="#7cc7ff"/><circle cx="40" cy="33" r="4" fill="#7cc7ff"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2e4a63" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#7cc7ff" fill="none" stroke-width="2"/></svg>
+        <span class="name">TEACHER AI</span>
+      </div>
+      <div class="track">
+        <div class="rail"></div>
+        <div class="stations">
+          <div class="station"><span class="ico">🔍</span>EXTRACT<br>the skill</div>
+          <div class="station"><span class="ico">🧪</span>PROVE<br>on held-out tests</div>
+          <div class="station gate"><span class="ico">⚖️</span>TRUST GATE<br>all-or-nothing</div>
+        </div>
+        <div class="packet"></div>
+      </div>
+      <div class="actor student">
+        <svg viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="36" rx="10" fill="#12291f" stroke="#2c5a46"/><circle cx="24" cy="33" r="4" fill="#6ee7a8"/><circle cx="40" cy="33" r="4" fill="#6ee7a8"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2c5a46" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#6ee7a8" fill="none" stroke-width="2"/></svg>
+        <span class="name">STUDENT AI</span>
+      </div>
+    </div>
+    <p class="stage-cap">Skill packets travel from teacher to learner — the gate decides whether they arrive.</p>
+    <div class="ctas"><a class="btn primary" href="#play">Play the gate ↓</a><a class="btn ghost" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">View the open-source repo</a></div>
     <div class="patent">Indian Provisional Patent Application No. 202631101454 · Built in Assam, India 🇮🇳</div>
   </div>
 </section>
 
-<section class="problem" id="thesis">
-  <div class="wrap problem-grid">
-    <div>
-      <div class="kicker">The SILT thesis</div>
-      <h2>A model should not need to know everything from birth.</h2>
-      <p class="lead">If the model you want to deploy is strong but lacks one measurable capability — a language, terminology set, task pattern, workflow, or other narrow skill — SILT asks whether that capability can be represented, transferred from a specialist system, and admitted only after evidence shows the learner improved.</p>
+<section class="play" id="play">
+  <div class="wrap">
+    <div class="kicker">One idea, played</div>
+    <h2>Evidence decides. Nothing else does.</h2>
+    <p class="lead">The whole of SILT in one move: a skill packet may only enter the learner when held-out tests, safety checks and regression sweeps say so. Try sending two different packets through the gate.</p>
+    <div class="playbox">
+      <div class="playrow">
+        <div class="pbot t"><svg viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="36" rx="10" fill="#13273a" stroke="#2e4a63"/><circle cx="24" cy="33" r="4" fill="#7cc7ff"/><circle cx="40" cy="33" r="4" fill="#7cc7ff"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2e4a63" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#7cc7ff" fill="none" stroke-width="2"/></svg><span class="tag">TEACHER</span></div>
+        <div class="pstation" id="ps1"><span class="ico">🔍</span>EXTRACT</div><span class="parrow">→</span>
+        <div class="pstation" id="ps2"><span class="ico">🧪</span>PROVE</div><span class="parrow">→</span>
+        <div class="pstation" id="ps3"><span class="ico">⚖️</span>GATE</div><span class="parrow">→</span>
+        <div class="pbot s" id="pstudent"><svg viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="36" rx="10" fill="#12291f" stroke="#2c5a46"/><circle cx="24" cy="33" r="4" fill="#6ee7a8"/><circle cx="40" cy="33" r="4" fill="#6ee7a8"/><line x1="32" y1="16" x2="32" y2="8" stroke="#2c5a46" stroke-width="2"/><circle cx="32" cy="7" r="3" fill="#21d4bd"/><path d="M22 44 q10 5 20 0" stroke="#6ee7a8" fill="none" stroke-width="2"/></svg><span class="tag">STUDENT</span></div>
+      </div>
+      <div class="verdict" id="verdict" aria-live="polite">The gate is armed. Send a packet.</div>
+      <div class="playbtns">
+        <button class="good" id="btnGood">Send an <b>evaluated</b> packet ✓</button>
+        <button class="bad" id="btnBad">Send an <b>unevaluated</b> packet ✗</button>
+      </div>
+      <p class="playnote">Illustration of the gate discipline — not a real model run. Real verdicts come only from recorded held-out evaluations.</p>
     </div>
-    <div class="quote"><span class="teacher">TEACHER AI</span> already has <span class="skill">specialist skill X</span><br>↓<br>extract / represent the narrow capability<br>↓<br><strong>held-out evidence + safety + regression checks</strong><br>↓<br><span class="learner">LEARNER AI</span> receives it only if the gate permits it</div>
   </div>
 </section>
 
-<section>
+<section id="thesis">
   <div class="wrap">
-    <div class="panel">
-      <h3>Read the status, not just the feature name.</h3>
-      <p>Implemented ≠ enabled ≠ measured ≠ admitted ≠ active. Installing or merging code starts no model run and grants no certificate. No model weights are included in this public source repository; no model or endpoint is automatically activated.</p>
-      <p>The <a href="https://github.com/inbharatai/SILT/blob/main/docs/INTEGRATED_RELEASE_2026_09_12.md">2026-09-12 integrated snapshot</a> adds hardware-adaptive planning/execution, controller/data-binding safeguards, numeric/state fixes and Studio usability repairs. Linux CPU is supported and exercised; single-NVIDIA-CUDA code remains <code>GPU_UNVERIFIED</code>. Independent local regression recorded 2,695 passed, 18 skipped and 92 warnings. This historical count predates the readiness generation-policy fix; it is not a current all-tests-green, clean-wheel, CUDA or model-quality result. CI reports its own environment separately. <strong>Generation-policy correction included in this source snapshot.</strong> Public deployment is verified separately; publication adds no model weights or new quality result. See the <a href="https://github.com/inbharatai/SILT/blob/main/docs/GENERATION_POLICY_NOTICE.md">generation-policy notice</a>; fresh governed data and a verified effective-policy protocol are required for quality claims.</p>
-      <div class="badges"><span class="badge ok">DEFAULT WHEN RUN</span><span class="badge">OPTIONAL BACKEND</span><span class="badge wait">EXPERIMENTAL OPT-IN</span><span class="badge">LOCAL DIAGNOSTIC</span></div>
-      <p>Default means an explicitly invoked core run; optional means backend/API selection; experimental means a separate CLI or opt-in local workbench; diagnostic means a requested local check. Each still needs its supported models, dependencies and evidence.</p>
+    <div class="kicker">Read the status, not the feature name</div>
+    <h2>A model should not need to know everything from birth.</h2>
+    <div class="vocab">
+      <span class="vchip">implemented</span><span class="vneq">≠</span>
+      <span class="vchip">enabled</span><span class="vneq">≠</span>
+      <span class="vchip">measured</span><span class="vneq">≠</span>
+      <span class="vchip">admitted</span><span class="vneq">≠</span>
+      <span class="vchip">active</span>
     </div>
-    <div class="kicker">Transfer → Prove → Adapt</div>
-    <h2>Three stages, one discipline: do not confuse a process completing with a capability improving.</h2>
+    <p class="lead" style="text-align:center;margin-left:auto;margin-right:auto">Installing or merging code starts no model run and grants no certificate. No model weights live in this public repository; no model or endpoint is auto-activated.</p>
+    <details>
+      <summary>What each status means · the 2026-09-12 snapshot in one place</summary>
+      <div class="body">
+        <p><b>Default when run</b> = an explicitly invoked core run · <b>optional backend</b> = backend/API selection · <b>experimental opt-in</b> = a separate CLI or opt-in local workbench · <b>local diagnostic</b> = a requested local check. Each still needs its supported models, dependencies and evidence.</p>
+        <p>The <a href="https://github.com/inbharatai/SILT/blob/main/docs/INTEGRATED_RELEASE_2026_09_12.md">2026-09-12 integrated snapshot</a> adds hardware-adaptive planning/execution, controller safeguards, numeric/state fixes and Studio repairs. Linux CPU is exercised; CUDA stays <code>GPU_UNVERIFIED</code>. Its historical local regression count predates the generation-policy readiness fix and is not a current quality or all-green claim. See the <a href="https://github.com/inbharatai/SILT/blob/main/docs/GENERATION_POLICY_NOTICE.md">generation-policy notice</a> — fresh governed data and a verified protocol are required for quality claims. Public deployment is verified separately; publication adds no weights or quality result.</p>
+      </div>
+    </details>
     <div class="grid3">
-      <div class="card"><div class="n">01 · TRANSFER</div><h3>Represent a narrow skill</h3><p>The default L3 path creates an inspectable Skill Packet containing capability-specific material such as rules, mappings, glossary entries, exemplars, or structured instructions. The teacher's weights are not copied.</p></div>
-      <div class="card"><div class="n">02 · PROVE</div><h3>Evaluate beyond extraction</h3><p>Held-out cases are separated from this extraction workflow—not guaranteed unseen in pretraining. SILT compares baseline and candidate on supplied suites, checks declared provenance, regressions and safety tripwires, then returns <code>PROMOTED</code>, <code>REJECTED</code>, or, only when otherwise eligible and missing approval metadata, <code>PENDING_HUMAN</code>.</p></div>
-      <div class="card"><div class="n">03 · ADAPT</div><h3>Fit the deployment constraint</h3><p>Optional deep-apply can train a removable LoRA from already-approved packets and gate it again. SiltSpring measures quantized-state loss against operator-provided suites and a resident reference. A separate experimental path reconstructs smaller models from source weights and applies teacher-guided recovery; construction completion is not quality certification.</p></div>
+      <div class="card"><div class="ico">📦</div><div class="n">01 · TRANSFER</div><h3>Represent a narrow skill</h3><p>An inspectable Skill Packet — rules, glossaries, exemplars, structured instructions. Teacher weights are never copied.</p>
+        <details><summary>Full discipline</summary><div class="body"><p>The default L3 path creates capability/modality-specific packets. Extraction includes gap measurement, relevance filtering and safety tripwires. Cross-family transfer assumes no shared vocabulary.</p></div></details>
+      </div>
+      <div class="card"><div class="ico">🧪</div><div class="n">02 · PROVE</div><h3>Evaluate beyond extraction</h3><p>Held-out A/B: baseline vs candidate, regression sweep, declared provenance. Verdict: <code>PROMOTED</code>, <code>REJECTED</code>, or <code>PENDING_HUMAN</code> only when approval metadata is the missing piece.</p>
+        <details><summary>Full discipline</summary><div class="body"><p>Held-out cases are separated from the extraction workflow — not guaranteed unseen in pretraining. High-risk medical/legal/finance domains require caller-supplied approval metadata; the approver name is not verified human review. A gate can only measure what its tests and policies cover.</p></div></details>
+      </div>
+      <div class="card"><div class="ico">🗜️</div><div class="n">03 · ADAPT</div><h3>Fit the deployment constraint</h3><p>Optional removable-LoRA deep-apply, re-gated by an independent Gate 2. SiltSpring measures quantized-state loss. A separate path rebuilds smaller specialists from source weights.</p>
+        <details><summary>Full discipline</summary><div class="body"><p>Deep-apply trains LoRA only from Gate-1-approved packets; adapters stay removable, never merged into base weights. Training completion alone never admits an adapter. SiltSpring compares next-token loss on operator-provided suites against a resident reference — held-out-only filtering is not automatic, and loss thresholds do not prove whole-device fit. Construction complete (<code>BUILT_UNCERTIFIED</code>) is not quality passed. Native Windows, macOS/MPS, ROCm, multi-GPU and offload are unsupported; CUDA staging is not out-of-core execution.</p></div></details>
+      </div>
     </div>
   </div>
 </section>
@@ -102,52 +261,42 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
 <section id="architecture">
   <div class="wrap">
     <div class="kicker">Architecture at a glance</div>
-    <h2>The trust gate is the enforcement layer — not the whole purpose.</h2>
-    <p class="lead">SILT separates how a capability is produced from whether the result is allowed into the learner. The default packet pipeline uses capability/modality-specific plugins; optional training, composition, compiler and specialist workflows have distinct activation and evidence contracts. HF causal/seq2seq and Ollama connectors require configured models. Legacy TTS packets carry symbolic G2P text—not voice timbre or acoustic prosody.</p>
-    <div class="arch">
-      <div class="flow">
-        <div class="node"><b>Teacher AI</b><small>capability manifest + sender output</small></div><div class="arrow">→</div>
-        <div class="node"><b>Extract & Distil</b><small>gap measurement · relevance · safety · Skill Packet</small></div><div class="arrow">→</div>
-        <div class="node"><b>Held-out Evaluation</b><small>baseline vs candidate · regression sweep · provenance</small></div><div class="arrow">→</div>
-        <div class="node gate"><b>Trust Gate</b><small>all-or-nothing admission + rollback metadata</small><div class="badges"><span class="badge ok">PROMOTED</span><span class="badge wait">PENDING_HUMAN</span><span class="badge no">REJECTED</span></div></div>
+    <h2>How a capability is produced is separate from whether it is allowed in.</h2>
+    <div class="grid3">
+      <div class="card"><div class="ico">🔌</div><div class="n">CORE · L3</div><h3>Skill Packet path</h3><p>Teacher manifest → extract &amp; distil → held-out evaluation → trust gate. Packets apply at inference; no learner weights change. Approved and rejected states stay physically separated.</p></div>
+      <div class="card"><div class="ico">⚙️</div><div class="n">OPTIONAL · L4</div><h3>Training backends</h3><p>Standard, SiltStream (layer-streamed LoRA) and ZeroForge (zeroth-order, no backprop) deep-apply — each followed by an independent Gate 2. Adapters remain removable.</p></div>
+      <div class="card"><div class="ico">🔬</div><div class="n">EXPERIMENTAL OPT-IN</div><h3>Specialist pipeline</h3><p>Source-weight reconstruction → teacher-guided recovery → teacher-independent export. Engineering admission is never quality admission; frozen finals stay quarantined.</p></div>
+    </div>
+    <details>
+      <summary>The full boundary text — every caveat, nothing hidden</summary>
+      <div class="body">
+        <p><b>Evidence controls have boundaries.</b> Core safety checks are rule-based tripwires; provenance depends on trusted declarations and regression coverage on supplied suites. Hash-chained audit records, runner telemetry, local HMAC reports and retained traces are different evidence types — not external authentication. Mock fixtures demonstrate mechanics; recorded model runs support bounded results; neither establishes broader capability.</p>
+        <p><b>SiltSpring:</b> int8/int4/int2 reports compare next-token loss on operator-provided suites against a resident reference; neither decoder-layer bytes nor loss thresholds prove whole-device fit or task quality. Real HF and toy Spring reject invalid/non-finite loss evidence. Streamer exit restores banked parameters and persistent buffers — not live LoRA or failed-entry states. Toy state-selection is not the real Studio report path.</p>
+        <p><b>Deep-apply + Gate 2:</b> packet-derived LoRA training then a second benchmark; Gate 2 inherits source-packet safety scores and is not a comprehensive trained-output safety audit.</p>
+        <p><b>SiltStream:</b> layer-streamed LoRA with disk-backed frozen decoder layers; sampled pre-training forward logits prove parity, not identical gradients or learned weights; full resident loading/parity is still required first.</p>
+        <p><b>ZeroForge:</b> forward-only SPSA-style LoRA updates — zero backward passes still means multiple forward passes per update and real memory costs; not free compute or a GPU-independence advantage.</p>
+        <p><b>Asymmetric SPRT (evaluator API):</b> stops sufficiently negative candidate evaluations early; never early-promotes; off by default; nominal error settings depend on test assumptions.</p>
+        <p><b>Compiler (experimental):</b> native Switch pruning physically removes experts/router rows and exports weights; certification is a separate narrow seq2seq-text operation; pruning is not admission; repair-training unsupported; not an arbitrary-MoE compiler.</p>
+        <p><b>Reconstruction &amp; recovery:</b> Qwen2 MLP-channel slicing and Switch→dense-T5 are family-specific transformations requiring explicit local source weights and calibration; <code>RECONSTRUCTED_UNVALIDATED</code> establishes nothing about retained quality. Factor-preserving bundles need complete base + factors + tokenizer + matching SILT/PEFT runtime — not plain HF-root or GGUF loading. The recorded BF16 merge failed and was preserved, not relaxed.</p>
+        <p><b>Portable artifacts:</b> dependency-inclusive Compose export and bounded import validate inventories and rebind paths; imports stay unadmitted until fresh local evaluation; relocation is not clean-machine certification. Legacy packet export produces unexecuted job recipes, not checkpoints.</p>
+        <p><b>Compose &amp; speech bridges:</b> typed linear chains of 1–16 local nodes (not arbitrary branching or latent fusion); Whisper/Vits/MMS are bounded CPU float32 paths; audio-output admission stays blocked — waveform/listening packets are pending-human, not intelligibility or MOS certificates. Matched SmolVLM/Idefics3 vision→text is an implemented bridge, not broad OCR certification. Model licensing constrains use.</p>
+        <p><b>Governance &amp; observability:</b> validation registries, consumed final reservations, external function-IO grading, generation/oracle traces and resource probes expose what ran and failed. Linux <code>process_as</code> limits virtual address space, not aggregate RSS; unsupported Windows/cgroup execution fails closed.</p>
+        <p><a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Full activation catalog: commands, dependencies, evidence and usable limits →</a> · <a href="https://github.com/inbharatai/SILT/blob/main/docs/HARDWARE_ADAPTIVE.md">Hardware contract</a> · <a href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook">Device-local runbook</a></p>
       </div>
-    </div>
-    <div class="grid3">
-      <div class="card"><div class="n">DEFAULT WHEN RUN · L3</div><h3>Skill Packet mode</h3><p>Approved skill material is used at inference time. No learner weights are changed. Candidate, approved, and rejected states remain physically separated.</p></div>
-      <div class="card"><div class="n">OPTIONAL BACKEND · L4</div><h3>Deep-apply + Gate 2</h3><p>Explicit packet-derived deep-apply trains LoRA from Gate-1-approved packets, then benchmarks the adapter again. These adapters remain removable, not merged into base weights. Gate 2 inherits source-packet safety scores; it is not a comprehensive trained-output safety audit. Training completion alone does not admit an adapter.</p></div>
-      <div class="card"><div class="n">OPTIONAL BACKEND</div><h3>SiltSpring</h3><p>Explicit int8/int4/int2 reports compare next-token loss on operator-provided suites; held-out-only filtering is not automatic. The real-HF path needs a full resident reference. Toy state-selection, serving and staleness safeguards are not the real Studio report path. Neither decoder-layer bytes nor loss thresholds prove whole-device fit or task quality.</p><p>Real HF and toy Spring now reject invalid/non-finite loss evidence and derived overflow without changing valid tolerances. Streamer exit restores banked parameters and persistent buffers—not live LoRA, nonpersistent caches, failed entry or storage failures.</p></div>
-    </div>
-    <div class="panel">
-      <div class="kicker">Implemented portfolio · distinct paths, one narrow-capability thesis</div>
-      <h3>Source weights → smaller specialist → recovery → independent serving</h3>
-      <p>Alongside packets, the experimental specialist workflow implements source validation and calibration, coherent reconstruction, reconstructed validation, teacher-guided recovery, and recovered validation. Export/reload checks and a separately invoked frozen final comparison follow their own contracts. <code>BUILT_UNCERTIFIED</code> means engineering complete—not quality passed or active deployment.</p>
-      <p>Adaptive specialist planning uses native architecture, dtype, actual inventory and phase-lifetime estimates. Header-only planning differs from authorized TRAIN/DEV profiling; FINAL stays quarantined. <code>READY</code> is feasibility—not approval or reservation. Explicit unavailable devices block; reconstruction remains CPU-only and CUDA CPU staging is not out-of-core execution. Native Windows, macOS/MPS, ROCm/HIP, multi-GPU and offload are unsupported. See the <a href="https://github.com/inbharatai/SILT/blob/main/docs/HARDWARE_ADAPTIVE.md">hardware contract</a> and <a href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md#device-local-codex-runbook">device-local runbook</a>.</p>
-      <p><a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Full activation catalog: commands, dependencies, evidence and usable limits →</a></p>
-    </div>
-    <div class="grid3">
-      <div class="card"><div class="n">OPTIONAL BACKEND</div><h3>SiltStream</h3><p>Select <code>streamed</code> for layer-streamed LoRA with disk-backed frozen decoder layers. Real-HF parity checks sampled pre-training forward logits—not identical gradients or learned weights. Full resident loading/parity is still required before streaming. Supported model/runtime and memory limits apply; a prepared GPU probe is not a measured GPU result.</p></div>
-      <div class="card"><div class="n">OPTIONAL BACKEND</div><h3>ZeroForge</h3><p>Select <code>zeroforge</code> for forward-only, zeroth-order LoRA updates using SPSA-style perturbations. Zero backward passes still means multiple forward passes per update, resident loading/parity, and real memory costs. Small-model CPU backprop also exists; this is neither free compute nor a general speed, quality or GPU-independence advantage.</p></div>
-      <div class="card"><div class="n">OPTIONAL BACKEND · EVALUATOR API</div><h3>Asymmetric SPRT</h3><p>Explicitly configure the evaluator with <code>SprtConfig</code> to stop sufficiently negative candidate evaluations early. It never early-promotes; a surviving candidate still faces the ordinary full-suite gate. SPRT is off by default, and nominal statistical error settings depend on the test assumptions—not universal confidence in model quality.</p></div>
-    </div>
-    <div class="grid3">
-      <div class="card"><div class="n">LOCAL DIAGNOSTIC</div><h3>Signed Capability Diff</h3><p>Request <code>diff</code> and <code>diff-verify</code> to compare approved-set snapshots, packet-content changes and held-out capability scores. CapabilityDiff reports use a local HMAC key: verification establishes holder-key integrity, not externally authenticated authorship or factual correctness. Results cover the supplied suites, receiver and runtime—not differences inside model weights.</p></div>
-      <div class="card"><div class="n">LOCAL DIAGNOSTIC</div><h3>Skill-layer Unlearning</h3><p>After explicit snapshot/rollback operations, <code>unlearn</code> checks managed packet removal and behavior returning within tolerance of the native baseline. A substantive result also requires prior measurable lift. Its local ErasureCertificate is suite-limited evidence—not deletion of weights, LoRA factors, audit history, or knowledge retained by a stateful connector.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Structural compiler</h3><p>The separate native Switch compiler physically prunes experts and router rows, exports weights, and offers diagnostics, identity roundtrips and research scoring. Certification is a separate narrow seq2seq-text operation; pruning is not admission. Compiler repair-training remains unsupported, even though specialist recovery exists. This is not an arbitrary MoE or frontier-model compiler.</p></div>
-    </div>
-    <div class="grid3">
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Coherent reconstruction</h3><p>Qwen2 reconstruction physically slices aligned MLP channels while retaining learned attention/backbone weights. Switch reconstruction selects source experts into a genuine dense T5—not the compiler's keep-N Switch model. Explicit local source weights and calibration are required. These are implemented family-specific transformations; <code>RECONSTRUCTED_UNVALIDATED</code> does not establish retained quality.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Recovery &amp; teacher-independent export</h3><p>Specialist recovery trains actual LoRA factors with teacher KL and supervised response loss. Native-merged export requires parity checks; the recorded BF16 merge failed. Recorded factor-preserving bundles serve without the teacher/cache but require complete base, factors, tokenizer and matching SILT/PEFT runtime—not plain HF-root or GGUF loading. Engineering admission is not quality admission.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Portable artifacts, fresh trust</h3><p>Explicit dependency-inclusive Compose export and bounded import validate inventories and rebind model paths. Imports remain unadmitted until fresh local evaluation; selection and import never activate automatically. Same-host relocation is not clean-machine certification. Separately, legacy packet export produces inspectable datasets and L4/L5 job recipes marked unexecuted—not trained checkpoints.</p></div>
-    </div>
-    <div class="grid3">
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Composition &amp; speech bridges</h3><p>Compose runs typed linear chains of 1–16 locally provisioned nodes, not arbitrary branching or latent fusion. Text-mediated Whisper ASR and Vits/MMS TTS use bounded inputs and CPU float32. Audio-output quality admission remains blocked; waveform/listening packets stay pending-human, not intelligibility or MOS certificates. Model licensing still constrains use.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Matched vision → text</h3><p>The matched SmolVLM/Idefics3 model and processor accept bounded images plus a question, producing text that can feed text/TTS nodes. Provision the complete local model and required Transformers runtime. This is an implemented image-to-text bridge—not a standalone encoder attached to any LLM, broad OCR certification, or arbitrary cross-modal capability transplantation.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Governance &amp; observability</h3><p>Explicit validation registries, consumed final reservations, external function-IO grading, generation/oracle traces and resource probes expose what ran and failed. Linux <code>process_as</code> limits virtual address space—not aggregate RSS; observe-only does not enforce. Traces require retention choices, local records are not independent custody, and unsupported Windows/cgroup execution fails closed.</p></div>
-    </div>
-    <div class="panel">
-      <h3>Evidence controls have boundaries.</h3>
-      <p>Core safety checks are rule-based tripwires; provenance depends on trusted declarations and regression coverage on supplied suites. For declared medical/legal/finance domains, approval metadata is mandatory under the normal gate, but the caller-supplied approver name is not verified human review. Only otherwise-eligible candidates without that metadata become pending; other failed checks reject.</p>
-      <p>Hash-chained audit records, runner telemetry, local HMAC reports and retained traces are different evidence types—not external authentication. Mock fixtures demonstrate mechanics, recorded model runs support bounded results, and neither automatically establishes broader capability. See the activation catalog for exact defaults, platform bounds and evidence links.</p>
+    </details>
+    <div class="caps">
+      <div class="cap"><div class="top"><h4>Signed Capability Diff</h4><span class="st l">LOCAL DIAGNOSTIC</span></div><p><code>diff</code>/<code>diff-verify</code> compare approved-set snapshots. Local HMAC = holder-key integrity, not external authorship.</p></div>
+      <div class="cap"><div class="top"><h4>Skill-layer Unlearning</h4><span class="st l">LOCAL DIAGNOSTIC</span></div><p>Checks managed packet removal against the native baseline. Suite-limited evidence — not weight deletion.</p></div>
+      <div class="cap"><div class="top"><h4>Asymmetric SPRT</h4><span class="st o">EVALUATOR API</span></div><p>Early-stops sufficiently negative evaluations. Never early-promotes; off by default.</p></div>
+      <div class="cap"><div class="top"><h4>SiltStream</h4><span class="st o">OPTIONAL</span></div><p>Layer-streamed LoRA with disk-backed frozen layers, resident parity first.</p></div>
+      <div class="cap"><div class="top"><h4>ZeroForge</h4><span class="st o">OPTIONAL</span></div><p>Forward-only, zeroth-order LoRA updates. Multiple forward passes; not free compute.</p></div>
+      <div class="cap"><div class="top"><h4>SiltSpring</h4><span class="st o">OPTIONAL</span></div><p>int8/int4/int2 loss-vs-reference reports. Loss is not whole-device fit.</p></div>
+      <div class="cap"><div class="top"><h4>Structural compiler</h4><span class="st e">EXPERIMENTAL</span></div><p>Physically prunes Switch experts + router rows, exports weights. Pruning ≠ admission.</p></div>
+      <div class="cap"><div class="top"><h4>Reconstruction</h4><span class="st e">EXPERIMENTAL</span></div><p>Qwen2 MLP-channel slices; Switch→dense T5. Unvalidated until independently scored.</p></div>
+      <div class="cap"><div class="top"><h4>Recovery &amp; export</h4><span class="st e">EXPERIMENTAL</span></div><p>Real LoRA factors, teacher KL, teacher-independent bundles. Engineering ≠ quality.</p></div>
+      <div class="cap"><div class="top"><h4>Compose &amp; bridges</h4><span class="st e">EXPERIMENTAL</span></div><p>Typed 1–16 node chains; bounded Whisper/Vits + matched vision→text. Not broad cross-modal transplantation.</p></div>
+      <div class="cap"><div class="top"><h4>Governance</h4><span class="st e">EXPERIMENTAL</span></div><p>Registries, reservations, external grading, traces. Fails closed where unsupported.</p></div>
+      <div class="cap"><div class="top"><h4>Capability-build research</h4><span class="st e">EXPERIMENTAL</span></div><p>Teacher footprinting, causal intervention, minimum-capability search. See <a href="#capability-research">research</a> below.</p></div>
     </div>
   </div>
 </section>
@@ -156,16 +305,18 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
   <div class="wrap">
     <div class="kicker">Capability-build research layer</div>
     <h2>Footprint a teacher's capability. Intervene causally. Search for the minimum.</h2>
-    <p class="lead">A separate research CLI (<code>silt-capability</code>) asks one question under an operator-written spec: given a large teacher and a narrowly defined capability, what is the minimum computational artifact that reproduces it in a much smaller student — proven on untouched held-out tests without materially regressing controls? It is <strong>not</strong> part of any default run, never auto-activates, and admits nothing; admission stays with the existing Deep-apply/Gate 2 path. <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITY_BUILD.md">Read the capability-build guide</a>.</p>
+    <p class="lead">A separate research CLI (<code>silt-capability</code>) asks one question under an operator-written spec: what is the <em>minimum</em> artifact that reproduces a narrow capability in a much smaller student — proven on untouched held-out tests, without regressing controls? <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITY_BUILD.md">Read the guide →</a></p>
     <div class="grid3">
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Teacher footprinting</h3><p>Define the capability in a machine-readable spec, then collect traces from a teacher under one of two evidence classes that are never mixed: behavioural (cloud/Ollama, only with per-run explicit remote consent) or instrumented open weights (isolated GLM-5.3-Flash worker with its own runtime, read-only weights). A footprint names components <em>associated with</em> a capability under a workload — it <strong>is not</strong> a claim about what the teacher "knows", and routing usage is never called causal importance.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Causal intervention</h3><p>For open-weight teachers only: temporarily mask one component, measure the drop on identical target and control cases, restore, and verify the teacher's weights are byte-identical before and after. An intervention that cannot be restored and verified is <strong>never</strong> recorded as causal evidence. On hardware that cannot hold a ~320B teacher the worker reports a typed <code>BLOCKED_RESOURCE</code> — the honest outcome, not a silent skip.</p></div>
-      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Teach, then reduce</h3><p>Fresh five-split datasets quarantine the consumed September finals and add near-duplicate leakage guards. Student baselines measure the gap — no measured gap, no distillation. Sequence-level pairs from host-judged successes hand off to Deep-apply (LoRA via Gate 2); the trainer never certifies itself. The minimum-capability search then records every candidate and failure — <strong>a smaller parameter count is not evidence</strong>, only held-out functional scores count.</p></div>
+      <div class="card"><div class="ico">👣</div><div class="n">FOOTPRINT</div><h3>Teacher footprinting</h3><p>Two never-mixed evidence classes: behavioural (per-run remote consent) or instrumented open weights via an isolated worker. A footprint names components <em>associated with</em> a capability — routing usage is never called causal importance.</p></div>
+      <div class="card"><div class="ico">🎭</div><div class="n">INTERVENE</div><h3>Causal intervention</h3><p>Temporarily mask one component, measure target vs control drops, restore, verify weights byte-identical. Unrestorable = never causal evidence. Small hosts get a typed <code>BLOCKED_RESOURCE</code> — honest, not a skip.</p></div>
+      <div class="card"><div class="ico">📉</div><div class="n">REDUCE</div><h3>Teach, then reduce</h3><p>Fresh five-split datasets with leakage guards; no measured gap → no distillation. Every candidate and failure recorded. A smaller parameter count is not evidence — only held-out scores count.</p></div>
     </div>
-    <div class="panel">
-      <h3>What the pilot did — and did not — show.</h3>
-      <p>One executed behavioural pilot (8 authored cases, 4 python-repair targets and 4 controls) recorded traces against an operator-selected cloud teacher, with every outcome left <code>UNJUDGED</code> until the host oracle graded it: the teacher never grades itself. The four target repairs then passed all six sandbox oracle checks. That is a judged functional outcome on four target cases — <strong>not</strong> a capability certificate, not a quality claim about GLM-5.3-Flash, and no student has been trained, admitted or certified. Reduction search, student baselines and state certification remain unexecuted; their CLI surfaces refuse honestly rather than emit placeholders.</p>
-    </div>
+    <details>
+      <summary>What the executed pilot showed — and did not</summary>
+      <div class="body">
+        <p>One behavioural pilot (8 authored cases: 4 python-repair targets, 4 controls) ran against an operator-selected cloud teacher, every outcome left <code>UNJUDGED</code> until the host oracle graded it — the teacher never grades itself. The four target repairs passed all six sandbox oracle checks. That is a judged functional outcome on four target cases: <b>not</b> a capability certificate, not a quality claim about GLM-5.3-Flash, and no student has been trained, admitted or certified. Reduction search, student baselines and state certification remain unexecuted; their CLI surfaces refuse honestly rather than emit placeholders. Admission stays with the existing Deep-apply/Gate 2 path — this layer never auto-activates and admits nothing.</p>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -173,17 +324,30 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
   <div class="wrap">
     <div class="kicker">Recorded real-model evidence</div>
     <h2>Failures are part of the evidence.</h2>
-    <p class="lead">SILT does not assume that moving information means the learner acquired the capability. Recorded runs include both promotions and rejections on small local/sample suites. Decimal scores below are the named evaluator metrics, not absolute quality or task-pass percentages. The September 2026 reconstruction evidence is locally recorded and reproducible against its frozen inventory, not third-party authentication; see the <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_RELEASE_2026_09.md">bounded release report</a>.</p>
+    <p class="lead">Every recorded run below is a real verdict from a real gate — including the refusals. Decimal scores are the named evaluator metrics, not absolute quality. <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_RELEASE_2026_09.md">Bounded release report</a>.</p>
+
+    <div class="bars" id="arms">
+      <div class="kicker" style="margin-top:34px">Frozen 16-task final · six arms, all completed</div>
+      <div class="brow"><span class="lab">Source Qwen2</span><div class="bar"><i style="--w:75%"></i></div><span class="num">12/16</span></div>
+      <div class="brow"><span class="lab">Activation-unrepaired</span><div class="bar"><i style="--w:50%"></i></div><span class="num">8/16</span></div>
+      <div class="brow"><span class="lab">Recovered</span><div class="bar"><i style="--w:50%"></i></div><span class="num">8/16</span></div>
+      <div class="brow"><span class="lab">SmolLM2-360M-Instruct</span><div class="bar"><i style="--w:50%"></i></div><span class="num">8/16</span></div>
+      <div class="brow"><span class="lab">Random-MLP control</span><div class="bar"><i class="zero" style="--w:2%"></i></div><span class="num">0/16</span></div>
+      <div class="brow"><span class="lab">Uniform-unrepaired control</span><div class="bar"><i class="zero" style="--w:2%"></i></div><span class="num">0/16</span></div>
+    </div>
+    <p class="lead" style="max-width:760px;margin:14px auto 0;font-size:14px">No aggregate gain over reconstruction or the smaller baseline — retention remains unfinished. Archived logs recorded sampling-default overrides in two arms, so the four lost tasks cannot be attributed solely to compression/training. <a href="https://github.com/inbharatai/SILT/blob/main/docs/GENERATION_POLICY_NOTICE.md">The 2026-09-12 correction</a> documents this in full. The final is consumed — never a tuning set.</p>
+
     <div class="runs">
-      <div class="run"><div class="tag no">REJECTED</div><h3>NLLB-200 → Qwen2.5-0.5B · lexical metric</h3><p>Assamese→English Skill Packet. The candidate made this sample suite’s lexical-similarity result slightly worse. <a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Recorded protocol</a>.</p><div class="metric bad">0.5901 → 0.5795 · Δ −0.0106</div></div>
-      <div class="run"><div class="tag ok">PROMOTED AFTER METRIC FIX</div><h3>NLLB-200 → Qwen2.5-0.5B · embedding metric</h3><p>The same models/data produced a different verdict after a metric inconsistency was corrected. These are semantic-similarity scores from an iterative sample-data rerun, not an untouched final test. <a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Metric-change report</a>.</p><div class="metric good">0.5943 → 0.6475 · Δ +0.0532</div></div>
-      <div class="run"><div class="tag no">REJECTED</div><h3>NLLB-200 → SmolLM2-360M</h3><p>The cross-family learner could not reliably use the injected glossary and also damaged a Hindi control capability. The pipeline ran; the gate refused admission on the supplied suites. <a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Cross-family report</a>.</p><div class="metric bad">Δ −0.0042 · regression detected</div></div>
-      <div class="run"><div class="tag wait">HIGH-RISK APPROVAL METADATA GATE</div><h3>Medical triage rules · Qwen2.5-0.5B → SmolLM2-360M</h3><p>Illustrative sample-data semantic scores improved after calibrating the relevance floor to 0.35—not the default 0.75. The otherwise-eligible medical candidate awaited caller-supplied approval metadata, not authenticated clinical review. This is not clinical efficacy evidence. <a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Calibrated run</a>.</p><div class="metric wait">0.6419 → 0.9116 · Δ +0.2697</div></div>
-      <div class="run"><div class="tag no">GATE 2 REJECTED</div><h3>Real LoRA deep-apply · SmolLM2-135M CPU run</h3><p>Three standard-backend CPU optimization steps produced finite loss and a real adapter from seeded promoted input. Gate 2 rejected it: mechanism evidence, not an end-to-end quality win or streamed/ZeroForge GPU receipt. <a href="https://github.com/inbharatai/SILT/blob/main/docs/deep_apply_real_run_findings.md">CPU run report</a>.</p><div class="metric bad">evaluator score 0.27 · improvement 0.0</div></div>
-      <div class="run"><div class="tag wait">EXPERIMENTAL · NOT CERTIFIED</div><h3>Smaller models, real recovery training</h3><p>A Qwen source was reconstructed and trained for 64 steps: approximately 494M → 417M unique stored parameters, including trained LoRA factors—not a RAM or speed measurement. A separate Switch → dense T5 path reached 224.5M from 619M parameters with 32 recovery steps on synthetic spans—not coding-quality evidence.</p><p>Recorded factor-bundle serving needs the complete base, factors, tokenizer and matching SILT/PEFT runtime, but not the original teacher. The local generation fix requires Transformers 4.51.3 and non-prompt PEFT 0.15.2 for factor wrappers. Tiny and retained-Qwen nonfinal checks under both seeds verify generation mechanics, not quality. Subsequent local readiness verification rebuilt the wheel and sdist and confirmed payload equality with the previously tested installed wheel. This is packaging integrity evidence, not new model-quality or CUDA evidence; rebuild and reverify packaged resources after further source/document edits. Teacher-forced loss and explicit-do_sample=False strict reload probes are outside this specific default-merge defect. This is not a plain HF-root or GGUF model. <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_RELEASE_2026_09.md">Construction and export evidence</a>.</p><div class="metric wait">Construction verified · quality unproven</div></div>
-      <div class="run"><div class="tag wait">FROZEN FINAL · 16 LOCAL TASKS</div><h3>Quality retention remains unfinished</h3><p>Correct tasks: source 12/16; activation-unrepaired 8/16; recovered 8/16; random-MLP control 0/16; uniform-unrepaired 0/16; SmolLM2-360M-Instruct 8/16. All six arms completed. The unchanged historical totals show no aggregate gain over reconstruction or the smaller baseline. <strong>Retention is not established by a matched-greedy comparison.</strong> Archived logs record sampling-default overrides for the reconstructed/recovered and random/uniform arms despite requested-greedy receipts; source-Qwen and SmolLM2 logs do not. Historical per-case actual modes were not instrumented. These results cannot attribute four lost tasks solely to compression/training. The three archived algorithmic defects remain real static diagnoses, not causal proof. No corrected score or final rerun is claimed. <a href="https://github.com/inbharatai/SILT/blob/main/docs/GENERATION_POLICY_NOTICE.md">2026-09-12 correction and evidence</a>.</p><p>Historical frozen local V5 regression: 2,039 passed, eight expected skips, 75 warnings. Tests verify the implementation—not universal model quality or performance on every machine. The final is consumed—not a tuning or retry set. <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_RELEASE_2026_09.md">Frozen comparison and limitations</a>.</p><div class="metric wait">12/16 source · 8/16 recovered</div></div>
-      <div class="run"><div class="tag wait">ENGINEERING ROUTE · NO 3B RESULT</div><h3>Qwen2.5-Coder-3B study preparation</h3><p>The integrated wrapper delegates planning/build/finalize to public SILT modules, binds the executed recipe/config and mandatory reviewed dataset sidecar, and records exact blocked/rejected outcomes. Terminal reports require a separate fsync acknowledgement; they do not promise power-loss durability.</p><p>A config-only 3B proposal is not READY without actual local checkpoint/tokenizer/data evidence. The wrapper keeps <code>BASELINE_NOT_RUN</code>; final needs an explicit engineering-only waiver and separate deployment receipt, not automatic four-arm quality approval. A separate CPU smoke used two optimizer steps, one TRAIN and one DEV row, two calibration samples and a 32-token cap—not a 3B or final-quality result. <a href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md">Experiment runbook</a>.</p><div class="metric wait">plan ≠ approval · GPU_UNVERIFIED</div></div>
-      <div class="run"><div class="tag">AUDITED / REVERSIBLE</div><h3>Admission is a state transition, not a loose copy</h3><p>Promotion has snapshot/rollback metadata and pipeline audit events. Rollback restores the approved set, not arbitrary isolated-skill deletion. The local hash chain is tamper evidence, not tamper-proof external authentication; declared high-risk approval metadata cannot be disabled through normal policy. <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Control boundaries</a>.</p><div class="metric">candidate → verdict → approved/rejected</div></div>
+      <div class="run"><div class="tag no">REJECTED</div><h3>NLLB-200 → Qwen2.5-0.5B · lexical metric</h3><p>The candidate made the sample suite slightly worse. The gate refused.</p><div class="metric bad">0.5901 → 0.5795 · Δ −0.0106</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Recorded protocol</a></p></div>
+      <div class="run"><div class="tag ok">PROMOTED AFTER METRIC FIX</div><h3>NLLB-200 → Qwen2.5-0.5B · embedding metric</h3><p>Same models and data, different verdict after a metric inconsistency was corrected. Iterative sample-data rerun — not an untouched final.</p><div class="metric good">0.5943 → 0.6475 · Δ +0.0532</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Metric-change report</a></p></div>
+      <div class="run"><div class="tag no">REJECTED</div><h3>NLLB-200 → SmolLM2-360M</h3><p>The cross-family learner could not use the glossary and damaged a Hindi control. The gate refused.</p><div class="metric bad">Δ −0.0042 · regression detected</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Cross-family report</a></p></div>
+      <div class="run"><div class="tag wait">HIGH-RISK APPROVAL GATE</div><h3>Medical triage rules · Qwen2.5-0.5B → SmolLM2-360M</h3><p>Scores improved with a calibrated relevance floor; the otherwise-eligible medical candidate awaited caller-supplied approval metadata — not verified clinical review. Not efficacy evidence.</p><div class="metric wait">0.6419 → 0.9116 · Δ +0.2697</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/real_run_findings.md">Calibrated run</a></p></div>
+      <div class="run"><div class="tag no">GATE 2 REJECTED</div><h3>Real LoRA deep-apply · SmolLM2-135M CPU run</h3><p>Three real CPU optimization steps produced a real adapter. Gate 2 rejected it: mechanism evidence, not an end-to-end quality win.</p><div class="metric bad">evaluator score 0.27 · improvement 0.0</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/deep_apply_real_run_findings.md">CPU run report</a></p></div>
+      <div class="run"><div class="tag wait">EXPERIMENTAL · NOT CERTIFIED</div><h3>Smaller models, real recovery training</h3><p>Qwen source reconstructed and trained 64 steps: ~494M → 417M unique stored parameters including LoRA factors. A Switch→dense-T5 path reached 224.5M from 619M in 32 steps.</p><div class="metric wait">Construction verified · quality unproven</div>
+        <details><summary>Packaging, serving and verification boundaries</summary><div class="body"><p>Factor-bundle serving needs the complete base, factors, tokenizer and matching SILT/PEFT runtime — not the teacher, and not plain HF-root or GGUF loading. The local generation fix requires Transformers 4.51.3 and non-prompt PEFT 0.15.2. Tiny and retained-Qwen nonfinal checks verify generation mechanics under both seeds, not quality. A subsequent readiness verification rebuilt the wheel/sdist and confirmed payload equality — packaging integrity, not new model-quality or CUDA evidence. Teacher-forced loss and strict reload probes sit outside the recorded default-merge defect. <a href="https://github.com/inbharatai/SILT/blob/main/docs/EXPERIMENTAL_RELEASE_2026_09.md">Construction and export evidence</a>.</p></div></details>
+      </div>
+      <div class="run"><div class="tag wait">ENGINEERING ROUTE · NO 3B RESULT</div><h3>Qwen2.5-Coder-3B study preparation</h3><p>The integrated wrapper binds recipes, dataset sidecars and exact blocked/rejected outcomes; terminal reports need a separate fsync acknowledgement. A config-only 3B proposal is not READY without local checkpoint/tokenizer/data evidence; final needs an explicit engineering-only waiver.</p><div class="metric wait">plan ≠ approval · GPU_UNVERIFIED</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md">Experiment runbook</a></p></div>
+      <div class="run"><div class="tag">AUDITED / REVERSIBLE</div><h3>Admission is a state transition, not a loose copy</h3><p>Promotion carries snapshot/rollback metadata and pipeline audit events. Rollback restores the approved set. The local hash chain is tamper evidence, not tamper-proof external authentication.</p><div class="metric">candidate → verdict → approved/rejected</div><p style="margin-top:8px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Control boundaries</a></p></div>
     </div>
   </div>
 </section>
@@ -193,30 +357,54 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
     <div class="kicker">Honest scope</div>
     <h2>What SILT claims — and what it does not.</h2>
     <div class="split">
-      <div class="panel"><h3>What exists in the repository</h3><ul><li>Inspectable L3 Skill Packets and held-out A/B evaluation.</li><li>All-or-nothing admission over emitted checks under the chosen policy, with supplied regression suites, safety tripwires, declared provenance, rollback and audit controls.</li><li>Mandatory caller-supplied approval metadata for declared high-risk medical/legal/finance domains—not verified human identity.</li><li>Optional removable LoRA deep-apply followed by an independent Gate 2.</li><li>Optional SiltStream, ZeroForge and loss-based SiltSpring reports; opt-in SPRT and local Capability Diff/skill-layer Unlearning diagnostics.</li><li>Local Studio, CLI, library interfaces, examples, tests, and recorded real-run findings.</li><li>Experimental source-derived reconstruction, recovery and export; composition, matched media bridges, compiler, governance and portability. <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Full activation catalog</a>; completed models remain uncertified.</li></ul></div>
-      <div class="panel"><h3>What SILT does not claim</h3><ul><li>Universal arbitrary capability copying between any two models.</li><li>Complete transfer of a teacher model's knowledge or internal weights.</li><li>AGI or unrestricted autonomous self-improvement.</li><li>Demonstrated frontier-model reconstruction, arbitrary billion-parameter models on 4 GB, or universal GPU/Windows validation. Full-reference loading still constrains streaming paths.</li><li>A fabricated percentage of “knowledge transferred.” SILT reports measurable benchmark deltas and gate verdicts instead.</li><li>A universal safety guarantee: a gate can only measure what its tests and policies cover.</li><li>Patent novelty for standard LoRA or coverage of the new reconstruction/recovery mechanisms by the existing provisional.</li></ul></div>
+      <div class="panel"><h3>What exists in the repository</h3>
+        <ul class="check">
+          <li><span class="y">✓</span> Inspectable L3 Skill Packets and held-out A/B evaluation.</li>
+          <li><span class="y">✓</span> All-or-nothing admission with regression suites, safety tripwires, provenance, rollback and audit.</li>
+          <li><span class="y">✓</span> Mandatory approval metadata for declared high-risk domains (not verified human identity).</li>
+          <li><span class="y">✓</span> Optional removable-LoRA deep-apply + independent Gate 2; SiltStream, ZeroForge, SiltSpring, opt-in SPRT.</li>
+          <li><span class="y">✓</span> Local diagnostics: Capability Diff, skill-layer Unlearning.</li>
+          <li><span class="y">✓</span> Experimental reconstruction/recovery/export, composition and media bridges, compiler, governance, portability.</li>
+          <li><span class="y">✓</span> Studio, CLI, examples, tests and recorded real-run findings — including every rejection.</li>
+        </ul>
+        <p style="color:var(--faint);font-size:13px;margin-top:12px"><a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Full activation catalog</a> — completed models remain uncertified.</p>
+      </div>
+      <div class="panel"><h3>What SILT does not claim</h3>
+        <ul class="check">
+          <li><span class="x">✗</span> Universal arbitrary capability copying between any two models.</li>
+          <li><span class="x">✗</span> Complete transfer of a teacher's knowledge or internal weights.</li>
+          <li><span class="x">✗</span> AGI or unrestricted autonomous self-improvement.</li>
+          <li><span class="x">✗</span> Frontier-model reconstruction, arbitrary billion-parameter models on 4 GB, or universal GPU/Windows validation.</li>
+          <li><span class="x">✗</span> A fabricated "percentage of knowledge transferred" — SILT reports benchmark deltas and gate verdicts.</li>
+          <li><span class="x">✗</span> A universal safety guarantee: a gate measures only what its tests and policies cover.</li>
+          <li><span class="x">✗</span> Patent novelty for standard LoRA, or coverage of the reconstruction/recovery mechanisms by the existing provisional.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="studio" class="problem">
-  <div class="wrap problem-grid">
-    <div>
-      <div class="kicker">SILT Studio</div>
-      <h2>Use Studio locally. Choose where model inference runs.</h2>
-      <p class="lead">The local Studio configures transfers, gate decisions, approved-skill tests, audit review, deep-apply and Spring reports. This homepage and public <code>/studio/</code> are static discovery/setup pages—not a running or hosted engine. Start the local service before opening <code>127.0.0.1:8377</code>. Privacy depends on the selected endpoint: local orchestration does not make remote or cloud-backed inference local.</p>
-      <p>Integrated fixes repair tab navigation, mobile forms and README table rendering. Health distinguishes code availability, mounted routes and enablement without a model load or hardware probe. “App available” is not verified model readiness; local assets, runtime and quality still require separate checks.</p>
-      <div class="ctas"><a class="btn primary" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Open running local engine</a></div>
-    </div>
-    <div class="quote"><strong>LOCAL SETUP · EXPLICIT ACTIVATION</strong><br><br>1. Install the required extras and compatible models<br>2. Choose local or remote model endpoints explicitly<br>3. Start Studio; open <span class="learner">127.0.0.1:8377</span><br><br><span class="skill">Experimental workbench:</span> set <code>SILT_ENABLE_EXPERIMENTAL=1</code> before local startup, then open <code>/experimental</code>. Unset, <code>0</code> and <code>true</code> stay off; restart after changing an off-start.<br><br>Experimental CLI commands are separately explicit and do not use the Studio flag. No install, build or import activates a model.<br><a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Activation catalog and prerequisites →</a></div>
+<section id="studio" class="problem" style="background:var(--panel)">
+  <div class="wrap" style="max-width:860px">
+    <div class="kicker">SILT Studio</div>
+    <h2>Use Studio locally. Choose where inference runs.</h2>
+    <p class="lead">This page and public <code>/studio/</code> are static setup pages — not a hosted engine. Start the local service, then open <span style="color:var(--green);font-family:var(--mono)">127.0.0.1:8377</span>. Privacy follows your endpoint choice: local orchestration does not make cloud-backed inference local.</p>
+    <ol class="steps">
+      <li>Install the required extras and compatible models.</li>
+      <li>Choose local or remote model endpoints — explicitly, every time.</li>
+      <li>Start Studio and open <code>127.0.0.1:8377</code>.</li>
+      <li>Optional workbench: set <code>SILT_ENABLE_EXPERIMENTAL=1</code> before startup, then open <code>/experimental</code>. Off by default; restart after changing an off-start.</li>
+    </ol>
+    <p style="color:var(--faint);font-size:13px">"App available" is not verified model readiness. Experimental CLI commands are separately explicit and never use the Studio flag. <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">Activation catalog and prerequisites →</a></p>
+    <div class="ctas" style="justify-content:flex-start"><a class="btn primary" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="http://127.0.0.1:8377/" target="_blank" rel="noopener">Open running local engine</a></div>
   </div>
 </section>
 
 <section class="cta">
   <div class="wrap">
     <div class="kicker">Open source</div>
-    <h2>Don't take the landing page at face value. Clone it, run it, test the gate, and challenge the assumptions.</h2>
-    <p class="lead">The public repository contains the architecture, source, Studio, benchmark examples, tests, recorded findings, and the reproducible specialist quality experiment runner — including rejected and blocked outcomes. Start with the <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">capability and activation catalog</a> to choose an implemented path without mistaking availability for evidence.</p>
+    <h2>Don't take the landing page at face value. Clone it, run it, test the gate, challenge the assumptions.</h2>
+    <p class="lead">The repository carries the architecture, Studio, tests, recorded findings — including every rejected and blocked outcome. Start with the <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md">capability catalog</a> so availability is never mistaken for evidence.</p>
     <div class="repo"><a href="https://github.com/inbharatai/SILT">https://github.com/inbharatai/SILT</a></div>
     <div class="ctas"><a class="btn primary" href="/studio/">SILT Studio setup</a><a class="btn ghost" href="https://github.com/inbharatai/SILT">Open SILT on GitHub</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/docs/SPECIALIST_QUALITY_EXPERIMENT.md">Runbook</a><a class="btn ghost" href="https://github.com/inbharatai/SILT/blob/main/architecture.md">Read the architecture</a></div>
   </div>
@@ -224,5 +412,104 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
 </main>
 
 <footer><div class="wrap"><div>SILT — Skill Interchange Layer with Trust-gating · © 2026 Uni Guru Technologies LLP</div><div>Indian Provisional Patent Application No. 202631101454 · Assam, India 🇮🇳 · <a href="/studio/">SILT Studio</a> · <a href="https://inbharat.ai">InBharat.ai</a></div></div></footer>
+
+<script>
+(function () {
+  "use strict";
+  var reduced = window.matchMedia
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* scroll reveal */
+  if ("IntersectionObserver" in window) {
+    var ro = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("on"); ro.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll("section:not(.hero)").forEach(function (s) {
+      s.classList.add("reveal");
+      ro.observe(s);
+    });
+    var arms = document.getElementById("arms");
+    if (arms) {
+      var bo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { arms.classList.add("on"); bo.disconnect(); }
+        });
+      }, { threshold: 0.4 });
+      bo.observe(arms);
+    }
+  } else {
+    document.querySelectorAll("section").forEach(function (s) { s.classList.remove("reveal"); });
+    var a = document.getElementById("arms"); if (a) a.classList.add("on");
+  }
+
+  /* gate demo */
+  var verdict = document.getElementById("verdict");
+  var stations = ["ps1", "ps2", "ps3"].map(function (id) { return document.getElementById(id); });
+  var student = document.getElementById("pstudent");
+  var btnGood = document.getElementById("btnGood");
+  var btnBad = document.getElementById("btnBad");
+
+  function say(text, cls) {
+    verdict.textContent = "";
+    verdict.className = "verdict" + (cls ? " " + cls : "");
+    if (cls) {
+      var stamp = document.createElement("span");
+      stamp.className = "stamp " + cls;
+      stamp.textContent = text;
+      verdict.appendChild(stamp);
+    } else {
+      verdict.textContent = text;
+    }
+  }
+  function reset() {
+    stations.forEach(function (s) { s.classList.remove("lit", "hot"); });
+    student.classList.remove("won");
+  }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function send(evaluated) {
+    reset();
+    btnGood.disabled = true; btnBad.disabled = true;
+    var steps = evaluated
+      ? [function () { return "Extraction: rules + exemplars packaged. Nothing copied from weights."; },
+         function () { return "Proof: held-out A/B scored, regression sweep clean, safety tripwires armed."; },
+         function () { say("PROMOTED", "ok"); student.classList.add("won"); }]
+      : [function () { return "Extraction: packet built."; },
+         function () { return "Proof: …no held-out evaluation recorded."; },
+         function () { say("REJECTED", "no"); }];
+    var chain = Promise.resolve();
+    steps.forEach(function (step, i) {
+      chain = chain.then(function () {
+        if (reduced) {
+          stations[i].classList.add(i === 2 && !evaluated ? "hot" : "lit");
+          return step();
+        }
+        return sleep(i === 0 ? 250 : 900).then(function () {
+          stations[i].classList.add(i === 2 && !evaluated ? "hot" : "lit");
+          return step();
+        });
+      });
+    });
+    if (evaluated) {
+      chain = chain.then(function () {
+        if (!reduced) return sleep(1100);
+      }).then(function () {
+        say("PROMOTED — the packet arrived. Evidence carried it in.", "ok");
+      });
+    } else {
+      chain = chain.then(function () {
+        if (!reduced) return sleep(1100);
+      }).then(function () {
+        say("REJECTED — no held-out evidence, no entry. The student never sees it.", "no");
+      });
+    }
+    chain.then(function () { btnGood.disabled = false; btnBad.disabled = false; });
+  }
+  btnGood.addEventListener("click", function () { send(true); });
+  btnBad.addEventListener("click", function () { send(false); });
+})();
+</script>
 </body>
 </html>
