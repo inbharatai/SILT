@@ -1451,14 +1451,15 @@ async function populateDropdowns(){
   const recvOpts=m=>`<option value="${m.id}">${m.id}</option>`;
   const hfOpts=m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`;
   const suiteOpts=Object.entries(suites).map(([id,s])=>
-    `<option value="${id}">${id} — ${s.language||s.domain}${s.high_risk?" ⚠ high-risk":""}</option>`).join("");
+    `<option value="${id}">${id} — ${esc(s.language||s.domain)}${s.high_risk?" ⚠ high-risk":""}</option>`).join("");
   // Playground capability is driven by the SAME suites the catalog/transfer use
   // (was hardcoded to 3 — a model added for any other suite was unreachable in
   // Playground). Each option's value is the JSON CapabilityKey /api/playground
-  // expects.
+  // expects. esc() doubles as the single-quote/attribute breakout guard here
+  // (the server pattern-locks these fields too; this is the sink-side layer).
   const capOpts=Object.entries(suites).map(([id,s])=>{
     const cap=JSON.stringify({task_type:s.task_type,modality:s.modality,domain:s.domain,language:s.language});
-    return `<option value='${cap}'>${id} — ${s.language||s.domain}${s.high_risk?" ⚠ high-risk":""}</option>`;
+    return `<option value='${esc(cap)}'>${id} — ${esc(s.language||s.domain)}${s.high_risk?" ⚠ high-risk":""}</option>`;
   }).join("");
   $("#sender").innerHTML=senders.map(m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`).join("");
   $("#receiver").innerHTML=receivers.map(m=>`<option value="${m.id}">${m.id} — ${esc(m.description)}</option>`).join("");
@@ -1575,12 +1576,31 @@ $("#run").onclick=async()=>{
   }
 };
 let currentJob=null;
+// One live SSE stream at a time (audit 2026-09-18): starting a new run or
+// re-opening a past one must close the previous stream. An unclosed
+// EventSource auto-reconnects forever, so switching runs leaked a stream
+// whose stale handlers kept mutating shared DOM from a run the user is no
+// longer looking at. onerror surfaces a permanently dead stream (CLOSED =
+// server refused the stream, e.g. engine stopped); the transient CONNECTING
+// retry state is left to auto-reconnect.
+let liveES=null;
+function openES(url,onFail){
+  if(liveES){try{liveES.close();}catch(e){}}
+  const es=new EventSource(url); liveES=es;
+  es.onerror=()=>{
+    if(es.readyState===EventSource.CLOSED&&liveES===es){liveES=null;onFail();}
+  };
+  return es;
+}
 function watch(id){
   currentJob=id;
   const seen=[]; $("#events").textContent=""; $("#drops").innerHTML="";
   $("#checks").innerHTML=""; $("#verdict").innerHTML="";
   $("#jobstate").textContent="running";
-  const es=new EventSource(`/api/transfers/${id}/events`);
+  const es=openES(`/api/transfers/${id}/events`,()=>{
+    $("#jobstate").textContent="connection lost — the event stream closed before the status frame (engine down or restarted)";
+    $("#run").disabled=false;
+  });
   es.addEventListener("audit",e=>{
     const ev=JSON.parse(e.data);
     if(!seen.includes(ev.event))seen.push(ev.event);
@@ -1619,7 +1639,7 @@ async function showDropsLater(id){
 function showDrops(r){
   const drops=[...(r.dropped_relevance||[]),...(r.dropped_safety||[])];
   $("#drops").innerHTML=drops.length? drops.map(d=>
-    `<div class="drop">✂ ${d.reason}</div>`).join("")
+    `<div class="drop">✂ ${esc(d.reason)}</div>`).join("")
     :'<div class="footnote">nothing dropped</div>';
 }
 function showGate(d,job){
@@ -1656,7 +1676,7 @@ function showEval(d){
     const cls=r.delta>0?"delta-up":r.delta<0?"delta-down":"delta-flat";
     return `<tr><td>${esc(r.expected)}</td><td>${esc(trim(r.baseline_output))}</td>
       <td>${esc(trim(r.candidate_output))}</td>
-      <td class="${cls}">${r.delta>0?"+":""}${(+r.delta).toFixed(3)}</td></tr>`;
+      <td class="${cls}">${r.delta>0?"+":""}${num3(r.delta)}</td></tr>`;
   }).join("");
   $("#cases tbody").innerHTML=rows;
   const b=d.baseline?.score??d.scores?.baseline_score, c=d.candidate?.score??d.scores?.candidate_score;
@@ -1676,12 +1696,18 @@ function showReport(r,id){
   if(r.decisions&&r.decisions[0])showGate(r.decisions[0],id);
 }
 function drawBars(b,c){
-  const h=v=>Math.max(3,Math.round(v*90));
   $("#bars").innerHTML=`
-   <div class="bar"><div class="v">${(+b).toFixed(3)}</div><div class="fill" style="height:${h(b)}px;background:var(--faint)"></div><div class="v">before</div></div>
-   <div class="bar"><div class="v">${(+c).toFixed(3)}</div><div class="fill" style="height:${h(c)}px;background:var(--teal)"></div><div class="v">after</div></div>`;
+   <div class="bar"><div class="v">${num3(b)}</div><div class="fill" style="height:${barH(b)}px;background:var(--faint)"></div><div class="v">before</div></div>
+   <div class="bar"><div class="v">${num3(c)}</div><div class="fill" style="height:${barH(c)}px;background:var(--teal)"></div><div class="v">after</div></div>`;
 }
-const esc=s=>String(s??"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+// Finite or honestly blank (audit 2026-09-18): a null/NaN score must never
+// render as a fake "0.0000" (+null === 0) or "NaN" — an unmeasured value is
+// "—" in the UI. Same discipline as the search NaN-control guard: a missing
+// number is not a zero regression.
+const num3=v=>{const n=+v;return Number.isFinite(n)?n.toFixed(3):"—";};
+const num4=v=>{const n=+v;return Number.isFinite(n)?n.toFixed(4):"—";};
+const barH=v=>{const n=+v;return Math.max(3,Math.round((Number.isFinite(n)?n:0)*90));};
 const trim=s=>{s=String(s??"");return s.length>70?s.slice(0,70)+"…":s};
 
 /* packets tab */
@@ -1689,9 +1715,9 @@ $("#pk-load").onclick=async()=>{
   const id=$("#pk-job").value; if(!id){alert("Run or select a Transfer first — it becomes the current run pinned above.");return;}
   const d=await api(`/api/transfers/${id}/packets`);
   const card=(p,actions)=>`<div class="drop" style="border-color:var(--teal)">
-    <b>${p.packet_type||"packet"}</b> ${p.packet_id.slice(0,8)} — ${p.sender_capability.task_type}/${p.domain}
+    <b>${p.packet_type||"packet"}</b> ${p.packet_id.slice(0,8)} — ${esc(p.sender_capability.task_type)}/${esc(p.domain)}
     ${p.provenance.is_mock?'<span class="badge warn">MOCK — should be impossible</span>':""}
-    <br>eval=${p.evaluator_score?.toFixed(3)??"—"} safety=${p.safety_score?.toFixed(3)??"—"}
+    <br>eval=${num3(p.evaluator_score)} safety=${num3(p.safety_score)}
     ${p.human_approved_by?` · approved by ${esc(p.human_approved_by)}`:""}
     ${p.rejection_reason?`<br>✂ ${esc(p.rejection_reason)}`:""}
     <br>${actions||""}</div>`;
@@ -1748,7 +1774,7 @@ async function refreshSkills(){
     return;
   }
   $("#sk-list").innerHTML=d.skills.map(s=>{
-    const evalS=s.evaluator_score!=null?(+s.evaluator_score).toFixed(3):"—";
+    const evalS=num3(s.evaluator_score);
     return `<div class="drop" style="border-color:var(--teal)">
       <b>${s.packet_type||"packet"}</b> ${s.packet_id.slice(0,8)} — ${esc(s.capability)}
       ${s.is_mock?'<span class="badge warn">MOCK — should be impossible</span>':""}
@@ -1976,7 +2002,7 @@ async function refreshTtPackets(job,selPacket){
   let approved=[];
   try{const d=await api(`/api/transfers/${job}/packets`);approved=d.approved||[];}catch(e){}
   const opts=['<option value="">all approved</option>']
-    .concat(approved.map(p=>`<option value="${p.packet_id}">${p.packet_id.slice(0,8)} — ${p.sender_capability.task_type}/${p.domain}</option>`));
+    .concat(approved.map(p=>`<option value="${p.packet_id}">${p.packet_id.slice(0,8)} — ${esc(p.sender_capability.task_type)}/${esc(p.domain)}</option>`));
   $("#tt-packet").innerHTML=opts.join("");
   if(selPacket)$("#tt-packet").value=selPacket;
 }
@@ -1995,21 +2021,25 @@ $("#tt-run").onclick=async()=>{
       body:JSON.stringify(body)});
     const d=await r.json();
     if(!r.ok){$("#tt-banner").innerHTML=`<div class="verdict v-rejected">${esc(d.detail||("HTTP "+r.status))}</div>`;return;}
-    $("#tt-base").textContent="score "+(+d.baseline.score).toFixed(4)+"\ntask_success "+(+d.baseline.task_success).toFixed(4)+"\n"+d.baseline.case_count+" cases";
-    $("#tt-cand").textContent="score "+(+d.candidate.score).toFixed(4)+"\ntask_success "+(+d.candidate.task_success).toFixed(4)+"\n"+d.candidate.case_count+" cases";
+    $("#tt-base").textContent="score "+num4(d.baseline.score)+"\ntask_success "+num4(d.baseline.task_success)+"\n"+d.baseline.case_count+" cases";
+    $("#tt-cand").textContent="score "+num4(d.candidate.score)+"\ntask_success "+num4(d.candidate.task_success)+"\n"+d.candidate.case_count+" cases";
     const imp=+d.improvement;
-    $("#tt-improvement").textContent=`improvement: ${imp>=0?"+":""}${imp.toFixed(4)} (${d.skills_active} packet(s) active)`;
-    $("#tt-improvement").className="footnote "+(imp>0?"delta-up":imp<0?"delta-down":"delta-flat");
+    if(!Number.isFinite(imp)){
+      $("#tt-improvement").textContent="improvement: — (not measured)";
+      $("#tt-improvement").className="footnote";
+    }else{
+      $("#tt-improvement").textContent=`improvement: ${imp>=0?"+":""}${imp.toFixed(4)} (${d.skills_active} packet(s) active)`;
+      $("#tt-improvement").className="footnote "+(imp>0?"delta-up":imp<0?"delta-down":"delta-flat");
+    }
     const rows=(d.cases||[]).map(c=>{
       const cls=c.delta>0?"delta-up":c.delta<0?"delta-down":"delta-flat";
       return `<tr><td>${esc(c.expected)}</td><td>${esc(trim(c.baseline_output))}</td>
-        <td>${esc(trim(c.candidate_output))}</td><td class="${cls}">${c.delta>0?"+":""}${(+c.delta).toFixed(3)}</td></tr>`;
+        <td>${esc(trim(c.candidate_output))}</td><td class="${cls}">${c.delta>0?"+":""}${num3(c.delta)}</td></tr>`;
     }).join("");
     $("#tt-cases tbody").innerHTML=rows;
-    const h=v=>Math.max(3,Math.round(v*90));
     $("#tt-bars").innerHTML=`
-      <div class="bar"><div class="v">${(+d.baseline.score).toFixed(3)}</div><div class="fill" style="height:${h(d.baseline.score)}px;background:var(--faint)"></div><div class="v">before</div></div>
-      <div class="bar"><div class="v">${(+d.candidate.score).toFixed(3)}</div><div class="fill" style="height:${h(d.candidate.score)}px;background:var(--teal)"></div><div class="v">after</div></div>`;
+      <div class="bar"><div class="v">${num3(d.baseline.score)}</div><div class="fill" style="height:${barH(d.baseline.score)}px;background:var(--faint)"></div><div class="v">before</div></div>
+      <div class="bar"><div class="v">${num3(d.candidate.score)}</div><div class="fill" style="height:${barH(d.candidate.score)}px;background:var(--teal)"></div><div class="v">after</div></div>`;
     $("#tt-banner").innerHTML=d.high_risk?`<div class="verdict v-pending">HIGH-RISK DOMAIN — outputs are not professional advice</div>`:"";
   }catch(err){
     $("#tt-banner").innerHTML=`<div class="verdict v-rejected">${esc(err.message||err)}</div>`;
@@ -2034,7 +2064,11 @@ function drawLoss(canvas,pts,maxSteps){
     ctx.fillStyle=faint;ctx.font="12px ui-monospace,monospace";
     ctx.fillText("waiting for train_step events…",pad+4,H/2);return;
   }
-  const losses=pts.map(p=>p.loss);
+  const losses=pts.map(p=>p.loss).filter(Number.isFinite);
+  if(!losses.length){
+    ctx.fillStyle=faint;ctx.font="12px ui-monospace,monospace";
+    ctx.fillText("no finite losses yet…",pad+4,H/2);return;
+  }
   let lo=Math.min(...losses),hi=Math.max(...losses);
   if(hi-lo<1e-9){hi=lo+1;} lo=lo-(hi-lo)*0.1; hi=hi+(hi-lo)*0.1;
   const xFor=i=>pad+(pts.length<=1?0:(i/(Math.max(1,maxSteps||pts.length)-1))*(W-2*pad));
@@ -2093,7 +2127,10 @@ function watchTrain(id){
   $("#tr-parity").textContent="—";
   $("#tr-gauge").textContent="—";
   drawLoss($("#tr-canvas"),[],0);
-  const es=new EventSource(`/api/deepapply/${id}/telemetry`);
+  const es=openES(`/api/deepapply/${id}/telemetry`,()=>{
+    $("#tr-state").textContent="connection lost — telemetry stream closed (engine down or restarted)";
+    $("#tr-run").disabled=false;
+  });
   es.addEventListener("telemetry",e=>{
     const ev=JSON.parse(e.data);
     $("#tr-events").textContent+=`${ev.phase}\n`;
@@ -2102,16 +2139,16 @@ function watchTrain(id){
     if(ev.phase==="train_step"){
       pts.push({step:ev.step,loss:ev.loss});
       drawLoss($("#tr-canvas"),pts,maxSteps||ev.max_steps||pts.length);
-      $("#tr-gauge").textContent=`step ${ev.step}/${ev.max_steps||maxSteps||"?"} · loss ${(+ev.loss).toFixed(4)}`;
+      $("#tr-gauge").textContent=`step ${ev.step}/${ev.max_steps||maxSteps||"?"} · loss ${num4(ev.loss)}`;
     }
     if(ev.phase==="train_completed"){
       if(ev.backend)backend=ev.backend;
-      $("#tr-gauge").textContent+=`\nfinal loss ${(+ev.training_loss).toFixed(4)} · ${ev.trainable_param_count} trainable params`;
+      $("#tr-gauge").textContent+=`\nfinal loss ${num4(ev.training_loss)} · ${ev.trainable_param_count} trainable params`;
       renderTrainParity(ev.parity_verified, backend);
     }
     if(ev.phase==="gate2_evaluated"){
       const b=ev.baseline_score,c=ev.candidate_score;
-      if(b!=null&&c!=null) $("#tr-gauge").textContent+=`\nheld-out baseline ${(+b).toFixed(3)} · candidate ${(+c).toFixed(3)}`;
+      if(b!=null&&c!=null) $("#tr-gauge").textContent+=`\nheld-out baseline ${num3(b)} · candidate ${num3(c)}`;
     }
     if(ev.phase==="gate2_decision"){
       renderTrainVerdict(ev.status, $("#tr-job").value, backend, ev.parity_verified);
@@ -2139,8 +2176,8 @@ function watchTrain(id){
         renderTrainParity(rep.parity_verified, bk);
       }
       if(rep.training_loss!=null){
-        $("#tr-gauge").textContent=`final loss ${(+rep.training_loss).toFixed(4)} · ${rep.trainable_param_count||"?"} trainable params`+
-          (rep.improvement!=null?`\nheld-out improvement ${rep.improvement>=0?"+":""}${(+rep.improvement).toFixed(4)} · evaluator ${rep.evaluator_score!=null?(+rep.evaluator_score).toFixed(3):"—"}`:"");
+        $("#tr-gauge").textContent=`final loss ${num4(rep.training_loss)} · ${rep.trainable_param_count||"?"} trainable params`+
+          (rep.improvement!=null?`\nheld-out improvement ${rep.improvement>=0?"+":""}${num4(rep.improvement)} · evaluator ${num3(rep.evaluator_score)}`:"");
       }
     }
     refreshRuns();
@@ -2277,7 +2314,10 @@ function watchCompress(id){
   $("#cp-events").textContent="";
   $("#cp-vram").textContent="—";
   $("#cp-table tbody").innerHTML="";
-  const es=new EventSource(`/api/spring/${id}/telemetry`);
+  const es=openES(`/api/spring/${id}/telemetry`,()=>{
+    $("#cp-state").textContent="connection lost — telemetry stream closed (engine down or restarted)";
+    $("#cp-run").disabled=false;
+  });
   es.addEventListener("telemetry",e=>{
     const ev=JSON.parse(e.data);
     $("#cp-events").textContent+=`${ev.phase}\n`;

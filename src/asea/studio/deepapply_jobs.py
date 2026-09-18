@@ -52,6 +52,7 @@ from ..benchmarks.harness import load_all, load_suite
 from ..core.pipeline import Pipeline
 from ..deepapply.errors import DeepApplyBlocked
 from . import catalog
+from .jobs import suite_path_for_stem
 from ._jsonsafe import json_safe
 
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
@@ -244,8 +245,12 @@ class DeepApplyJob:
         # Target suite + regression sweep. The regression sweep = every OTHER
         # benchmark suite, so Gate 2's no_control_movement check has real teeth
         # (a capability the run is NOT targeting must not move). Skipping it
-        # would be the loophole this endpoint refuses.
-        suite_path = BENCHMARKS / "{}.json".format(suite_id)
+        # would be the loophole this endpoint refuses. The stem is validated
+        # before the path join (traversal refused; see suite_path_for_stem).
+        try:
+            suite_path = suite_path_for_stem(suite_id, BENCHMARKS)
+        except ValueError as exc:
+            raise DeepApplyBlocked(str(exc))
         if not suite_path.exists():
             raise DeepApplyBlocked("unknown suite '{}'".format(suite_id))
         target_suite = load_suite(suite_path)

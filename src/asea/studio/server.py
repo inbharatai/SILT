@@ -38,7 +38,7 @@ from ..core.protocol import (
     SkillPacket,
 )
 from . import catalog
-from .jobs import BENCHMARKS, JobManager, ROOT
+from .jobs import BENCHMARKS, JobManager, ROOT, suite_path_for_stem
 from .deepapply_jobs import DeepApplyManager
 from .spring_jobs import SpringManager
 from ._jsonsafe import json_safe
@@ -121,6 +121,87 @@ class LoopbackCORSMiddleware(CORSMiddleware):
         await super().__call__(scope, receive, send)
 
 
+class BrowserOriginGate:
+    """Reject cross-site BROWSER requests to state-changing endpoints.
+
+    Adversarial audit 2026-09-18: CORS only controls which pages may READ a
+    response. A malicious page in the operator's browser can still FIRE a
+    state-changing POST at the loopback engine (classic CSRF -- a text/plain
+    body needs no preflight, and FastAPI parses JSON regardless of the
+    content-type), spending real-model runs, authoring suites or approving
+    packets cross-site. Browsers always attach ``Origin`` to cross-site
+    POSTs and modern ones attach ``Sec-Fetch-Site: cross-site``. So:
+    reject when either header proves the request is cross-site. Header-less
+    clients (tests, curl, scripts -- anything that is not a browser) carry
+    neither header and pass untouched; the gate never becomes a test-only
+    guard.
+    """
+
+    _SAFE_FETCH_SITES = ("same-origin", "same-site", "none")
+    # 2 MiB is far above every legitimate Studio request (suite authoring
+    # with 200 cases stays well under it; the next-largest payload is an
+    # 8,000-char playground prompt). Bounds accidental/malicious giant JSON
+    # bodies before the parser; pydantic field caps still apply underneath.
+    _MAX_BODY_BYTES = 2 * 1024 * 1024
+
+    def _origin_allowed(self, origin: str) -> bool:
+        if origin in _PUBLIC_STUDIO_ORIGINS:
+            return True
+        return bool(_LOOPBACK_ORIGIN_REGEX.match(origin))
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or scope.get("method") not in (
+            "POST", "PUT", "PATCH", "DELETE"
+        ):
+            await self.app(scope, receive, send)
+            return
+
+        headers = {
+            k.decode("latin-1").lower(): v.decode("latin-1")
+            for k, v in scope.get("headers") or []
+        }
+        origin = headers.get("origin", "")
+        fetch_site = headers.get("sec-fetch-site", "")
+        content_length = headers.get("content-length", "")
+
+        if content_length.isdigit() and int(content_length) > self._MAX_BODY_BYTES:
+            await self._reject(
+                scope, send,
+                "request body too large (max {} bytes)".format(self._MAX_BODY_BYTES),
+                status=413,
+            )
+            return
+        if fetch_site and fetch_site not in self._SAFE_FETCH_SITES:
+            await self._reject(scope, send, "cross-site request refused")
+            return
+        if origin and not self._origin_allowed(origin):
+            await self._reject(
+                scope, send,
+                "origin {!r} is not allowed to drive the local engine".format(origin),
+            )
+            return
+
+        await self.app(scope, receive, send)
+
+    async def _reject(self, scope, send, message: str, status: int = 403) -> None:
+        import json as _json
+
+        body = _json.dumps({"detail": message}).encode("utf-8")
+        await send({
+            "type": "http.response.start",
+            "status": status,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(body)).encode("latin-1")),
+                (b"cache-control", b"no-store"),
+            ],
+        })
+        await send({"type": "http.response.body", "body": body})
+
+    def __init__(self, app):
+        self.app = app
+
+
 app = FastAPI(
     title="SILT Studio",
     description="Skill Interchange Layer with Trust-gating -- web platform. "
@@ -142,6 +223,10 @@ app.add_middleware(
     expose_headers=["Content-Disposition"],
 )
 
+# State-changing requests: reject cross-site browser origins (the gate is
+# outermost, but skips OPTIONS so CORS preflights still reach the CORS layer).
+app.add_middleware(BrowserOriginGate)
+
 # Opt-in extension: no imports or workspace side effects in the legacy default.
 _EXPERIMENTAL_ROUTES_MOUNTED = os.environ.get("SILT_ENABLE_EXPERIMENTAL") == "1"
 if _EXPERIMENTAL_ROUTES_MOUNTED:
@@ -157,6 +242,24 @@ spring_manager = SpringManager()
 # Schemas
 # --------------------------------------------------------------------------
 
+# Suite ids are filename STEMS under data/benchmarks/ (see
+# jobs.suite_path_for_stem). Pattern-locked at the request models so a
+# traversal-shaped stem is refused at the boundary (adversarial audit
+# 2026-09-18) instead of reaching a filesystem path join.
+_SUITE_STEM_PATTERN = r"^[a-z0-9][a-z0-9_-]{0,62}$"
+
+
+def _validate_suite_stems(value: List[str]) -> List[str]:
+    """Field validator for List[str] suite-id fields: every entry must be a
+    plain stem (no separators, no traversal)."""
+    for s in value:
+        if not re.fullmatch(_SUITE_STEM_PATTERN, s):
+            raise ValueError(
+                "invalid suite id {!r}: must be 1-63 chars of [a-z0-9_-], "
+                "starting with a letter/digit".format(s)
+            )
+    return value
+
 
 class TransferRequest(BaseModel):
     sender: str
@@ -170,6 +273,11 @@ class TransferRequest(BaseModel):
     relevance_floor: Optional[float] = Field(default=None, ge=0.0, le=1.0)
     approver: Optional[str] = None
     description: str = Field(default="", max_length=500)
+
+    @field_validator("suites")
+    @classmethod
+    def _suites_must_be_plain_stems(cls, v):
+        return _validate_suite_stems(v)
 
 
 class ApprovalRequest(BaseModel):
@@ -206,7 +314,7 @@ class CatalogEntryRequest(BaseModel):
     ollama_tag: str = Field(min_length=1, max_length=64,
                             pattern=r"^[a-zA-Z0-9._:/-]+$")
     role: str = Field(pattern="^(sender|receiver)$")
-    suite_id: str
+    suite_id: str = Field(pattern=_SUITE_STEM_PATTERN)
     description: str = Field(default="", max_length=500)
     think: Optional[bool] = None
 
@@ -235,7 +343,7 @@ class SkillTestRequest(BaseModel):
     without its approved skill packet(s). No gate, no store writes."""
     job_id: str
     module: str
-    suite_id: str
+    suite_id: str = Field(pattern=_SUITE_STEM_PATTERN)
     packet_id: Optional[str] = None
     similarity: str = Field(default="embedding", pattern="^(embedding|lexical)$")
 
@@ -250,7 +358,7 @@ class DeepApplyRequest(BaseModel):
     overrides are DeepApplyConfig's own documented knobs."""
     job_id: str
     receiver_id: Optional[str] = None
-    suite_id: str
+    suite_id: str = Field(pattern=_SUITE_STEM_PATTERN)
     backend: str = Field(default="standard", pattern="^(standard|streamed|zeroforge)$")
     packet_ids: Optional[List[str]] = None
     overrides: Optional[Dict[str, Any]] = None
@@ -270,6 +378,11 @@ class SpringRequest(BaseModel):
     tolerance: float = Field(default=0.05, ge=0.0, le=1.0)
     device: str = Field(default="auto", pattern="^(auto|cpu|cuda)$")
     max_len: int = Field(default=96, ge=8, le=512)
+
+    @field_validator("suite_ids")
+    @classmethod
+    def _suite_ids_must_be_plain_stems(cls, v):
+        return _validate_suite_stems(v)
 
     @field_validator("levels")
     @classmethod
@@ -306,11 +419,21 @@ class SuiteAuthorRequest(BaseModel):
     suite_id: str = Field(min_length=2, max_length=63,
                           pattern=r"^[a-z0-9][a-z0-9_-]*$")
     description: str = Field(default="", max_length=500)
-    task_type: str = Field(min_length=1, max_length=64)
+    # task_type/language are reflected into the Studio UI and the suite JSON
+    # (adversarial audit 2026-09-18): refuse the tag-OPENING char at the
+    # source (same discipline as the description validator -- ``>`` alone is
+    # inert in HTML text and appears in honest values like "fr->en"). The UI
+    # escapes the value at the sink as well. Free prose still belongs in
+    # ``description``.
+    task_type: str = Field(min_length=1, max_length=64, pattern=r"^[^<]{1,64}$")
     modality: Modality
     domain: Domain = Domain.GENERAL
-    language: Optional[str] = Field(default=None, max_length=64)
-    cases: List[BenchmarkCase] = Field(min_length=2)
+    language: Optional[str] = Field(default=None, max_length=64,
+                                    pattern=r"^[^<]{0,64}$")
+    # Bounded (adversarial audit 2026-09-18): an unbounded case list is
+    # unbounded JSON parse + per-case validation work per request. 200 cases
+    # is far above every shipped suite (max 60); more belongs in a file.
+    cases: List[BenchmarkCase] = Field(min_length=2, max_length=200)
 
     @field_validator("description")
     @classmethod
@@ -402,10 +525,13 @@ def get_suites():
 
 
 def _load_suite_or_404(suite_id: str) -> BenchmarkSuite:
-    """Load a suite by STEM (the Studio convention) or 404. Used by the
-    support-check + the run-creation support asserts so an unknown suite is a
-    structured 404, not a mid-run crash."""
-    path = BENCHMARKS / "{}.json".format(suite_id)
+    """Load a suite by STEM (the Studio convention) or 404. The stem is
+    pattern-locked (traversal refused -- adversarial audit 2026-09-18) and
+    an unknown suite is a structured 404, not a mid-run crash."""
+    try:
+        path = suite_path_for_stem(suite_id, BENCHMARKS)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
     if not path.exists():
         raise HTTPException(404, "unknown suite '{}'".format(suite_id))
     return load_suite(path)

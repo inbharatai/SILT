@@ -718,12 +718,15 @@ def test_catalog_post_rejects_unsafe_ollama_tag():
 
 
 def test_write_endpoints_are_currently_open_visible_decision():
-    """PINNING (audit #21): the Studio's mutating endpoints have no auth today.
-    This is an ACCEPTED RISK for a localhost dev tool, held for explicit
-    sign-off on an auth scheme (see the GATE/CORE findings) -- not an oversight.
-    The test pins the current open state: requests reach the schema/handler
-    layers (422/404), they are NOT intercepted by a 401/403 auth gate. Adding
-    auth later must update this test, making the change visible."""
+    """PINNING (audit #21, revised 2026-09-18): the Studio's mutating endpoints
+    have no USER AUTH today -- an accepted risk for a localhost dev tool, held
+    for explicit sign-off on an auth scheme. What they DO have since the
+    2026-09-18 audit is the BrowserOriginGate: requests carrying browser
+    headers that prove a cross-site origin (Origin / Sec-Fetch-Site) are
+    refused with 403 (CSRF). Header-less clients are not browsers, so they
+    pass untouched -- pinned here: a local client's request must reach the
+    schema/handler layers (422/404), NOT an auth/403 gate. Adding real auth
+    later must update this test again, making the change visible."""
     # /api/catalog reaches the schema validator (422), not an auth gate.
     assert client.post("/api/catalog", json={
         "module_id": "x", "ollama_tag": "bad tag!", "role": "receiver",
@@ -732,6 +735,140 @@ def test_write_endpoints_are_currently_open_visible_decision():
     # /approve on an unknown job reaches the 404 path, not 401/403.
     assert client.post("/api/transfers/nope/approve",
                        json={"packet_id": "x", "approver": "someone"}).status_code == 404
+
+
+def test_cross_site_browser_writes_are_refused():
+    """FAIL-ON-OLD (audit 2026-09-18, S1): a malicious page in the operator's
+    browser must not be able to fire state-changing POSTs at the loopback
+    engine. CORS only restricts reads; before the BrowserOriginGate a
+    cross-site POST with a text/plain body was parsed and executed. Pinned:
+    a cross-site Origin is 403, a cross-site Sec-Fetch-Site is 403, and the
+    allowlisted public landing origin still reaches the schema layer."""
+    body = {"module_id": "x", "ollama_tag": "bad tag!", "role": "receiver",
+            "suite_id": "assamese_english"}
+    # Cross-site Origin -> 403 (never the schema layer).
+    r = client.post("/api/catalog", json=body,
+                    headers={"Origin": "https://evil.example"})
+    assert r.status_code == 403
+    # Cross-site Sec-Fetch-Site (even without Origin) -> 403.
+    r = client.post("/api/catalog", json=body,
+                    headers={"Sec-Fetch-Site": "cross-site"})
+    assert r.status_code == 403
+    # Same-origin / same-site browser headers pass through to the schema layer.
+    assert client.post("/api/catalog", json=body, headers={
+        "Origin": "http://127.0.0.1:8377",
+        "Sec-Fetch-Site": "same-origin",
+    }).status_code == 422
+    assert client.post("/api/catalog", json=body, headers={
+        "Origin": "http://localhost:3000",
+        "Sec-Fetch-Site": "same-site",
+    }).status_code == 422
+    # The public landing origin is allowlisted for READS (CORS), but a request
+    # that self-reports Sec-Fetch-Site: cross-site is refused even from it:
+    # the hosted bridge only activates on loopback pages (an HTTPS page cannot
+    # reach a local HTTP engine), so no legitimate request is ever cross-site.
+    r = client.post("/api/catalog", json=body, headers={
+        "Origin": "https://silt.inbharat.ai",
+        "Sec-Fetch-Site": "cross-site",
+    })
+    assert r.status_code == 403
+    # Without the fetch-metadata header, the allowlisted origin reaches the
+    # schema layer (older browsers without Sec-Fetch-Site support).
+    assert client.post("/api/catalog", json=body, headers={
+        "Origin": "https://silt.inbharat.ai",
+    }).status_code == 422
+
+
+def test_reads_and_options_bypass_the_origin_gate():
+    """GET/OPTIONS are not state-changing: the gate must never interfere with
+    reads or CORS preflights (a preflight refused would look like a broken
+    bridge to the operator)."""
+    assert client.get("/api/health", headers={
+        "Origin": "https://evil.example",
+        "Sec-Fetch-Site": "cross-site",
+    }).status_code == 200
+
+
+def test_suite_stem_traversal_is_refused():
+    """FAIL-ON-OLD (audit 2026-09-18, S2): a suite id is a filename STEM under
+    data/benchmarks/. Before the stem lock, a stem like "../README" was joined
+    into a load path (BENCHMARKS / stem + ".json") at every suite-load site,
+    letting a request make the engine READ (and parse as a benchmark suite)
+    any .json file outside the benchmarks directory. Pinned: traversal-shaped
+    stems are refused at the request models, at _load_suite_or_404, and at the
+    shared jobs.suite_path_for_stem the worker threads use."""
+    from asea.studio.jobs import suite_path_for_stem
+    from asea.studio.server import (TransferRequest, SpringRequest,
+                                    _load_suite_or_404)
+    from fastapi import HTTPException
+    from pydantic import ValidationError
+
+    # Shared resolver refuses traversal, separators, and dotfiles.
+    for bad in ("../README", "..\\README", "a/b", "a b", ".hidden", "", "A-b",
+                "-lead", "x" * 64):
+        with pytest.raises(ValueError):
+            suite_path_for_stem(bad)
+
+    # Request models refuse the same shapes before a job is ever spawned.
+    with pytest.raises(ValidationError):
+        TransferRequest(sender="s", receiver="r", suites=["../README"])
+    with pytest.raises(ValidationError):
+        TransferRequest(sender="s", receiver="r", suites=["ok_stem", "a/b"])
+    with pytest.raises(ValidationError):
+        SpringRequest(module_id="m", suite_ids=["../secrets"])
+    # A plain stem resolves to a path inside BENCHMARKS.
+    p = suite_path_for_stem("assamese_english")
+    assert p.name == "assamese_english.json"
+    assert p.parent.name == "benchmarks"
+
+    # _load_suite_or_404: traversal is a structured 400, unknown-but-valid is 404.
+    with pytest.raises(HTTPException) as exc:
+        _load_suite_or_404("../README")
+    assert exc.value.status_code == 400
+    with pytest.raises(HTTPException) as exc:
+        _load_suite_or_404("no_such_suite_xyz")
+    assert exc.value.status_code == 404
+
+
+def test_suite_author_fields_are_constrained():
+    """FAIL-ON-OLD (audit 2026-09-18, S3+S7): authoring writes
+    data/benchmarks/<stem>.json and reflects task_type/language into the UI.
+    task_type/language are pattern-locked (HTML breakout chars refused at the
+    source) and the case list is capped (an unbounded list is unbounded parse
+    + validation work per request)."""
+    from asea.studio.server import SuiteAuthorRequest
+    from pydantic import ValidationError
+
+    def case(i, split="heldout"):
+        return {"case_id": "c{}".format(i), "prompt": "p",
+                "expected": "e", "split": split}
+
+    good = dict(suite_id="newcap", task_type="translation",
+                modality="text", language="en",
+                cases=[case(1, "extraction"), case(2, "heldout")])
+    SuiteAuthorRequest(**good)  # accepted
+
+    # Breakout chars in the reflected fields are refused at the source.
+    for bad_field, bad_val in (
+        ("task_type", "<script>x</script>"),
+        ("language", "<b>en"),
+    ):
+        with pytest.raises(ValidationError):
+            SuiteAuthorRequest(**{**good, bad_field: bad_val})
+    # Case list is bounded: 201 cases is refused.
+    with pytest.raises(ValidationError):
+        SuiteAuthorRequest(**{**good, "cases": [case(i) for i in range(201)]})
+
+
+def test_oversized_request_body_is_refused():
+    """FAIL-ON-OLD (audit 2026-09-18, S7): a declared Content-Length above the
+    Studio's 2 MiB request cap is refused 413 BEFORE the JSON parser runs."""
+    r = client.post(
+        "/api/catalog",
+        content=b'{"x":"' + b"a" * (2 * 1024 * 1024) + b'"}',
+        headers={"Content-Type": "application/json"},
+    )
+    assert r.status_code == 413
 
 
 # -- deep-apply (weights-mode training) endpoints ------------------------------

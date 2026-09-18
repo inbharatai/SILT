@@ -9,6 +9,7 @@ stream tails -- the Studio never invents state, it replays evidence.
 from __future__ import annotations
 
 import json
+import re
 import threading
 import time
 import traceback
@@ -29,6 +30,36 @@ from ._jsonsafe import json_safe
 
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
 BENCHMARKS = ROOT / "data" / "benchmarks"
+
+# A suite id is a filename STEM under data/benchmarks/ (the Studio-wide key).
+# Adversarial audit 2026-09-18: the stem was interpolated into a load path
+# (BENCHMARKS / f"{stem}.json") at every suite-load site, so a stem carrying
+# ``../`` could make the engine READ a JSON file outside the benchmarks
+# directory (path traversal) and parse it as a benchmark suite. The pattern
+# allows exactly what SuiteAuthorRequest already enforces at author time;
+# the resolved-parent check underneath is defense in depth.
+_SUITE_STEM_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_-]{0,62}$")
+
+
+def suite_path_for_stem(stem: str, base: Optional[Path] = None) -> Path:
+    """Resolve a suite stem to its benchmark JSON path, refusing anything
+    that is not a plain stem (no separators, no traversal, no dotfiles).
+    ``base`` defaults to this module's BENCHMARKS; the server passes its own
+    (tests monkeypatch it per-test). Raises ValueError with an
+    operator-readable message on refusal."""
+    if base is None:
+        base = BENCHMARKS
+    if not isinstance(stem, str) or not _SUITE_STEM_PATTERN.fullmatch(stem):
+        raise ValueError(
+            "invalid suite id {!r}: must be 1-63 chars of [a-z0-9_-], "
+            "starting with a letter/digit".format(stem)
+        )
+    path = base / "{}.json".format(stem)
+    if path.resolve().parent != base.resolve():
+        # Unreachable while the pattern above holds; kept so a future pattern
+        # relaxation cannot silently reopen traversal.
+        raise ValueError("invalid suite id {!r}".format(stem))
+    return path
 
 
 def _similarity(kind: str):
@@ -98,7 +129,8 @@ class TransferJob:
             )
 
             suites = [
-                load_suite(BENCHMARKS / "{}.json".format(name))
+                # Stem-validated (traversal refused; see suite_path_for_stem)
+                load_suite(suite_path_for_stem(name))
                 for name in self.config["suites"]
             ]
 

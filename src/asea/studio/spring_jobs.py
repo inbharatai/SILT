@@ -46,6 +46,7 @@ from ..benchmarks.harness import load_suite
 from ..core.pipeline import Pipeline  # noqa: F401  (type hint clarity)
 from ..deepapply.errors import DeepApplyBlocked
 from . import catalog
+from .jobs import suite_path_for_stem
 from ._jsonsafe import json_safe
 
 
@@ -267,7 +268,13 @@ class SpringJob:
         from ..spring.certifier import suites_from_benchmark
 
         layers = get_decoder_layers(model)
-        suites_obj = [load_suite(BENCHMARKS / "{}.json".format(s)) for s in suite_ids]
+        suites_obj = []
+        for s in suite_ids:
+            # Stem-validated (traversal refused; see jobs.suite_path_for_stem)
+            try:
+                suites_obj.append(load_suite(suite_path_for_stem(s, BENCHMARKS)))
+            except ValueError as exc:
+                raise DeepApplyBlocked(str(exc))
         suites = suites_from_benchmark(suites_obj, tok, max_len=max_len)
         if not suites:
             raise DeepApplyBlocked(
