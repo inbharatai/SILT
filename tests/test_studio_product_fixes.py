@@ -220,7 +220,7 @@ def source_tables():
 
 
 @pytest.mark.parametrize('width', [1440, 390])
-def test_live_readme_all_18_first_rows_16_portfolio_6_final_arms(browser, live_studio, width):
+def test_live_readme_all_18_first_rows_17_portfolio_6_final_arms(browser, live_studio, width):
     page, bad, errors = safe_page(browser, live_studio, width)
     try:
         page.locator('#readme > summary').click()
@@ -240,12 +240,12 @@ def test_live_readme_all_18_first_rows_16_portfolio_6_final_arms(browser, live_s
                      for row in rows] for rows in tables]
         actual = rendered.evaluate_all(
             'ts=>ts.map(t=>[...t.rows].map(r=>[...r.cells].map(c=>c.textContent.trim())))')
-        assert sum(len(row) for table in expected for row in table) == 501
-        assert [len(t) - 1 for t in expected] == [16, 6, 6, 3, 14, 16, 11, 3, 3, 6, 4, 5, 3, 3, 6, 22, 12, 6]
+        assert sum(len(row) for table in expected for row in table) == 504
+        assert [len(t) - 1 for t in expected] == [17, 6, 6, 3, 14, 16, 11, 3, 3, 6, 4, 5, 3, 3, 6, 22, 12, 6]
         assert actual == expected
         with urllib.request.urlopen(live_studio[0] + '/api/readme') as response:
             assert response.read() == (ROOT / 'README.md').read_bytes()
-        assert rendered.nth(0).locator('tbody tr').count() == 16
+        assert rendered.nth(0).locator('tbody tr').count() == 17
         assert 'Core L3' in rendered.nth(0).locator('tbody tr').first.inner_text()
         final = page.locator('#readme-body table').filter(has_text='Frozen final arm')
         assert final.locator('tbody tr').count() == 6

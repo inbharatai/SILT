@@ -8,10 +8,12 @@ use repository-relative source/test links; see the
 [integrated release summary](INTEGRATED_RELEASE_2026_09_12.md),
 [hardware contract](HARDWARE_ADAPTIVE.md) and
 [controller/device-local runbook](SPECIALIST_QUALITY_EXPERIMENT.md).
-The catalog retains **18 legacy entries (L01–L18) and 25 activation entries
-(C01–C25)**; **C01 is the same core packet path as L01** and is indexed there rather
+The catalog retains **18 legacy entries (L01–L18) and 29 activation entries
+(C01–C29)**; **C01 is the same core packet path as L01** and is indexed there rather
 than duplicated. C25 records unsupported/unproven outcomes, not a completed
-capability. The integration adds runtime safeguards and product fixes without
+capability. C26–C29 are the capability-build research layer: implemented,
+explicitly invoked, never auto-activated, with one small executed behavioural
+pilot recorded in [CAPABILITY_BUILD.md](CAPABILITY_BUILD.md). The integration adds runtime safeguards and product fixes without
 changing core transfer gates or defaults. Independent integrated local regression
 recorded **2,695 passed, 18 skipped and 92 warnings**. Historical component runs
 below remain separate; this local result is not GPU validation or a remote CI result.
@@ -812,6 +814,73 @@ See [hardware/CLI contract](HARDWARE_ADAPTIVE.md), [native-loading regression de
 **Test definitions (not new executions):** [tests/test_specialist_reconstruction.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_specialist_reconstruction.py) · [tests/test_vision_runtime.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_vision_runtime.py) · [tests/test_execution_limits.py](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/tests/test_execution_limits.py)
 
 **Guides / recorded evidence:** [README.md:7–7](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/README.md#L7) · [docs/index.html:134–153](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/docs/index.html#L134-L153) · [docs/EXPERIMENTAL_RELEASE_2026_09.md:95–97](https://github.com/inbharatai/SILT/blob/b583ba0d7de077d4e8594b08f0f77cc29655459e/docs/EXPERIMENTAL_RELEASE_2026_09.md#L95-L97)
+
+## Capability build (research layer)
+
+Explicit research layer on top of existing mechanisms; **never enabled, run or
+admitted by installing/merging the source**. Nothing in it auto-activates.
+`CapabilityDiff` keeps its existing meaning; the new object is
+`CapabilityFootprint`. Guide: [CAPABILITY_BUILD.md](CAPABILITY_BUILD.md).
+
+<a id="c26"></a>
+### C26 — Capability spec/trace/footprint/receipt layer
+
+**Default / enablement:** implemented; explicit per-run invocation only (`silt-capability`, a separate console script; `asea run` unchanged).
+
+**Invoke / knobs:** `silt-capability spec validate|teacher-baseline|trace|footprint|evaluate|student-baseline|distill|receipt|receipt-verify|dataset build|dataset validate`. Exit codes mirror `silt-compile` (0/2/3/4); JSON-only stdout.
+
+**Mechanism:** `CapabilitySpec` pins teacher/controls/thresholds (operator configuration, never guarantees). Two teacher evidence classes exist and are **never mixed in one trace or one footprint**: `behavioural_remote` (Ollama; per-run explicit remote consent `--allow-remote`, never carried over) and `internal_open_weight` (isolated worker only). `CapabilityTrace` binds each observation to a functional outcome via `sample_id`+`prompt_hash`; teacher responses record outcome `UNJUDGED` — the host oracle judges, the teacher never grades itself. `CapabilityFootprint` is "components associated with and experimentally important to a capability under a workload", **never** "these neurons contain knowledge"; behavioural evidence yields zero internal component claims. Receipts are signed with the existing local HMAC (not a portable attestation, not authorship proof, not a quality certificate); unmeasured values are `NOT_MEASURED`, never estimated.
+
+**Limits:** A behavioural footprint cannot reveal experts and does not claim to. Enrichment is usage evidence, not causal importance (carried verbatim from the compiler discipline). No universal-extraction claim, no "small GLM" claim; the ~18B-active figure is a per-token compute statement about the FULL model, not an identifiable subset.
+
+**Evidence kind:** Implemented (source_code_verified) with 57 offline mechanism tests plus one executed 8-case behavioural pilot (2026-09-17, Ollama cloud `glm-5.3-flash:cloud`, consent per run): traces + footprint recorded with UNJUDGED outcomes; the four target repairs then passed all six host-oracle checks in the Linux sandbox. That is a judged functional outcome on 4 target cases — not a capability certificate and not a quality claim about the teacher.
+
+**Pinned source / tests:** [src/asea/capability_build/](../src/asea/capability_build/) (schema/spec/trace/footprint/teacher/receipt/store) · [tests/test_capability_build.py](../tests/test_capability_build.py) · [docs/CAPABILITY_BUILD.md](CAPABILITY_BUILD.md)
+
+<a id="c27"></a>
+### C27 — Causal intervention machinery and isolated GLM worker
+
+**Default / enablement:** implemented; invoked only through the worker path on an operator-supplied open-weight checkpoint.
+
+**Invoke / knobs:** `silt-capability trace --mode internal --checkpoint DIR` / `intervene --component expert:3/7 --checkpoint DIR`; worker (`workers/glm53/`) has its own Dockerfile and `requirements.lock` (Transformers 5.x per the GLM model card — the core `transformers==4.51.3` pin is untouched; the GLM runtime never shares an env with Qwen/Switch).
+
+**Mechanism:** Net-new protocol (the compiler only prunes physically; no temporary-masking path existed): verify-unchanged → seeded baseline → temporary mask → measure → restore → verify-unchanged again. Byte-exact parameter-hash verification; an unrestorable intervention is **never** causal evidence. Teachers are read-only; interventions refuse quantized checkpoints (main HF repo is FP8; remedy names the BF16 variant). Versioned JSONL frames; worker memory preflight runs before load; crash preserves partial frames and never fabricates the lost portion.
+
+**Limits:** On small hosts the preflight admits the teacher as `BLOCKED_RESOURCE` — the correct honest outcome, not a bug (a ~320B-parameter teacher does not fit this class of hardware). The generation+judging stage inside the worker is not in this build; `intervene` refuses honestly after `hello`. Routing frequency is never called causal importance.
+
+**Evidence kind:** Implemented + mechanism-tested offline (fake adapters, protocol round-trips, crash/blocked frames). No open-weight run has been executed on any host yet.
+
+**Pinned source / tests:** [src/asea/capability_build/intervention.py](../src/asea/capability_build/intervention.py) · [src/asea/capability_build/adapters/](../src/asea/capability_build/adapters/) · [src/asea/capability_build/worker.py](../src/asea/capability_build/worker.py) · [workers/glm53/](../workers/glm53/) · [tests/test_capability_build.py](../tests/test_capability_build.py)
+
+<a id="c28"></a>
+### C28 — Fresh capability datasets, student baselines and KD hand-off
+
+**Default / enablement:** implemented; explicit invocation. Student connectors are LOCAL only — a non-localhost student host is a typed refusal; no remote student path exists.
+
+**Invoke / knobs:** `silt-capability dataset build --cases X.jsonl --out data/capability_v1` / `dataset validate --dir`; `student-baseline` (local Ollama); `distill`.
+
+**Mechanism:** Five splits (training/development/heldout/final/controls) with per-case ID, content hash, family, provenance, license; cross-split ID/content/family disjointness; a NEW near-duplicate token-shape guard; the frozen September sets quarantined as inputs; manifest+selection-lock frozen before any model sees a case. Student baselines measure the gap `Gap = TeacherScore − StudentScore` — the only justification for transfer work. `distill` builds sequence-level KD pairs ONLY from host-judged successful traces (failures stay visible as labelled negatives; UNJUDGED contributes nothing; one leakage collision refuses the whole set) and hands training to DeepApply (LoRA via Gate 2); cross-family pairs are text-only — no vocabulary/logit alignment assumed.
+
+**Limits:** The dataset builder never grades anything and never runs a model. Building data confers no capability. Nothing is admitted by any of this; the hand-off descriptor carries `pre_approval: false` and the trainer never certifies itself.
+
+**Evidence kind:** Implemented + mechanism-tested offline. No student baseline, no DeepApply training run and no dataset build has been executed against real model material yet.
+
+**Pinned source / tests:** [src/asea/capability_build/dataset.py](../src/asea/capability_build/dataset.py) · [src/asea/capability_build/student.py](../src/asea/capability_build/student.py) · [src/asea/capability_build/distillation.py](../src/asea/capability_build/distillation.py) · [tests/test_capability_build.py](../tests/test_capability_build.py)
+
+<a id="c29"></a>
+### C29 — Minimum-capability search (library; CLI refuses honestly)
+
+**Default / enablement:** implemented as a library surface; the `reduce`/`search`/`certify` CLI commands are registered and **refuse with `status: rejected`** until Phase 8 live work (admitted candidate models + host-oracle evaluator) exists. No placeholder results are ever emitted.
+
+**Invoke / knobs:** `asea.capability_build.search.search_with_reference(spec, teacher_target_score=…, candidate_plan=…, build=…, evaluate=…)`.
+
+**Mechanism:** `min Size(M)` s.t. `TargetScore(M) ≥ minimum_retention_ratio × TargetScore(teacher)` and control regression ≤ tolerance; every iteration recorded including rejects and failures; accepts the first candidate meeting the threshold; accepted candidates carry `admission: CANDIDATE_UNADMITTED`.
+
+**Limits:** A parameter-count decrease is NEVER itself evidence of capability retention; only held-out functional evaluation counts. Candidates are never admissions; admission is DeepApply/Gate 2's to give. The search is never claimed to have produced a smaller capable model — none has been built or measured.
+
+**Evidence kind:** Implemented + mechanism-tested offline with synthetic candidates (a mechanism test, not a reduced-model quality result).
+
+**Pinned source / tests:** [src/asea/capability_build/search.py](../src/asea/capability_build/search.py) · [tests/test_capability_build.py](../tests/test_capability_build.py)
 
 ## Recorded evidence and measurement units
 

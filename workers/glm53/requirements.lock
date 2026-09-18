@@ -1,0 +1,17 @@
+# Isolated GLM-5.3-Flash worker runtime.
+#
+# PINNED to the model card's own `transformers_version` field
+# (zai-org/GLM-5.3-Flash config.json = 5.16.0). This lock NEVER touches
+# the main SILT environment, which pins transformers==4.51.3.
+#
+# Do not relax these pins to make something run; bump them only with a new
+# GLM config.json revision and a fresh note in docs/CAPABILITY_BUILD.md.
+
+transformers==5.16.0
+# torch build for the worker: CUDA is not assumed; swap for a cu-wheel
+# build on the GPU box by editing ONLY this line and rebuilding the image.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.6,<2.8
+safetensors>=0.6
+# asea core dependency (stdlib-only protocol + pydantic schemas)
+pydantic>=2.7

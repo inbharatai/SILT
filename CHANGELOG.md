@@ -9,6 +9,52 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## Capability-build research layer — 2026-09-17
+
+A new research/build layer (`src/asea/capability_build/`, console script
+`silt-capability`) asking an operator-defined question: what is the minimum
+computational artifact that reproduces a narrowly defined capability in a much
+smaller student, proven on untouched held-out tests without materially
+regressing controls? It is experimental opt-in, never auto-activated, and
+admits nothing — admission stays with the existing Deep-apply/Gate 2 path.
+See [`docs/CAPABILITY_BUILD.md`](docs/CAPABILITY_BUILD.md).
+
+### Added
+- `CapabilitySpec` / `CapabilityTrace` / `CapabilityFootprint` /
+  `CapabilityBuildReceipt` schemas; two teacher evidence classes
+  (`behavioural_remote` via Ollama with per-run explicit `--allow-remote`
+  consent, `internal_open_weight` via an isolated GLM worker) that are never
+  mixed in one trace or footprint.
+- Causal intervention protocol (temporary mask → measure → restore →
+  verify-unchanged) for open-weight teachers; an unrestorable intervention is
+  never recorded as causal evidence. Teacher weights stay read-only.
+- Isolated GLM-5.3-Flash worker (`workers/glm53/`) with its own Dockerfile and
+  pinned Transformers-5.x runtime lock — the core `transformers==4.51.3` pin
+  is untouched. MoE adapter layer for Switch and GLM architectures.
+- Fresh five-split dataset builder with cross-split ID/content/family
+  disjointness, a near-duplicate token-shape guard, and quarantine of the
+  frozen September sets as inputs; local-only student baselines; sequence-level
+  KD hand-off to DeepApply (the trainer never certifies itself); a
+  minimum-capability search surface (`CANDIDATE_UNADMITTED` by construction).
+- `silt-capability` CLI (JSON-only stdout, typed refusals). `reduce`, `search`
+  and `certify` are registered surfaces that refuse honestly with the
+  scheduled phase rather than emit placeholder results.
+- One executed behavioural pilot (8 authored cases against the operator-
+  selected `glm-5.3-flash:cloud` connector): teacher baseline + traces stored
+  UNJUDGED, footprint built with zero internal component claims, and the four
+  target python repairs judged by the host oracle in the Linux sandbox.
+  Judged functional outcome on four target cases only — not a capability
+  certificate and not a quality claim about the teacher.
+- Landing-page research section (`docs/index.html`) and README/CAPABILITIES
+  registrations. `PATENT.md` is untouched; a separate
+  `docs/INVENTION_DISCLOSURE_capability_build.md` is provided for
+  owner/patent-counsel review and makes no claim.
+
+### Unchanged
+- Pipeline, Gates 1/2, DeepApply, SiltSpring, the compiler and the packet
+  distillers are reused as-is; `asea run`, `CapabilityDiff` semantics, the
+  frozen September results and the consumed 16-task final set are untouched.
+
 ## Integrated release snapshot — 2026-09-12
 
 This entry describes the combined source snapshot, not a claim of a completed

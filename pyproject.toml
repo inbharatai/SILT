@@ -76,6 +76,7 @@ silt-artifacts = "asea.artifacts.__main__:main"
 silt-validate = "asea.validation.__main__:main"
 silt-execution = "asea.execution.__main__:main"
 silt-specialist = "asea.specialist.__main__:main"
+silt-capability = "asea.capability_build.__main__:main"
 
 [tool.setuptools.package-dir]
 "" = "src"

@@ -53,7 +53,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       </svg>
     </a>
     <nav aria-label="Main navigation">
-      <a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio/">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a><a href="https://inbharat.ai">InBharat.ai</a>
+      <a href="#thesis">Thesis</a><a href="#architecture">Architecture</a><a href="#capability-research">Research</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a><a href="/studio/">Studio</a><a href="https://github.com/inbharatai/SILT">GitHub</a><a href="https://inbharat.ai">InBharat.ai</a>
     </nav>
   </div>
 </header>
@@ -148,6 +148,23 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--faint);font-s
       <h3>Evidence controls have boundaries.</h3>
       <p>Core safety checks are rule-based tripwires; provenance depends on trusted declarations and regression coverage on supplied suites. For declared medical/legal/finance domains, approval metadata is mandatory under the normal gate, but the caller-supplied approver name is not verified human review. Only otherwise-eligible candidates without that metadata become pending; other failed checks reject.</p>
       <p>Hash-chained audit records, runner telemetry, local HMAC reports and retained traces are different evidence types—not external authentication. Mock fixtures demonstrate mechanics, recorded model runs support bounded results, and neither automatically establishes broader capability. See the activation catalog for exact defaults, platform bounds and evidence links.</p>
+    </div>
+  </div>
+</section>
+
+<section id="capability-research">
+  <div class="wrap">
+    <div class="kicker">Capability-build research layer</div>
+    <h2>Footprint a teacher's capability. Intervene causally. Search for the minimum.</h2>
+    <p class="lead">A separate research CLI (<code>silt-capability</code>) asks one question under an operator-written spec: given a large teacher and a narrowly defined capability, what is the minimum computational artifact that reproduces it in a much smaller student — proven on untouched held-out tests without materially regressing controls? It is <strong>not</strong> part of any default run, never auto-activates, and admits nothing; admission stays with the existing Deep-apply/Gate 2 path. <a href="https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITY_BUILD.md">Read the capability-build guide</a>.</p>
+    <div class="grid3">
+      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Teacher footprinting</h3><p>Define the capability in a machine-readable spec, then collect traces from a teacher under one of two evidence classes that are never mixed: behavioural (cloud/Ollama, only with per-run explicit remote consent) or instrumented open weights (isolated GLM-5.3-Flash worker with its own runtime, read-only weights). A footprint names components <em>associated with</em> a capability under a workload — it <strong>is not</strong> a claim about what the teacher "knows", and routing usage is never called causal importance.</p></div>
+      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Causal intervention</h3><p>For open-weight teachers only: temporarily mask one component, measure the drop on identical target and control cases, restore, and verify the teacher's weights are byte-identical before and after. An intervention that cannot be restored and verified is <strong>never</strong> recorded as causal evidence. On hardware that cannot hold a ~320B teacher the worker reports a typed <code>BLOCKED_RESOURCE</code> — the honest outcome, not a silent skip.</p></div>
+      <div class="card"><div class="n">EXPERIMENTAL OPT-IN</div><h3>Teach, then reduce</h3><p>Fresh five-split datasets quarantine the consumed September finals and add near-duplicate leakage guards. Student baselines measure the gap — no measured gap, no distillation. Sequence-level pairs from host-judged successes hand off to Deep-apply (LoRA via Gate 2); the trainer never certifies itself. The minimum-capability search then records every candidate and failure — <strong>a smaller parameter count is not evidence</strong>, only held-out functional scores count.</p></div>
+    </div>
+    <div class="panel">
+      <h3>What the pilot did — and did not — show.</h3>
+      <p>One executed behavioural pilot (8 authored cases, 4 python-repair targets and 4 controls) recorded traces against an operator-selected cloud teacher, with every outcome left <code>UNJUDGED</code> until the host oracle graded it: the teacher never grades itself. The four target repairs then passed all six sandbox oracle checks. That is a judged functional outcome on four target cases — <strong>not</strong> a capability certificate, not a quality claim about GLM-5.3-Flash, and no student has been trained, admitted or certified. Reduction search, student baselines and state certification remain unexecuted; their CLI surfaces refuse honestly rather than emit placeholders.</p>
     </div>
   </div>
 </section>
