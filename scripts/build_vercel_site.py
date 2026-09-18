@@ -10,8 +10,17 @@ Emits dist-vercel/ with:
   - robots.txt
   - PATENT.md, README.md
 
+Vercel deploys docs/ directly (vercel.json outputDirectory: "docs",
+no build command), so the extras that must be reachable in production
+are ALSO synced into docs/:
+  - docs/sitemap.xml, docs/robots.txt   (generated here)
+  - docs/PATENT.md, docs/README.md      (copied from the repo root,
+                                         which stays the single source)
+
 The script is intentionally hermetic: no network, no secrets, no build-time
 parameter injection. Canonical host is https://silt.inbharat.ai.
+Run it whenever PATENT.md, README.md or the route set changes so the
+docs/ copies stay in sync.
 """
 from __future__ import annotations
 
@@ -83,37 +92,45 @@ def build() -> None:
         if src.exists():
             shutil.copy2(src, OUT / name)
 
-    # Sitemap
-    write(
-        OUT / "sitemap.xml",
-        f'''<?xml version="1.0" encoding="UTF-8"?>
+    # Sitemap + robots (shared by dist-vercel/ and docs/; /studio is the
+    # canonical clean URL -- trailingSlash:false 308s /studio/)
+    sitemap_xml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>{CANONICAL}/</loc>
-    <lastmod>2026-08-26</lastmod>
+    <lastmod>2026-09-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>{CANONICAL}/studio/</loc>
-    <lastmod>2026-08-26</lastmod>
+    <loc>{CANONICAL}/studio</loc>
+    <lastmod>2026-09-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>
-''',
-    )
-
-    # Robots
-    write(
-        OUT / "robots.txt",
-        f"""User-agent: *
+'''
+    robots_txt = f"""User-agent: *
 Allow: /
 Sitemap: {CANONICAL}/sitemap.xml
-""",
-    )
+"""
+    write(OUT / "sitemap.xml", sitemap_xml)
+    write(OUT / "robots.txt", robots_txt)
+
+    # Sync the deployable extras into docs/ (the directory Vercel serves).
+    # vercel.json has no build command, so anything outside docs/ never
+    # reaches production: sitemap.xml and robots.txt were 404 until this
+    # sync existed. Root PATENT.md/README.md stay the source of truth.
+    DOCS = REPO / "docs"
+    write(DOCS / "sitemap.xml", sitemap_xml)
+    write(DOCS / "robots.txt", robots_txt)
+    for name in ("PATENT.md", "README.md"):
+        src = REPO / name
+        if src.exists():
+            shutil.copy2(src, DOCS / name)
 
     print(f"Built SILT public site at {OUT}")
+    print(f"Synced deployable extras into {DOCS} (sitemap.xml, robots.txt, PATENT.md, README.md)")
 
 
 if __name__ == "__main__":

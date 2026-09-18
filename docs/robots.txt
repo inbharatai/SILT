@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://silt.inbharat.ai/sitemap.xml
