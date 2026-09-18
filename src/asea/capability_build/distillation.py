@@ -59,6 +59,8 @@ def build_sequence_pairs(
     protected_content_hashes: Optional[set] = None,
     protected_sample_ids: Optional[set] = None,
     protected_families: Optional[set] = None,
+    protected_prompts: Optional[set] = None,
+    sample_families: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     """Build sequence-level KD pairs from JUDGED behavioural traces.
 
@@ -66,10 +68,26 @@ def build_sequence_pairs(
     retained as labelled negatives (failed experiments stay visible). Any
     overlap with the protected splits raises :class:`LeakageError` and
     refuses the WHOLE pair set -- one collision poisons the build.
+
+    Protected means: sample ids, full content hashes, PROMPT hashes,
+    and FAMILIES of every non-training split. ``protected_families`` is
+    enforced, not advisory: when it is supplied, every trace's family must
+    be resolvable through ``sample_families`` (a trace whose family cannot
+    be verified is refused -- unverifiable is not safe), and a trace whose
+    family belongs to a protected split raises :class:`LeakageError`.
+    ``protected_prompts`` are sha256 hex digests of protected prompts and
+    catch exact prompt reuse even when the response differs.
     """
     protected_content_hashes = protected_content_hashes or set()
     protected_sample_ids = protected_sample_ids or set()
     protected_families = protected_families or set()
+    protected_prompts = protected_prompts or set()
+    if protected_families and sample_families is None:
+        raise CapabilityBuildError(
+            "protected families were supplied without a sample->family "
+            "lookup; family protection cannot be verified and the build is "
+            "refused (unverifiable is not safe)"
+        )
     positives: List[Dict[str, Any]] = []
     negatives: List[Dict[str, Any]] = []
     seen_hashes: set = set()
@@ -90,6 +108,25 @@ def build_sequence_pairs(
                 "trace content hash collides with a protected split at "
                 "sample %r" % trace.sample_id
             )
+        if _content_hash(prompt) in protected_prompts:
+            raise LeakageError(
+                "trace prompt at sample %r is the exact prompt of a "
+                "protected-split case" % trace.sample_id
+            )
+        if protected_families:
+            family = (sample_families or {}).get(trace.sample_id)
+            if family is None:
+                raise LeakageError(
+                    "family of trace sample %r cannot be resolved; a trace "
+                    "from outside the approved dataset is never teaching "
+                    "material" % trace.sample_id
+                )
+            if family in protected_families:
+                raise LeakageError(
+                    "trace sample %r belongs to family %r, which is "
+                    "protected (a family never crosses splits)"
+                    % (trace.sample_id, family)
+                )
         if content in seen_hashes:
             raise LeakageError("duplicate training pair at sample %r" % trace.sample_id)
         shape = _token_shape(prompt)
@@ -128,6 +165,7 @@ def build_sequence_pairs(
         ),
         "leakage_checks": [
             "sample_id disjointness", "exact content hash",
+            "protected prompt hash", "protected family",
             "token-shape near-duplicate", "within-set duplicate",
         ],
     }

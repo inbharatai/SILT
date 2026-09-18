@@ -542,6 +542,187 @@ def test_worker_client_crash_preserves_partial_frames(tmp_path):
         client.request("inspect")
 
 
+def test_worker_client_enforces_deadline_kills_and_drains_stderr(tmp_path):
+    """Defect fix: ``timeout`` is ENFORCED (a watchdog kills the worker
+    tree at the deadline) instead of being accepted and ignored by an
+    unbounded blocking read; stderr is drained so the failure carries the
+    worker's own diagnostic instead of a thrown-away pipe."""
+    from asea.capability_build.errors import WorkerTimeout
+    from asea.capability_build.worker import GlmWorkerClient
+
+    fake = tmp_path / "slow_worker.py"
+    fake.write_text(
+        "import sys, time\n"
+        "sys.stderr.write('hanging on purpose\\n')\n"
+        "sys.stderr.flush()\n"
+        "time.sleep(600)\n",
+        encoding="utf-8",
+    )
+    client = GlmWorkerClient(
+        repo_root=tmp_path, checkpoint=str(tmp_path), use_docker=False,
+        python=sys.executable, timeout=3600.0,
+    )
+    client._command = lambda: [sys.executable, str(fake)]
+    with pytest.raises(WorkerTimeout) as excinfo:
+        client.request("hello", timeout=0.5)
+    assert "deadline" in str(excinfo.value)
+    # the drained stderr rides the error, not a discarded pipe
+    assert "hanging on purpose" in str(excinfo.value)
+    # the worker process is dead and reaped, not left hanging
+    assert client._process is not None
+    assert client._process.wait(timeout=30) != 0
+    client.stop()
+
+
+# ---------------------------------------------------------------------------
+# Router-output masking (MECHANISM TEST: random fake routers, not GLM or
+# Switch capability results)
+# ---------------------------------------------------------------------------
+
+def _fake_glm_router_stack(torch):
+    """A minimal EXACT-SHAPE GLM-5.3-Flash stand-in for detect_architecture:
+    45 decoder blocks (first 3 dense, 42 sparse with a 288-expert router
+    each), a vision tower module, and the config fields the adapter pins.
+    Random weights -- mechanics only."""
+    from asea.capability_build.adapters.glm53_flash import Glm53FlashAdapter
+
+    class Glm5NextForCausalLM(torch.nn.Module):  # accepted class name
+        def __init__(self):
+            super().__init__()
+            self.model = torch.nn.Module()
+            self.model.layers = torch.nn.ModuleList()
+            for index in range(45):
+                block = torch.nn.Module()
+                if index < 3:
+                    block.mlp = torch.nn.Linear(8, 8)  # dense: no "experts"
+                else:
+                    block.experts = torch.nn.Module()
+                    block.experts.router = torch.nn.Linear(8, 288)
+                self.model.layers.append(block)
+            self.vision_tower = torch.nn.Linear(8, 8)
+
+    class Cfg:
+        pass
+
+    cfg = Cfg()
+    cfg.model_type = "glm5_next"
+    cfg.num_hidden_layers = 45
+    cfg.n_routed_experts = 288
+    cfg.n_shared_experts = 1
+    cfg.num_experts_per_tok = 8
+    cfg.scoring_func = "sigmoid"
+    cfg.first_k_dense_replace = 3
+    cfg.hidden_size = 4096
+    cfg.max_position_embeddings = 1_048_576
+    cfg.torch_dtype = "bfloat16"
+    return Glm53FlashAdapter(Glm5NextForCausalLM(), torch, config=cfg)
+
+
+def test_glm_mask_suppresses_expert_and_restore_succeeds():
+    """Defect fix: the mask is a router-OUTPUT forward hook, not a
+    weight-row rewrite. The old ``-30`` row made the masked expert's
+    logit ``-30 * sum(hidden)`` -- STRONGLY POSITIVE for negative-sum
+    hidden states, i.e. it INCREASED the selection probability. The hook
+    gives ``-1e9`` for every token, input-independent, and touches no
+    weights: the teacher verifies hash-unchanged even while masked."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    target = InterventionTarget("expert", 0, 17)
+    _, block = adapter.layers[0]
+    router = adapter._router_of(block)[1]
+    hidden = -torch.ones(3, 8)  # NEGATIVE-sum hidden states
+    # the OLD mechanism would have produced a POSITIVE logit on this input
+    assert -30.0 * float(hidden.sum(dim=-1)[0]) > 0
+    adapter.freeze_baseline()
+    with torch.no_grad():
+        baseline = router(hidden).clone()
+    result = adapter.temporary_mask(target)
+    assert result["weights_modified"] is False
+    assert result["mechanism"] == "router_output_forward_hook"
+    with torch.no_grad():
+        masked = router(hidden)
+        assert torch.all(masked[:, 17] == -1.0e9)
+        others = [e for e in range(288) if e != 17]
+        assert torch.equal(masked[:, others], baseline[:, others])
+        # the masked expert can never enter the top-8 selection
+        top = torch.sigmoid(masked).topk(8, dim=-1).indices
+        assert 17 not in top.reshape(-1).tolist()
+    # weights were never modified: unchanged holds DURING the mask window
+    assert adapter.verify_unchanged()["unchanged"] is True
+    restored = adapter.restore_mask(target)
+    assert restored["restored"] is True
+    assert restored["weights_modified"] is False
+    with torch.no_grad():
+        assert torch.equal(router(hidden), baseline)
+    assert adapter.verify_unchanged()["unchanged"] is True
+
+
+def test_glm_mask_refuses_partial_scale_layer_kind_and_double_ops():
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    with pytest.raises(InterventionInvalid):
+        adapter.temporary_mask(InterventionTarget("expert", 0, 5), scale=0.5)
+    with pytest.raises(InterventionInvalid):
+        # masking every expert would leave top-k firing over all -1e9
+        # logits: silent under-suppression, refused
+        adapter.temporary_mask(InterventionTarget("layer", 0))
+    with pytest.raises(InterventionInvalid):
+        adapter.temporary_mask(InterventionTarget("expert", 0, 288))
+    adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+    with pytest.raises(InterventionInvalid):
+        adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+    with pytest.raises(InterventionInvalid):
+        # cannot restore what was never masked
+        adapter.restore_mask(InterventionTarget("expert", 1, 2))
+
+
+def test_switch_mask_suppresses_expert_and_restore_succeeds():
+    """Same defect class in the Switch adapter: the old ``-1e9`` weight-row
+    mask made the masked expert's logit ``-1e9 * sum(hidden)`` -- POSITIVE
+    for negative-sum hidden states. The classifier-OUTPUT hook is
+    input-independent; restoration removes the hook."""
+    torch = pytest.importorskip("torch")
+    transformers = pytest.importorskip("transformers")
+    if transformers.__version__ != "4.51.3":
+        pytest.skip("Supported compiler runtime is transformers 4.51.3")
+    from transformers import (
+        SwitchTransformersConfig,
+        SwitchTransformersForConditionalGeneration,
+    )
+
+    from asea.capability_build.adapters.switch import SwitchAdapter
+
+    torch.manual_seed(7)
+    config = SwitchTransformersConfig(
+        vocab_size=12, d_model=8, d_ff=16, d_kv=4, num_heads=2, num_layers=2,
+        num_decoder_layers=2, num_sparse_encoder_layers=1,
+        num_sparse_decoder_layers=1, num_experts=4, expert_capacity=8,
+        dropout_rate=0, router_jitter_noise=0, decoder_start_token_id=0,
+        pad_token_id=0, eos_token_id=1,
+    )
+    model = SwitchTransformersForConditionalGeneration(config)
+    adapter = SwitchAdapter(model, torch)
+    target = InterventionTarget("expert", 0, 2)
+    _, layer = adapter.layers[0]
+    classifier = layer.router.classifier
+    hidden = -torch.ones(2, 8)  # negative-sum hidden states
+    with torch.no_grad():
+        baseline = classifier(hidden).clone()
+    adapter.freeze_baseline()
+    result = adapter.temporary_mask(target)
+    assert result["weights_modified"] is False
+    with torch.no_grad():
+        masked = classifier(hidden)
+        assert torch.all(masked[:, 2] == -1.0e9)
+        assert torch.equal(masked[:, [0, 1, 3]], baseline[:, [0, 1, 3]])
+        assert 2 not in masked.argmax(dim=-1).tolist()
+    assert adapter.verify_unchanged()["unchanged"] is True
+    adapter.restore_mask(target)
+    with torch.no_grad():
+        assert torch.equal(classifier(hidden), baseline)
+    assert adapter.verify_unchanged()["unchanged"] is True
+
+
 # ---------------------------------------------------------------------------
 # Evaluation platform honesty
 # ---------------------------------------------------------------------------
@@ -651,6 +832,34 @@ def test_local_student_refuses_remote_host():
         local_ollama_student("m", host="http://gpu.box.example:11434")
 
 
+def test_local_student_host_validation_parses_real_hostnames():
+    """Defect fix: the old string-prefix check accepted
+    ``http://localhost.example.invalid:11434`` as "local". A REAL URL
+    parse must refuse it, along with the userinfo/path/query/scheme
+    variants -- a resolvable name is never provably local."""
+    from asea.capability_build.student import validate_local_student_host
+
+    # literal loopback forms are accepted (parsed hostname returned)
+    assert validate_local_student_host("http://localhost:11434") == "localhost"
+    assert validate_local_student_host("http://127.0.0.1:11434") == "127.0.0.1"
+    assert validate_local_student_host("http://[::1]:11434/") == "::1"
+    assert validate_local_student_host("http://0.0.0.0:11434") == "0.0.0.0"
+    # the reviewer's exact bypass and its cousins are all REFUSED
+    for host in (
+        "http://localhost.example.invalid:11434",
+        "http://127.0.0.1.evil.example:11434",
+        "http://localhost@evil.example:11434",        # userinfo trick
+        "http://localhost:11434/redirect",             # path
+        "https://localhost:11434",                    # non-http scheme
+        "http://localhost:11434?next=http://evil.example",
+        "http://localhost:11434#frag",
+        "file:///etc/passwd",
+        "not a url",
+    ):
+        with pytest.raises(BlockedResource):
+            validate_local_student_host(host)
+
+
 def test_measure_student_baseline_groups_and_note():
     from asea.capability_build.student import measure_student_baseline
 
@@ -736,6 +945,50 @@ def test_sequence_pairs_leakage_poisons_whole_set():
         build_sequence_pairs(traces, protected_sample_ids={"final-9"})
 
 
+def test_sequence_pairs_enforce_protected_families():
+    """Defect fix: ``protected_families`` is ENFORCED, not accepted-and-
+    ignored. A trace whose family is protected, or whose family cannot be
+    resolved through the approved dataset, poisons the whole build."""
+    from asea.capability_build.distillation import build_sequence_pairs
+
+    traces = [_judged_behavioural_trace("t-1", "train prompt body", "r1", True)]
+    # (1) the trace's own family is protected: a family never crosses splits
+    with pytest.raises(LeakageError):
+        build_sequence_pairs(
+            traces, protected_families={"fam-train"},
+            sample_families={"t-1": "fam-train"},
+        )
+    # (2) family not resolvable through the dataset: unverifiable is not safe
+    with pytest.raises(LeakageError):
+        build_sequence_pairs(
+            traces, protected_families={"fam-heldout"}, sample_families={},
+        )
+    # (3) protected families supplied without a lookup: refused outright
+    with pytest.raises(CapabilityBuildError):
+        build_sequence_pairs(traces, protected_families={"fam-heldout"})
+    # (4) a resolvable, non-protected family passes
+    pairs = build_sequence_pairs(
+        traces, protected_families={"fam-heldout"},
+        sample_families={"t-1": "fam-train"},
+    )
+    assert pairs["positives"][0]["sample_id"] == "t-1"
+
+
+def test_sequence_pairs_enforce_protected_prompts():
+    """The exact PROMPT of a protected-split case poisons the build even
+    when the response differs (content-hash checks alone would miss it)."""
+    import hashlib
+
+    from asea.capability_build.distillation import build_sequence_pairs
+
+    traces = [_judged_behavioural_trace("t-1", "train prompt body", "different r", True)]
+    with pytest.raises(LeakageError):
+        build_sequence_pairs(
+            traces,
+            protected_prompts={hashlib.sha256(b"train prompt body").hexdigest()},
+        )
+
+
 def test_sequence_pairs_reject_duplicate_and_near_duplicate():
     from asea.capability_build.distillation import build_sequence_pairs
 
@@ -774,48 +1027,121 @@ def test_hand_to_deepapply_needs_positives_and_never_preapproves():
 # Minimum-capability search (MECHANISM TEST: synthetic candidates, not a
 # reduced-model quality result)
 # ---------------------------------------------------------------------------
-def test_search_accepts_first_candidate_meeting_threshold(spec):
+def test_search_selects_smallest_passing_candidate(spec):
+    """Defect fix: the search evaluates EVERY candidate and admits the
+    SMALLEST passing one by measured size -- it must not stop at the
+    first pass when a smaller passing candidate follows."""
     from asea.capability_build.search import search_with_reference
 
     plans = [{"keep": 10}, {"keep": 4}, {"keep": 2}]
 
-    def build(plan):
-        return plan
-
     def evaluate_by_plan(candidate):
         keep = candidate["keep"]
         if keep == 10:
-            return {"target_score": 1.0, "control_scores": {"math": 1.0},
+            return {"target_score": 1.0,
+                    "control_scores": {"math_reasoning": 1.0},
                     "size_bytes": 100}
         if keep == 4:
-            return {"target_score": 0.9, "control_scores": {"math": 1.0},
+            return {"target_score": 0.9,
+                    "control_scores": {"math_reasoning": 0.95},
                     "size_bytes": 60}
-        return {"target_score": 0.5, "control_scores": {"math": 0.99},
+        return {"target_score": 0.5,
+                "control_scores": {"math_reasoning": 0.94},
                 "size_bytes": 30}
 
     result = search_with_reference(
-        spec, teacher_target_score=1.0, candidate_plan=plans,
-        build=build, evaluate=evaluate_by_plan,
+        spec, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 0.95},
+        candidate_plan=plans, build=lambda p: p, evaluate=evaluate_by_plan,
     )
-    # threshold = 0.8 * 1.0; keep=4 already meets it (0.9 >= 0.8), so the
-    # LARGER keep=10 is accepted first (order matters, not optimality).
-    assert result["accepted"]["plan"]["keep"] == 10
+    # threshold = 0.8 * 1.0. keep=10 passes too (size 100) but the search
+    # must admit the smaller passing keep=4 (size 60), and the whole plan
+    # was evaluated: the keep=2 rejection is visible in the iterations.
+    assert result["accepted"]["plan"]["keep"] == 4
+    assert result["accepted"]["size_bytes"] == 60
     assert result["accepted"]["admission"] == "CANDIDATE_UNADMITTED"
     assert result["autoactivated"] is False
+    assert len(result["iterations"]) == 3
+    assert result["iterations"][2]["status"] == "rejected"
+    assert result["failed_experiments_visible"] is True
 
 
 def test_search_rejects_candidate_below_threshold(spec):
     from asea.capability_build.search import search_with_reference
 
     result = search_with_reference(
-        spec, teacher_target_score=1.0, candidate_plan=[{"keep": 2}],
+        spec, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 1.0},
+        candidate_plan=[{"keep": 2}],
         build=lambda p: p,
-        evaluate=lambda c: {"target_score": 0.5, "control_scores": {},
-                           "size_bytes": 10},
+        evaluate=lambda c: {"target_score": 0.5,
+                            "control_scores": {"math_reasoning": 1.0},
+                            "size_bytes": 10},
     )
     assert result["accepted"] is None
     assert result["iterations"][0]["status"] == "rejected"
     assert result["failed_experiments_visible"] is True
+
+
+def test_search_rejects_unmeasured_controls_sizes_and_budget(spec):
+    """Defect fix: candidates with NO control results, a zero/missing
+    size, or a size over the spec's storage budget are all REJECTED with
+    the reason recorded -- never accepted by default."""
+    from asea.capability_build.schema import HardwareBudget
+    from asea.capability_build.search import search_with_reference
+
+    budgeted = spec.model_copy(update={
+        "hardware_budget": HardwareBudget(max_model_storage_bytes=50),
+    })
+    plans = [{"name": "no-controls"}, {"name": "zero-size"},
+             {"name": "missing-size"}, {"name": "over-budget"}]
+
+    def evaluate(candidate):
+        name = candidate["name"]
+        if name == "no-controls":
+            return {"target_score": 1.0, "control_scores": {}, "size_bytes": 10}
+        if name == "zero-size":
+            return {"target_score": 1.0,
+                    "control_scores": {"math_reasoning": 1.0}, "size_bytes": 0}
+        if name == "missing-size":
+            return {"target_score": 1.0,
+                    "control_scores": {"math_reasoning": 1.0}}
+        return {"target_score": 1.0,
+                "control_scores": {"math_reasoning": 1.0}, "size_bytes": 100}
+
+    result = search_with_reference(
+        budgeted, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 1.0},
+        candidate_plan=plans, build=lambda p: p, evaluate=evaluate,
+    )
+    assert result["accepted"] is None
+    by_name = {i["plan"]["name"]: i for i in result["iterations"]}
+    assert all(i["status"] == "rejected" for i in result["iterations"])
+    assert "not measured" in by_name["no-controls"]["reason"]
+    assert "size" in by_name["zero-size"]["reason"]
+    assert "size" in by_name["missing-size"]["reason"]
+    assert "exceeds" in by_name["over-budget"]["reason"]
+
+
+def test_search_uses_measured_baseline_not_assumed_unity(spec):
+    """Defect fix: control regression is computed against the MEASURED
+    teacher control baseline, never an assumed 1.0. A candidate at the
+    teacher's real 0.9 control baseline must NOT be counted as
+    regressing (against an assumed 1.0 it would have been wrongly
+    rejected at the 0.05 tolerance)."""
+    from asea.capability_build.search import search_with_reference
+
+    result = search_with_reference(
+        spec, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 0.9},
+        candidate_plan=[{"keep": 4}],
+        build=lambda p: p,
+        evaluate=lambda c: {"target_score": 0.9,
+                            "control_scores": {"math_reasoning": 0.9},
+                            "size_bytes": 60},
+    )
+    assert result["accepted"] is not None
+    assert result["accepted"]["control_regression"] == pytest.approx(0.0)
 
 
 def test_search_records_failed_builders_and_never_fabricates(spec):
@@ -825,7 +1151,9 @@ def test_search_records_failed_builders_and_never_fabricates(spec):
         raise RuntimeError("OOM")
 
     result = search_with_reference(
-        spec, teacher_target_score=1.0, candidate_plan=[{"keep": 1}],
+        spec, teacher_target_score=1.0,
+        teacher_control_baselines={"math_reasoning": 1.0},
+        candidate_plan=[{"keep": 1}],
         build=boom, evaluate=lambda c: {},
     )
     assert result["iterations"][0]["status"] == "failed"
@@ -834,16 +1162,37 @@ def test_search_records_failed_builders_and_never_fabricates(spec):
 
 
 def test_search_refuses_unmeasured_teacher_and_empty_plan(spec):
+    """The search refuses to RUN against an unmeasured teacher: an empty
+    control-baseline dict (controls would be scored against an assumed
+    1.0) and a spec control group with no measured baseline are both
+    refused up front, not silently papered over."""
     from asea.capability_build.search import search_with_reference
+
+    def build(p):
+        return p
+
+    def evaluate(c):
+        return {}
 
     with pytest.raises(CapabilityBuildError):
         search_with_reference(spec, teacher_target_score=0.0,
+                              teacher_control_baselines={"math_reasoning": 1.0},
                               candidate_plan=[{"keep": 1}],
-                              build=lambda p: p, evaluate=lambda c: {})
+                              build=build, evaluate=evaluate)
     with pytest.raises(CapabilityBuildError):
         search_with_reference(spec, teacher_target_score=1.0,
-                              candidate_plan=[], build=lambda p: p,
-                              evaluate=lambda c: {})
+                              teacher_control_baselines={"math_reasoning": 1.0},
+                              candidate_plan=[], build=build, evaluate=evaluate)
+    with pytest.raises(CapabilityBuildError):
+        search_with_reference(spec, teacher_target_score=1.0,
+                              teacher_control_baselines={},
+                              candidate_plan=[{"keep": 1}],
+                              build=build, evaluate=evaluate)
+    with pytest.raises(CapabilityBuildError):
+        search_with_reference(spec, teacher_target_score=1.0,
+                              teacher_control_baselines={"unrelated_group": 1.0},
+                              candidate_plan=[{"keep": 1}],
+                              build=build, evaluate=evaluate)
 
 
 # ---------------------------------------------------------------------------
@@ -865,7 +1214,7 @@ def test_cli_student_baseline_refuses_remote_host(tmp_path, capsys):
     assert code == 2
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == BLOCKED_RESOURCE
-    assert "not local" in payload["requirement"]
+    assert "not a literal loopback" in payload["requirement"]
 
 
 def test_cli_student_baseline_blocked_without_local_daemon(tmp_path, capsys):
@@ -888,15 +1237,127 @@ def test_cli_student_baseline_blocked_without_local_daemon(tmp_path, capsys):
     assert payload["status"] == BLOCKED_RESOURCE
 
 
+def _seed_traces(workspace, traces):
+    from asea.capability_build.store import CapabilityStore
+
+    store = CapabilityStore(workspace)
+    for n, trace in enumerate(traces):
+        store.put("traces", "t%d" % n, trace.model_dump(mode="json", by_alias=True))
+    return store
+
+
+def _training_trace(sample_id="training-0", prompt=None, response="ok",
+                    capability_id="python_repo_debugging_v1",
+                    revision="glm-5.3-flash-20260901"):
+    prompt = prompt or ("distinct prompt body for %s" % sample_id)
+    return make_behavioural_trace(
+        capability_id=capability_id,
+        sample_id=sample_id,
+        model_revision=revision,
+        prompt=prompt,
+        group="target",
+        outcome=TraceOutcome(success=True),
+        behavioural=BehaviouralRecord(prompt=prompt, response=response),
+    )
+
+
+def _built_dataset(tmp_path):
+    from asea.capability_build.__main__ import main
+
+    cases = _write_cases(tmp_path, _full_case_list())
+    out = tmp_path / "capability_v1"
+    assert main(["dataset", "build", "--spec", _write_spec(tmp_path),
+                 "--cases", str(cases), "--out", str(out)]) == 0
+    return out
+
+
 def test_cli_distill_needs_traces(tmp_path, capsys):
     from asea.capability_build.__main__ import main
 
+    out = _built_dataset(tmp_path)
+    capsys.readouterr()
     code = main(["distill", "--spec", _write_spec(tmp_path),
+                 "--dataset", str(out),
                  "--workspace", str(tmp_path / "ws")])
     assert code == 2
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == BLOCKED_RESOURCE
     assert "no traces" in payload["requirement"]
+
+
+def test_cli_distill_refuses_missing_dataset(tmp_path, capsys):
+    from asea.capability_build.__main__ import main
+
+    code = main(["distill", "--spec", _write_spec(tmp_path),
+                 "--dataset", str(tmp_path / "no-such-dataset"),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == BLOCKED_RESOURCE
+    assert "dataset" in payload["requirement"]
+
+
+def test_cli_distill_refuses_trace_outside_training_split(tmp_path, capsys):
+    """Defect fix: distill is bound to the approved dataset. A trace whose
+    sample is NOT part of the dataset's training split is refused -- it
+    can never become teaching material."""
+    from asea.capability_build.__main__ import main
+
+    out = _built_dataset(tmp_path)
+    capsys.readouterr()
+    _seed_traces(tmp_path / "ws", [
+        _training_trace(sample_id="heldout-0"),
+    ])
+    code = main(["distill", "--spec", _write_spec(tmp_path),
+                 "--dataset", str(out),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "rejected"
+    assert "training split" in payload["error"]
+
+
+def test_cli_distill_refuses_identity_mismatch(tmp_path, capsys):
+    """The dataset manifest must carry the SAME capability id, teacher pin
+    and spec fingerprint as --spec: identity is verified, never assumed
+    from a path."""
+    from asea.capability_build.__main__ import main
+
+    out = _built_dataset(tmp_path)
+    capsys.readouterr()
+    other = json.loads(json.dumps(SPEC))
+    other["teacher"]["revision"] = "glm-5.3-flash-OTHER-20260902"
+    other_path = tmp_path / "spec-other.json"
+    other_path.write_text(json.dumps(other), encoding="utf-8")
+    code = main(["distill", "--spec", str(other_path),
+                 "--dataset", str(out),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "rejected"
+    assert "identity mismatch" in payload["error"]
+
+
+def test_cli_distill_happy_path_builds_pairs_and_handoff(tmp_path, capsys):
+    from asea.capability_build.__main__ import main
+
+    out = _built_dataset(tmp_path)
+    capsys.readouterr()
+    _seed_traces(tmp_path / "ws", [
+        _training_trace(sample_id="training-0", response="ok-training-0"),
+    ])
+    code = main(["distill", "--spec", _write_spec(tmp_path),
+                 "--dataset", str(out),
+                 "--workspace", str(tmp_path / "ws")])
+    assert code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["positives"] == 1
+    assert payload["dataset"]["training_samples"] == 3
+    assert payload["dataset"]["protected_splits_enforced"] == [
+        "development", "heldout", "final", "controls",
+    ]
+    assert payload["deepapply_handoff"]["pre_approval"] is False
+    assert payload["deepapply_handoff"]["autoactivated"] is False
 
 # ---------------------------------------------------------------------------
 # Dataset builder (MECHANISM TEST: synthetic cases, never real teacher or
@@ -933,40 +1394,64 @@ def _write_cases(tmp_path, cases, name="cases.jsonl"):
     return path
 
 
-def test_dataset_build_and_validate_round_trip(tmp_path):
+def test_dataset_build_and_validate_round_trip(tmp_path, spec):
     from asea.capability_build.dataset import build_dataset, validate_dataset
 
     out = tmp_path / "capability_v1"
-    manifest = build_dataset(_full_case_list(), output_dir=out)
+    manifest = build_dataset(_full_case_list(), output_dir=out, spec=spec)
     assert manifest["frozen_before_model_generation"] is True
     assert manifest["final_opened"] is False
     assert manifest["counts"]["training"] == 3
+    assert manifest["capability_id"] == "python_repo_debugging_v1"
+    assert manifest["teacher"]["model"] == "glm-5.3-flash:cloud"
+    assert manifest["teacher"]["revision"] == spec.teacher.revision
+    assert len(manifest["spec_fingerprint"]) == 64
     result = validate_dataset(out)
     assert result["ok"] is True
+    assert result["capability_id"] == spec.capability_id
+    assert result["spec_fingerprint"] == manifest["spec_fingerprint"]
     assert (out / "selection-lock.json").is_file()
 
 
-def test_dataset_refuses_id_family_and_nearduplicate_leakage(tmp_path):
+def test_dataset_requires_spec_and_binds_identity(tmp_path, spec):
+    """Defect fix: a dataset built without a spec cannot bind capability /
+    teacher / spec-fingerprint identity and may never back training
+    pairs; validation refuses a manifest with a missing identity field."""
+    from asea.capability_build.dataset import build_dataset, validate_dataset
+
+    with pytest.raises(DatasetInvalid):
+        build_dataset(_full_case_list(), output_dir=tmp_path / "nospec")
+    out = tmp_path / "capability_v1"
+    build_dataset(_full_case_list(), output_dir=out, spec=spec)
+    manifest_path = out / "manifest.json"
+    raw = json.loads(manifest_path.read_text(encoding="utf-8"))
+    raw.pop("spec_fingerprint")
+    manifest_path.write_text(json.dumps(raw), encoding="utf-8")
+    with pytest.raises(DatasetInvalid):
+        validate_dataset(out)
+
+
+def test_dataset_refuses_id_family_and_nearduplicate_leakage(tmp_path, spec):
     from asea.capability_build.dataset import build_dataset
 
     cases = _full_case_list()
     # same sample_id in two splits
     clash = _case("training-0", "development", family="other-fam")
     with pytest.raises(DatasetInvalid):
-        build_dataset(cases + [clash], output_dir=tmp_path / "a")
+        build_dataset(cases + [clash], output_dir=tmp_path / "a", spec=spec)
     # family crossing splits
     cross = _case("new-id", "heldout", family="fam-training-0")
     with pytest.raises(DatasetInvalid):
-        build_dataset(cases + [cross], output_dir=tmp_path / "b")
+        build_dataset(cases + [cross], output_dir=tmp_path / "b", spec=spec)
     # near-duplicate prompt shape across splits (new guard)
     near = _case("near-id", "heldout", family="near-fam",
                  prompt="DISTINCT prompt BODY for training-0")
     with pytest.raises(DatasetInvalid):
-        build_dataset(cases + [near], output_dir=tmp_path / "c")
+        build_dataset(cases + [near], output_dir=tmp_path / "c", spec=spec)
     # empty split
     only = [_case("t-0", "training")]
     with pytest.raises(DatasetInvalid):
-        build_dataset(only, output_dir=tmp_path / "d")
+        build_dataset(only, output_dir=tmp_path / "d", spec=spec)
 
 
 def test_dataset_quarantines_frozen_september_inputs(tmp_path):
@@ -979,20 +1464,20 @@ def test_dataset_quarantines_frozen_september_inputs(tmp_path):
         read_cases(frozen)
 
 
-def test_dataset_output_must_be_new(tmp_path):
+def test_dataset_output_must_be_new(tmp_path, spec):
     from asea.capability_build.dataset import build_dataset
 
     out = tmp_path / "existing"
     out.mkdir()
     with pytest.raises(DatasetInvalid):
-        build_dataset(_full_case_list(), output_dir=out)
+        build_dataset(_full_case_list(), output_dir=out, spec=spec)
 
 
-def test_dataset_validate_detects_post_build_tampering(tmp_path):
+def test_dataset_validate_detects_post_build_tampering(tmp_path, spec):
     from asea.capability_build.dataset import build_dataset, validate_dataset
 
     out = tmp_path / "capability_v1"
-    build_dataset(_full_case_list(), output_dir=out)
+    build_dataset(_full_case_list(), output_dir=out, spec=spec)
     victim = out / "training.jsonl"
     victim.write_text(victim.read_text(encoding="utf-8").replace(
         "ok-training-0", "edited"), encoding="utf-8")
@@ -1005,11 +1490,14 @@ def test_cli_dataset_build_and_validate(tmp_path, capsys):
 
     cases = _write_cases(tmp_path, _full_case_list())
     out = tmp_path / "capability_v1"
-    code = main(["dataset", "build", "--cases", str(cases), "--out", str(out)])
+    code = main(["dataset", "build", "--spec", _write_spec(tmp_path),
+                 "--cases", str(cases), "--out", str(out)])
     assert code == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["ok"] is True
     assert payload["counts"]["final"] == 3
+    assert payload["capability_id"] == "python_repo_debugging_v1"
+    assert payload["teacher"]["model"] == "glm-5.3-flash:cloud"
     code = main(["dataset", "validate", "--dir", str(out)])
     assert code == 0
     assert json.loads(capsys.readouterr().out)["ok"] is True
@@ -1019,8 +1507,8 @@ def test_cli_dataset_build_refuses_leaky_cases(tmp_path, capsys):
     from asea.capability_build.__main__ import main
 
     cases = _write_cases(tmp_path, [_case("t-0", "training")])
-    code = main(["dataset", "build", "--cases", str(cases),
-                 "--out", str(tmp_path / "v1")])
+    code = main(["dataset", "build", "--spec", _write_spec(tmp_path),
+                 "--cases", str(cases), "--out", str(tmp_path / "v1")])
     assert code == 2
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "rejected"

@@ -27,9 +27,12 @@ RUN pip install --no-cache-dir -r /tmp/requirements.lock
 
 # The worker needs only asea's stdlib/pydantic core (worker_protocol,
 # adapters, intervention, errors) -- never the localmodels extras.
+# build_support.py (the custom build command declared in pyproject.toml
+# under [tool.setuptools] build_support) is a single MODULE at the repo
+# root, not a directory: ``pip install /silt`` fails without it.
 COPY pyproject.toml README.md /silt/
 COPY src/ /silt/src/
-COPY build_support/ /silt/build_support/
+COPY build_support.py /silt/build_support.py
 RUN pip install --no-cache-dir /silt
 
 COPY workers/glm53/worker.py /worker/worker.py

@@ -72,6 +72,13 @@ class WorkerCrashed(CapabilityBuildError):
     portion."""
 
 
+class WorkerTimeout(WorkerCrashed):
+    """The worker exceeded the request deadline and was killed. The
+    deadline (and the worker's stderr tail) ride the message; whatever
+    the worker had not produced by the deadline is reported as lost, not
+    fabricated."""
+
+
 class SpecInvalid(CapabilityBuildError):
     """A capability spec failed schema or cross-field validation."""
 

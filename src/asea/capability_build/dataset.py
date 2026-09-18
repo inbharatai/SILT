@@ -35,6 +35,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Sequence
 
 from .errors import CapabilityBuildError
+from .schema import spec_fingerprint
 
 DATASET_SCHEMA = "silt.capability_cases.v1"
 MANIFEST_SCHEMA = "silt.capability_dataset_manifest.v1"
@@ -168,12 +169,25 @@ def _check_disjointness(by_split: Dict[str, List[Dict[str, Any]]]) -> None:
             seen_families[family] = split
 
 
-def build_dataset(cases: Sequence[Dict[str, Any]], *, output_dir: Path) -> Dict[str, Any]:
+def build_dataset(
+    cases: Sequence[Dict[str, Any]], *, output_dir: Path, spec=None
+) -> Dict[str, Any]:
     """Validate and write the five split files + manifest + selection lock.
 
     ``output_dir`` must not exist (new exclusive path, recovery.py pattern);
-    nothing is ever written in place.
+    nothing is ever written in place. ``spec`` is the capability spec the
+    dataset is built for and is REQUIRED in practice (the CLI enforces it):
+    the manifest records the capability id, the teacher pin and the spec
+    fingerprint so every downstream consumer (distillation, search,
+    certification) can verify dataset identity instead of trusting a path.
+    A dataset without an identity binding cannot back any training pairs.
     """
+    if spec is None:
+        raise DatasetInvalid(
+            "dataset build requires the capability spec (--spec); without "
+            "it the manifest cannot bind capability/teacher identity and "
+            "no downstream consumer may trust the splits"
+        )
     output_dir = Path(output_dir)
     if output_dir.exists() or output_dir.is_symlink():
         raise DatasetInvalid(
@@ -202,6 +216,14 @@ def build_dataset(cases: Sequence[Dict[str, Any]], *, output_dir: Path) -> Dict[
     manifest = {
         "schema": MANIFEST_SCHEMA,
         "schema_version": 1,
+        "capability_id": spec.capability_id,
+        "teacher": {
+            "provider": spec.teacher.provider,
+            "model": spec.teacher.model,
+            "revision": spec.teacher.revision,
+            "access": spec.teacher.access,
+        },
+        "spec_fingerprint": spec_fingerprint(spec),
         "counts": {s: len(by_split[s]) for s in SPLITS},
         "groups": {
             s: {
@@ -257,6 +279,13 @@ def validate_dataset(dataset_dir: Path) -> Dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("schema") != MANIFEST_SCHEMA:
         raise DatasetInvalid("manifest is not %s" % MANIFEST_SCHEMA)
+    for identity_field in ("capability_id", "teacher", "spec_fingerprint"):
+        if not manifest.get(identity_field):
+            raise DatasetInvalid(
+                "manifest is missing the identity field %r; a dataset that "
+                "cannot prove which capability and teacher it was built for "
+                "may not back any training pairs" % identity_field
+            )
     by_split: Dict[str, List[Dict[str, Any]]] = {}
     for split in SPLITS:
         path = dataset_dir / ("%s.jsonl" % split)
@@ -288,6 +317,9 @@ def validate_dataset(dataset_dir: Path) -> Dict[str, Any]:
                 )
     return {
         "ok": True,
+        "capability_id": manifest["capability_id"],
+        "teacher": manifest["teacher"],
+        "spec_fingerprint": manifest["spec_fingerprint"],
         "counts": manifest["counts"],
         "leakage_checks": manifest["leakage_checks"],
         "final_opened": manifest["final_opened"],

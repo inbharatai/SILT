@@ -21,12 +21,78 @@ Honesty rules (binding):
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, List, Sequence
+from urllib.parse import urlsplit
 
 from .errors import BlockedResource
 from .schema import EvaluationSplits
 
 #: Judge contract: (case, student_output) -> bool (host-owned verdict).
 StudentJudge = Callable[[Dict[str, Any], str], bool]
+
+#: The ONLY hostnames a student connector may use. Literal loopback names
+#: and addresses -- no DNS names at all, because a resolvable name is not
+#: provably local (``localhost.example.invalid`` parses as a hostname and
+#: is NOT localhost; a public name that happens to resolve to 127.0.0.1
+#: today may not tomorrow).
+_LOCAL_HOSTNAMES = frozenset({"localhost", "127.0.0.1", "::1", "0.0.0.0"})
+
+
+def validate_local_student_host(host: str) -> str:
+    """Parse ``host`` and refuse anything that is not a literal loopback.
+
+    This is a real parse (:func:`urllib.parse.urlsplit`), not a string
+    prefix check: ``http://localhost.example.invalid:11434`` and
+    ``http://127.0.0.1.evil.example:11434`` are REFUSED here even though a
+    ``startswith("http://localhost")`` check would accept both.
+
+    Honest limits (binding):
+
+      * The connector posts directly to this URL and does NOT follow
+        redirects; a 3xx from the daemon surfaces as an error, never as a
+        silent second hop to an unvalidated host.
+      * A URL can only prove which host was *addressed*. That the selected
+        model executes locally is enforced by the caller running the actual
+        inference through this local connector only -- there is no remote
+        student path in this build, so no silent escape route exists.
+    """
+    try:
+        parts = urlsplit(host)
+    except ValueError as exc:
+        raise BlockedResource(
+            requirement="student connector host %r does not parse as a URL (%s)"
+                         % (host, exc),
+            remedy="use http://localhost:11434",
+        ) from exc
+    if parts.scheme != "http":
+        raise BlockedResource(
+            requirement="student connector host %r must be a plain http:// URL"
+                         % host,
+            remedy="use http://localhost:11434",
+        )
+    if parts.username or parts.password or parts.query or parts.fragment:
+        raise BlockedResource(
+            requirement="student connector host %r carries userinfo, query or "
+                        "fragment; a local daemon needs none of these" % host,
+            remedy="use http://localhost:11434",
+        )
+    if parts.path not in ("", "/"):
+        raise BlockedResource(
+            requirement="student connector host %r carries a path; a local "
+                        "Ollama daemon is addressed at its root" % host,
+            remedy="use http://localhost:11434",
+        )
+    name = (parts.hostname or "").lower()
+    if name not in _LOCAL_HOSTNAMES:
+        raise BlockedResource(
+            requirement=(
+                "student connector host %r is not a literal loopback address "
+                "(parsed hostname %r); remote students are not supported in "
+                "this build" % (host, name)
+            ),
+            remedy="run a local Ollama daemon (ollama serve) and use "
+                   "http://localhost:11434",
+        )
+    return name
 
 
 def local_ollama_student(
@@ -36,18 +102,10 @@ def local_ollama_student(
     existing :class:`asea.modules.real.ollama.OllamaConnector` (local
     daemon, no ML deps, no network beyond localhost); this function only
     validates the request and returns the wiring the caller needs, so the
-    remote-consent machinery can never be confused with student runs."""
-    if not host.startswith("http://localhost") and not host.startswith(
-        "http://127.0.0.1"
-    ):
-        raise BlockedResource(
-            requirement=(
-                "student connector host %r is not local; remote students "
-                "are not supported in this build" % host
-            ),
-            remedy="run a local Ollama daemon (ollama serve) and use "
-                   "http://localhost:11434",
-        )
+    remote-consent machinery can never be confused with student runs.
+    The host is validated by :func:`validate_local_student_host` -- a real
+    URL parse, never a string prefix check."""
+    validate_local_student_host(host)
     return {
         "kind": "ollama_local",
         "model": model,

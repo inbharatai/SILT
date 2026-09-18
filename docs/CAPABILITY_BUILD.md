@@ -61,8 +61,15 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   usage enrichment is usage evidence, not causal expert importance.*
 * Causal intervention protocol (net-new; the compiler only prunes physically):
   verify-unchanged → seeded baseline → temporary mask → measure → restore →
-  verify-unchanged again. An intervention whose restore cannot be verified is
-  **never** causal evidence. The teacher's weights are read-only throughout.
+  verify-unchanged again. The mask is a **router-output forward hook**: a
+  masked expert's routing logit is set to −1e9 on the cloned router output,
+  independent of the hidden state. No weight row is ever written — writing a
+  constant into a router Linear's row makes the masked expert's logit
+  `−c·Σ(hidden)`, which is strongly *positive* for negative-sum hidden states
+  and would have made the masked expert MORE likely to be routed. An
+  intervention whose restore cannot be verified is **never** causal evidence.
+  The teacher's weights are read-only throughout (and `verify_unchanged` holds
+  even during the mask window, because nothing was modified).
 * MoE adapter layer (`adapters/`): a `MoEArchitectureAdapter` contract with a
   Switch implementation (wrapping compiler telemetry, byte-exact parameter-hash
   verification) and a GLM-5.3-Flash implementation pinned to the published
@@ -75,28 +82,55 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   `transformers==4.51.3` pin is untouched), versioned JSONL frame protocol,
   memory preflight before load (a small host is honestly `BLOCKED`, which is
   the correct outcome, not a bug), partial-frame preservation on crash —
-  a lost generation is never fabricated.
-* Fresh dataset builder (`dataset.py`, CLI `dataset build`): five splits
+  a lost generation is never fabricated. The client **enforces** the request
+  deadline: a watchdog timer kills the worker process group at the deadline
+  and raises a typed `WorkerTimeout` carrying every preserved frame plus the
+  worker's stderr tail (drained from a temp file — an undrained stderr PIPE
+  both deadlocks a chatty worker and throws the crash diagnostic away). The
+  Docker build context copies `build_support.py` (the single root-level module
+  `pyproject.toml` declares under `[tool.setuptools]`), so
+  `pip install /silt` inside the worker image succeeds.
+* Fresh dataset builder (`dataset.py`, CLI `dataset build --spec`): five splits
   (training/development/heldout/final/controls), per-case unique ID, content
   hash, family ID, provenance, license; cross-split ID/content/family
   disjointness; a NEW near-duplicate token-shape guard (the existing repo only
   guards exact duplicates); the frozen September sets are quarantined as
-  inputs; manifest + selection lock frozen before any model sees a case.
-* Student baselines: LOCAL connectors only (a non-localhost student host is a
-  typed `BLOCKED_RESOURCE`; no remote student path exists). The measured gap
-  `Gap = TeacherScore − StudentScore` is the only justification for any
-  transfer work.
-* Sequence-level KD pair builder + DeepApply hand-off: pairs only from
-  host-judged successful traces (failures kept as labelled negatives; UNJUDGED
-  traces contribute nothing); leakage collisions poison the whole set; training
-  itself is DeepApply's (LoRA via Gate 2) — the trainer never certifies itself.
-  Cross-family (GLM→Qwen) pairs are text-only: no vocabulary or logit
-  alignment is assumed.
+  inputs; manifest + selection lock frozen before any model sees a case. The
+  spec is REQUIRED: the manifest binds capability ID, teacher provider/model/
+  revision/access and the spec fingerprint, and `dataset validate` refuses a
+  manifest whose identity fields are missing or altered.
+* Student baselines: LOCAL connectors only — the student host URL is PARSED
+  and its actual hostname validated (`localhost`, `127.0.0.1`, `::1`,
+  `0.0.0.0` only; non-http schemes, userinfo, query strings, fragments,
+  non-root paths and lookalike hosts such as
+  `http://localhost.example.invalid:11434` are typed `BLOCKED_RESOURCE`
+  refusals; no redirects are followed); no remote student path exists. The
+  measured gap `Gap = TeacherScore − StudentScore` is the only justification
+  for any transfer work.
+* Sequence-level KD pair builder + DeepApply hand-off: `distill` REQUIRES a
+  built dataset (`--dataset`), verifies the dataset's identity against the
+  spec (capability ID, teacher model + revision, spec fingerprint), builds
+  the protected sets (protected sample IDs, content hashes, prompt hashes and
+  families from every non-training split) and refuses any trace outside the
+  training split. Pairs come only from host-judged successful traces (failures
+  kept as labelled negatives; UNJUDGED traces contribute nothing); a leakage
+  collision — protected family, protected prompt or protected content —
+  poisons the whole set; training itself is DeepApply's (LoRA via Gate 2) —
+  the trainer never certifies itself. Cross-family (GLM→Qwen) pairs are
+  text-only: no vocabulary or logit alignment is assumed.
 * Minimum-capability search (`search.py`, library surface): the objective
   `min Size(M)` s.t. `TargetScore(M) ≥ retention_ratio × teacher` and control
-  regression ≤ tolerance; every iteration recorded including failures; a
-  parameter decrease is never itself evidence. Candidates are
-  `CANDIDATE_UNADMITTED` by construction.
+  regression ≤ tolerance. The search enforces its own advertised contract:
+  measured `teacher_control_baselines` are REQUIRED (a control regression
+  against an assumed 1.0 baseline is a fabrication and the search refuses to
+  run on one), every candidate's target score, control results and
+  `size_bytes` must be MEASURED (an unmeasured control result, a missing or
+  non-positive size, or a size over `hardware_budget.max_model_storage_bytes`
+  is a recorded rejection), the ENTIRE candidate plan is evaluated (never
+  stops at the first passing candidate), and the smallest passing candidate
+  by measured `size_bytes` is selected. Every iteration is recorded including
+  failures and explicit rejection reasons; a parameter decrease is never
+  itself evidence. Candidates are `CANDIDATE_UNADMITTED` by construction.
 * Functional evaluation routes to the existing external host oracle
   (`asea.certification.function_oracle`) and Linux-only sandbox; verdicts are
   host-owned; the teacher never grades itself. On Windows/macOS the gate fails
@@ -168,22 +202,39 @@ experiments stay visible.
 
 ## Tests
 
-`tests/test_capability_build.py` — 57 tests: schema validation, evidence-class
+`tests/test_capability_build.py` — 71 tests: schema validation, evidence-class
 separation, consent gating (no network without per-run consent), enrichment
 scoring with correlation limitation, intervention protocol (mask-measure-
 restore-verify on a fake adapter; unrestorable never causal), store/receipt
-integrity + tamper detection, worker IPC crash/blocked frames, dataset
-leakage/near-duplicate/quarantine guards, student gap bookkeeping, KD pair
-leakage poisoning, search accept/reject/failure visibility, CLI exit codes,
-and two REAL Linux-sandbox oracle integration tests (skipped on Windows where
-the sandbox fails closed). Every test is a MECHANISM test unless its docstring
+integrity + tamper detection, worker IPC crash/blocked frames and deadline
+enforcement (a hanging fake worker is killed at the deadline with a typed
+`WorkerTimeout` carrying preserved frames + the drained stderr tail), dataset
+identity binding, leakage/near-duplicate/quarantine guards, distill
+dataset/training-split/protected-set enforcement, student host URL-parse
+validation (lookalike hosts, userinfo, query/fragment, non-http schemes all
+refused), router-output-hook masking on both a fake GLM stack and a real tiny
+Switch model (a negative-sum hidden state — where the old write-−30-rows
+mechanism would have produced a POSITIVE masked-expert logit — proves which
+expert was suppressed and that restoration succeeds), student gap bookkeeping,
+KD pair leakage poisoning, search contract enforcement (measured baselines,
+full-plan evaluation, smallest-passing selection, size/budget/measurement
+rejections), CLI exit codes, and two REAL Linux-sandbox oracle integration
+tests (they probe for Linux containment and skip where it is unavailable —
+GitHub CI containers and Windows both honestly skip; the skip is a probe
+result, not an assumption). Every test is a MECHANISM test unless its docstring
 says REAL; no test asserts anything about any teacher's behaviour.
+
+Test counts are per-environment facts, not project claims: at commit `a37c2cf`
+the CI Python-3.12 log recorded 2,791 passed / 100 skipped for the full suite
+(including the two REAL oracle tests skipped there); a local WSL run of the
+same tree recorded 2,872 passed / 19 skipped. Neither number is a guarantee
+about any other machine.
 
 ## Commands
 
 ```
 silt-capability spec validate --spec spec.json
-silt-capability dataset build --cases cases.jsonl --out data/capability_v1
+silt-capability dataset build --spec spec.json --cases cases.jsonl --out data/capability_v1
 silt-capability dataset validate --dir data/capability_v1
 silt-capability teacher-baseline --spec spec.json --cases cases.json [--allow-remote]
 silt-capability trace --spec spec.json --cases cases.json [--mode behavioural|internal] [--allow-remote]
@@ -191,7 +242,7 @@ silt-capability footprint --spec spec.json
 silt-capability intervene --spec spec.json --component expert:3/7 [--checkpoint DIR]
 silt-capability evaluate --spec spec.json --cases cases.json --source candidate.py
 silt-capability student-baseline --spec spec.json --cases cases.json [--model qwen2.5-coder:0.5b]
-silt-capability distill --spec spec.json
+silt-capability distill --spec spec.json --dataset data/capability_v1
 silt-capability receipt --receipt receipt.json
 silt-capability receipt-verify --receipt receipt.json
 ```

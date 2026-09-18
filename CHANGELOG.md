@@ -9,6 +9,62 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## Capability-build review fixes — 2026-09-18
+
+An external review of the 2026-09-17 capability-build layer found five
+defects that the then-green tests did not catch. All five are fixed, each with
+new tests that fail on the old behaviour. No frozen result, Gate or existing
+mechanism was weakened; the module suite grew from 57 to 71 tests.
+
+### Fixed
+- **Student "local-only" check accepted remote hosts.** The check matched a
+  string prefix, so `http://localhost.example.invalid:11434` passed. The
+  student host URL is now parsed and its actual hostname validated (literal
+  loopback only; non-http schemes, userinfo, query strings, fragments,
+  non-root paths and lookalike hosts are typed refusals; redirects are not
+  followed).
+- **Protected splits were not connected to distillation.** `distill` now
+  REQUIRES a built dataset (`--dataset`), verifies the dataset's identity
+  against the spec (capability ID, teacher model + revision, spec
+  fingerprint), builds protected sets — sample IDs, content hashes, prompt
+  hashes and families — from every non-training split, and refuses any trace
+  outside the training split. `dataset build` requires `--spec` and binds the
+  identity into the manifest; `dataset validate` refuses an altered identity.
+- **Search did not enforce its advertised contract.** `search_with_reference`
+  now REQUIRES measured `teacher_control_baselines` (refuses an empty or
+  assumed-1.0 baseline set as a fabrication), requires a measured target
+  score, measured control results and a positive integer `size_bytes` for
+  every candidate, enforces `hardware_budget.max_model_storage_bytes`,
+  evaluates the ENTIRE candidate plan (never stops at the first passing
+  candidate) and selects the smallest passing candidate by measured size;
+  rejects carry explicit reasons.
+- **The GLM expert mask was mathematically unreliable.** Writing −30 into
+  router weight rows makes the masked expert's logit `−30·Σ(hidden)` —
+  strongly POSITIVE for negative-sum hidden states, i.e. masking made the
+  expert MORE likely to be routed. Masking is now a router-output forward
+  hook that sets the masked expert's logit to −1e9 on the cloned router
+  output (no weight is written; both the GLM and Switch adapters). Tests use
+  a negative-sum hidden state — where the old mechanism demonstrably produced
+  a positive logit — and prove which expert was suppressed and that
+  restoration succeeds.
+- **The isolated worker had software blockers.** The worker Dockerfile
+  copied a `build_support/` directory that does not exist (`build_support.py`
+  is a single root-level module), so `pip install /silt` inside the image
+  failed; the worker client accepted a `timeout` it never enforced and read
+  with an unbounded blocking `readline()`; stderr was never drained. Fixed:
+  the Docker build context ships `build_support.py`, request deadlines are
+  enforced by a watchdog that kills the worker process group at the deadline
+  (typed `WorkerTimeout` carrying preserved frames + the drained stderr
+  tail, read from a temp file instead of an undrained PIPE).
+- **The invention disclosure was published to the public repo.** The
+  2026-09-17 entry described `docs/INVENTION_DISCLOSURE_capability_build.md`
+  as an internal document for owner/patent-counsel review, but `docs/` is
+  publicly served, so the file should never have been in the repo. It has
+  been removed from the tree and handed to the owner outside the repo.
+  Honesty note: the file remains in the pushed git history; removing it from
+  history requires a rewrite of public history, which was NOT done
+  unilaterally.
+
 ## Capability-build research layer — 2026-09-17
 
 A new research/build layer (`src/asea/capability_build/`, console script
@@ -46,9 +102,12 @@ See [`docs/CAPABILITY_BUILD.md`](docs/CAPABILITY_BUILD.md).
   Judged functional outcome on four target cases only — not a capability
   certificate and not a quality claim about the teacher.
 - Landing-page research section (`docs/index.html`) and README/CAPABILITIES
-  registrations. `PATENT.md` is untouched; a separate
-  `docs/INVENTION_DISCLOSURE_capability_build.md` is provided for
-  owner/patent-counsel review and makes no claim.
+  registrations. `PATENT.md` is untouched; a separate invention disclosure
+  (capability footprinting + causal intervention + minimum-capability
+  compilation) was drafted for owner/patent-counsel review and makes no
+  claim. It was originally placed in `docs/` and removed from the public tree
+  on 2026-09-18 (see the review-fixes entry below) because that brief called
+  for private owner/counsel review.
 
 ### Unchanged
 - Pipeline, Gates 1/2, DeepApply, SiltSpring, the compiler and the packet

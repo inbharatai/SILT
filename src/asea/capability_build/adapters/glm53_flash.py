@@ -173,9 +173,14 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
                 "behavioural (cloud) evidence class instead",
             )
         self.layers = self._find_sparse_layers()
-        self.n_experts = int(
-            getattr(self.text, "n_routed_experts", getattr(self.text, "num_routed_experts"))
-        )
+        # getattr defaults are evaluated EAGERLY in Python: the old
+        # ``getattr(x, "n_routed_experts", getattr(x, "num_routed_experts"))``
+        # raised AttributeError whenever the first key was missing, because
+        # the inner call ran first. Chain explicitly instead.
+        n_routed = getattr(self.text, "n_routed_experts", None)
+        if n_routed is None:
+            n_routed = getattr(self.text, "num_routed_experts")
+        self.n_experts = int(n_routed)
         self.experts_per_tok = int(getattr(self.text, "num_experts_per_tok"))
         self._telemetry = None
         self._baseline_hashes: Optional[Dict[str, str]] = None
@@ -362,43 +367,77 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
         }
 
     def temporary_mask(self, target, *, scale: float = 0.0) -> Dict[str, Any]:
+        """Suppress the masked expert's ROUTING DECISION, weights untouched.
+
+        A weight-row rewrite is mathematically UNRELIABLE under this
+        router and was removed: writing a constant ``-c`` into an expert's
+        router rows makes its logit ``-c * sum(hidden)``, which is
+        STRONGLY POSITIVE whenever the hidden-state sum is negative --
+        the masked expert would become MORE likely to enter the top-8,
+        the exact opposite of the intervention. (Sigmoid scoring makes
+        this worse, not better: a positive logit means selection
+        probability close to 1.)
+
+        Instead a forward hook on the router module rewrites the router
+        OUTPUT: the masked expert's logit becomes ``-1e9`` for every
+        token, input-independent, so ``sigmoid(-1e9)`` underflows to 0
+        and the expert can never enter the top-``experts_per_tok``
+        selection. Router weights, expert weights and every other
+        parameter are never modified, so ``verify_unchanged`` holds
+        during the mask window trivially and honestly.
+        """
+        if scale != 0.0:
+            raise InterventionInvalid(
+                "partial-scale masking (scale=%r) is not implemented; only "
+                "full suppression is, and this adapter refuses to pretend "
+                "otherwise" % scale
+            )
+        _require(
+            target.kind == "expert",
+            "masking kind %r is not supported: masking EVERY expert does not "
+            "disable top-%d routing (top-k still fires over all -1e9 logits) "
+            "and would silently under-suppress"
+            % (target.kind, self.experts_per_tok),
+        )
         _require(0 <= target.layer < len(self.layers), "layer index out of range")
+        _require(
+            0 <= target.expert_id < self.n_experts,
+            "expert %d out of range 0..%d" % (target.expert_id, self.n_experts - 1),
+        )
         index, block = self.layers[target.layer]
         router_name, router = self._router_of(block)
-        gate = None
-        for name, module in router.named_modules():
-            if isinstance(module, self.torch.nn.Linear):
-                gate = module
-                break
-        _require(gate is not None, "no router Linear found at layer %d" % index)
-        if target.kind == "expert":
-            indices = [target.expert_id]
-            _require(
-                0 <= target.expert_id < self.n_experts,
-                "expert %d out of range 0..%d" % (target.expert_id, self.n_experts - 1),
-            )
-        else:
-            indices = list(range(self.n_experts))
         registry_key = "%d:%s" % (index, target.key)
         _require(
             registry_key not in self._masked,
             "component already masked; restore before re-masking",
         )
-        saved = {"weight": gate.weight.data[indices].clone()}
-        if gate.bias is not None:
-            saved["bias"] = gate.bias.data[indices].clone()
-        with self.torch.no_grad():
-            # Sigmoid(x) -> 0 for very negative x: the expert is never in
-            # the top-k selection, without touching expert weights.
-            gate.weight.data[indices] = -30.0
-            if gate.bias is not None:
-                gate.bias.data[indices] = -30.0
+        indices = [target.expert_id]
+
+        def suppress(module, inputs, output):
+            logits = output[0] if isinstance(output, tuple) else output
+            if not isinstance(logits, self.torch.Tensor):
+                return None
+            masked = logits.clone()
+            for expert in indices:
+                masked[..., expert] = -1.0e9
+            if isinstance(output, tuple):
+                return (masked,) + tuple(output[1:])
+            return masked
+
+        handle = router.register_forward_hook(suppress)
         self._masked[registry_key] = {
             "indices": indices,
-            "saved": saved,
-            "gate": gate,
+            "handle": handle,
+            "router_name": router_name,
+            "layer_index": index,
         }
-        return {"key": registry_key, "layer": index, "indices": indices}
+        return {
+            "key": registry_key,
+            "layer": index,
+            "indices": indices,
+            "mechanism": "router_output_forward_hook",
+            "weights_modified": False,
+        }
 
     def restore_mask(self, target) -> Dict[str, Any]:
         _require(0 <= target.layer < len(self.layers), "layer index out of range")
@@ -409,13 +448,13 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
             record is not None,
             "no recorded mask; cannot restore what was never masked",
         )
-        gate = record["gate"]
-        indices = record["indices"]
-        with self.torch.no_grad():
-            gate.weight.data[indices] = record["saved"]["weight"]
-            if gate.bias is not None and "bias" in record["saved"]:
-                gate.bias.data[indices] = record["saved"]["bias"]
-        return {"key": registry_key, "restored": True}
+        record["handle"].remove()
+        return {
+            "key": registry_key,
+            "restored": True,
+            "mechanism": "router_output_forward_hook_removed",
+            "weights_modified": False,
+        }
 
     # -- reduction -----------------------------------------------------------
 

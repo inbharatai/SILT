@@ -13,26 +13,36 @@ Failure honesty (binding):
   * Worker dies mid-request -> :class:`WorkerCrashed` carrying every
     COMPLETE validated frame emitted so far; the lost portion is never
     fabricated.
+  * Worker exceeds the request deadline -> :class:`WorkerTimeout` (a
+    :class:`WorkerCrashed` subclass): a watchdog kills the worker process
+    group at the deadline, and the lost portion is reported as lost. The
+    ``timeout`` argument is therefore ENFORCED -- it is never accepted
+    and silently ignored, and the read is never allowed to block forever.
   * A ``blocked`` frame -> :class:`BlockedResource` with the worker's
     exact requirement + remedy (a small host gets an honest
     ``BLOCKED_RESOURCE``, never a local weaker path).
 
-This module is stdlib-only (subprocess + json): it must work without any
-ML dependency, because its whole point is to keep the GLM runtime away
-from this process.
+This module is stdlib-only (subprocess + threading + json): it must work
+without any ML dependency, because its whole point is to keep the GLM
+runtime away from this process.
 """
 
 from __future__ import annotations
 
-import subprocess
+import os
 import shutil
+import signal
+import subprocess
+import tempfile
+import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from .errors import BlockedResource, WorkerCrashed, WorkerUnavailable
+from .errors import BlockedResource, WorkerCrashed, WorkerTimeout, WorkerUnavailable
 from . import worker_protocol as proto
 
 _WORKER_REL = Path("workers") / "glm53" / "worker.py"
+_STDERR_TAIL_CHARS = 4000
 
 
 class GlmWorkerClient:
@@ -58,6 +68,8 @@ class GlmWorkerClient:
         self.python = python
         self._process: Optional[subprocess.Popen] = None
         self._frames: List[Dict[str, Any]] = []
+        self._stderr_file: Optional[Any] = None
+        self._deadline_fired = False
 
     # -- lifecycle ----------------------------------------------------------
 
@@ -88,18 +100,67 @@ class GlmWorkerClient:
         if self._process is not None:
             return
         try:
+            # stderr goes to a TEMP FILE, not a PIPE: an un-drained PIPE
+            # deadlocks a chatty worker once the OS buffer fills, and a
+            # never-drained PIPE means the diagnostic for the crash was
+            # thrown away. The file is read (tailed) on failure.
+            self._stderr_file = tempfile.TemporaryFile(
+                mode="w+", encoding="utf-8", errors="replace"
+            )
+            self._deadline_fired = False
             self._process = subprocess.Popen(
                 self._command(),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stderr=self._stderr_file,
                 env=None,
+                # New session/process group so a deadline kill takes down
+                # the whole worker tree, not just the shim interpreter.
+                # POSIX-only argument: Windows Popen rejects it outright.
+                **({"start_new_session": True} if os.name == "posix" else {}),
             )
         except (OSError, ValueError) as exc:
+            self._close_stderr()
             raise WorkerUnavailable("worker did not start: %s" % exc) from exc
+
+    def _kill_worker(self) -> None:
+        """Watchdog callback: kill the worker tree at the deadline."""
+        self._deadline_fired = True
+        process = self._process
+        if process is None:
+            return
+        try:
+            os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+        except (AttributeError, OSError, PermissionError):
+            # POSIX-only or the group is already gone: kill what remains.
+            try:
+                process.kill()
+            except (OSError, ValueError):
+                pass
+
+    def _stderr_tail(self) -> str:
+        if self._stderr_file is None:
+            return ""
+        try:
+            self._stderr_file.flush()
+            self._stderr_file.seek(0, os.SEEK_END)
+            size = self._stderr_file.tell()
+            self._stderr_file.seek(max(0, size - _STDERR_TAIL_CHARS))
+            return self._stderr_file.read() or ""
+        except (OSError, ValueError):
+            return ""
+
+    def _close_stderr(self) -> None:
+        if self._stderr_file is not None:
+            try:
+                self._stderr_file.close()
+            except OSError:
+                pass
+            self._stderr_file = None
 
     def stop(self) -> None:
         if self._process is None:
+            self._close_stderr()
             return
         try:
             self.request("shutdown", {}, timeout=30.0)
@@ -112,8 +173,13 @@ class GlmWorkerClient:
         try:
             self._process.wait(timeout=30)
         except subprocess.TimeoutExpired:
-            self._process.kill()
+            self._kill_worker()
+            try:
+                self._process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                pass
         self._process = None
+        self._close_stderr()
 
     # -- protocol -----------------------------------------------------------
 
@@ -122,7 +188,13 @@ class GlmWorkerClient:
         timeout: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Send one request, read one response. The response id MUST echo
-        the request id; a mismatch is a protocol fault, not data."""
+        the request id; a mismatch is a protocol fault, not data.
+
+        ``timeout`` (seconds) is ENFORCED with a watchdog that kills the
+        worker tree at the deadline; the read can never block unboundedly.
+        The default is the client-level ``timeout``. Whatever the worker
+        had not produced by the deadline is reported as lost, never
+        fabricated."""
         self.start()
         assert self._process is not None
         request = proto.make_request(op, payload)
@@ -133,22 +205,39 @@ class GlmWorkerClient:
         except (BrokenPipeError, OSError) as exc:
             raise WorkerCrashed(
                 "worker died before accepting %r (partial frames: %d). "
-                "The lost request was never executed."
-                % (op, len(self._frames))
+                "The lost request was never executed.%s"
+                % (op, len(self._frames), self._stderr_suffix())
             ) from exc
-        response_line = self._process.stdout.readline()  # type: ignore[union-attr]
+        deadline = float(timeout) if timeout is not None else float(self.timeout)
+        watchdog = threading.Timer(deadline, self._kill_worker)
+        watchdog.daemon = True
+        self._deadline_fired = False
+        watchdog.start()
+        try:
+            response_line = self._process.stdout.readline()  # type: ignore[union-attr]
+        finally:
+            watchdog.cancel()
+        if self._deadline_fired:
+            raise WorkerTimeout(
+                "worker exceeded the %.1fs deadline during %r and was "
+                "killed; %d complete frames were preserved and the lost "
+                "portion was never observed.%s"
+                % (deadline, op, len(self._frames), self._stderr_suffix())
+            )
         if not response_line:
             raise WorkerCrashed(
                 "worker closed its stdout during %r after %d complete "
                 "frames; the lost portion was never observed and is not "
-                "fabricated" % (op, len(self._frames))
+                "fabricated%s"
+                % (op, len(self._frames), self._stderr_suffix())
             )
         try:
             response = proto.decode(response_line.strip())
         except ValueError as exc:
             raise WorkerCrashed(
                 "worker emitted an invalid frame during %r: %s (%d "
-                "complete frames preserved)" % (op, exc, len(self._frames))
+                "complete frames preserved)%s"
+                % (op, exc, len(self._frames), self._stderr_suffix())
             ) from exc
         if response.get("id") != request["id"]:
             raise WorkerCrashed(
@@ -169,6 +258,12 @@ class GlmWorkerClient:
                 % (op, error.get("kind"), error.get("message"))
             )
         return response.get("result") or {}
+
+    def _stderr_suffix(self) -> str:
+        tail = self._stderr_tail()
+        if not tail:
+            return " (no worker stderr captured)"
+        return " Worker stderr tail: %r" % tail[-_STDERR_TAIL_CHARS:]
 
     # -- high-level operations ----------------------------------------------
 

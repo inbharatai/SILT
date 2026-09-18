@@ -511,15 +511,107 @@ def _cmd_student_baseline(args) -> Dict[str, Any]:
 
 
 def _cmd_distill(args) -> Dict[str, Any]:
-    """Build sequence-level KD pairs from stored JUDGED traces (leakage
-    checked), then emit the DeepApply hand-off descriptor. No training
-    happens here; DeepApply + Gate 2 own training and admission."""
+    """Build sequence-level KD pairs from stored JUDGED traces, bound to an
+    APPROVED five-split dataset, then emit the DeepApply hand-off
+    descriptor. No training happens here; DeepApply + Gate 2 own training
+    and admission.
+
+    Binding rules (enforced, not advisory):
+
+      * ``--dataset`` is required: pairs may only come from traces whose
+        sample ids appear in that dataset's TRAINING split. A trace from
+        outside the approved training split is refused -- unverifiable is
+        not safe.
+      * The dataset manifest must validate (hashes, counts, disjointness)
+        and must carry the SAME capability id, teacher pin and spec
+        fingerprint as ``--spec`` -- identity is verified, never assumed
+        from a path.
+      * The protected splits (development/heldout/final/controls) supply
+        protected sample ids, content hashes, PROMPT hashes and families
+        to the pair builder; any collision poisons the whole build.
+      * Every trace's capability id and teacher revision must match the
+        spec -- traces from another teacher are refused.
+    """
+    import hashlib
+    import json as _json
+
     loaded = load_spec(args.spec)
     spec = loaded["spec"]
     workspace = Path(args.workspace)
     from .distillation import build_sequence_pairs, hand_to_deepapply
+    from .dataset import SPLITS, validate_dataset
     from .store import CapabilityStore
     from .trace import load_trace
+
+    dataset_dir = Path(args.dataset)
+    if not dataset_dir.is_dir():
+        raise BlockedResource(
+            requirement="dataset directory %s does not exist; KD pairs may "
+                        "only be built from traces bound to an approved "
+                        "five-split dataset" % dataset_dir,
+            remedy="build the dataset first: silt-capability dataset build "
+                   "--spec spec.json --cases cases.jsonl --out "
+                   "data/capability_v1",
+        )
+    validated = validate_dataset(dataset_dir)
+    if validated["capability_id"] != spec.capability_id:
+        raise CapabilityBuildError(
+            "dataset identity mismatch: manifest was built for capability "
+            "%r but the spec names %r" % (
+                validated["capability_id"], spec.capability_id
+            )
+        )
+    if validated["spec_fingerprint"] != loaded["spec_fingerprint"]:
+        raise CapabilityBuildError(
+            "dataset identity mismatch: manifest spec fingerprint %r does "
+            "not match this spec (%r); the dataset was frozen for a "
+            "different contract" % (
+                validated["spec_fingerprint"], loaded["spec_fingerprint"]
+            )
+        )
+    dataset_teacher = validated["teacher"]
+    if (
+        dataset_teacher.get("model") != spec.teacher.model
+        or dataset_teacher.get("revision") != spec.teacher.revision
+    ):
+        raise CapabilityBuildError(
+            "dataset teacher %r does not match the spec teacher %r@%r"
+            % (
+                dataset_teacher,
+                spec.teacher.model,
+                spec.teacher.revision,
+            )
+        )
+
+    # Training split: the ONLY samples teaching material may come from.
+    training_rows = []
+    with (dataset_dir / "training.jsonl").open("r", encoding="utf-8") as handle:
+        for line in handle:
+            if line.strip():
+                training_rows.append(_json.loads(line))
+    training_ids = {row["sample_id"] for row in training_rows}
+    sample_families = {row["sample_id"]: row["family_id"] for row in training_rows}
+
+    # Protected splits: every non-training split contributes ids, content
+    # hashes, prompt hashes and families that must never appear in pairs.
+    protected_ids: set = set()
+    protected_hashes: set = set()
+    protected_prompts: set = set()
+    protected_families: set = set()
+    for split in SPLITS:
+        if split == "training":
+            continue
+        with (dataset_dir / ("%s.jsonl" % split)).open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                row = _json.loads(line)
+                protected_ids.add(row["sample_id"])
+                protected_hashes.add(row.get("content_sha256"))
+                protected_prompts.add(
+                    hashlib.sha256(row["prompt"].encode("utf-8")).hexdigest()
+                )
+                protected_families.add(row["family_id"])
 
     store = CapabilityStore(workspace)
     names = store.list("traces")
@@ -531,14 +623,45 @@ def _cmd_distill(args) -> Dict[str, Any]:
     traces = [
         load_trace(store.root / "traces" / ("%s.json" % n)) for n in names
     ]
-    # Protected splits: everything recorded under the workspace baselines
-    # plus the spec's final split is untouchable by construction here
-    # because pairs come only from recorded traces; nothing from the frozen
-    # September sets or the spec's final path is ever read.
-    pairs = build_sequence_pairs(traces)
+    for trace in traces:
+        if trace.capability_id != spec.capability_id:
+            raise CapabilityBuildError(
+                "trace %r belongs to capability %r, not %r; traces from "
+                "another capability are never teaching material"
+                % (trace.sample_id, trace.capability_id, spec.capability_id)
+            )
+        if trace.model_revision != spec.teacher.revision:
+            raise CapabilityBuildError(
+                "trace %r was produced by teacher revision %r, but the spec "
+                "pins %r; traces from another teacher revision are never "
+                "teaching material"
+                % (trace.sample_id, trace.model_revision, spec.teacher.revision)
+            )
+        if trace.behavioural is not None and trace.sample_id not in training_ids:
+            raise CapabilityBuildError(
+                "trace %r is not part of the dataset's approved training "
+                "split; only training-split traces may become pairs"
+                % trace.sample_id
+            )
+    pairs = build_sequence_pairs(
+        traces,
+        protected_sample_ids=protected_ids,
+        protected_content_hashes={h for h in protected_hashes if h},
+        protected_families=protected_families,
+        protected_prompts=protected_prompts,
+        sample_families=sample_families,
+    )
     handoff = hand_to_deepapply(pairs) if pairs["positives"] else None
     payload = dict(pairs)
     payload["capability_id"] = spec.capability_id
+    payload["dataset"] = {
+        "dir": str(dataset_dir),
+        "spec_fingerprint": validated["spec_fingerprint"],
+        "training_samples": len(training_ids),
+        "protected_splits_enforced": [
+            s for s in SPLITS if s != "training"
+        ],
+    }
     payload["deepapply_handoff"] = handoff
     written = store.put(
         "candidates", "%s-kd-pairs" % spec.capability_id, payload
@@ -550,6 +673,7 @@ def _cmd_distill(args) -> Dict[str, Any]:
         "positives": len(pairs["positives"]),
         "negatives": len(pairs["negatives"]),
         "unjudged_excluded": pairs["unjudged_excluded"],
+        "dataset": payload["dataset"],
         "deepapply_handoff": handoff,
         "artifact": written,
     }
@@ -644,15 +768,22 @@ def _cmd_dataset_build(args) -> Dict[str, Any]:
     """Build the fresh five-split dataset (data/capability_v1 namespace).
 
     The frozen September sets are quarantined as inputs; the build writes
-    a manifest + selection lock frozen BEFORE any model sees a case."""
+    a manifest + selection lock frozen BEFORE any model sees a case. The
+    manifest binds capability + teacher + spec-fingerprint identity: a
+    dataset that cannot prove what it was built for may never back
+    training pairs."""
+    loaded = load_spec(args.spec)
+    spec = loaded["spec"]
     from .dataset import build_dataset, read_cases
 
     cases = read_cases(Path(args.cases))
-    manifest = build_dataset(cases, output_dir=Path(args.out))
+    manifest = build_dataset(cases, output_dir=Path(args.out), spec=spec)
     return {
         "ok": True,
         "command": "dataset build",
         "status": "completed",
+        "capability_id": manifest["capability_id"],
+        "teacher": manifest["teacher"],
         "counts": manifest["counts"],
         "output": str(args.out),
         "frozen_before_model_generation": True,
@@ -697,6 +828,7 @@ def parser() -> Parser:
     dataset_cmd = commands.add_parser("dataset", help="Build/validate the fresh capability case sets")
     dataset_sub = dataset_cmd.add_subparsers(dest="dataset_command", required=True)
     dataset_build = dataset_sub.add_parser("build")
+    dataset_build.add_argument("--spec", required=True)
     dataset_build.add_argument("--cases", required=True)
     dataset_build.add_argument("--out", required=True)
     dataset_validate = dataset_sub.add_parser("validate")
@@ -732,6 +864,8 @@ def parser() -> Parser:
         command.add_argument("--max-new-tokens", type=int, default=1024)
     trace_cmd.add_argument("--mode", choices=["behavioural", "internal"], default="behavioural")
     trace_cmd.add_argument("--checkpoint", help="Open-weight checkpoint for internal tracing (or GLM_CHECKPOINT)")
+    distill_cmd.add_argument("--dataset", required=True,
+                             help="Approved five-split dataset directory; pairs may come ONLY from its training split")
     intervene_cmd.add_argument("--component")
     intervene_cmd.add_argument("--seed", type=int, default=0)
     intervene_cmd.add_argument("--checkpoint", help="Open-weight checkpoint for interventions (or GLM_CHECKPOINT)")

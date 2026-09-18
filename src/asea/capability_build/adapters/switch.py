@@ -7,10 +7,17 @@ probability mass kept separate from native-postcast top-1 and post-capacity
 dispatched counts; REAP conditional-mean expert outputs; "probability mass
 is usage evidence, not causal expert importance".
 
-Intervention masking is implemented as an in-place, reversible edit of the
-router classifier rows for the targeted expert (saved clones are restored
-and proven via full-parameter hashing). The masking changes which expert
-wins the router argmax; it never writes to disk and never exports a model.
+Intervention masking is implemented as a forward hook on the router
+classifier that rewrites the router OUTPUT (the masked expert's logit
+becomes -1e9 for every token, input-independent), so the expert can
+never win the top-1 argmax. A weight-row rewrite was removed: writing a
+negative constant into a router row makes the logit ``-c * sum(hidden)``,
+which is STRONGLY POSITIVE when the hidden-state sum is negative -- the
+masked expert would become MORE likely to win, the opposite of the
+intervention. Router and expert weights are never modified; restoration
+removes the hook, and full-parameter hashing proves the teacher was
+never touched. The masking changes which expert wins the router argmax;
+it never writes to disk and never exports a model.
 
 ``structural_reduce`` produces a physically smaller CANDIDATE by keeping an
 EXPLICIT index set per layer (from causal evidence downstream) -- the
@@ -151,45 +158,69 @@ class SwitchAdapter(MoEArchitectureAdapter):
         return name, module
 
     def temporary_mask(self, target, *, scale: float = 0.0) -> Dict[str, Any]:
-        if target.kind == "layer":
-            indices = list(range(self.n_experts))
-        else:
-            indices = [target.expert_id]
-            if not (0 <= target.expert_id < self.n_experts):
-                raise InterventionInvalid(
-                    "expert %d out of range 0..%d" % (target.expert_id, self.n_experts - 1)
-                )
+        """Suppress the masked expert's ROUTING DECISION, weights untouched.
+
+        The hook rewrites the router classifier's OUTPUT logits (masked
+        expert -> -1e9 for every token, input-independent) so the expert
+        can never win the top-1 argmax. Router weights are never
+        modified: a weight-row rewrite is mathematically unreliable here
+        (the masked logit would be ``-c * sum(hidden)``, strongly
+        POSITIVE when the hidden-state sum is negative), and unmodified
+        weights make ``verify_unchanged`` hold trivially and honestly.
+        """
+        if scale != 0.0:
+            raise InterventionInvalid(
+                "partial-scale masking (scale=%r) is not implemented; only "
+                "full suppression is, and this adapter refuses to pretend "
+                "otherwise" % scale
+            )
+        if target.kind != "expert":
+            raise InterventionInvalid(
+                "masking kind %r is not supported: masking EVERY expert does "
+                "not disable top-1 routing (argmax still fires over all "
+                "-1e9 logits) and would silently under-suppress" % target.kind
+            )
+        if not (0 <= target.expert_id < self.n_experts):
+            raise InterventionInvalid(
+                "expert %d out of range 0..%d"
+                % (target.expert_id, self.n_experts - 1)
+            )
         name, module = self._layer_by_index(target.layer)
         classifier = module.router.classifier
-        saved = {
-            "weight": classifier.weight.data[indices].clone(),
-        }
-        if classifier.bias is not None:
-            saved["bias"] = classifier.bias.data[indices].clone()
         registry_key = "%s:%s" % (name, target.key)
         if registry_key in self._masked:
             raise InterventionInvalid(
-                "component %s is already masked; restore before re-masking" % target.key
+                "component %s is already masked; restore before re-masking"
+                % target.key
             )
-        with self.torch.no_grad():
-            # A hugely negative router logit guarantees the expert never
-            # wins the top-1 argmax, without touching expert weights.
-            classifier.weight.data[indices] = -1.0e9
-            if classifier.bias is not None:
-                classifier.bias.data[indices] = -1.0e9
+        expert_id = [int(target.expert_id)]
+
+        def suppress(module_, inputs, output):
+            logits = output[0] if isinstance(output, tuple) else output
+            if not isinstance(logits, self.torch.Tensor):
+                return None
+            masked = logits.clone()
+            masked[..., expert_id] = -1.0e9
+            if isinstance(output, tuple):
+                return (masked,) + tuple(output[1:])
+            return masked
+
+        handle = classifier.register_forward_hook(suppress)
         self._masked[registry_key] = {
             "layer_index": target.layer,
-            "indices": indices,
-            "saved": saved,
+            "indices": expert_id,
+            "handle": handle,
             "layer_name": name,
         }
-        return {"key": registry_key, "layer": name, "indices": indices}
+        return {
+            "key": registry_key,
+            "layer": name,
+            "indices": expert_id,
+            "mechanism": "router_output_forward_hook",
+            "weights_modified": False,
+        }
 
     def restore_mask(self, target) -> Dict[str, Any]:
-        if target.kind == "layer":
-            indices = list(range(self.n_experts))
-        else:
-            indices = [target.expert_id]
         name, module = self._layer_by_index(target.layer)
         registry_key = "%s:%s" % (name, target.key)
         record = self._masked.pop(registry_key, None)
@@ -198,13 +229,13 @@ class SwitchAdapter(MoEArchitectureAdapter):
                 "no recorded mask for %s; cannot restore what was never masked"
                 % target.key
             )
-        classifier = module.router.classifier
-        indices = record["indices"]
-        with self.torch.no_grad():
-            classifier.weight.data[indices] = record["saved"]["weight"]
-            if classifier.bias is not None and "bias" in record["saved"]:
-                classifier.bias.data[indices] = record["saved"]["bias"]
-        return {"key": registry_key, "restored": True}
+        record["handle"].remove()
+        return {
+            "key": registry_key,
+            "restored": True,
+            "mechanism": "router_output_forward_hook_removed",
+            "weights_modified": False,
+        }
 
     # -- reduction -----------------------------------------------------------
 
