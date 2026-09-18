@@ -1029,7 +1029,15 @@ def test_cli_dataset_build_refuses_leaky_cases(tmp_path, capsys):
 @pytest.mark.skipif(sys.platform != "linux", reason="real host oracle needs the Linux sandbox")
 def test_evaluate_code_cases_real_oracle_groups():
     """REAL integration: one candidate through the actual Linux code
-    sandbox + function oracle (unshare/seccomp/chroot). Not a mock."""
+    sandbox + function oracle (unshare/seccomp/chroot). Not a mock.
+    Skips honestly when the host cannot provide containment (the sandbox
+    failing closed there is correct behaviour, covered by mechanism tests)."""
+    from asea.certification import sandbox as _sandbox
+
+    probe = _sandbox.probe_code_sandbox()
+    if not probe.supported:
+        pytest.skip("actual Linux containment unavailable: " + probe.reason + probe.stderr)
+    assert probe.passed
     from asea.capability_build.evaluation import evaluate_code_cases
 
     source = "def add(a, b):\n    return a + b\n"
@@ -1052,7 +1060,14 @@ def test_evaluate_code_cases_real_oracle_groups():
 @pytest.mark.skipif(sys.platform != "linux", reason="real host oracle needs the Linux sandbox")
 def test_evaluate_code_cases_real_oracle_rejects_extra_group_key_in_oracle_frame():
     """The wrapper must strip the bookkeeping 'group' key; the oracle itself
-    refuses any extra key (exact-frame contract), so this proves the strip."""
+    refuses any extra key (exact-frame contract), so this proves the strip.
+    Skips honestly when the host cannot provide containment."""
+    from asea.certification import sandbox as _sandbox
+
+    probe = _sandbox.probe_code_sandbox()
+    if not probe.supported:
+        pytest.skip("actual Linux containment unavailable: " + probe.reason + probe.stderr)
+    assert probe.passed
     from asea.capability_build.evaluation import evaluate_code_cases
 
     source = "def add(a, b):\n    return a + b\n"
