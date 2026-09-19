@@ -9,6 +9,85 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## GLM-5.3-Flash pilot: DeepApply training stage — 2026-09-19
+
+The judged pilot's chain was executed past the distill boundary: the 6
+receipt-verified KD pairs trained a REAL LoRA adapter through the production
+`StandardTrainerBackend` (Qwen2.5-0.5B-Instruct, r=8 α=16 q/v-proj, 48 steps,
+540,672 trainable parameters, finite losses, no divergence, CPU), and an
+INDEPENDENT host-oracle A/B judged base vs adapter on identical deterministic
+generation paths (16 non-final cases; final split never generated). The
+measured verdict is MIXED and is recorded as mixed: heldout checks
+0.8889→1.0 and development 0.6667→0.8889 with zero control regression, but
+the AGGREGATE target rate regressed 0.8108→0.7143, driven by a training-split
+drop (0.8421→0.4615) — the adapter visibly shifted the student toward the
+teacher's response format while producing confidently wrong fixes on some
+trained cases (e.g. a divisibility precondition that aborts the oracle run).
+With 6 pairs this is a mechanism-scale result, not a quality verdict either
+way. A second signed receipt records the stage (`capability_retention`
+0.7143/0.8649 = 0.8259 by the search-layer definition, computed from the
+unrounded rates; cross-path ratio, caveated); the 2026-09-18 receipt record
+stays untouched in the append-only store. Nothing was admitted, activated or
+certified — production admission remains Gate-1 PROMOTED packets →
+DeepApplyRunner → Gate 2 and was NOT sought. Full record in
+`docs/CAPABILITY_BUILD.md`.
+
+### Added
+- `StandardTrainerBackend` sequence-length knob: `max_length` in the train
+  config / `DeepApplyConfig` (default 256 — the historical small-model budget,
+  unchanged behavior; the pilot raised it to 1280 because the real teacher
+  responses run 284–1172 tokens with the code fence after the reasoning prose,
+  and the old truncation would have cut 5 of 6 supervision targets
+  mid-response). Label masking keeps the objective response-only regardless
+  of the budget.
+- `experiments/glm53_flash_pilot/train_deepapply.py`: the train/ab/judge
+  driver — receipt-pinned KD intake (fail-closed store read, embedded-hash
+  pin, spec fingerprint, training-split-only, frozen-file hash), real
+  training, checkpointed dual-arm generation, independent oracle judgment
+  reusing `judge_pilot.py`'s strict extraction so the A/B cannot drift from
+  the rule the baseline numbers were produced under.
+- `experiments/glm53_flash_pilot/deepapply-run/`: the trained adapter weights
+  (the pilot's evidence artifact), training report with all 48 losses, both
+  arms' responses, both oracle judgments and the A/B verdict.
+- `experiments/glm53_flash_pilot/pilot-receipt-training.unsigned.json`: the
+  signed second-stage receipt record.
+
+### Fixed
+- **The first completed training crashed in its report step** (`NameError`:
+  `digest` was imported only inside `load_kd_pairs`), after the adapter had
+  been saved; three earlier attempts failed on driver bugs the runs
+  themselves exposed (the receipt pin is the artifact's embedded content
+  hash, not the raw file-byte hash; the dataset manifest `files` map is
+  filename→sha256, not split→filename; the WSL venv's editable `asea`
+  install pointed at a stale checkout and is shadowed via `PYTHONPATH`).
+  Driver fixed and the complete training re-run once, start to finish — the
+  committed artifacts come from that single complete run.
+- **Two controller-integrity timing tests were load-fragile.**
+  `test_actual_timeout_invalid_bytes_and_bounded_streams` gave the parent a
+  0.18s effective window to start two interpreters and drain 1.1MB of
+  stdout — under full-suite CPU load the drain lost the race and the test
+  failed (it passes standalone); same family:
+  `test_wrapper_inherited_pipe_deadline_and_unreaped_leader` paired a 0.4s
+  window with a 1.5s elapsed cap. Both windows widened (2.5s / 2.0s, elapsed
+  cap 5s) while keeping every assertion — the children still sleep 10s, so
+  each test still proves the kill fires well before a natural exit; the
+  bounded-capture, invalid-UTF-8, single-killpg and classification
+  semantics are unchanged (same discipline as the earlier CI-race fix:
+  widen the window, keep what the test measures).
+- **Pre-commit pin audit caught two receipt-integrity defects.** (1) The
+  first signed copy of the training receipt pinned `train_deepapply.py` as
+  it stood at signing time; its usage docstring was edited minutes later,
+  so the pin matched no file on disk — the uncommitted record was
+  regenerated from the as-committed driver bytes (the store is append-only
+  against *published* records; nothing had been pushed) and the mismatch
+  is recorded in the receipt's own failure history. (2) The 09-18 receipt
+  pins `judgment-teacher.json`/`judgment-student-*.json` over CRLF bytes
+  while the git index held autocrlf-normalised LF, so the pins would fail
+  on any fresh non-Windows checkout — `.gitattributes` now marks
+  `experiments/glm53_flash_pilot/**` `-text` (the `data/**` precedent) and
+  the two judgment files are re-committed in their pinned byte form, so
+  every checkout on every platform yields the exact pinned bytes.
+
 ## GLM-5.3-Flash judged capability pilot + fixes — 2026-09-18
 
 The capability-build layer's first real end-to-end judged pilot

@@ -1026,3 +1026,16 @@ def test_real_end_to_end_smollm2(tmp_path):
         n = runner.store.count(APPROVED)
         runner.rollback_adapter(ad.adapter_id, report.rollback_token)
         assert runner.store.count(APPROVED) == n - 1
+
+def test_deepapply_config_max_length_default_and_plumb():
+    """Training-row token budget: defaults to the historical 256 and rides
+    to_train_dict (the StandardTrainerBackend reads config["max_length"], so
+    long teacher responses can be trained without truncation while every
+    existing run keeps byte-identical behavior)."""
+    default = DeepApplyConfig()
+    assert default.max_length == 256
+    assert default.to_train_dict()["max_length"] == 256
+    raised = DeepApplyConfig(max_length=1280)
+    assert raised.to_train_dict()["max_length"] == 1280
+    # The knob is a budget, never a generation-length setting.
+    assert default.max_new_tokens == 48

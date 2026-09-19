@@ -17,3 +17,15 @@ data/** -text
 # builder_sha256). Force LF working-tree bytes for exactly these scripts.
 scripts/prepare_coding_pilot.py text eol=lf
 scripts/prepare_specialist_data.py text eol=lf
+
+# Receipt-pinned pilot artifacts (capability-build receipts pin the raw
+# sha256 of these files' on-disk bytes): same failure class as data/**.
+# The 09-18 receipt pins judgment-teacher.json / judgment-student-*.json
+# over CRLF bytes, so the LF-normalised index copy fails its pin on any
+# fresh checkout; the 09-19 receipt pins the deepapply-run artifacts over
+# LF bytes, which a Windows autocrlf checkout would have converted. No
+# conversion anywhere: the index keeps whatever bytes the pins were
+# computed from, so every checkout on every platform yields them exactly
+# (pre-commit pin audit 2026-09-19; the judgment files are re-committed
+# in their pinned CRLF form).
+experiments/glm53_flash_pilot/** -text

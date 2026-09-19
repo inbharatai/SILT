@@ -254,7 +254,13 @@ def test_terminal_collision_during_effects_not_overwritten(tmp_path, monkeypatch
 
 
 def test_actual_timeout_invalid_bytes_and_bounded_streams(tmp_path):
-    result = r.run([sys.executable, '-c', "import sys,time;sys.stdout.buffer.write(b'\\xff'*1100000);sys.stdout.flush();time.sleep(10)"], tmp_path, timeout=.2)
+    # The 10s child sleep is what makes this an ACTUAL-timeout test; the
+    # parent window must still cover two interpreter startups plus the
+    # 1.1MB pipe drain under load, so it stays far below the child's
+    # natural exit while not starving on a contended host (a 0.2s window
+    # flaked under full-suite CPU load: the drain lost the race, not the
+    # mechanism).
+    result = r.run([sys.executable, '-c', "import sys,time;sys.stdout.buffer.write(b'\\xff'*1100000);sys.stdout.flush();time.sleep(10)"], tmp_path, timeout=2.5)
     assert result['timeout'] and result['stdout_capture']['invalid_utf8']
     assert result['stdout_capture']['captured_bytes'] == r.CAPTURE_LIMIT
     assert result['stdout_capture']['bytes'] == 1100000
@@ -518,9 +524,13 @@ def test_wrapper_inherited_pipe_deadline_and_unreaped_leader(tmp_path, monkeypat
         return kill(pid, sig)
     monkeypatch.setattr(os, "killpg", killpg)
     # Exactly one fork, tiny sleeping stand-in; no adversarial resource exhaustion.
+    # Same load-tolerance rule as the bounded-capture timeout test: the
+    # window must cover interpreter startup under load, and the elapsed
+    # bound only needs to prove the kill happened well before the child's
+    # 10s natural exit (a 0.4s/1.5s pair flaked under full-suite load).
     code = "import os,time; p=os.fork(); time.sleep(10) if p==0 else None"
-    result = r.run([sys.executable, "-c", code], tmp_path, timeout=.4)
-    assert result["timeout"] and result["elapsed_seconds"] < 1.5 and len(observed) == 1
+    result = r.run([sys.executable, "-c", code], tmp_path, timeout=2.0)
+    assert result["timeout"] and result["elapsed_seconds"] < 5 and len(observed) == 1
 
 
 def test_controller_bootstrap_parent_race_precedes_target(tmp_path):

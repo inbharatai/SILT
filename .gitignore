@@ -53,3 +53,8 @@ Thumbs.db
 # judging/ holds per-case candidate sources + oracle payloads written during
 # judgment; they are derivative (reproducible from cases.jsonl + judgment-*.json)
 experiments/glm53_flash_pilot/judging/
+# deepapply-run: judging/ is the same derivative scratch. The trained adapter
+# under adapter_model/ is the pilot's evidence artifact (~3 MB), so its
+# safetensors file is deliberately re-included below.
+experiments/glm53_flash_pilot/deepapply-run/judging/
+!experiments/glm53_flash_pilot/deepapply-run/adapter_model/*.safetensors

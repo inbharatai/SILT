@@ -374,6 +374,13 @@ class StandardTrainerBackend(TrainerBackend):
 
         lr = float(config.get("learning_rate", 1e-4))
         max_steps_cap = int(config.get("max_steps_cap", 64))
+        # Sequence-length budget for one training row. The 256 default is the
+        # historical small-model budget; a run whose teacher responses carry
+        # reasoning before the code fence may raise it via the train config
+        # (DeepApplyConfig.max_length) so the supervision target is not
+        # truncated mid-response. Label masking below keeps the objective
+        # response-only regardless of the budget.
+        max_len = int(config.get("max_length", 256))
         max_steps = min(
             int(config.get("max_steps", config.get("epochs", 1) * max(1, len(dataset.rows)))),
             max_steps_cap,
@@ -396,10 +403,10 @@ class StandardTrainerBackend(TrainerBackend):
             if inp is None or outp is None:
                 continue
             enc = tokenizer(
-                "{}\n{}".format(inp, outp), return_tensors="pt", truncation=True, max_length=256
+                "{}\n{}".format(inp, outp), return_tensors="pt", truncation=True, max_length=max_len
             )
             input_ids = enc["input_ids"].to(device)
-            in_enc = tokenizer(str(inp), return_tensors="pt", truncation=True, max_length=256)
+            in_enc = tokenizer(str(inp), return_tensors="pt", truncation=True, max_length=max_len)
             in_len = in_enc["input_ids"].shape[-1]
             labels = input_ids.clone()
             if in_len < labels.shape[-1]:

@@ -1,0 +1,286 @@
+{
+  "capability_id": "python_repo_debugging_v1",
+  "cases": [
+    {
+      "candidate_sha256": "41a793a2b86517a28ec201b00fc1e01ee7a4cc89ec237af18d435b6d82698179",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 14204.219,
+      "new_tokens": 89,
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "absent": true,
+        "present": true,
+        "singleton": true
+      },
+      "sample_id": "binary_search_v1",
+      "split": "heldout",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "35745d64a1314ca48f072cfd27e47547cd5ec38dc39e41748ed042a3c9982542",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 6922.021,
+      "new_tokens": 40,
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "mixed_case": false,
+        "solo": true,
+        "two_words": true
+      },
+      "sample_id": "capitalize_words_v1",
+      "split": "heldout",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "c315dbb3a6df971f5113ce9787745c9342994b19d8a54799867fc55e654e072c",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 9424.144,
+      "new_tokens": 56,
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "empty": true,
+        "exact": true,
+        "remainder": false
+      },
+      "sample_id": "chunk_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "cea342a6a32b12f875bb05fceefcbcdce19b344cff3d2b61263e6b5186c5d3d4",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 11799.262,
+      "new_tokens": 76,
+      "oracle_status": "measured",
+      "passed": 1,
+      "per_check": {
+        "blank": false,
+        "double_space": false,
+        "simple": true
+      },
+      "sample_id": "count_words_v1",
+      "split": "development",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "00ced4b40411bf6a1eb4bf5772dc54274382427b145c77ee857164d41f086003",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "latency_ms": 43966.976,
+      "new_tokens": 279,
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "double_digit": true,
+        "padded": true
+      },
+      "sample_id": "date_label_v1",
+      "split": "controls",
+      "total": 2
+    },
+    {
+      "candidate_sha256": "a38b884baf6e898fd778e1363a0e6abbd16117179c3a21f083a1a7b9fa9ee701",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 8213.832,
+      "new_tokens": 46,
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "all_same": true,
+        "empty": true,
+        "order_kept": true
+      },
+      "sample_id": "dedupe_stable_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "8086aff650b63d4cbb5d8dba1d7f36532c962441209b76ead77c5265265b032f",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 8918.477,
+      "new_tokens": 48,
+      "oracle_status": "measured",
+      "passed": 4,
+      "per_check": {
+        "already_flat": true,
+        "deep_nesting": true,
+        "empty": true,
+        "nested_empty": true
+      },
+      "sample_id": "flatten_recursive_v1",
+      "split": "training",
+      "total": 4
+    },
+    {
+      "candidate_sha256": "319d9f52130a6143e45248ffa2ae68411158d8b4680d73fd6e386bf61282d693",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "latency_ms": 27381.735,
+      "new_tokens": 169,
+      "oracle_status": "measured",
+      "passed": 0,
+      "per_check": {},
+      "sample_id": "greeting_format_v1",
+      "split": "controls",
+      "total": 0
+    },
+    {
+      "candidate_sha256": "cfb9e46aea89549576736a6be7cbc0ce4592cec697ea19d5656094f374a6e1fd",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "latency_ms": 24019.649,
+      "new_tokens": 159,
+      "oracle_status": "measured",
+      "passed": 0,
+      "per_check": {
+        "one_name": false,
+        "two_names": false
+      },
+      "sample_id": "initials_v1",
+      "split": "controls",
+      "total": 2
+    },
+    {
+      "candidate_sha256": "139810837f85bf5881ce92e6942f0c6c579d2e8c11d00db446b302e5e72f4261",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 18104.465,
+      "new_tokens": 124,
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "single": true,
+        "unsorted_five": true,
+        "unsorted_three": true
+      },
+      "sample_id": "median_odd_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "e6e175f410d6f83a26ea6e538a0f944dcd550bffbd07e4d7562f1c08c677f2b5",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 12274.808,
+      "new_tokens": 79,
+      "oracle_status": "measured",
+      "passed": 2,
+      "per_check": {
+        "contained": true,
+        "disjoint_unsorted": false,
+        "touching": true
+      },
+      "sample_id": "merge_intervals_v1",
+      "split": "development",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "84125ce48077e4f2d3ec9b7e6f6233971932599c61fff2a13afd2db7d015a166",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "latency_ms": 62309.206,
+      "new_tokens": 399,
+      "oracle_status": "measured",
+      "passed": 0,
+      "per_check": {},
+      "sample_id": "price_total_v1",
+      "split": "controls",
+      "total": 0
+    },
+    {
+      "candidate_sha256": "8addecc68dbbe87a92e0e39b178888c54afe3d4af0b96205c5ca9953005caaf2",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 11136.78,
+      "new_tokens": 70,
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "by_one": true,
+        "wrapped": true,
+        "zero": true
+      },
+      "sample_id": "rotate_list_v1",
+      "split": "development",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "dc93ae4eb3794e880c1a02a98eb311afe81ced275645ffcb2c8f2f6ffff64c33",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 7709.868,
+      "new_tokens": 50,
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "falling": true,
+        "rising": true,
+        "singleton": true
+      },
+      "sample_id": "running_max_v1",
+      "split": "heldout",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "e92569d396b7cb505bcb4aa02d582e6428e5de1a1b3415afb3017f1813b842d9",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 10485.847,
+      "new_tokens": 62,
+      "oracle_status": "measured",
+      "passed": 1,
+      "per_check": {
+        "mixed": false,
+        "padded": true,
+        "runs": false
+      },
+      "sample_id": "slugify_v1",
+      "split": "training",
+      "total": 3
+    },
+    {
+      "candidate_sha256": "a80738a8386698a52d1611691c5cdba4c292ce88b8f428efc2418c801740cca0",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "latency_ms": 8879.109,
+      "new_tokens": 54,
+      "oracle_status": "measured",
+      "passed": 3,
+      "per_check": {
+        "single_row": true,
+        "square": true,
+        "tall": true
+      },
+      "sample_id": "transpose_rows_v1",
+      "split": "training",
+      "total": 3
+    }
+  ],
+  "extraction_rule": "last fenced ```python block; whole response if it is itself a def-containing source; else no_code_block failure",
+  "honesty": [
+    "A pass rate on these authored cases is a measurement of THIS case set only; it is not a quality claim about the model.",
+    "Implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it."
+  ],
+  "judge": "host_oracle_function_io_linux_sandbox",
+  "pass_rates": {
+    "cases_fully_passed": 0.5,
+    "control_checks": 0.5,
+    "controls_split_checks": 0.5,
+    "development_checks": 0.6667,
+    "heldout_checks": 0.8889,
+    "overall_checks": 0.7805,
+    "target_checks": 0.8108,
+    "training_checks": 0.8421
+  },
+  "run": "student Qwen/Qwen2.5-0.5B-Instruct, no adapter (A/B base arm)"
+}

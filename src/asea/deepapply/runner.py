@@ -120,6 +120,11 @@ class DeepApplyConfig:
     epochs: int = 1
     seed: int = 0
     max_new_tokens: int = 48
+    # Training-row token budget (prompt+response). 256 is the historical
+    # default; longer teacher responses (reasoning before the code fence) need
+    # a larger budget or the supervision target is truncated mid-response.
+    # Generation length is NOT governed by this (that is max_new_tokens).
+    max_length: int = 256
     cpu_param_ceiling: int = 1_500_000_000
     strict_no_mock: bool = True
     regression_tolerance: float = 0.02
@@ -160,6 +165,7 @@ class DeepApplyConfig:
             "epochs": self.epochs,
             "seed": self.seed,
             "max_new_tokens": self.max_new_tokens,
+            "max_length": self.max_length,
             "cpu_param_ceiling": self.cpu_param_ceiling,
             "load_in_4bit": self.load_in_4bit,
             "compute_device": self.compute_device,

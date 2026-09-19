@@ -298,6 +298,110 @@ built cleanly on this machine, 2026-09-18: `docker build` of
 verified image build is not a verified worker run, and no checkpoint has ever
 been mounted here.)
 
+## DeepApply training stage (recorded 2026-09-19; real end-to-end)
+
+The 2026-09-18 pilot ended with the KD pairs as a handoff descriptor and
+`capability_retention` honestly `NOT_MEASURED`. This stage executed the rest
+of the chain — real training, then an independent oracle A/B — through the
+REAL production trainer, never a re-implementation
+(`experiments/glm53_flash_pilot/train_deepapply.py`; artifacts in
+`experiments/glm53_flash_pilot/deepapply-run/`):
+
+* **Intake (research path, honestly labelled).** The production
+  `DeepApplyRunner` intake requires Gate-1 PROMOTED `SkillPackets` — the pilot
+  does not fake that status. Instead the driver loads the KD artifact through
+  the fail-closed `CapabilityStore` read, cross-checks it against the signed
+  receipt's pin (`202a8c2f…`, the artifact's embedded content hash — the first
+  run's guard wrongly compared the raw file bytes and was fixed by the run
+  itself), verifies the spec fingerprint, enforces training-split-only
+  membership against the frozen `training.jsonl` (manifest hash checked), and
+  builds `TrainingDataset` rows directly from the receipt-verified pairs with
+  a manifest that states plainly: *pilot research artifact, NOT Gate-1
+  packets; production admission still requires the Gate-1 intake via
+  DeepApplyRunner*.
+* **Training (REAL production trainer).** `StandardTrainerBackend.train` —
+  real `Qwen/Qwen2.5-0.5B-Instruct` weights loaded by the backend itself, PEFT
+  LoRA r=8, α=16, `q_proj`/`v_proj`, lr 1e-4, 48 steps (8 epochs over 6 rows),
+  seed 0, CPU. A new production knob was added for this run:
+  `max_length` (default 256, unchanged historical behavior), raised to 1280
+  because the real teacher responses run 284–1172 tokens with the code fence
+  after the reasoning prose — the old 256-token truncation would have cut 5 of
+  6 responses mid-reasoning. Label masking keeps the objective response-only
+  regardless of the budget. Result: **540,672 trainable parameters, 48 finite
+  recorded losses (per-row sawtooth within each epoch — the six rows carry
+  different loss levels; final step 1.055, no divergence), 381 s wall.**
+* **A/B (identical paths, one difference).** Both arms generate through the
+  SAME deterministic HF path — greedy (`do_sample=False`), raw-text
+  continuation matching the production trainer's raw `input\noutput` format
+  (no chat template, so generation matches the training distribution),
+  `max_new_tokens` 1024 — over the 16 non-final cases. The ONLY difference
+  between arms is the trained adapter. The final split was never generated.
+  Every one of the 16 responses changed between arms: the adapter shifted the
+  student toward the teacher's trace format (reasoning prose before the code
+  fence) — visible sequence-KD behaviour.
+* **Independent judgment (the trainer never certifies itself).** The `judge`
+  stage reuses the SAME strict extraction rule and the SAME host oracle as the
+  teacher/student judgments (imported from `judge_pilot.py`, deliberately not
+  re-implemented so the A/B cannot drift). Measured check pass rates:
+
+  | Split (checks) | base (no adapter) | + trained adapter | Δ |
+  |---|---|---|---|
+  | training | 0.8421 | 0.4615 | **−0.3806** |
+  | development | 0.6667 | 0.8889 | **+0.2222** |
+  | heldout | 0.8889 | 1.0000 | **+0.1111** |
+  | controls (utility writing) | 0.5000 | 0.5000 | 0.0000 |
+  | **target checks (aggregate)** | **0.8108** | **0.7143** | **−0.0965** |
+
+  **A genuinely mixed result, recorded as such.** The untouched held-out split
+  improved (0.8889 → 1.0) and development improved, with no control regression
+  — but the AGGREGATE target rate regressed, driven by a large training-split
+  drop. Root causes are visible in the artifacts: on `chunk_v1` the adapter
+  produced a confidently wrong "fix" (an added divisibility precondition that
+  raises `ValueError` on the remainder check — the oracle aborts the case as
+  `candidate_error`, 0/0 judged), and `slugify_v1` regressed to 0/3. The
+  adapter moved the student's FORMAT toward the teacher while degrading some
+  answers. With 6 KD pairs this is a mechanism-scale training set: the honest
+  verdict is "held-out improved on 9 checks, aggregate regressed, nothing
+  admitted", NOT "distillation works" and NOT "distillation fails".
+* **Receipt (second record, first untouched).** The append-only store keeps
+  the 2026-09-18 record; a second receipt
+  (`pilot-receipt-training.unsigned.json`, command
+  `glm53-flash-pilot-training`) adds `measurements.deepapply_training`, fills
+  `capability_retention` = 0.7143 / 0.8649 = **0.8259** (the `search.py`
+  definition: adapter target checks / teacher target checks — a CROSS-PATH
+  ratio: the teacher number is from the cloud-teacher run, the adapter number
+  from the deterministic local HF path; recorded as a ratio, not a
+  like-for-like comparison) and `control_regressions.ab_control_checks_delta`
+  = 0.0. Signed and verified; both records verify against the same key.
+* **A real run caught real bugs again.** The first completed training saved a
+  real adapter but crashed in the report step (`digest` was imported only
+  inside `load_kd_pairs`); three earlier attempts failed on driver bugs the
+  runs themselves exposed (receipt pin = embedded content hash, not file
+  bytes; the manifest files map is filename→sha256; the WSL venv's editable
+  `asea` install pointed at a stale checkout and had to be shadowed with
+  `PYTHONPATH`). Driver fixed, the whole training re-run once start to finish
+  — the committed artifacts come from that single complete run.
+* **A pre-commit pin audit caught two receipt-integrity defects before
+  anything was published.** (1) The first signed copy of the training
+  receipt pinned `train_deepapply.py` as it stood at signing time; a
+  docstring edit minutes later left the pin matching no file on disk. The
+  record had not been committed, so it was regenerated from the
+  as-committed driver bytes and the mismatch recorded in the receipt's own
+  `failure_history` (freeze the driver BEFORE generating the receipt). (2)
+  The 09-18 receipt pins `judgment-teacher.json` / `judgment-student-*.json`
+  over CRLF bytes while the git index held autocrlf-normalised LF — the pins
+  would fail on any fresh non-Windows checkout. `.gitattributes` now marks
+  `experiments/glm53_flash_pilot/**` `-text` (the `data/**` precedent) and
+  the affected files are committed in their pinned byte form, so every
+  checkout on every platform yields the exact pinned bytes; a final audit
+  confirmed every pin in BOTH receipts against both working-tree and index
+  bytes.
+
+Nothing about this stage admits, activates or certifies anything: production
+admission remains DeepApply (Gate-1 PROMOTED packets → `DeepApplyRunner` →
+Gate 2 → `AdapterStore`) and was NOT sought. The adapter is a research
+artifact.
+
 ## Boundary rules (binding, all verified in review)
 
 Package stays `asea`; `asea run` unchanged; Pipeline called, never mutated;

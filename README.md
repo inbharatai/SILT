@@ -422,6 +422,18 @@ training data. Installing extras starts neither. Historical
 >   [Recorded report](docs/deep_apply_real_run_findings.md). GPU streamed/ZeroForge
 >   [probe scripts](scripts/real_streamed_4bit_gpu.py) exist; matching Qwen2.5-7B /
 >   RTX 5050 execution/parity receipts are not included in this repository.
+> - **capability-build pilot (GLM-5.3-Flash)** — the research layer's judged
+>   end-to-end chain: a frozen five-split dataset (final split never opened),
+>   16 consented cloud-teacher traces, host-oracle judgment of teacher
+>   (0.8649) and local student (0.4595) on identical target checks — a
+>   measurement of that case set only, never a model-quality claim — 6
+>   byte-bound KD pairs, a **REAL DeepApply LoRA training** through the
+>   production trainer and an **independent oracle A/B** with a MIXED verdict
+>   (held-out checks 0.8889→1.0, controls unchanged, aggregate target
+>   0.8108→0.7143, recorded as a regression where it regressed), and a real
+>   SiltSpring compression proof with genuine revocations. Two signed
+>   receipts; nothing admitted, activated or certified.
+>   [Full record](docs/CAPABILITY_BUILD.md).
 > - **SiltSpring** — [opt-in real-HF probe](scripts/real_siltspring_1p5b.py) exists;
 >   raw Qwen0.5B/1.5B certification/revocation receipts are not included here.
 >   Script availability is not an executed outcome, nor evidence that a full
@@ -945,7 +957,9 @@ models; SILT connects to them through real connectors in
 
 The model is **operator-selected**, within connector/model/runtime constraints;
 not every tag or HF repository is compatible. Recorded reports include CPU HF
-Qwen/SmolLM2/NLLB and Ollama/cloud-tagged GLM packet runs. Those reports do not
+Qwen/SmolLM2/NLLB, Ollama/cloud-tagged GLM packet runs and the judged
+GLM-5.3-Flash capability pilot (teacher + student + trained-adapter A/B, host
+oracle). Those reports do not
 establish local RTX 5050 execution for every listed model. Model-agnostic means
 interface extensibility, not a universal model or latent-modality bridge.
 

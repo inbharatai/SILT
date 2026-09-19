@@ -1,0 +1,361 @@
+{
+  "adapter_path": "/mnt/c/Users/reetu/Desktop/SILT/experiments/glm53_flash_pilot/deepapply-run/adapter_model",
+  "backend": "standard",
+  "backend_version": "peft-lora-v1",
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "capability_id": "python_repo_debugging_v1",
+  "dataset": {
+    "contains_mock": false,
+    "dataset_hash": "86383e5b76eef932540aff217e549245d3513b169a8fda186a284454eb7d37da",
+    "min_safety_score": null,
+    "packet_count": 0,
+    "provenance": "sequence-level KD positives distilled from REAL judged teacher traces (see make_receipt.py measurements); production admission still requires the Gate-1 PROMOTED-packet intake via DeepApplyRunner.from_pipeline",
+    "row_count": 6,
+    "source_domains": [
+      "software"
+    ],
+    "source_packet_ids": [
+      "python_repo_debugging_v1-kd-pairs (pilot research artifact, NOT Gate-1 packets)"
+    ],
+    "source_packet_ids_sorted": [
+      "python_repo_debugging_v1-kd-pairs (pilot research artifact, NOT Gate-1 packets)"
+    ],
+    "synthetic_depth_max": 0
+  },
+  "device": "cpu (no CUDA in this environment)",
+  "honesty": [
+    "The production trainer (StandardTrainerBackend) ran for real; every loss above is a measured training loss.",
+    "Training success is not capability success; the independent oracle A/B (judge stage) is the only accepted evidence here.",
+    "These rows are pilot KD pairs, not Gate-1 PROMOTED packets; no production admission was sought or granted.",
+    "Nothing auto-activates; the adapter is a research artifact."
+  ],
+  "kd_pairs_sha256": "202a8c2fac3d5ae1a5374f7a2fd2ead06e74cbc110e330655a0d896c677fd550",
+  "lora_config": {
+    "bias": "none",
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "r": 8,
+    "target_modules": [
+      "q_proj",
+      "v_proj"
+    ],
+    "task_type": "CAUSAL_LM"
+  },
+  "run": "deepapply training stage (REAL)",
+  "stage": "train",
+  "step_count": 48,
+  "steps_recorded": [
+    {
+      "diverged": null,
+      "loss": 1.0401074886322021,
+      "max_steps": 48,
+      "step": 1
+    },
+    {
+      "diverged": null,
+      "loss": 2.0585684776306152,
+      "max_steps": 48,
+      "step": 2
+    },
+    {
+      "diverged": null,
+      "loss": 1.6856697797775269,
+      "max_steps": 48,
+      "step": 3
+    },
+    {
+      "diverged": null,
+      "loss": 1.0645378828048706,
+      "max_steps": 48,
+      "step": 4
+    },
+    {
+      "diverged": null,
+      "loss": 2.03434157371521,
+      "max_steps": 48,
+      "step": 5
+    },
+    {
+      "diverged": null,
+      "loss": 1.3970705270767212,
+      "max_steps": 48,
+      "step": 6
+    },
+    {
+      "diverged": null,
+      "loss": 0.9607973098754883,
+      "max_steps": 48,
+      "step": 7
+    },
+    {
+      "diverged": null,
+      "loss": 2.026975393295288,
+      "max_steps": 48,
+      "step": 8
+    },
+    {
+      "diverged": null,
+      "loss": 1.5507607460021973,
+      "max_steps": 48,
+      "step": 9
+    },
+    {
+      "diverged": null,
+      "loss": 1.0281625986099243,
+      "max_steps": 48,
+      "step": 10
+    },
+    {
+      "diverged": null,
+      "loss": 2.010791063308716,
+      "max_steps": 48,
+      "step": 11
+    },
+    {
+      "diverged": null,
+      "loss": 1.3441025018692017,
+      "max_steps": 48,
+      "step": 12
+    },
+    {
+      "diverged": null,
+      "loss": 0.9189105033874512,
+      "max_steps": 48,
+      "step": 13
+    },
+    {
+      "diverged": null,
+      "loss": 2.004261016845703,
+      "max_steps": 48,
+      "step": 14
+    },
+    {
+      "diverged": null,
+      "loss": 1.4533889293670654,
+      "max_steps": 48,
+      "step": 15
+    },
+    {
+      "diverged": null,
+      "loss": 1.0006163120269775,
+      "max_steps": 48,
+      "step": 16
+    },
+    {
+      "diverged": null,
+      "loss": 1.9910255670547485,
+      "max_steps": 48,
+      "step": 17
+    },
+    {
+      "diverged": null,
+      "loss": 1.2992035150527954,
+      "max_steps": 48,
+      "step": 18
+    },
+    {
+      "diverged": null,
+      "loss": 0.886549174785614,
+      "max_steps": 48,
+      "step": 19
+    },
+    {
+      "diverged": null,
+      "loss": 1.9870656728744507,
+      "max_steps": 48,
+      "step": 20
+    },
+    {
+      "diverged": null,
+      "loss": 1.3741137981414795,
+      "max_steps": 48,
+      "step": 21
+    },
+    {
+      "diverged": null,
+      "loss": 0.9746613502502441,
+      "max_steps": 48,
+      "step": 22
+    },
+    {
+      "diverged": null,
+      "loss": 1.9711240530014038,
+      "max_steps": 48,
+      "step": 23
+    },
+    {
+      "diverged": null,
+      "loss": 1.2573226690292358,
+      "max_steps": 48,
+      "step": 24
+    },
+    {
+      "diverged": null,
+      "loss": 0.8593000173568726,
+      "max_steps": 48,
+      "step": 25
+    },
+    {
+      "diverged": null,
+      "loss": 1.9671941995620728,
+      "max_steps": 48,
+      "step": 26
+    },
+    {
+      "diverged": null,
+      "loss": 1.306310772895813,
+      "max_steps": 48,
+      "step": 27
+    },
+    {
+      "diverged": null,
+      "loss": 0.9489088654518127,
+      "max_steps": 48,
+      "step": 28
+    },
+    {
+      "diverged": null,
+      "loss": 1.9514811038970947,
+      "max_steps": 48,
+      "step": 29
+    },
+    {
+      "diverged": null,
+      "loss": 1.2148040533065796,
+      "max_steps": 48,
+      "step": 30
+    },
+    {
+      "diverged": null,
+      "loss": 0.8240111470222473,
+      "max_steps": 48,
+      "step": 31
+    },
+    {
+      "diverged": null,
+      "loss": 1.9463592767715454,
+      "max_steps": 48,
+      "step": 32
+    },
+    {
+      "diverged": null,
+      "loss": 1.229614496231079,
+      "max_steps": 48,
+      "step": 33
+    },
+    {
+      "diverged": null,
+      "loss": 0.9202340841293335,
+      "max_steps": 48,
+      "step": 34
+    },
+    {
+      "diverged": null,
+      "loss": 1.9306854009628296,
+      "max_steps": 48,
+      "step": 35
+    },
+    {
+      "diverged": null,
+      "loss": 1.164942741394043,
+      "max_steps": 48,
+      "step": 36
+    },
+    {
+      "diverged": null,
+      "loss": 0.7878955006599426,
+      "max_steps": 48,
+      "step": 37
+    },
+    {
+      "diverged": null,
+      "loss": 1.92388916015625,
+      "max_steps": 48,
+      "step": 38
+    },
+    {
+      "diverged": null,
+      "loss": 1.1500555276870728,
+      "max_steps": 48,
+      "step": 39
+    },
+    {
+      "diverged": null,
+      "loss": 0.8954616785049438,
+      "max_steps": 48,
+      "step": 40
+    },
+    {
+      "diverged": null,
+      "loss": 1.9093401432037354,
+      "max_steps": 48,
+      "step": 41
+    },
+    {
+      "diverged": null,
+      "loss": 1.1027019023895264,
+      "max_steps": 48,
+      "step": 42
+    },
+    {
+      "diverged": null,
+      "loss": 0.747895359992981,
+      "max_steps": 48,
+      "step": 43
+    },
+    {
+      "diverged": null,
+      "loss": 1.8981894254684448,
+      "max_steps": 48,
+      "step": 44
+    },
+    {
+      "diverged": null,
+      "loss": 1.0549542903900146,
+      "max_steps": 48,
+      "step": 45
+    },
+    {
+      "diverged": null,
+      "loss": 0.861106276512146,
+      "max_steps": 48,
+      "step": 46
+    },
+    {
+      "diverged": null,
+      "loss": 1.8874166011810303,
+      "max_steps": 48,
+      "step": 47
+    },
+    {
+      "diverged": null,
+      "loss": 1.0549677610397339,
+      "max_steps": 48,
+      "step": 48
+    }
+  ],
+  "train_config": {
+    "backend": "standard",
+    "compute_device": null,
+    "cpu_param_ceiling": 1500000000,
+    "epochs": 8,
+    "learning_rate": 0.0001,
+    "load_in_4bit": false,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "lora_rank": 8,
+    "max_length": 1280,
+    "max_new_tokens": 1024,
+    "max_steps": 48,
+    "max_steps_cap": 64,
+    "seed": 0,
+    "storage_tier": "disk",
+    "target_modules": [
+      "q_proj",
+      "v_proj"
+    ]
+  },
+  "trainable_param_count": 540672,
+  "training_loss": 1.0549677610397339,
+  "wall_seconds": 381.1
+}
