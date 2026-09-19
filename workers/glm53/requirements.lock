@@ -1,13 +1,32 @@
 # Isolated GLM-5.3-Flash worker runtime.
 #
-# PINNED to the model card's own `transformers_version` field
-# (zai-org/GLM-5.3-Flash config.json = 5.16.0). This lock NEVER touches
-# the main SILT environment, which pins transformers==4.51.3.
+# transformers is pinned to 5.16.1 -- NOT the model card's declared
+# `transformers_version` (zai-org/GLM-5.3-Flash config.json says 5.16.0):
+# the 5.16.0 wheel does NOT ship models/glm5_next (verified against the
+# upstream huggingface/transformers tags: the directory exists at v5.16.1
+# and 404s at v5.16.0), so 5.16.1 is the minimal release that actually
+# contains the architecture the worker must load. The worker records BOTH
+# the declared and the installed version in its `hello` frame instead of
+# pretending the pin matches the card (external audit 2026-09-19). This
+# lock NEVER touches the main SILT environment, which pins
+# transformers==4.51.3.
+#
+# Wheel digests recorded at pin time (sha256, PyPI):
+#   transformers-5.16.1-py3-none-any.whl
+#     2f2d5b98a5ad3718713653734298fa620754ed683702a635ebb587df3ed29c7e
+#     (12,080,592 bytes; requires torch>=2.5 and accelerate>=1.1.0)
+#   accelerate-1.15.0-py3-none-any.whl
+#     97eacca0b73e45cb867dbf8c5d5d4dc32219544300e0c8992c7334dc2ef33cec
+#     (394,295 bytes)
 #
 # Do not relax these pins to make something run; bump them only with a new
 # GLM config.json revision and a fresh note in docs/CAPABILITY_BUILD.md.
 
-transformers==5.16.0
+transformers==5.16.1
+# accelerate is REQUIRED here (not optional): the worker loads through
+# AutoModelForMultimodalLM with device_map="cpu", which is
+# accelerate-backed; without it from_pretrained raises instead of loading.
+accelerate==1.15.0
 # torch build for the worker: CUDA is not assumed; swap for a cu-wheel
 # build on the GPU box by editing ONLY this line and rebuilding the image.
 --extra-index-url https://download.pytorch.org/whl/cpu

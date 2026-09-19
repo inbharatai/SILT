@@ -1,0 +1,278 @@
+{
+  "artifact_hashes": {
+    "adapter_config": "7dbaa3cdd192953cc773e577e16d4b59f7cf053ecc3ae71746e43ed2da6e8939",
+    "adapter_weights": "632254814e7d062a18a6f16c187e4781ed0b6368405a5a14b2e53f7e2548a3b2",
+    "authoring_selfcheck.py": "26ef412c549fe6bb9824b2f1246ab3204904a624414b4d524f7ed0fd21baead9",
+    "cases.jsonl": "83fefb7bcc04c742aea870d84d491473a2bde6c981d60ca8ded0a30d9e4622b9",
+    "compress_proof.py": "bfbc704ffadef7f4276a7166c22e9363fa8cdcde956ea0c79042f8cf88d40547",
+    "compression-proof.json": "784759a7af2952ca3cbd1cbff0dcd53a7588710fce2f4b7b4c93b5c1302481bb",
+    "correct_ab_scoring.py": "4cbb5a99c1c05b76fbde7381c6c7fecd29c10565453af09af2fa58b34613f307",
+    "dataset_manifest": "12551ddd238e55af72c18444f668ad3a20c3edf60fd17570a86d40ccc361127b",
+    "diag_quant.py": "2b81df2206d00205b9ec4753bd1ea2e46be9fcab953027142792a4623c8208e5",
+    "judge_pilot.py": "582b900e0791c2f2a8375dd1f456c2f428723a756c288be54e8fe19e37d8d256",
+    "judgment-student-qwen2.5_0.5b.json": "a7f179f4cf0c37bf78d0fe494dcf66aa880b076a5da2d358720a3fdeda3e1db3",
+    "judgment-teacher.json": "36995552777cc35038af809bf9f7b9636f00a8a291f9ee71b691bb024d867e9b",
+    "judgment_ab_adapter_corrected": "15786836a4da41f565dd105e8a366424520c86214f8abe72aba877e52bea4879",
+    "judgment_ab_base_corrected": "b121b28bbd48f9138382bec36e7ed1090b7bd1b1e93847987da9693981ec1073",
+    "kd_pairs": "202a8c2fac3d5ae1a5374f7a2fd2ead06e74cbc110e330655a0d896c677fd550",
+    "spec.json": "5775e2bd757256b1a8bb75d1880c2b8b8607efbf05d604ebdc3c6c62f040c7b3",
+    "superseded_judgment_ab_adapter": "e5244c9540dceb0cbc67b1572c1647294ad5d6a487e4d8e25ba5e911883064d5",
+    "superseded_judgment_ab_base": "87d640f35b41e241c03928716182152f4dd44e3fdea9bd3bb822d7368a504864",
+    "superseded_receipt_record_sha256": "2aae2501c1fe6e7a6e97dd5f44b87d859224cd5dbf2aeeec89669baa4dd52042",
+    "superseded_training_report": "0848e2b28aa918dd20075477d37ed6197fec0a689e3ec1d058db96b49b8476e9",
+    "train_deepapply.py": "812a4edb3e1f8ab775eed285fb37a058bd10d4f45163bd046e6b26c6250a0f18",
+    "training_report_corrected": "64a82f31ff1d2a1a327b6cbc171958dcd5aa18d3bc20a267e47d975bf0765bfd",
+    "training_run": "1068cb077c6539ef001f0b2a6503877fa9b1bc18e39b2adf13c0257ed03bce8f"
+  },
+  "artifact_sha256": "dabb61bf176c8869a116f27819d8e68f7b861fd31ea0c62f4cc2844b38abd28e",
+  "capability_id": "python_repo_debugging_v1",
+  "capability_retention": 0.625,
+  "command": "glm53-flash-pilot-correction",
+  "control_regressions": {
+    "ab_control_checks_delta": 0.25
+  },
+  "data_split_hashes": {
+    "controls.jsonl": "cdae6cf925526424828e4409639f81f5ae9bb7d4a89a63f2b2eb8caacaf440b4",
+    "development.jsonl": "37361aa41f641f57ca9d28d56dd455dfa7b0c108f73b5806f0a67a3f8ec0b2e0",
+    "final.jsonl": "957027f1963d2e403ffa743c5c143faef1b0f09f426558432e0502793decf21c",
+    "heldout.jsonl": "07c97359d0aec66216bb48768073d9ddfbb5f0dea7f1aaf177d7bb508ccaf2b0",
+    "training.jsonl": "2bfb2facc0d5e4aa1dc8c0db482ee55dd0e5a331e9c654057c7b1ef3bbff8666"
+  },
+  "error": null,
+  "evidence_class": "behavioural_remote",
+  "failure_history": [
+    "teacher.py three-dot relative import raised ImportError at call time during the FIRST real teacher run; fixed to two dots and a live-loopback regression test added (unit tests mock the transport, so only a real network run caught it)",
+    "teacher capitalize_words_v1: 0/3 checks (response was reasoning prose with no code block)",
+    "teacher rotate_list_v1: 1/3 checks (returned the same buggy left-rotation)",
+    "CI run 35359937603 (py3.12) failed test_kernel_cpu_limit_not_bandwidth_claim: wall-clock safety deadline fired before RLIMIT_CPU on a contended runner; safety window widened (test semantics unchanged)",
+    "The first completed DeepApply training saved a real adapter but crashed in the report step (NameError: digest was imported only inside load_kd_pairs); three earlier attempts failed on driver bugs the run itself exposed (the receipt pin is the artifact's embedded content hash, not the raw file hash; the dataset manifest files map is filename->sha256, not split->filename; the WSL venv's editable asea install pointed at a stale checkout and had to be shadowed with PYTHONPATH). Driver fixed and the whole training re-run once, start to finish",
+    "The first signed copy of the training receipt pinned train_deepapply.py as it stood at signing time; its usage docstring was edited minutes later (PYTHONPATH note), so that pin matched no file on disk. Caught by a pre-commit pin-vs-bytes audit before anything was published; the uncommitted record was regenerated from the as-committed driver bytes. Lesson recorded: freeze the driver BEFORE generating the receipt, not after",
+    "SCORING DEFECT (found by external read-only audit of main @091637e, 2026-09-19): every functional pass rate divided by the REPORTED judged totals, so five candidate-error cases (oracle 0/0 rows: base greeting_format_v1/price_total_v1, adapter capitalize_words_v1/chunk_v1/transpose_rows_v1) silently vanished from the A/B denominators and the published numbers were wrong (falsely 'held-out improved 0.8889 -> 1.0'). Fixed with authored-denominator accounting in production (evaluate_code_cases), both pilot drivers, and summarise; regression tests verified fail-on-old; both arms re-graded from the frozen responses with byte-for-byte reproduction of every previously-graded case; corrected numbers republished via this superseding receipt"
+  ],
+  "gates": {
+    "gate1_status": "not_requested (no promotion sought in this pilot)",
+    "gate2_status": "research A/B re-scored under corrected accounting (2026-09-19): the independent host oracle judged base vs trained adapter on identical authored checks; the adapter REGRESSED the measured target capability and NOTHING is admitted; production admission NOT requested -- the pilot's research intake trains directly from receipt-verified KD pairs, not Gate-1 PROMOTED packets",
+    "siltspring_states": {
+      "full": "certified=control_utility,target_debugging_development,target_debugging_heldout",
+      "int2": "certified=- revoked=control_utility,target_debugging_development,target_debugging_heldout",
+      "int4": "certified=control_utility,target_debugging_development,target_debugging_heldout",
+      "int8": "certified=target_debugging_development revoked=control_utility,target_debugging_heldout"
+    }
+  },
+  "hardware_identity": {
+    "machine": "x86_64",
+    "note": "8 GB-class laptop; no GPU was used in this pilot",
+    "processor": "x86_64"
+  },
+  "honesty_note": "Signature is a local HMAC over the report bytes with a workspace-local key. It proves the report was not modified after generation to the holder of that same key. It is NOT a portable attestation, NOT proof of authorship to third parties, and NOT a quality certificate.",
+  "key_fingerprint": "d83edb3218cde8d1",
+  "limitations": [
+    "A pass rate on these authored cases measures THIS case set only; it is not a quality claim about any model.",
+    "Implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it.",
+    "DeepApply LoRA training ran as a research path (48 steps over 6 KD pairs); 6 pairs is a mechanism-scale training set -- a null or negative held-out delta is a real result, not a failure to hide. Production admission (Gate-1 PROMOTED packets -> DeepApplyRunner -> Gate 2 -> AdapterStore) was NOT sought; the adapter is a research artifact and autoactivates nothing.",
+    "CORRECTED VERDICT (2026-09-19): under authored-denominator accounting the trained adapter REGRESSED the measured target capability (training -0.5263, held-out -0.2222, aggregate -0.2703) while improving development (+0.2222) and the controls split (+0.25); retention 0.625. The earlier 'held-out improved' claim is withdrawn.",
+    "capability_retention is the defined ratio (adapter target checks passed / teacher target checks passed over identical authored checks), but the two numbers come from different generation paths (deterministic local HF raw-text continuation vs the cloud-teacher run) judged by the same host oracle -- recorded as a ratio, not a like-for-like comparison.",
+    "The A/B used raw-text greedy continuation matching the production trainer's raw input/output format, not a chat template; its base-arm scores are not comparable to the Ollama-judged student numbers above.",
+    "The compression certificate criterion is suite-loss degradation vs the full-precision reference (the certifier's designed contract); it is NOT an oracle pass-rate measurement.",
+    "The teacher is behavioural-only: no routers, experts or internal state were observed; no internal claims are made.",
+    "The compression proof used Qwen/Qwen2.5-0.5B-Instruct because the shared HF cache's base-0.5B snapshot contains no weight files; same architecture and scale as the judged student."
+  ],
+  "measurements": {
+    "ab_scoring_correction": {
+      "defect": "evaluate_code_cases divided every rate by the REPORTED judged totals; a candidate that failed to import or raised on call reported judged_cases=0 and its authored checks silently vanished from the denominators, inflating the rates",
+      "dropped_cases_reinstated": {
+        "adapter": [
+          "capitalize_words_v1",
+          "chunk_v1",
+          "transpose_rows_v1"
+        ],
+        "base": [
+          "greeting_format_v1",
+          "price_total_v1"
+        ]
+      },
+      "fix": "authored-denominator accounting (audit 2026-09-19): denominator = the frozen authored oracle count per case; unjudged checks count as FAILED; missing status/duplicate/unknown/verdictless oracle entries are hard refusals; regression tests verified fail-on-old",
+      "recomputation": "both A/B arms re-graded from the frozen responses-{base,adapter}.jsonl through the real host oracle under the corrected accounting (no new model generation; the final split stays sealed); every case the committed judgment graded in full reproduced byte-for-byte -- the recomputation changed nothing except restoring the five dropped cases to the denominators",
+      "reproducibility": "corrected judgment files carry a 'correction' block with every dropped case's true oracle status and candidate_error diagnostic",
+      "supersedes": {
+        "artifact_sha256": "2aae2501c1fe6e7a6e97dd5f44b87d859224cd5dbf2aeeec89669baa4dd52042",
+        "reason": "the superseded receipt published A/B pass rates computed with a denominator defect: rates divided by the reported judged totals, so candidate-error cases (oracle 0/0 rows) silently vanished from every denominator and inflated the rates. Affected cases: base greeting_format_v1 (2 checks), price_total_v1 (2), adapter capitalize_words_v1 (3), chunk_v1 (3), transpose_rows_v1 (3). The published 'held-out improved 0.8889 -> 1.0' was FALSE; corrected is a held-out regression 0.8889 -> 0.6667 and an aggregate target regression 0.8108 -> 0.5405",
+        "record": "pilot-receipt-training.unsigned.json",
+        "status": "invalidated (superseded by this correction); the stored record is preserved unmodified as history"
+      }
+    },
+    "compression_proof": {
+      "anomaly": "int4 suite losses BELOW the full-precision reference (negative degradation); investigated with diag_quant.py -- no pipeline defect (in-place round-trip reproduces streamed losses to 4 decimals); a loss-metric artifact, never reported as a quality improvement",
+      "bytes_packed": {
+        "full": null,
+        "int2": 90955776,
+        "int4": 180412416,
+        "int8": 359325696
+      },
+      "levels": [
+        "int8",
+        "int4",
+        "int2"
+      ],
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "tolerance": 0.02,
+      "weights_read_only_byte_exact": true
+    },
+    "deepapply_training": {
+      "ab_design": "the committed report dropped candidate-error checks from every denominator (reported 0/0 rows vanished from the sums); corrected accounting uses the frozen authored oracle count and counts unjudged checks as FAILED",
+      "adapter_pass_rates": {
+        "cases_fully_passed": 0.4375,
+        "control_checks": 0.5,
+        "controls_split_checks": 0.5,
+        "development_checks": 0.8889,
+        "heldout_checks": 0.6667,
+        "overall_checks": 0.5333,
+        "target_checks": 0.5405,
+        "training_checks": 0.3158
+      },
+      "backend": "standard",
+      "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "base_pass_rates": {
+        "cases_fully_passed": 0.5,
+        "control_checks": 0.25,
+        "controls_split_checks": 0.25,
+        "development_checks": 0.6667,
+        "heldout_checks": 0.8889,
+        "overall_checks": 0.7111,
+        "target_checks": 0.8108,
+        "training_checks": 0.8421
+      },
+      "committed_pass_rates_superseded": {
+        "adapter": {
+          "cases_fully_passed": 0.4375,
+          "control_checks": 0.5,
+          "controls_split_checks": 0.5,
+          "development_checks": 0.8889,
+          "heldout_checks": 1.0,
+          "overall_checks": 0.6667,
+          "target_checks": 0.7143,
+          "training_checks": 0.4615
+        },
+        "base": {
+          "cases_fully_passed": 0.5,
+          "control_checks": 0.5,
+          "controls_split_checks": 0.5,
+          "development_checks": 0.6667,
+          "heldout_checks": 0.8889,
+          "overall_checks": 0.7805,
+          "target_checks": 0.8108,
+          "training_checks": 0.8421
+        }
+      },
+      "control_regressed": false,
+      "control_regression_definition": "adapter minus base on the utility-writing control checks, identical generation path; negative = regression",
+      "corrected": true,
+      "corrected_retention_counts": {
+        "adapter_target_passed": 20,
+        "authored_target_checks": 37,
+        "note": "capability_retention is the exact ratio 20/32 over raw counts; the superseded receipt's 0.8259 was inflated by the denominator defect",
+        "teacher_target_passed": 32
+      },
+      "corrected_verdict": "the trained adapter REGRESSED the measured target capability overall (training -0.5263, held-out -0.2222, aggregate target -0.2703) while improving development (+0.2222) and the controls split (+0.25); the earlier 'held-out improved' claim was an artifact of the scoring defect and is withdrawn",
+      "deltas_adapter_minus_base": {
+        "control_checks": 0.25,
+        "controls_split_checks": 0.25,
+        "development_checks": 0.2222,
+        "heldout_checks": -0.2222,
+        "overall_checks": -0.1778,
+        "target_checks": -0.2703,
+        "training_checks": -0.5263
+      },
+      "final_training_loss": 1.0549677610397339,
+      "heldout_improved": false,
+      "intake": "research path: TrainingDataset rows built directly from the receipt-verified KD pairs (NOT Gate-1 PROMOTED packets; no production admission sought)",
+      "judge": "host_oracle_function_io_linux_sandbox (independent A/B; the trainer never certified itself)",
+      "kd_pairs_sha256": "202a8c2fac3d5ae1a5374f7a2fd2ead06e74cbc110e330655a0d896c677fd550",
+      "step_count": 48,
+      "trainable_param_count": 540672
+    },
+    "distill": {
+      "negatives": 0,
+      "positives": 6,
+      "protected_splits_enforced": [
+        "development",
+        "heldout",
+        "final",
+        "controls"
+      ],
+      "sequence_level_only": true
+    },
+    "gap": {
+      "definition": "teacher target_checks - student target_checks on identical oracle checks",
+      "heldout_checks": 0.3334,
+      "target_checks": 0.4054,
+      "training_checks": 0.4737
+    },
+    "student_judged": {
+      "cases": 16,
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "model": "qwen2.5:0.5b",
+      "pass_rates": {
+        "cases_fully_passed": 0.25,
+        "control_checks": 0.75,
+        "controls_split_checks": 0.75,
+        "development_checks": 0.4444,
+        "heldout_checks": 0.3333,
+        "overall_checks": 0.5111,
+        "target_checks": 0.4595,
+        "training_checks": 0.5263
+      }
+    },
+    "teacher_judged": {
+      "cases": 16,
+      "correction_note": "teacher/student judged runs were re-verified 2026-09-19: no denominator drops (45/45 authored checks per non-final arm present); these numbers are IMMUNE to the corrected defect and stand unchanged",
+      "genuine_failures": [
+        "capitalize_words_v1: no code block in response (0/3, no_code_block)",
+        "rotate_list_v1: returned the same buggy left-rotation (1/3)"
+      ],
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "pass_rates": {
+        "cases_fully_passed": 0.875,
+        "control_checks": 1.0,
+        "controls_split_checks": 1.0,
+        "development_checks": 0.7778,
+        "heldout_checks": 0.6667,
+        "overall_checks": 0.8889,
+        "target_checks": 0.8649,
+        "training_checks": 1.0
+      }
+    }
+  },
+  "resources": {
+    "disk_bytes": "NOT_MEASURED",
+    "energy_joules": "NOT_MEASURED",
+    "latency_ms_p50": "NOT_MEASURED",
+    "ram_peak_bytes": "NOT_MEASURED",
+    "tokens_per_second": "NOT_MEASURED",
+    "vram_peak_bytes": "NOT_MEASURED"
+  },
+  "runtime_versions": {
+    "judge_environment": "WSL2 Ubuntu, asea CPU-only torch venv (Linux sandbox required for the host oracle)",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3"
+  },
+  "schema": "silt.capability_receipt.v1",
+  "schema_version": 1,
+  "signature": "9e1a42dc9214aada170ae787205f024b75378a8367f15f0bd033952b87a29a0b",
+  "signature_alg": "hmac-sha256-local",
+  "spec_sha256": "1101de73ea9f1ad2ce412626735e9fda8a04c229edecd59514ae7266662fcd9b",
+  "status": "completed",
+  "student": {
+    "compression_proof_model": "Qwen/Qwen2.5-0.5B-Instruct@7ae557604adf67be50417f59c2c2f167def9a775",
+    "gap_model": "qwen2.5:0.5b (Ollama local, judged 16 cases)"
+  },
+  "teacher": {
+    "access": "behavioural_remote",
+    "model": "glm-5.3-flash:cloud",
+    "provider": "ollama",
+    "revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+    "traced_cases": "16 (final split never traced)"
+  }
+}

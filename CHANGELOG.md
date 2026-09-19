@@ -16,21 +16,93 @@ receipt-verified KD pairs trained a REAL LoRA adapter through the production
 `StandardTrainerBackend` (Qwen2.5-0.5B-Instruct, r=8 α=16 q/v-proj, 48 steps,
 540,672 trainable parameters, finite losses, no divergence, CPU), and an
 INDEPENDENT host-oracle A/B judged base vs adapter on identical deterministic
-generation paths (16 non-final cases; final split never generated). The
-measured verdict is MIXED and is recorded as mixed: heldout checks
-0.8889→1.0 and development 0.6667→0.8889 with zero control regression, but
-the AGGREGATE target rate regressed 0.8108→0.7143, driven by a training-split
-drop (0.8421→0.4615) — the adapter visibly shifted the student toward the
+generation paths (16 non-final cases; final split never generated).
+
+**Corrected verdict (same day, external audit): a NET NEGATIVE target result.**
+The A/B's published numbers were computed with a denominator defect — every
+pass rate divided by the *reported judged* totals, so five candidate-error
+cases (oracle 0/0 rows) silently vanished from the denominators and inflated
+the rates; the published "heldout 0.8889→1.0 improvement" was FALSE. The
+defect was fixed at the root (`evaluate_code_cases` now uses authored
+denominators, counts unjudged checks as FAILED, and hard-refuses
+missing-status/partial/duplicate oracle responses; regression tests verified
+fail-on-old), and both arms were re-graded from the frozen responses with
+byte-for-byte reproduction of every previously-graded case. Corrected
+figures: training 0.8421→0.3158 (−0.5263), development 0.6667→0.8889
+(+0.2222), heldout 0.8889→0.6667 (−0.2222), controls 0.25→0.5 (+0.25),
+aggregate target 0.8108→0.5405 (−0.2703) — the adapter REGRESSED the measured
+target capability; the adapter visibly shifted the student toward the
 teacher's response format while producing confidently wrong fixes on some
-trained cases (e.g. a divisibility precondition that aborts the oracle run).
-With 6 pairs this is a mechanism-scale result, not a quality verdict either
-way. A second signed receipt records the stage (`capability_retention`
-0.7143/0.8649 = 0.8259 by the search-layer definition, computed from the
-unrounded rates; cross-path ratio, caveated); the 2026-09-18 receipt record
-stays untouched in the append-only store. Nothing was admitted, activated or
+trained cases (e.g. a divisibility precondition that aborts the oracle run,
+now counted as failed checks rather than dropped). With 6 pairs this is a
+mechanism-scale result, not a quality verdict either way. A third signed
+receipt (`glm53-flash-pilot-correction`) references and invalidates the
+training record by its stored hash and republishes the corrected figures:
+`capability_retention` 20/32 = **0.625** (exact ratio over raw counts;
+cross-path, caveated), `ab_control_checks_delta` +0.25 (no control
+regression). The superseded records stay untouched in the append-only store
+as invalidated history; the 2026-09-18 teacher/student judged numbers are
+immune to the defect and stand unchanged. Nothing was admitted, activated or
 certified — production admission remains Gate-1 PROMOTED packets →
 DeepApplyRunner → Gate 2 and was NOT sought. Full record in
 `docs/CAPABILITY_BUILD.md`.
+
+### Fixed (external audit, second pass — GLM worker, routing contract, intervention loop)
+
+The same audit found the open-weight GLM worker path was not buildable
+against the real model. All findings were verified against the actual
+`transformers` 5.16.1 source and fixed at the root:
+
+- **Pin**: the worker locked `transformers==5.16.0` "per the model card's
+  `transformers_version`", but the 5.16.0 wheel does NOT ship
+  `models/glm5_next` (verified against the upstream tags: the directory
+  exists at v5.16.1 and 404s at v5.16.0). Locked to **5.16.1** (+
+  `accelerate==1.15.0`, required by `device_map`), wheel sha256 digests
+  recorded in `requirements.lock`, a BUILD-TIME smoke test added to the
+  Dockerfile (architecture module + `AutoModelForMultimodalLM` mapping +
+  accelerate must be importable — the build fails instead of the first
+  real run), and the worker's `hello` records both the declared and the
+  installed version.
+- **Model class**: the worker loaded through `AutoModelForCausalLM`; the
+  real checkpoint loads as `Glm5NextForConditionalGeneration` via
+  `AutoModelForMultimodalLM` (no `Glm5NextForCausalLM` exists in 5.16.1).
+  An arch-presence check now refuses by name BEFORE any config or weights
+  are touched, and `hello`/`inspect` report checkpoint-identity sha256s
+  (config.json / generation_config.json / model index) so every
+  downstream artifact names its exact revision.
+- **Routing contract**: the adapter claimed a plain sigmoid-topk
+  equation, refused a config boolean `e_score_correction_bias` (a field
+  the real config never has — it would have refused the real model) and
+  checked a nonexistent `scoring_func` config field. Rewritten against the
+  real `Glm5NextTextTopkRouter`: sigmoid scores with
+  `e_score_correction_bias` added to the SELECTION scores only, group
+  top-k, pre-bias weight gather, routed scaling; detection now verifies
+  the ROUTER MODULE CONTRACT (weight shape, bias buffer, group/scaling
+  attributes); telemetry captures the ACTUAL dispatched ids/weights from
+  the router's own `(router_logits, topk_weights, topk_indices)` output —
+  never a re-derived approximation.
+- **The mask was a silent no-op**: the old hook rewrote only
+  `output[0]` (the logits) while the dispatch decision lives in the
+  returned tuple — masked interventions would have measured an UNMASKED
+  teacher. The mask hook now rewrites the FULL tuple, forcing the masked
+  expert to `-inf` in the selection scores BEFORE the group stage (a
+  nonzero correction bias after a `−1e9` logit could otherwise push the
+  masked expert back into the top-8), and telemetry/mask hooks refuse to
+  be live together (registered first, telemetry would record the unmasked
+  dispatch as if masked).
+- **Intervention loop wired (audit item 8)**: the worker gained a
+  `generate` op (completions under the CURRENT mask state, live masks
+  reported with every generation), and `silt-capability intervene` now
+  drives the full measured protocol — hash-verify, base arm regenerates +
+  judge every case through the host oracle, mask, masked arm repeats the
+  identical cases, restore, re-verify — with a judge
+  (`make_worker_judge`) that refuses by name when the worker's reported
+  mask set contradicts the phase being scored. The old honest refusal
+  ("generation+judging stage not wired") is retired; what stays honest is
+  that no GLM intervention has been MEASURED (the worker still cannot be
+  admitted on this hardware, and every live run reports the block). The
+  adapter's `structural_reduce` remedy no longer points at a nonexistent
+  worker reduce op.
 
 ### Added
 - `StandardTrainerBackend` sequence-length knob: `max_length` in the train

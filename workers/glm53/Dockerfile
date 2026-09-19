@@ -1,9 +1,10 @@
 # Isolated GLM-5.3-Flash worker image.
 #
 # This runtime is DELIBERATELY separate from the main SILT environment:
-# GLM-5.3-Flash needs Transformers 5.x (pinned to the model card's
-# transformers_version, 5.16.0) while the main environment pins
-# transformers==4.51.3. The two must never share an interpreter.
+# GLM-5.3-Flash needs Transformers 5.x (pinned to 5.16.1 -- the model
+# card DECLARES 5.16.0, but that wheel does not ship models/glm5_next;
+# 5.16.1 is the minimal release that does) while the main environment
+# pins transformers==4.51.3. The two must never share an interpreter.
 #
 # Build:  docker build -f workers/glm53/Dockerfile -t silt-glm53-worker .
 # Run:    docker run --rm -i \
@@ -24,6 +25,45 @@ ENV HF_HUB_OFFLINE=1 \
 
 COPY workers/glm53/requirements.lock /tmp/requirements.lock
 RUN pip install --no-cache-dir -r /tmp/requirements.lock
+
+# BUILD-TIME SMOKE TEST (audit 2026-09-19): the previous image pinned
+# transformers 5.16.0, which cannot even import the glm5_next
+# architecture -- the first real failure would have surfaced only at
+# run time inside a box that had already burned minutes of model loading.
+# Fail the BUILD instead: the architecture module, the
+# AutoModelForMultimodalLM mapping and accelerate must all be present in
+# the exact pinned wheels.
+RUN python - <<'EOF'
+import sys
+
+import transformers
+
+try:
+    from transformers.models.glm5_next import modeling_glm5_next  # noqa: F401
+except ImportError as exc:
+    sys.exit(
+        "smoke test failed: transformers %s lacks models/glm5_next (%s); "
+        "the pin must provide the GLM-5.3-Flash architecture" % (
+            transformers.__version__, exc)
+    )
+from transformers.models.auto import modeling_auto
+
+mapping = getattr(modeling_auto, "MODEL_FOR_IMAGE_TEXT_TO_TEXT_MAPPING_NAMES", None)
+if mapping is None or "glm5_next" not in mapping:
+    sys.exit(
+        "smoke test failed: transformers %s does not map glm5_next onto "
+        "AutoModelForMultimodalLM" % transformers.__version__
+    )
+try:
+    import accelerate  # noqa: F401
+except ImportError as exc:
+    sys.exit(
+        "smoke test failed: accelerate missing (%s); the worker loads with "
+        "device_map which is accelerate-backed" % exc
+    )
+print("smoke test ok: transformers %s + accelerate %s + glm5_next present"
+      % (transformers.__version__, accelerate.__version__))
+EOF
 
 # The worker needs only asea's stdlib/pydantic core (worker_protocol,
 # adapters, intervention, errors) -- never the localmodels extras.

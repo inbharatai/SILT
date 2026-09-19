@@ -428,11 +428,15 @@ training data. Installing extras starts neither. Historical
 >   (0.8649) and local student (0.4595) on identical target checks — a
 >   measurement of that case set only, never a model-quality claim — 6
 >   byte-bound KD pairs, a **REAL DeepApply LoRA training** through the
->   production trainer and an **independent oracle A/B** with a MIXED verdict
->   (held-out checks 0.8889→1.0, controls unchanged, aggregate target
->   0.8108→0.7143, recorded as a regression where it regressed), and a real
->   SiltSpring compression proof with genuine revocations. Two signed
->   receipts; nothing admitted, activated or certified.
+>   production trainer and an **independent oracle A/B** whose corrected
+>   verdict (2026-09-19 scoring correction, authored denominators) is a NET
+>   NEGATIVE target result: training 0.8421→0.3158, held-out 0.8889→0.6667,
+>   aggregate target 0.8108→0.5405, retention 0.625 (development +0.2222 and
+>   controls +0.25 improved; the earlier "held-out improved" claim was an
+>   artifact of the scoring defect and is withdrawn) — recorded as the
+>   product, and a real SiltSpring compression proof with genuine revocations.
+>   Three signed receipts (the third corrects and supersedes the second);
+>   nothing admitted, activated or certified.
 >   [Full record](docs/CAPABILITY_BUILD.md).
 > - **SiltSpring** — [opt-in real-HF probe](scripts/real_siltspring_1p5b.py) exists;
 >   raw Qwen0.5B/1.5B certification/revocation receipts are not included here.

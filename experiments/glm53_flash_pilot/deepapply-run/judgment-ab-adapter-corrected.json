@@ -1,0 +1,424 @@
+{
+  "capability_id": "python_repo_debugging_v1",
+  "cases": [
+    {
+      "candidate_error": null,
+      "candidate_sha256": "9c289dab7036a9226e872bc1258a2b6a65b87b362871bdbf1cd76a1e390e76d3",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 46637.484,
+      "new_tokens": 279,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "absent": true,
+        "present": true,
+        "singleton": true
+      },
+      "sample_id": "binary_search_v1",
+      "split": "heldout",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": {
+        "phase": "call",
+        "schema_version": 1,
+        "trust": "untrusted_candidate",
+        "type_code": "NameError"
+      },
+      "candidate_sha256": "bb8748c94458a74220fe7891faf4c23e931edf53e7984509f348e0430c9c7612",
+      "diagnostic_event": "candidate_error",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 0,
+      "latency_ms": 40526.997,
+      "new_tokens": 243,
+      "oracle_status": "FAILED",
+      "passed": 0,
+      "per_check": {},
+      "sample_id": "capitalize_words_v1",
+      "split": "heldout",
+      "total": 3,
+      "unjudged_checks": 3
+    },
+    {
+      "candidate_error": {
+        "phase": "call",
+        "schema_version": 1,
+        "trust": "untrusted_candidate",
+        "type_code": "ValueError"
+      },
+      "candidate_sha256": "0bafee4cc7ef77d524775deba625b66102fd20c1595a6cbe2be2c5d269a20b67",
+      "diagnostic_event": "candidate_error",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 0,
+      "latency_ms": 25004.961,
+      "new_tokens": 154,
+      "oracle_status": "FAILED",
+      "passed": 0,
+      "per_check": {},
+      "sample_id": "chunk_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 3
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "de18fcb396a21e87e18dd9202213194a684bd79aa0e8bbab792a09af637f74bd",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 23242.617,
+      "new_tokens": 145,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "blank": true,
+        "double_space": true,
+        "simple": true
+      },
+      "sample_id": "count_words_v1",
+      "split": "development",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "a0bc42086fe74f005d1ca1ea901425948ead122d008a97700901edd61805385a",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "judged_cases": 2,
+      "latency_ms": 47242.772,
+      "new_tokens": 288,
+      "oracle_status": "PASSED",
+      "passed": 2,
+      "per_check": {
+        "double_digit": true,
+        "padded": true
+      },
+      "sample_id": "date_label_v1",
+      "split": "controls",
+      "total": 2,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "b69120315118939a3a72d2db00140292808c5392f105088854e9d87314ef456a",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 44589.231,
+      "new_tokens": 278,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "all_same": true,
+        "empty": true,
+        "order_kept": true
+      },
+      "sample_id": "dedupe_stable_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "772d423babe06f2f9bc8bf911ced4adee3ed261ace4a49c5015f1d43afa71a3e",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "latency_ms": 25414.855,
+      "new_tokens": 173,
+      "oracle_status": "FAILED",
+      "passed": 2,
+      "per_check": {
+        "already_flat": true,
+        "deep_nesting": false,
+        "empty": true,
+        "nested_empty": false
+      },
+      "sample_id": "flatten_recursive_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "31e0a4e60fc0ff2f1a7fb17267cccadfdf711c272bdb7722145b844f4fe042c2",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "judged_cases": 2,
+      "latency_ms": 39983.081,
+      "new_tokens": 228,
+      "oracle_status": "FAILED",
+      "passed": 0,
+      "per_check": {
+        "exclaim": false,
+        "question": false
+      },
+      "sample_id": "greeting_format_v1",
+      "split": "controls",
+      "total": 2,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "83ac1d300d64a569fabb190c42048f10c97a4e203f8e9f94f06a56a7eec34eb6",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "judged_cases": 2,
+      "latency_ms": 38261.702,
+      "new_tokens": 226,
+      "oracle_status": "FAILED",
+      "passed": 0,
+      "per_check": {
+        "one_name": false,
+        "two_names": false
+      },
+      "sample_id": "initials_v1",
+      "split": "controls",
+      "total": 2,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "4ec5f4229361bfd0c67ed4b40e97ce6f2e03f6617eb0067ee53fbee8e3cc69d7",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 30718.163,
+      "new_tokens": 174,
+      "oracle_status": "FAILED",
+      "passed": 1,
+      "per_check": {
+        "single": true,
+        "unsorted_five": false,
+        "unsorted_three": false
+      },
+      "sample_id": "median_odd_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "cc73c11ecf0edac79a77c6ce9742e32df23dfc99dd29b8652697e55adb526e98",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 28675.911,
+      "new_tokens": 162,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "contained": true,
+        "disjoint_unsorted": true,
+        "touching": true
+      },
+      "sample_id": "merge_intervals_v1",
+      "split": "development",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "4d57300247ce58080993dd75fca6f9896b3ead8a72278615b1c96d1ecf94297c",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "control",
+      "judged_cases": 2,
+      "latency_ms": 22540.941,
+      "new_tokens": 131,
+      "oracle_status": "PASSED",
+      "passed": 2,
+      "per_check": {
+        "empty": true,
+        "two_items": true
+      },
+      "sample_id": "price_total_v1",
+      "split": "controls",
+      "total": 2,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "f455262062766679f07855b0e6c4fcbe7dc4c0a255c258a781fde8fc63823094",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 39287.507,
+      "new_tokens": 229,
+      "oracle_status": "FAILED",
+      "passed": 2,
+      "per_check": {
+        "by_one": true,
+        "wrapped": false,
+        "zero": true
+      },
+      "sample_id": "rotate_list_v1",
+      "split": "development",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "dc93ae4eb3794e880c1a02a98eb311afe81ced275645ffcb2c8f2f6ffff64c33",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 29128.353,
+      "new_tokens": 172,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "falling": true,
+        "rising": true,
+        "singleton": true
+      },
+      "sample_id": "running_max_v1",
+      "split": "heldout",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": null,
+      "candidate_sha256": "a23369624c30fb3739d0ce5e32d0888d7319f8c681fee7f230caf869317ae2e1",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "latency_ms": 32056.795,
+      "new_tokens": 184,
+      "oracle_status": "FAILED",
+      "passed": 0,
+      "per_check": {
+        "mixed": false,
+        "padded": false,
+        "runs": false
+      },
+      "sample_id": "slugify_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "candidate_error": {
+        "phase": "serialize",
+        "schema_version": 1,
+        "trust": "untrusted_candidate",
+        "type_code": "opaque"
+      },
+      "candidate_sha256": "c016fedcdc3eb16077808167da1acf1d7641c5e2dd7771817e0b1165f5ad77cc",
+      "diagnostic_event": "candidate_error",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 0,
+      "latency_ms": 42680.284,
+      "new_tokens": 261,
+      "oracle_status": "FAILED",
+      "passed": 0,
+      "per_check": {},
+      "sample_id": "transpose_rows_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 3
+    }
+  ],
+  "correction": {
+    "committed_pass_rates": {
+      "cases_fully_passed": 0.4375,
+      "control_checks": 0.5,
+      "controls_split_checks": 0.5,
+      "development_checks": 0.8889,
+      "heldout_checks": 1.0,
+      "overall_checks": 0.6667,
+      "target_checks": 0.7143,
+      "training_checks": 0.4615
+    },
+    "corrects": "judgment-ab-adapter.json",
+    "dropped_cases": [
+      {
+        "authored_checks": 3,
+        "committed_passed": 0,
+        "committed_total": 0,
+        "corrected_candidate_error": {
+          "phase": "call",
+          "schema_version": 1,
+          "trust": "untrusted_candidate",
+          "type_code": "NameError"
+        },
+        "corrected_diagnostic_event": "candidate_error",
+        "corrected_oracle_status": "FAILED",
+        "corrected_passed": 0,
+        "corrected_total": 3,
+        "sample_id": "capitalize_words_v1"
+      },
+      {
+        "authored_checks": 3,
+        "committed_passed": 0,
+        "committed_total": 0,
+        "corrected_candidate_error": {
+          "phase": "call",
+          "schema_version": 1,
+          "trust": "untrusted_candidate",
+          "type_code": "ValueError"
+        },
+        "corrected_diagnostic_event": "candidate_error",
+        "corrected_oracle_status": "FAILED",
+        "corrected_passed": 0,
+        "corrected_total": 3,
+        "sample_id": "chunk_v1"
+      },
+      {
+        "authored_checks": 3,
+        "committed_passed": 0,
+        "committed_total": 0,
+        "corrected_candidate_error": {
+          "phase": "serialize",
+          "schema_version": 1,
+          "trust": "untrusted_candidate",
+          "type_code": "opaque"
+        },
+        "corrected_diagnostic_event": "candidate_error",
+        "corrected_oracle_status": "FAILED",
+        "corrected_passed": 0,
+        "corrected_total": 3,
+        "sample_id": "transpose_rows_v1"
+      }
+    ],
+    "reason": "the committed report dropped candidate-error checks from every denominator (reported 0/0 rows vanished from the sums); corrected accounting uses the frozen authored oracle count and counts unjudged checks as FAILED",
+    "reproducibility": "every case the committed report graded in full reproduced byte-for-byte under recomputation from the same frozen response"
+  },
+  "extraction_rule": "last fenced ```python block; whole response if it is itself a def-containing source; else no_code_block failure",
+  "honesty": [
+    "A pass rate on these authored cases is a measurement of THIS case set only; it is not a quality claim about the model.",
+    "Implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it."
+  ],
+  "judge": "host_oracle_function_io_linux_sandbox",
+  "pass_rates": {
+    "cases_fully_passed": 0.4375,
+    "control_checks": 0.5,
+    "controls_split_checks": 0.5,
+    "development_checks": 0.8889,
+    "heldout_checks": 0.6667,
+    "overall_checks": 0.5333,
+    "target_checks": 0.5405,
+    "training_checks": 0.3158
+  },
+  "run": "student Qwen/Qwen2.5-0.5B-Instruct + trained LoRA adapter (A/B adapter arm) -- CORRECTED authored-denominator accounting"
+}

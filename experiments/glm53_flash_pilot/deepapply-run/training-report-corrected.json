@@ -1,0 +1,58 @@
+{
+  "adapter_pass_rates": {
+    "cases_fully_passed": 0.4375,
+    "control_checks": 0.5,
+    "controls_split_checks": 0.5,
+    "development_checks": 0.8889,
+    "heldout_checks": 0.6667,
+    "overall_checks": 0.5333,
+    "target_checks": 0.5405,
+    "training_checks": 0.3158
+  },
+  "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "base_pass_rates": {
+    "cases_fully_passed": 0.5,
+    "control_checks": 0.25,
+    "controls_split_checks": 0.25,
+    "development_checks": 0.6667,
+    "heldout_checks": 0.8889,
+    "overall_checks": 0.7111,
+    "target_checks": 0.8108,
+    "training_checks": 0.8421
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "comparison": "the committed report dropped candidate-error checks from every denominator (reported 0/0 rows vanished from the sums); corrected accounting uses the frozen authored oracle count and counts unjudged checks as FAILED",
+  "control_regressed": false,
+  "deltas_adapter_minus_base": {
+    "control_checks": 0.25,
+    "controls_split_checks": 0.25,
+    "development_checks": 0.2222,
+    "heldout_checks": -0.2222,
+    "overall_checks": -0.1778,
+    "target_checks": -0.2703,
+    "training_checks": -0.5263
+  },
+  "dropped_cases_reinstated": {
+    "adapter": [
+      "capitalize_words_v1",
+      "chunk_v1",
+      "transpose_rows_v1"
+    ],
+    "base": [
+      "greeting_format_v1",
+      "price_total_v1"
+    ]
+  },
+  "heldout_improved": false,
+  "honesty": [
+    "A pass rate on these authored cases measures THIS case set only; it is not a quality claim about the model.",
+    "6 KD pairs is a mechanism-scale training set; a null or negative held-out delta is a real result, not a failure to hide.",
+    "The trainer never certified itself: every number here comes from the independent host oracle in the Linux sandbox.",
+    "The final split was never generated or judged.",
+    "Production admission (Gate 1 PROMOTED packets -> DeepApplyRunner -> Gate 2 -> AdapterStore) was NOT sought; this adapter is a research artifact and autoactivates nothing.",
+    "Corrected verdict: the adapter REGRESSED the measured target capability overall (training and held-out both regressed; development and the control split improved). The earlier 'held-out improved' claim was an artifact of the scoring defect and is withdrawn."
+  ],
+  "run": "deepapply training + independent oracle A/B (REAL) -- CORRECTED scoring (supersedes training-report.json)",
+  "supersedes": "deepapply-run/training-report.json",
+  "supersession_reason": "the superseded report's rates divided by the reported judged totals, so candidate-error cases (0/0 rows) silently vanished from the denominators and inflated every rate"
+}

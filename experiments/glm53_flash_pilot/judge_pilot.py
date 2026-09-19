@@ -137,13 +137,21 @@ def judge_source(source: str, case: dict):
         c["id"]: c.get("matched")
         for c in (result.get("oracle") or {}).get("cases", [])
     }
-    total = int(result.get("judged_cases", len(case["oracle"])))
-    passed = int(result.get("passed_cases", 0))
+    # AUTHORED denominator (2026-09-19 correction): checks the oracle could
+    # not judge (candidate import/call error, timeout, resource kill) count
+    # as FAILED, never dropped -- the graded total is the frozen authored
+    # count, and the reported judged count rides along for transparency.
+    authored = len(case["oracle"])
+    diagnostic = (result.get("oracle") or {}).get("diagnostic") or {}
     return {
-        "passed": passed,
-        "total": total,
+        "passed": int(result.get("passed_cases", 0)),
+        "total": authored,
+        "judged_cases": int(result.get("judged_cases", 0)),
+        "unjudged_checks": int(result.get("unjudged_cases", authored)),
         "per_check": per_check,
-        "oracle_status": result.get("status", "measured"),
+        "oracle_status": result["status"],
+        "diagnostic_event": diagnostic.get("event"),
+        "candidate_error": diagnostic.get("candidate_error"),
     }
 
 
@@ -176,6 +184,18 @@ def summarise(rows, run_name):
             sum(r["passed"] for r in subset) / max(1, sum(r["total"] for r in subset)),
             4,
         )
+
+    # Accounting guard (audit 2026-09-19): the graded total per case must be
+    # the frozen authored oracle count. A row that grades fewer checks than
+    # the case defines (candidate-error cases reporting judged_cases=0 under
+    # the old accounting) silently inflates every rate by shrinking the
+    # denominator -- refuse the whole report instead of publishing it.
+    for r in rows:
+        if r["total"] <= 0:
+            raise SystemExit(
+                "case %s graded %d checks; every case defines at least one "
+                "-- refusing the report" % (r.get("sample_id"), r["total"])
+            )
 
     by = lambda key, value: [r for r in rows if r[key] == value]
     summary = {
@@ -273,6 +293,8 @@ def judge_traced_responses():
         rows.append({
             "sample_id": sid, "split": case["split"], "group": case["group"],
             "passed": verdict["passed"], "total": verdict["total"],
+            "judged_cases": verdict["judged_cases"],
+            "unjudged_checks": verdict["unjudged_checks"],
             "per_check": verdict["per_check"], "extraction": how,
             "candidate_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
             "behavioural": raw["behavioural"],
@@ -307,6 +329,8 @@ def judge_student_live(model: str):
         rows.append({
             "sample_id": sid, "split": case["split"], "group": case["group"],
             "passed": verdict["passed"], "total": verdict["total"],
+            "judged_cases": verdict["judged_cases"],
+            "unjudged_checks": verdict["unjudged_checks"],
             "per_check": verdict["per_check"], "extraction": how,
             "candidate_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
             "latency_ms": wall_ms,

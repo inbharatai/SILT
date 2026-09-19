@@ -704,25 +704,82 @@ def test_worker_deadline_covers_request_transmission(tmp_path):
 
 def _fake_glm_router_stack(torch):
     """A minimal EXACT-SHAPE GLM-5.3-Flash stand-in for detect_architecture:
-    45 decoder blocks (first 3 dense, 42 sparse with a 288-expert router
-    each), a vision tower module, and the config fields the adapter pins.
-    Random weights -- mechanics only."""
+    45 decoder blocks (first 3 dense, 42 sparse with a router each), a vision
+    tower module, and the config fields the adapter pins. The router is a
+    FAITHFUL REPLICA of transformers 5.16.1 ``Glm5NextTextTopkRouter``
+    (Apache-2.0): sigmoid scores, ``e_score_correction_bias`` added to the
+    selection scores only, group top-k (top-2 within each of 4 groups, top-2
+    groups kept), weights gathered from the PRE-bias scores, renorm,
+    routed scaling -- returning the full ``(router_logits, topk_weights,
+    topk_indices)`` contract the adapter's telemetry and mask hooks read.
+    One router instance is SHARED by all 42 sparse blocks (the fake is a
+    mechanics fixture; per-layer weights are not under test) so the stack
+    stays small and hashing stays fast. Random weights -- mechanics only."""
     from asea.capability_build.adapters.glm53_flash import Glm53FlashAdapter
+
+    class FakeGlm5NextTextTopkRouter(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            torch.manual_seed(5)
+            self.weight = torch.nn.Parameter(
+                torch.randn(288, 4096) * 0.02
+            )
+            self.e_score_correction_bias = torch.zeros(288)
+            self.top_k = 8
+            self.num_experts = 288
+            self.num_group = 4
+            self.topk_group = 2
+            self.norm_topk_prob = True
+            self.routed_scaling_factor = 2.5
+
+        def forward(self, hidden):
+            functional = torch.nn.functional
+            router_logits = functional.linear(hidden.float(), self.weight.float())
+            scores = torch.sigmoid(router_logits)
+            scores_for_choice = scores + self.e_score_correction_bias.to(scores.dtype)
+            group_scores = (
+                scores_for_choice.view(-1, self.num_group, self.num_experts // self.num_group)
+                .topk(2, dim=-1)[0]
+                .sum(dim=-1)
+            )
+            group_idx = torch.topk(group_scores, k=self.topk_group, dim=-1, sorted=False)[1]
+            group_mask = torch.zeros_like(group_scores)
+            group_mask.scatter_(1, group_idx, 1)
+            score_mask = (
+                group_mask.unsqueeze(-1)
+                .expand(-1, self.num_group, self.num_experts // self.num_group)
+                .reshape(-1, self.num_experts)
+            )
+            scores_for_choice = scores_for_choice.masked_fill(
+                ~score_mask.bool(), float("-inf")
+            )
+            topk_indices = torch.topk(
+                scores_for_choice, k=self.top_k, dim=-1, sorted=False
+            )[1]
+            topk_weights = scores.gather(1, topk_indices)
+            if self.norm_topk_prob:
+                topk_weights = topk_weights / (
+                    topk_weights.sum(dim=-1, keepdim=True) + 1e-20
+                )
+            topk_weights = topk_weights * self.routed_scaling_factor
+            return router_logits, topk_weights, topk_indices
 
     class Glm5NextForCausalLM(torch.nn.Module):  # accepted class name
         def __init__(self):
             super().__init__()
             self.model = torch.nn.Module()
             self.model.layers = torch.nn.ModuleList()
+            router = FakeGlm5NextTextTopkRouter()
             for index in range(45):
                 block = torch.nn.Module()
                 if index < 3:
-                    block.mlp = torch.nn.Linear(8, 8)  # dense: no "experts"
+                    block.mlp = torch.nn.Linear(4096, 4)  # dense: no "experts"
                 else:
-                    block.experts = torch.nn.Module()
-                    block.experts.router = torch.nn.Linear(8, 288)
+                    block.mlp = torch.nn.Module()
+                    block.mlp.gate = router  # the REAL module name
+                    block.mlp.experts = torch.nn.Module()
                 self.model.layers.append(block)
-            self.vision_tower = torch.nn.Linear(8, 8)
+            self.vision_tower = torch.nn.Linear(4096, 4)
 
     class Cfg:
         pass
@@ -733,7 +790,6 @@ def _fake_glm_router_stack(torch):
     cfg.n_routed_experts = 288
     cfg.n_shared_experts = 1
     cfg.num_experts_per_tok = 8
-    cfg.scoring_func = "sigmoid"
     cfg.first_k_dense_replace = 3
     cfg.hidden_size = 4096
     cfg.max_position_embeddings = 1_048_576
@@ -742,41 +798,66 @@ def _fake_glm_router_stack(torch):
 
 
 def test_glm_mask_suppresses_expert_and_restore_succeeds():
-    """Defect fix: the mask is a router-OUTPUT forward hook, not a
-    weight-row rewrite. The old ``-30`` row made the masked expert's
-    logit ``-30 * sum(hidden)`` -- STRONGLY POSITIVE for negative-sum
-    hidden states, i.e. it INCREASED the selection probability. The hook
-    gives ``-1e9`` for every token, input-independent, and touches no
-    weights: the teacher verifies hash-unchanged even while masked."""
+    """Defect fix (external audit 2026-09-19): the mask must rewrite the
+    router's FULL output tuple. The v5.16.1 router returns
+    ``(router_logits, topk_weights, topk_indices)`` -- the dispatch lives in
+    the tuple, so the old hook that rewrote only ``output[0]`` (the logits)
+    changed NOTHING the MoE consumes and masked interventions silently
+    measured an UNMASKED teacher. The hook now also recomputes the
+    selection under the exact routing equation with the masked expert
+    forced to ``-inf`` BEFORE the group stage (a nonzero
+    ``e_score_correction_bias`` added after a ``-1e9`` logit could
+    otherwise push the masked expert back into the top-8). No weights are
+    touched, ever: the teacher verifies hash-unchanged even while
+    masked."""
     torch = pytest.importorskip("torch")
     adapter = _fake_glm_router_stack(torch)
     target = InterventionTarget("expert", 0, 17)
     _, block = adapter.layers[0]
     router = adapter._router_of(block)[1]
-    hidden = -torch.ones(3, 8)  # NEGATIVE-sum hidden states
-    # the OLD mechanism would have produced a POSITIVE logit on this input
-    assert -30.0 * float(hidden.sum(dim=-1)[0]) > 0
+    hidden = -torch.ones(3, 4096)  # NEGATIVE-sum hidden states
     adapter.freeze_baseline()
     with torch.no_grad():
-        baseline = router(hidden).clone()
+        base_logits, base_weights, base_indices = router(hidden)
+    # a nonzero correction bias must push expert 17 into the UNMASKED
+    # dispatch (sigmoid(logits) may be low, but the +5 bias added to the
+    # selection scores wins the top-8) -- this is the exact condition that
+    # silently defeats a naive "-1e9 logit" mask
+    router.e_score_correction_bias[17] = 5.0
+    with torch.no_grad():
+        _, _, biased_indices = router(hidden)
+    assert 17 in biased_indices.reshape(-1).tolist()
     result = adapter.temporary_mask(target)
     assert result["weights_modified"] is False
-    assert result["mechanism"] == "router_output_forward_hook"
+    assert result["mechanism"] == "router_output_forward_hook_full_tuple"
     with torch.no_grad():
-        masked = router(hidden)
-        assert torch.all(masked[:, 17] == -1.0e9)
+        # the SAME bias stays set: the mask must suppress 17 anyway,
+        # because the suppression hits the selection scores BEFORE the
+        # bias is added -- not just the logits
+        masked_logits, masked_weights, masked_indices = router(hidden)
+        # the masked expert's logit is -1e9 for every token, and the OTHER
+        # experts' logits are untouched
+        assert torch.all(masked_logits[:, 17] == -1.0e9)
         others = [e for e in range(288) if e != 17]
-        assert torch.equal(masked[:, others], baseline[:, others])
-        # the masked expert can never enter the top-8 selection
-        top = torch.sigmoid(masked).topk(8, dim=-1).indices
-        assert 17 not in top.reshape(-1).tolist()
+        assert torch.equal(masked_logits[:, others], base_logits[:, others])
+        # the masked expert can never enter the dispatched top-8, bias or no
+        assert 17 not in masked_indices.reshape(-1).tolist()
+        # every token still dispatches exactly 8 experts whose weights are
+        # the recomputed pre-bias gather (finite, rescaled)
+        assert masked_indices.shape == base_indices.shape
+        assert torch.isfinite(masked_weights).all()
+    router.e_score_correction_bias[17] = 0.0
     # weights were never modified: unchanged holds DURING the mask window
     assert adapter.verify_unchanged()["unchanged"] is True
+    assert adapter.active_masks() == ["3:expert:0/17"]
     restored = adapter.restore_mask(target)
     assert restored["restored"] is True
     assert restored["weights_modified"] is False
     with torch.no_grad():
-        assert torch.equal(router(hidden), baseline)
+        again = router(hidden)
+        assert torch.equal(again[0], base_logits)
+        assert torch.equal(again[1], base_weights)
+        assert torch.equal(again[2], base_indices)
     assert adapter.verify_unchanged()["unchanged"] is True
 
 
@@ -881,6 +962,459 @@ def test_evaluate_code_cases_validates_cases():
 
 
 # ---------------------------------------------------------------------------
+# Audit 2026-09-19 fix: authored-denominator accounting. The previous
+# release counted only boolean-matched verdicts, so every check the oracle
+# could not judge (candidate import/call error, timeout, resource kill)
+# silently vanished from the denominator and INFLATED every rate -- the
+# defect that produced the wrong published A/B numbers (held-out was
+# reported as improved when it had regressed). These tests pin the
+# corrected contract; each was verified to FAIL on the pre-fix code.
+# ---------------------------------------------------------------------------
+
+def _fake_oracle(monkeypatch, result):
+    import asea.capability_build.evaluation as evaluation_module
+
+    def fake_evaluate_functions(source, cases, limits=None, trace_policy=None):
+        return result
+
+    monkeypatch.setattr(evaluation_module, "require_sandbox", lambda: None)
+    import asea.certification.function_oracle as oracle_module
+
+    monkeypatch.setattr(oracle_module, "evaluate_functions", fake_evaluate_functions)
+
+
+def _ab_cases(n=3):
+    return [
+        {"id": "c%d" % i, "group": "target" if i < n - 1 else "control",
+         "function": "f", "args": [i], "kwargs": {}, "expected": i}
+        for i in range(n)
+    ]
+
+
+def test_evaluate_counts_candidate_errors_as_failed_checks(monkeypatch):
+    """The headline defect: a candidate that crashed on call made its whole
+    case disappear from the denominator (judged_cases=0, rate inflated for
+    every other case). Authored-denominator contract: those checks count as
+    FAILED, pass_rate is over the authored total and is 0.0 (not None) when
+    nothing could be judged."""
+    _fake_oracle(monkeypatch, {
+        "status": "FAILED",
+        "cases": [],  # the oracle returns nothing for a crashed candidate
+        "diagnostic": {"event": "candidate_error",
+                       "candidate_error": {"type_code": "ValueError"}},
+    })
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    result = evaluate_code_cases("def f(i):\n    raise ValueError('boom')\n", _ab_cases())
+    assert result["authored_cases"] == 3
+    assert result["judged_cases"] == 0
+    assert result["unjudged_cases"] == 3
+    assert result["passed_cases"] == 0
+    assert result["failed_cases"] == 3
+    assert result["pass_rate"] == 0.0          # authored denominator, not None
+    assert result["judged_pass_rate"] is None  # diagnostic only
+    assert result["status"] == "FAILED"
+    assert result["groups"]["target"] == {
+        "passed": 0, "total": 2, "unjudged": 2, "pass_rate": 0.0}
+    assert result["groups"]["control"] == {
+        "passed": 0, "total": 1, "unjudged": 1, "pass_rate": 0.0}
+
+
+def test_evaluate_partial_oracle_response_counts_missing_checks_failed(monkeypatch):
+    """A partial oracle response (some cases judged, others lost to an
+    aborted run) must not shrink the denominator to the surviving subset."""
+    _fake_oracle(monkeypatch, {
+        "status": "FAILED",
+        "cases": [{"id": "c0", "matched": True}],
+        "diagnostic": {"event": "candidate_error", "candidate_error": None},
+    })
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    result = evaluate_code_cases("def f(i):\n    return i\n", _ab_cases())
+    assert result["authored_cases"] == 3
+    assert result["judged_cases"] == 1
+    assert result["unjudged_cases"] == 2
+    assert result["passed_cases"] == 1
+    assert result["pass_rate"] == 1 / 3
+    assert result["judged_pass_rate"] == 1.0
+
+
+def test_evaluate_unsupported_return_value_is_a_judged_failure(monkeypatch):
+    """An executed check whose output does not match is judged False: it
+    lands in the judged set and deflates the rate -- never dropped."""
+    _fake_oracle(monkeypatch, {
+        "status": "FAILED",
+        "cases": [{"id": "c0", "matched": False},
+                  {"id": "c1", "matched": False},
+                  {"id": "c2", "matched": False}],
+    })
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    result = evaluate_code_cases("def f(i):\n    return None\n", _ab_cases())
+    assert result["judged_cases"] == 3
+    assert result["unjudged_cases"] == 0
+    assert result["pass_rate"] == 0.0
+    assert result["judged_pass_rate"] == 0.0
+
+
+def test_evaluate_refuses_unknown_duplicate_and_verdictless_cases(monkeypatch):
+    """The oracle response is host-owned evidence: an id that was never
+    authored, a duplicated id, or a verdictless entry is a contract
+    violation -- refuse the whole report rather than grade on it."""
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    _fake_oracle(monkeypatch, {"status": "FAILED",
+                               "cases": [{"id": "cX", "matched": True}]})
+    with pytest.raises(ValueError, match="not authored"):
+        evaluate_code_cases("def f(i): return i", _ab_cases())
+
+    _fake_oracle(monkeypatch, {"status": "FAILED",
+                               "cases": [{"id": "c0", "matched": True},
+                                         {"id": "c0", "matched": True}]})
+    with pytest.raises(ValueError, match="duplicate"):
+        evaluate_code_cases("def f(i): return i", _ab_cases())
+
+    _fake_oracle(monkeypatch, {"status": "FAILED",
+                               "cases": [{"id": "c0", "matched": None}]})
+    with pytest.raises(ValueError, match="no boolean verdict"):
+        evaluate_code_cases("def f(i): return i", _ab_cases())
+
+
+def test_evaluate_refuses_missing_status_never_defaults_to_measured(monkeypatch):
+    """A missing oracle status must refuse the report; the previous release
+    silently defaulted it to 'measured'."""
+    _fake_oracle(monkeypatch, {"cases": [{"id": "c0", "matched": True}]})
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    with pytest.raises(ValueError, match="no status"):
+        evaluate_code_cases("def f(i): return i", _ab_cases())
+
+
+def test_evaluate_duplicate_authored_case_id_is_refused(monkeypatch):
+    _fake_oracle(monkeypatch, {"status": "PASSED", "cases": []})
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    with pytest.raises(ValueError, match="duplicate oracle case id"):
+        evaluate_code_cases("def f(i): return i", [
+            {"id": "c0", "group": "target", "function": "f",
+             "args": [0], "kwargs": {}, "expected": 0},
+            {"id": "c0", "group": "target", "function": "f",
+             "args": [1], "kwargs": {}, "expected": 1},
+        ])
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="real host oracle needs the Linux sandbox")
+def test_evaluate_code_cases_real_oracle_counts_crashed_candidate_as_failed():
+    """REAL integration companion to the mechanism tests: a candidate that
+    raises on call, through the actual Linux sandbox. Every authored check
+    must count as failed (0.0 pass rate over the authored denominator), the
+    candidate-error diagnostic must be preserved, and the status must be
+    the oracle's real one. Skips honestly where containment is unavailable."""
+    from asea.certification import sandbox as _sandbox
+
+    probe = _sandbox.probe_code_sandbox()
+    if not probe.supported:
+        pytest.skip("actual Linux containment unavailable: " + probe.reason + probe.stderr)
+    assert probe.passed
+    from asea.capability_build.evaluation import evaluate_code_cases
+
+    source = "def add(a, b):\n    raise ValueError('candidate crashed')\n"
+    cases = [
+        {"id": "t1", "group": "target", "function": "add",
+         "args": [1, 2], "kwargs": {}, "expected": 3},
+        {"id": "t2", "group": "target", "function": "add",
+         "args": [2, 2], "kwargs": {}, "expected": 4},
+        {"id": "c1", "group": "control", "function": "add",
+         "args": [0, 0], "kwargs": {}, "expected": 0},
+    ]
+    result = evaluate_code_cases(source, cases)
+    assert result["blocked"] is False
+    assert result["authored_cases"] == 3
+    assert result["judged_cases"] == 0
+    assert result["unjudged_cases"] == 3
+    assert result["passed_cases"] == 0
+    assert result["pass_rate"] == 0.0
+    assert result["status"] in ("FAILED", "TIMEOUT", "RESOURCE_LIMIT")
+    diagnostic = result["oracle"].get("diagnostic") or {}
+    assert diagnostic.get("event") == "candidate_error"
+
+
+# ---------------------------------------------------------------------------
+# Audit 2026-09-19 item 8: the intervention generation+judging loop. The
+# worker-side ``generate`` op plus make_worker_judge replace the old
+# "generation+judging stage not wired" refusal; these tests pin the judge
+# contract (regenerate under the CURRENT state, grade through the host
+# oracle, refuse contaminated state attribution).
+# ---------------------------------------------------------------------------
+
+class _FakeWorkerClient:
+    """Minimal worker-protocol stand-in: records requests, replays scripted
+    ``generate`` responses. MECHANISM test: no GLM, no Docker."""
+
+    def __init__(self, completions=None, active_masks=None):
+        self.requests = []
+        self._completions = list(completions or [])
+        self._active_masks = list(active_masks or [])
+
+    def request(self, op, payload):
+        self.requests.append((op, payload))
+        if op == "generate":
+            item = self._completions.pop(0)
+            return {"per_prompt": [dict(item)],
+                    "active_masks": list(self._active_masks)}
+        raise AssertionError("unexpected worker op %r" % op)
+
+
+def _judge_case(sample_id="s1", group="target", frames=None, prompt="write f"):
+    return {
+        "sample_id": sample_id, "group": group, "prompt": prompt,
+        "oracle": frames if frames is not None else [
+            {"id": "o1", "function": "f", "args": [2],
+             "kwargs": {}, "expected": 4},
+        ],
+    }
+
+
+def test_extract_candidate_code_matches_pilot_rules():
+    from asea.capability_build.evaluation import extract_candidate_code
+
+    # the LAST fenced python block wins
+    text = "intro\n```python\ndef f():\n    return 1\n```\nmore\n```python\ndef g():\n    return 2\n```\n"
+    assert "def g" in extract_candidate_code(text)
+    # no fence but a def: the whole response is the candidate
+    assert "def f" in extract_candidate_code("Sure:\ndef f(x):\n    return x")
+    # nothing extractable: candidate error (None, never a guess)
+    assert extract_candidate_code("I cannot help with that.") is None
+    assert extract_candidate_code("") is None
+
+
+def test_worker_judge_refuses_cases_without_oracle_frames():
+    from asea.capability_build.evaluation import make_worker_judge
+
+    judge = make_worker_judge(_FakeWorkerClient())
+    with pytest.raises(InterventionInvalid, match="oracle frames"):
+        judge({"sample_id": "s1", "group": "target", "prompt": "p"},
+              {"phase": "base", "masked_component": None})
+
+
+def test_worker_judge_validates_frame_shape():
+    from asea.capability_build.evaluation import make_worker_judge
+
+    judge = make_worker_judge(_FakeWorkerClient())
+    case = _judge_case(frames=[{"id": "o1", "function": "f", "args": [1]}])
+    with pytest.raises(InterventionInvalid, match="expected"):
+        judge(case, {"phase": "base", "masked_component": None})
+    case = _judge_case(frames=[
+        {"id": "o1", "function": "f", "args": [1], "kwargs": {}, "expected": 1},
+        {"id": "o1", "function": "f", "args": [2], "kwargs": {}, "expected": 2},
+    ])
+    with pytest.raises(InterventionInvalid, match="reuses oracle frame id"):
+        judge(case, {"phase": "base", "masked_component": None})
+
+
+def test_worker_judge_refuses_contaminated_state_attribution():
+    """The state-contamination guard: a verdict labeled "base" generated
+    under a live mask (or labeled "masked" with no mask live) is refused
+    by name -- the base and masked arms of an intervention must never be
+    cross-contaminated silently."""
+    from asea.capability_build.evaluation import make_worker_judge
+
+    case = _judge_case()
+    # base phase, but the worker reports a live mask
+    client = _FakeWorkerClient(
+        completions=[{"sample_id": "s1", "group": "target",
+                      "completion": "```python\ndef f(i):\n    return i * i\n```",
+                      "new_tokens": 20}],
+        active_masks=["3:expert:0/17"])
+    with pytest.raises(InterventionInvalid, match="not a baseline"):
+        make_worker_judge(client)(case, {"phase": "base", "masked_component": None})
+    # masked phase, but the worker reports NO live mask
+    client = _FakeWorkerClient(
+        completions=[{"sample_id": "s1", "group": "target", "completion": "x"}],
+        active_masks=[])
+    with pytest.raises(InterventionInvalid, match="NO active masks"):
+        make_worker_judge(client)(case, {"phase": "masked",
+                                         "masked_component": "expert:0/17"})
+
+
+def test_worker_judge_regenerates_and_grades_through_oracle(monkeypatch):
+    """The full verdict path: the judge regenerates the completion under
+    the CURRENT state, extracts the candidate with the pilot's rule, and
+    grades it through the (faked) host oracle over the case's authored
+    frames -- all frames must pass. A completion with no extractable code
+    is a candidate error: FAILED, never silently absent."""
+    seen = {}
+
+    def fake_evaluate_functions(source, cases, limits=None, trace_policy=None):
+        seen["source"] = source
+        seen["cases"] = cases
+        return {"status": "OK",
+                "cases": [{"id": c["id"], "matched": True} for c in cases]}
+
+    import asea.capability_build.evaluation as evaluation_module
+    import asea.certification.function_oracle as oracle_module
+
+    monkeypatch.setattr(evaluation_module, "require_sandbox", lambda: None)
+    monkeypatch.setattr(oracle_module, "evaluate_functions", fake_evaluate_functions)
+    from asea.capability_build.evaluation import make_worker_judge
+
+    completion = "Reasoning...\n```python\ndef f(i):\n    return i * i\n```"
+    client = _FakeWorkerClient(completions=[
+        {"sample_id": "s1", "group": "target", "completion": completion,
+         "new_tokens": 24}])
+    case = _judge_case()
+    verdict = make_worker_judge(client, max_new_tokens=64)(
+        case, {"phase": "base", "masked_component": None})
+    assert verdict is True
+    # the candidate the oracle graded is the EXTRACTED block verbatim
+    # (including the block's trailing newline -- the extraction rule is
+    # exact, never repaired), not the whole completion, and the oracle saw
+    # the case's authored frames
+    assert seen["source"] == "def f(i):\n    return i * i\n"
+    assert [c["id"] for c in seen["cases"]] == ["o1"]
+    # the wrapper strips the bookkeeping before the oracle sees the suite
+    # (the oracle rejects any extra key, by contract)
+    assert "group" not in seen["cases"][0]
+    # the generation request carried the case's prompt and the knob
+    op, payload = client.requests[0]
+    assert op == "generate"
+    assert payload["prompts"][0]["prompt"] == "write f"
+    assert payload["max_new_tokens"] == 64
+
+    # a completion with no extractable code: candidate error -> False, and
+    # the oracle is never even asked
+    client = _FakeWorkerClient(completions=[
+        {"sample_id": "s1", "group": "target", "completion": "no code here",
+         "new_tokens": 4}])
+    assert make_worker_judge(client)(case, {"phase": "base",
+                                           "masked_component": None}) is False
+
+
+def test_worker_intervention_adapter_proxies_protocol_ops():
+    """run_intervention's adapter contract proxied to the worker: verify/
+    mask/restore are worker ops carrying the component as a dict."""
+    from asea.capability_build.__main__ import _WorkerInterventionAdapter
+    from asea.capability_build.intervention import InterventionTarget
+
+    class _RecordingClient:
+        def __init__(self):
+            self.requests = []
+
+        def request(self, op, payload):
+            self.requests.append((op, payload))
+            return {"unchanged": True, "active_masks": []}
+
+    client = _RecordingClient()
+    adapter = _WorkerInterventionAdapter(client)
+    component = InterventionTarget("expert", 0, 17)
+    assert adapter.verify_unchanged() == {"unchanged": True, "active_masks": []}
+    assert adapter.temporary_mask(component) is not None
+    assert adapter.restore_mask(component) is not None
+    assert [(op, payload) for op, payload in client.requests] == [
+        ("verify", {}),
+        ("mask", {"target": {"kind": "expert", "layer": 0, "expert_id": 17}}),
+        ("restore", {"target": {"kind": "expert", "layer": 0, "expert_id": 17}}),
+    ]
+
+
+def test_worker_judge_end_to_end_intervention_through_fake_worker(monkeypatch):
+    """The WHOLE item-8 loop end to end at mechanism scale: run_intervention
+    drives the worker facade -- verify-clean, base arm generates+judges
+    every case, mask ON, masked arm repeats the IDENTICAL cases, mask OFF,
+    verify-clean -- and the drops reflect the two arms' different verdicts.
+    A replay judge could never produce a nonzero drop here; this test
+    fails if the judge ignores the teacher state."""
+    def fake_evaluate_functions(source, cases, limits=None, trace_policy=None):
+        # base-arm candidates always pass; the masked arm never reaches the
+        # oracle at all (its completion has no extractable code)
+        return {"status": "OK",
+                "cases": [{"id": c["id"], "matched": True} for c in cases]}
+
+    import asea.capability_build.evaluation as evaluation_module
+    import asea.certification.function_oracle as oracle_module
+
+    monkeypatch.setattr(evaluation_module, "require_sandbox", lambda: None)
+    monkeypatch.setattr(oracle_module, "evaluate_functions", fake_evaluate_functions)
+    from asea.capability_build.__main__ import _WorkerInterventionAdapter
+    from asea.capability_build.evaluation import make_worker_judge
+    from asea.capability_build.intervention import InterventionTarget, run_intervention
+
+    class _StateAwareClient:
+        """Simulates the worker: masks toggle what generate returns, and
+        the live-mask registry is reported with every generation exactly as
+        the real worker does."""
+
+        def __init__(self):
+            self.requests = []
+            self.masked = None
+
+        def request(self, op, payload):
+            self.requests.append((op, payload))
+            if op == "verify":
+                return {"unchanged": True, "detail": "hash-identical",
+                        "active_masks": [] if self.masked is None
+                        else [self.masked]}
+            if op == "mask":
+                self.masked = "3:expert:0/17"
+                return {"key": self.masked, "weights_modified": False}
+            if op == "restore":
+                self.masked = None
+                return {"restored": True, "weights_modified": False}
+            if op == "generate":
+                sample = payload["prompts"][0]
+                completion = (
+                    "```python\ndef f(i):\n    return i * i\n```"
+                    if self.masked is None else "no code"
+                )
+                return {"per_prompt": [{
+                            "sample_id": sample["sample_id"],
+                            "group": sample["group"],
+                            "completion": completion, "new_tokens": 12}],
+                        "active_masks": [] if self.masked is None
+                        else [self.masked]}
+            raise AssertionError("unexpected op %r" % op)
+
+    client = _StateAwareClient()
+    frames = [{"id": "o1", "function": "f", "args": [2],
+               "kwargs": {}, "expected": 4}]
+    cases = [
+        {"sample_id": "t%d" % i, "group": "target", "prompt": "p",
+         "oracle": frames} for i in range(2)
+    ] + [
+        {"sample_id": "c%d" % i, "group": "control", "prompt": "p",
+         "oracle": frames} for i in range(2)
+    ]
+    entry = run_intervention(
+        _WorkerInterventionAdapter(client),
+        InterventionTarget("expert", 0, 17),
+        target_cases=[c for c in cases if c["group"] == "target"],
+        control_cases=[c for c in cases if c["group"] == "control"],
+        judge=make_worker_judge(client, max_new_tokens=32),
+        seed=0,
+    )
+    # base arm: code extracted, oracle verdicts all True (rate 1.0);
+    # masked arm: "no code" -> candidate error -> False (rate 0.0)
+    assert entry.target_drop == 1.0
+    assert entry.control_drop == 1.0
+    assert entry.restored_and_verified is True
+    # the protocol ran in order: verify, base generations, mask, masked
+    # generations, restore -- and the mask was OFF again afterwards
+    ops = [op for op, _ in client.requests]
+    assert ops[0] == "verify"
+    assert "mask" in ops and "restore" in ops
+    assert ops.index("mask") < ops.index("restore")
+    assert client.masked is None
+    # the masked arm generated under the SAME case set in the same seeded
+    # order (identical prompts appear once per case per arm: 4 cases x 2
+    # arms = 8 generation requests)
+    generate_payloads = [p for op, p in client.requests if op == "generate"]
+    assert len(generate_payloads) == 8
+    base_prompts = [p["prompts"][0]["sample_id"] for p in generate_payloads[:4]]
+    masked_prompts = [p["prompts"][0]["sample_id"] for p in generate_payloads[4:]]
+    assert sorted(base_prompts) == sorted(masked_prompts)
+
+
+# ---------------------------------------------------------------------------
 # CLI (in-process: exit codes and JSON contract)
 # ---------------------------------------------------------------------------
 
@@ -934,8 +1468,18 @@ def test_cli_pending_commands_refuse_honestly(tmp_path, capsys):
 def test_cli_intervene_needs_internal_spec(tmp_path, capsys):
     from asea.capability_build.__main__ import main
 
+    cases = tmp_path / "cases.json"
+    cases.write_text(json.dumps([
+        {"sample_id": "t1", "group": "target", "prompt": "p",
+         "oracle": [{"id": "o1", "function": "f", "args": [1],
+                     "kwargs": {}, "expected": 1}]},
+        {"sample_id": "c1", "group": "control", "prompt": "p",
+         "oracle": [{"id": "o1", "function": "f", "args": [2],
+                     "kwargs": {}, "expected": 2}]},
+    ]), encoding="utf-8")
     code = main(["intervene", "--spec", _write_spec(tmp_path),
                  "--workspace", str(tmp_path / "ws"),
+                 "--cases", str(cases),
                  "--component", "expert:3/7"])
     assert code == 2
     payload = json.loads(capsys.readouterr().out)
@@ -1858,10 +2402,15 @@ def test_evaluate_code_cases_real_oracle_groups():
     ]
     result = evaluate_code_cases(source, cases)
     assert result["blocked"] is False
+    assert result["authored_cases"] == 3
     assert result["judged_cases"] == 3
+    assert result["unjudged_cases"] == 0
     assert result["passed_cases"] == 2
-    assert result["groups"]["target"] == {"passed": 1, "total": 2, "pass_rate": 0.5}
-    assert result["groups"]["control"] == {"passed": 1, "total": 1, "pass_rate": 1.0}
+    assert result["pass_rate"] == 2 / 3
+    assert result["groups"]["target"] == {
+        "passed": 1, "total": 2, "unjudged": 0, "pass_rate": 0.5}
+    assert result["groups"]["control"] == {
+        "passed": 1, "total": 1, "unjudged": 0, "pass_rate": 1.0}
 
 
 @pytest.mark.skipif(sys.platform != "linux", reason="real host oracle needs the Linux sandbox")
@@ -2068,7 +2617,7 @@ def test_glm_verify_reports_active_masks_and_hooks_are_idempotent():
     # leaked first registration.
     _, block = adapter.layers[0]
     router = adapter._router_of(block)[1]
-    hidden = torch.ones(3, 8)
+    hidden = torch.ones(3, 4096)  # the faithful replica's hidden width
     adapter.register_router_hooks()
     with torch.no_grad():
         router(hidden)
@@ -2467,31 +3016,88 @@ def test_worker_unknown_op_reports_invalid_op_kind(tmp_path):
     assert "definitely_not_an_op" in response["error"]["message"]
 
 
-def test_glm_adapter_refuses_bias_corrected_router_configs():
-    """Defect fix (F10): a config with ``e_score_correction_bias=True``
-    biases expert scores before top-k, so plain sigmoid-mass telemetry
-    would accumulate usage under a scoring rule that was never in effect.
-    The adapter refuses the config instead of misreporting usage
-    evidence. MECHANISM test on the exact-shape fake stack."""
+def test_glm_telemetry_captures_real_bias_corrected_dispatch():
+    """Defect fix (external audit 2026-09-19, replaces the old
+    bias-REFUSAL test): the real transformers 5.16.1
+    ``Glm5NextTextTopkRouter`` ALWAYS carries an ``e_score_correction_bias``
+    buffer, and the GLM config declares no ``scoring_func`` field at all.
+    The old adapter refused a config boolean named
+    ``e_score_correction_bias`` -- a field the real config never has -- so
+    it would refuse the REAL model while claiming a sigmoid-topk equation
+    that was never in effect. The corrected adapter accepts the biased
+    router and records the ACTUAL dispatched experts from the router's own
+    ``(logits, topk_weights, topk_indices)`` output: usage evidence under
+    the equation truly in effect, never a re-derived plain-sigmoid
+    approximation. MECHANISM test on the exact-shape faithful-replica
+    stack."""
     torch = pytest.importorskip("torch")
     adapter = _fake_glm_router_stack(torch)
-    # the accepted config carries the flag False
-    assert adapter.inspection["e_score_correction_bias"] is False
-    # an otherwise-exact config with the bias enabled is refused by name
-    cfg = adapter.config
-    cfg.e_score_correction_bias = True
-    with pytest.raises(InterventionInvalid) as excinfo:
-        from asea.capability_build.adapters.glm53_flash import detect_architecture
+    _, block = adapter.layers[0]
+    router = adapter._router_of(block)[1]
+    hidden = torch.ones(3, 4096)
+    # bias expert 17 into every token's dispatch: plain sigmoid-mass
+    # telemetry would not see this as usage, the real dispatch does
+    router.e_score_correction_bias[17] = 5.0
+    adapter.register_router_hooks()
+    with torch.no_grad():
+        _, weights, indices = router(hidden)  # the hook fires on this pass
+    collected = adapter.collect_routing(reset=True)["3"]
+    assert collected["correction_bias_nonzero"] is True
+    assert collected["tokens"] == 3
+    # dispatched_count is the ACTUAL dispatch: total == tokens x top-8 ...
+    assert sum(collected["dispatched_count"]) == 3 * 8
+    # ... expert 17 really dispatched under the bias ...
+    assert collected["dispatched_count"][17] > 0
+    # ... and the recorded dispatch equals a manual recount of the router's
+    # own topk ids (the hook captured the real tuple, not a re-derivation)
+    manual = torch.bincount(indices.reshape(-1).long(), minlength=288).tolist()
+    assert collected["dispatched_count"] == manual
+    # the recorded weight sums match the router's own topk_weights
+    manual_weights = torch.zeros(288).scatter_add(
+        0, indices.reshape(-1).long(), weights.reshape(-1).float()
+    ).tolist()
+    assert collected["dispatched_weight_sum"] == pytest.approx(manual_weights, abs=1e-6)
+    # the selection parameters actually in effect ride along, so a reader
+    # never has to guess which equation produced the numbers
+    assert collected["router_params"]["num_group"] == 4
+    assert collected["router_params"]["topk_group"] == 2
+    assert collected["router_params"]["norm_topk_prob"] is True
+    assert collected["router_params"]["routed_scaling_factor"] == 2.5
+    assert collected["usage_evidence_not_causal_importance"] is True
+    router.e_score_correction_bias[17] = 0.0
+    adapter.remove_router_hooks()
 
-        detect_architecture(adapter.model, cfg)
-    assert "e_score_correction_bias" in str(excinfo.value)
+
+def test_glm_telemetry_and_mask_refuse_to_be_live_together():
+    """The telemetry hook and the mask hook both sit on the same router
+    module: if telemetry is registered FIRST, it records the router's
+    UNMASKED dispatch during a masked measurement -- contaminated usage
+    evidence that looks exactly like clean data. Both directions are
+    refused (external audit 2026-09-19)."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    adapter.register_router_hooks()
+    with pytest.raises(InterventionInvalid) as excinfo:
+        adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+    assert "telemetry" in str(excinfo.value)
+    adapter.remove_router_hooks()
+    adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+    with pytest.raises(InterventionInvalid) as excinfo:
+        adapter.register_router_hooks()
+    assert "masks are active" in str(excinfo.value)
+    adapter.restore_mask(InterventionTarget("expert", 0, 5))
+    # with both sides clean, registration works again
+    adapter.register_router_hooks()
+    adapter.remove_router_hooks()
 
 
 def test_glm_hook_names_non_tensor_router_output():
-    """Defect fix (F10): a router returning a non-tensor (a transformers
-    revision changing the router's return contract) used to surface as an
-    opaque AttributeError deep inside the forward pass. The hook must
-    refuse with the layer, the router and the actual type named."""
+    """A transformers revision changing the router's return contract must
+    be refused by NAME (layer, router, actual type), never surfaced as an
+    opaque AttributeError deep inside the forward pass. The v5.16.1
+    contract is the 3-tuple ``(router_logits, topk_weights,
+    topk_indices)``; both a non-tuple return and a non-tensor INSIDE the
+    tuple are typed detection failures."""
     torch = pytest.importorskip("torch")
     adapter = _fake_glm_router_stack(torch)
     adapter.register_router_hooks()
@@ -2500,15 +3106,33 @@ def test_glm_hook_names_non_tensor_router_output():
     original_forward = router.forward
 
     def broken_forward(x):
-        return {"logits": original_forward(x)}  # a dict, not a tensor
+        return {"logits": original_forward(x)}  # a dict, not the tuple
 
     router.forward = broken_forward
     with pytest.raises(InterventionInvalid) as excinfo:
         with torch.no_grad():
-            router(torch.ones(2, 8))
+            router(torch.ones(2, 4096))
     message = str(excinfo.value)
-    assert "not a tensor" in message
     # the layer named is the TRUE layer index (layers[0] is sparse layer 3)
     assert "layer 3" in message
     assert "dict" in message
+    assert "tuple" in message
+    adapter.remove_router_hooks()
+
+    # a tuple with a non-tensor inside is the SAME class of contract break
+    adapter.register_router_hooks()
+    router = adapter._router_of(adapter.layers[0][1])[1]
+
+    def half_broken(x):
+        logits, weights, indices = original_forward(x)
+        return logits, weights.tolist(), indices  # weights as a plain list
+
+    router.forward = half_broken
+    with pytest.raises(InterventionInvalid) as excinfo:
+        with torch.no_grad():
+            router(torch.ones(2, 4096))
+    message = str(excinfo.value)
+    assert "layer 3" in message
+    assert "topk_weights" in message
+    assert "list" in message
     adapter.remove_router_hooks()

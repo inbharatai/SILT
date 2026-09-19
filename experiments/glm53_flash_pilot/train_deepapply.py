@@ -437,17 +437,35 @@ def _judge_arm(arm: str, cases: dict) -> list:
                 "oracle BLOCKED for %s (%s): %r -- refusing to grade locally"
                 % (sid, arm, result)
             )
+        authored = len(case["oracle"])
+        if int(result.get("authored_cases", -1)) != authored:
+            raise SystemExit(
+                "oracle accounting mismatch for %s (%s): reported %s authored "
+                "checks, the frozen case defines %d -- refusing the report"
+                % (sid, arm, result.get("authored_cases"), authored)
+            )
         per_check = {
             c["id"]: c.get("matched")
             for c in (result.get("oracle") or {}).get("cases", [])
         }
+        diagnostic = (result.get("oracle") or {}).get("diagnostic") or {}
         rows.append({
             "sample_id": sid, "split": case["split"], "group": case["group"],
+            # AUTHORED denominator (2026-09-19 correction): checks the oracle
+            # could not judge (candidate import/call error, timeout, resource
+            # kill) count as FAILED, never dropped. The previous release
+            # divided by the reported judged count and silently erased
+            # candidate-error cases from every rate -- the defect the
+            # published A/B numbers were corrected for.
             "passed": int(result.get("passed_cases", 0)),
-            "total": int(result.get("judged_cases", len(case["oracle"]))),
+            "total": authored,
+            "judged_cases": int(result.get("judged_cases", 0)),
+            "unjudged_checks": int(result.get("unjudged_cases", 0)),
             "per_check": per_check, "extraction": how,
             "candidate_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-            "oracle_status": result.get("status", "measured"),
+            "oracle_status": result["status"],
+            "diagnostic_event": diagnostic.get("event"),
+            "candidate_error": diagnostic.get("candidate_error"),
             "latency_ms": record["latency_ms"],
             "new_tokens": record["new_tokens"],
         })
@@ -468,6 +486,17 @@ def do_judge() -> None:
                        encoding="utf-8")
         reports[arm] = summary
         print(json.dumps({"arm": arm, "pass_rates": summary["pass_rates"]}))
+
+    # The frozen non-final dataset defines exactly 45 authored checks per
+    # arm (16 cases). A completed report whose check total differs is
+    # refused, not published (audit 2026-09-19).
+    for arm, summary in reports.items():
+        arm_total = sum(r["total"] for r in summary["cases"])
+        if arm_total != 45:
+            raise SystemExit(
+                "A/B %s arm reports %d authored checks; the frozen non-final "
+                "dataset defines 45 -- refusing the report" % (arm, arm_total)
+            )
 
     base_rates = reports["base"]["pass_rates"]
     adapter_rates = reports["adapter"]["pass_rates"]

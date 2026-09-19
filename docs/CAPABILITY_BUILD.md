@@ -186,9 +186,19 @@ evidence plus DeepApply/Gate 2 admission could ever change that).
   placeholder results. Their library implementations exist (`search.py`;
   reduction candidates and SiltSpring certification are Phase 8 live work that
   needs admitted candidate models).
-* The open-weight intervention loop is wired up to worker `hello`, then refuses
-  honestly that the generation+judging stage inside the worker is not in this
-  build.
+* The open-weight intervention loop is **wired end to end in code** (audit
+  2026-09-19, correction order item 8): the worker exposes a `generate` op
+  (completions under the current mask state, live masks reported with every
+  generation), the `intervene` CLI command drives the full protocol —
+  hash-verify, base arm generates + judges every case through the host
+  oracle, mask, masked arm repeats the identical cases, restore,
+  re-verify — and the judge (`make_worker_judge`) regenerates under the
+  CURRENT state and refuses by name when the worker's reported mask set
+  contradicts the phase it is scoring. What is **not** executed: the worker
+  itself has never run on teacher-sized hardware, so no GLM intervention
+  has been MEASURED (the loop's every live invocation still honestly
+  reports `BLOCKED_RESOURCE` on small hosts); that is the open operational
+  chain work.
 * No live student baseline, no DeepApply training run, no SiltSpring state
   certification has been executed. Nothing has been admitted anywhere.
 
@@ -342,37 +352,65 @@ REAL production trainer, never a re-implementation
 * **Independent judgment (the trainer never certifies itself).** The `judge`
   stage reuses the SAME strict extraction rule and the SAME host oracle as the
   teacher/student judgments (imported from `judge_pilot.py`, deliberately not
-  re-implemented so the A/B cannot drift). Measured check pass rates:
+  re-implemented so the A/B cannot drift). Measured check pass rates —
+  **CORRECTED 2026-09-19** under authored-denominator accounting (see the
+  scoring-correction bullet below; the originally published table divided by
+  the *reported judged* totals, which silently dropped candidate-error cases
+  and inflated the rates):
 
   | Split (checks) | base (no adapter) | + trained adapter | Δ |
   |---|---|---|---|
-  | training | 0.8421 | 0.4615 | **−0.3806** |
+  | training | 0.8421 | 0.3158 | **−0.5263** |
   | development | 0.6667 | 0.8889 | **+0.2222** |
-  | heldout | 0.8889 | 1.0000 | **+0.1111** |
-  | controls (utility writing) | 0.5000 | 0.5000 | 0.0000 |
-  | **target checks (aggregate)** | **0.8108** | **0.7143** | **−0.0965** |
+  | heldout | 0.8889 | 0.6667 | **−0.2222** |
+  | controls (utility writing) | 0.2500 | 0.5000 | **+0.2500** |
+  | **target checks (aggregate)** | **0.8108** | **0.5405** | **−0.2703** |
 
-  **A genuinely mixed result, recorded as such.** The untouched held-out split
-  improved (0.8889 → 1.0) and development improved, with no control regression
-  — but the AGGREGATE target rate regressed, driven by a large training-split
-  drop. Root causes are visible in the artifacts: on `chunk_v1` the adapter
-  produced a confidently wrong "fix" (an added divisibility precondition that
-  raises `ValueError` on the remainder check — the oracle aborts the case as
-  `candidate_error`, 0/0 judged), and `slugify_v1` regressed to 0/3. The
-  adapter moved the student's FORMAT toward the teacher while degrading some
-  answers. With 6 KD pairs this is a mechanism-scale training set: the honest
-  verdict is "held-out improved on 9 checks, aggregate regressed, nothing
-  admitted", NOT "distillation works" and NOT "distillation fails".
-* **Receipt (second record, first untouched).** The append-only store keeps
-  the 2026-09-18 record; a second receipt
-  (`pilot-receipt-training.unsigned.json`, command
-  `glm53-flash-pilot-training`) adds `measurements.deepapply_training`, fills
-  `capability_retention` = 0.7143 / 0.8649 = **0.8259** (the `search.py`
-  definition: adapter target checks / teacher target checks — a CROSS-PATH
-  ratio: the teacher number is from the cloud-teacher run, the adapter number
-  from the deterministic local HF path; recorded as a ratio, not a
-  like-for-like comparison) and `control_regressions.ab_control_checks_delta`
-  = 0.0. Signed and verified; both records verify against the same key.
+  **A net negative target result, recorded as such.** The trained adapter
+  REGRESSED the measured target capability overall: both the training split
+  (0.8421 → 0.3158) and the untouched held-out split (0.8889 → 0.6667) dropped,
+  while development (+0.2222) and the controls split (+0.25) improved. Root
+  causes are visible in the artifacts: the adapter produced confidently wrong
+  "fixes" on trained cases (e.g. `chunk_v1`: an added divisibility precondition
+  that raises `ValueError` on the remainder check — the oracle aborts the case
+  as `candidate_error`, and under the corrected accounting those authored
+  checks count as FAILED, not as absent), and the earlier "held-out improved
+  0.8889 → 1.0" claim was an artifact of exactly that accounting defect. With
+  6 KD pairs this is a mechanism-scale training set: the honest verdict is
+  "the adapter degraded the measured target capability; development and
+  controls improved; nothing admitted", NOT "distillation works" and NOT
+  "distillation fails".
+* **Scoring correction (2026-09-19, external audit).** A read-only audit of
+  the committed record found the denominator defect: every functional pass
+  rate divided by the *reported judged* totals, so five candidate-error
+  cases (oracle 0/0 rows: base `greeting_format_v1`/`price_total_v1`, adapter
+  `capitalize_words_v1`/`chunk_v1`/`transpose_rows_v1`) silently vanished from
+  the A/B denominators and inflated the published rates. Fixed at the root —
+  `evaluate_code_cases` now uses the frozen *authored* oracle count as the
+  denominator, counts unjudged checks as FAILED, and hard-refuses
+  missing-status/partial/duplicate/unknown oracle responses (regression
+  tests verified fail-on-old) — and both arms were re-graded from the frozen
+  responses (no new generation; the final split stays sealed): every case the
+  committed judgment graded in full reproduced byte-for-byte, so the
+  recomputation changed nothing except restoring the five dropped cases to
+  the denominators. Corrected artifacts live alongside the frozen originals
+  (`judgment-ab-*-corrected.json`, `training-report-corrected.json`);
+  the superseded files are preserved unmodified as invalidated history.
+  The 2026-09-18 teacher/student judged numbers are IMMUNE (no denominator
+  drops in either run) and stand unchanged.
+* **Receipt (correction record, old records preserved).** The append-only
+  store keeps the 2026-09-18 record and the superseded 2026-09-19 training
+  record; a third receipt (`pilot-receipt-correction.unsigned.json`, command
+  `glm53-flash-pilot-correction`) references the training record by its stored
+  hash (`2aae2501…`), marks it invalidated, and republishes the stage with the
+  corrected figures: `capability_retention` = 20/32 = **0.625** (the `search.py`
+  definition: adapter target checks passed / teacher target checks passed over
+  the identical 37 authored target checks — a CROSS-PATH ratio: the teacher
+  number is from the cloud-teacher run, the adapter number from the
+  deterministic local HF path; recorded as a ratio, not a like-for-like
+  comparison) and `control_regressions.ab_control_checks_delta` = **+0.25**
+  (the control split *improved*; no control regression). Signed and verified;
+  all records verify against the same key.
 * **A real run caught real bugs again.** The first completed training saved a
   real adapter but crashed in the report step (`digest` was imported only
   inside `load_kd_pairs`); three earlier attempts failed on driver bugs the
@@ -419,7 +457,7 @@ experiments stay visible.
 
 ## Tests
 
-`tests/test_capability_build.py` — 78 tests: schema validation, evidence-class
+`tests/test_capability_build.py` — 115 tests: schema validation, evidence-class
 separation, consent gating (no network without per-run consent), enrichment
 scoring with correlation limitation, intervention protocol (mask-measure-
 restore-verify on a fake adapter; unrestorable never causal), store/receipt
@@ -447,7 +485,25 @@ KD pair leakage poisoning, search contract enforcement (measured baselines,
 full-plan evaluation, smallest-passing selection, size/budget/measurement
 rejections, and FINITENESS: NaN control scores, infinite target scores and
 non-finite teacher scores/baselines are all refused before arithmetic),
-CLI exit codes, and two REAL Linux-sandbox oracle integration
+CLI exit codes, the audit-2026-09-19 authored-denominator accounting tests
+(each verified to fail on the pre-fix code: candidate errors count FAILED,
+partial oracle responses never shrink the denominator, missing-status/
+verdictless/duplicate oracle responses are hard refusals), the corrected
+GLM routing-contract tests (a faithful replica of the real transformers
+5.16.1 `Glm5NextTextTopkRouter` — sigmoid scores + `e_score_correction_bias`
+on the selection scores only, group top-k, pre-bias weight gather, routed
+scaling, full `(router_logits, topk_weights, topk_indices)` output: telemetry
+captures the ACTUAL bias-corrected dispatch and matches a manual recount of
+the router's own topk ids/weights; the mask rewrites the FULL tuple and
+defeats a nonzero correction bias; telemetry and mask hooks refuse to be
+live together), and the item-8 intervention-loop tests (candidate
+extraction matches the pilot's exact rule; the worker judge regenerates
+through `generate` and grades through the host oracle, refuses cases
+without authored oracle frames and refuses contaminated state attribution
+by name; the worker facade proxies verify/mask/restore; the WHOLE
+mask→generate→judge→restore→verify loop runs end-to-end at mechanism
+scale and a replay judge could never produce the nonzero drop it
+measures), and two REAL Linux-sandbox oracle integration
 tests (they probe for Linux containment and skip where it is unavailable —
 GitHub CI containers and Windows both honestly skip; the skip is a probe
 result, not an assumption). Every test is a MECHANISM test unless its docstring
@@ -468,7 +524,7 @@ silt-capability dataset validate --dir data/capability_v1
 silt-capability teacher-baseline --spec spec.json --cases cases.json [--allow-remote]
 silt-capability trace --spec spec.json --cases cases.json [--mode behavioural|internal] [--allow-remote]
 silt-capability footprint --spec spec.json
-silt-capability intervene --spec spec.json --component expert:3/7 [--checkpoint DIR]
+silt-capability intervene --spec spec.json --component expert:3/7 --cases cases.json [--checkpoint DIR]
 silt-capability evaluate --spec spec.json --cases cases.json --source candidate.py
 silt-capability student-baseline --spec spec.json --cases cases.json [--model qwen2.5-coder:0.5b]
 silt-capability distill --spec spec.json --dataset data/capability_v1

@@ -45,6 +45,8 @@ OPS = (
     "hello",        # handshake: versions, arch detection, hardware preflight
     "inspect",      # read-only architecture/parameter inventory
     "routing",      # router usage telemetry over a batch of prompts
+    "generate",     # completions under the CURRENT mask state (item 8:
+                    # the measurement primitive of mask->generate->judge)
     "mask",         # temporary_mask one component (intervention protocol)
     "restore",      # restore_mask one component
     "verify",       # verify_unchanged (parameter hashes)

@@ -335,11 +335,25 @@ def _trace_internal(args, spec, loaded) -> Dict[str, Any]:
             for index, mass in enumerate(row.get("sigmoid_mass") or []):
                 experts[str(index)] = {
                     "usage_mass": float(mass),
-                    "topk_count": int((row.get("topk_count") or [0] * (index + 1))[index]),
+                    # the ACTUAL dispatch under the routing equation in
+                    # effect (sigmoid + correction bias + group top-k),
+                    # captured from the router's own topk output -- never a
+                    # plain-sigmoid re-derivation (audit 2026-09-19)
+                    "dispatched_count": int(
+                        (row.get("dispatched_count")
+                         or [0] * (index + 1))[index]
+                    ),
+                    "dispatched_weight_sum": float(
+                        (row.get("dispatched_weight_sum")
+                         or [0.0] * (index + 1))[index]
+                    ),
                 }
             layers[str(layer_id)] = {
                 "usage_mass": float(sum(row.get("sigmoid_mass") or [])),
                 "tokens": int(row.get("tokens", 0)),
+                "correction_bias_nonzero": bool(
+                    row.get("correction_bias_nonzero", False)
+                ),
                 "experts": experts,
             }
         case = next(
@@ -744,7 +758,44 @@ def _cmd_distill(args) -> Dict[str, Any]:
     }
 
 
+class _WorkerInterventionAdapter:
+    """run_intervention's adapter contract, proxied to the isolated
+    worker: the teacher (and its masks) live inside the worker process;
+    this facade only shuttles verify/mask/restore ops. The protocol's
+    every guard still runs -- the worker's ``verify`` op reports both the
+    parameter hashes and the active-mask registry."""
+
+    def __init__(self, client) -> None:
+        self._client = client
+
+    def verify_unchanged(self):
+        return self._client.request("verify", {})
+
+    def temporary_mask(self, component):
+        return self._client.request("mask", {"target": component.as_dict()})
+
+    def restore_mask(self, component):
+        return self._client.request("restore", {"target": component.as_dict()})
+
+
 def _cmd_intervene(args) -> Dict[str, Any]:
+    """The FULL causal intervention protocol, measured end to end (audit
+    2026-09-19, item 8 -- replaces the old "generation+judging stage not
+    wired" refusal):
+
+      1. the worker verifies the teacher hash-unchanged and mask-free;
+      2. the BASE arm regenerates every case's completion through the
+         worker's ``generate`` op and grades it through the host oracle;
+      3. the mask goes on; the MASKED arm repeats the identical cases;
+      4. the mask comes off; the teacher must verify hash-unchanged again;
+      5. the drop is recorded ONLY if both verifications passed.
+
+    The judge (:func:`...evaluation.make_worker_judge`) regenerates under
+    the CURRENT state (never a replay) and refuses by name when the
+    worker's reported live-mask set contradicts the phase it is scoring.
+    Judging runs through the host oracle, so this command needs the Linux
+    code sandbox (WSL2/container) and fails closed on Windows-native runs.
+    """
     loaded = load_spec(args.spec)
     spec = loaded["spec"]
     if spec.teacher.access != TRACE_CLASS_INTERNAL:
@@ -764,6 +815,49 @@ def _cmd_intervene(args) -> Dict[str, Any]:
             remedy="mount the BF16 checkpoint (zai-org/GLM-5.3-Flash-BF16) "
                    "and pass --checkpoint /path/to/GLM-5.3-Flash-BF16",
         )
+    if not args.component:
+        raise CapabilityBuildError(
+            "intervene needs --component expert:<sparse-layer>/<expert-id> "
+            "(e.g. expert:0/17) or layer:<sparse-layer>"
+        )
+    # Judging goes through the host oracle: fail closed BEFORE the worker
+    # touches anything on a host where the sandbox cannot run.
+    from .evaluation import make_worker_judge, require_sandbox
+
+    require_sandbox()
+    cases = _load_cases(args.cases)
+    target_cases = [c for c in cases if c["group"] == "target"]
+    control_cases = [c for c in cases if c["group"] == "control"]
+    if not target_cases or not control_cases:
+        raise CapabilityBuildError(
+            "the intervention needs BOTH a target and a control case set; "
+            "got %d target / %d control" % (len(target_cases), len(control_cases))
+        )
+    from .intervention import InterventionTarget, run_intervention
+
+    if args.component.startswith("expert:"):
+        try:
+            layer_text, _, expert_text = args.component[len("expert:"):].partition("/")
+            target = InterventionTarget(
+                "expert", int(layer_text), int(expert_text))
+        except ValueError:
+            raise CapabilityBuildError(
+                "--component %r is not expert:<layer>/<expert-id> with "
+                "integer indices" % args.component
+            )
+    elif args.component.startswith("layer:"):
+        try:
+            target = InterventionTarget("layer", int(args.component.split(":", 1)[1]))
+        except ValueError:
+            raise CapabilityBuildError(
+                "--component %r is not layer:<n> with an integer index"
+                % args.component
+            )
+    else:
+        raise CapabilityBuildError(
+            "--component %r must be expert:<layer>/<expert-id> or layer:<n>"
+            % args.component
+        )
     from .worker import GlmWorkerClient
 
     repo_root = Path(__file__).resolve().parents[3]
@@ -777,12 +871,52 @@ def _cmd_intervene(args) -> Dict[str, Any]:
     # requirement + remedy -- the honest outcome, never a local weaker
     # path.
     hello = client.hello()
-    raise CapabilityBuildError(
-        "worker admitted the checkpoint (preflight: %r) but the full "
-        "mask-measure-restore intervention loop requires the generation+"
-        "judging stage, which is not wired in this build; refusing to "
-        "report an intervention that was not measured" % hello
+    entry = run_intervention(
+        _WorkerInterventionAdapter(client),
+        target,
+        target_cases=target_cases,
+        control_cases=control_cases,
+        judge=make_worker_judge(
+            client, max_new_tokens=int(args.max_new_tokens)),
+        seed=int(args.seed),
     )
+    workspace = Path(args.workspace)
+    from .store import CapabilityStore
+
+    store = CapabilityStore(workspace)
+    # ':' is Windows-illegal in filenames (the same reason sample ids
+    # forbid it): the component key is flattened to a portable form.
+    portable = entry.component.replace(":", "-").replace("/", "-")
+    name = "%s-%s" % (spec.capability_id, portable)
+    artifact = store.put(
+        "interventions", name, entry.model_dump(mode="json", by_alias=True))
+    _receipt(
+        "intervene",
+        "completed",
+        {"capability_id": spec.capability_id, "spec_sha256": loaded["spec_sha256"]},
+        TRACE_CLASS_INTERNAL,
+        workspace=workspace,
+        extra={
+            "teacher": {"provider": spec.teacher.provider,
+                        "model": spec.teacher.model,
+                        "revision": spec.teacher.revision},
+            "intervention": entry.model_dump(mode="json", by_alias=True),
+            "data_split_hashes": {"cases": args.cases},
+        },
+    )
+    return {
+        "ok": True,
+        "command": "intervene",
+        "status": "completed",
+        "component": entry.component,
+        "target_drop": entry.target_drop,
+        "control_drop": entry.control_drop,
+        "target_cases": entry.target_cases,
+        "control_cases": entry.control_cases,
+        "restored_and_verified": entry.restored_and_verified,
+        "worker": hello,
+        "artifact": artifact,
+    }
 
 
 def _cmd_evaluate(args) -> Dict[str, Any]:
@@ -962,6 +1096,9 @@ def parser() -> Parser:
     distill_cmd.add_argument("--dataset", required=True,
                              help="Approved five-split dataset directory; pairs may come ONLY from its training split")
     intervene_cmd.add_argument("--component")
+    intervene_cmd.add_argument("--cases", required=True,
+                               help="Target+control case set with per-case oracle frames")
+    intervene_cmd.add_argument("--max-new-tokens", type=int, default=512)
     intervene_cmd.add_argument("--seed", type=int, default=0)
     intervene_cmd.add_argument("--checkpoint", help="Open-weight checkpoint for interventions (or GLM_CHECKPOINT)")
     evaluate_cmd.add_argument("--cases", required=True)
