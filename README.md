@@ -436,7 +436,11 @@ training data. Installing extras starts neither. Historical
 >   artifact of the scoring defect and is withdrawn) — recorded as the
 >   product, and a real SiltSpring compression proof with genuine revocations.
 >   Three signed receipts (the third corrects and supersedes the second);
->   nothing admitted, activated or certified.
+>   nothing admitted, activated or certified. The causal-intervention loop
+>   (mask → generate → judge → restore → verify) is wired end-to-end in code
+>   against the real Transformers-5.16.1 GLM-5.3-Flash routing contract, but
+>   **no GLM intervention has been measured** — the open-weight worker needs
+>   teacher-sized hardware and is honestly blocked on small hosts.
 >   [Full record](docs/CAPABILITY_BUILD.md).
 > - **SiltSpring** — [opt-in real-HF probe](scripts/real_siltspring_1p5b.py) exists;
 >   raw Qwen0.5B/1.5B certification/revocation receipts are not included here.
