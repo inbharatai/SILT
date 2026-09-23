@@ -1,0 +1,37 @@
+{
+  "artifact_sha256": "a71883a54b9c63389b8a1578a418b0a3b1ea70acf7e18763fe1b33a41317088e",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 5581.295,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: dot accepts two lists of numbers of equal length and returns the sum of the element-wise products of the two lists. The inputs are not mutated.\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] + v[i]\n    return total\n```",
+    "prompt_tokens": 125,
+    "response": "The user wants me to fix a bug in a Python function. Let me analyze the function:\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] + v[i]\n    return total\n```\n\nThe specification says: dot accepts two lists of numbers of equal length and returns the sum of the element-wise products of the two lists. The inputs are not mutated.\n\nThe bug: `total += u[i] + v[i]` adds the elements instead of multiplying them. It should be `total += u[i] * v[i]`.\n\nThe function doesn't mutate inputs, so that part is fine. The only bug is the `+` instead of `*`.\n\nFixed function:\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] * v[i]\n    return total\n```\n\nThe user asked to return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should just output the code block.</think>```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] * v[i]\n    return total\n```",
+    "response_tokens": 267,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "1d5258b5824481f6c2651e502720fc1085438a23a6b5a301e1d4b4647b9644f3",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "basic": true,
+        "empty": true,
+        "zero_element": true
+      }
+    },
+    "success": true,
+    "tests_passed": 3,
+    "tests_total": 3
+  },
+  "prompt_hash": "b107a245c8151ba2dc93e0d964446d9ecb1e7d44ebb6f5e754a91c2a3b33d0dd",
+  "sample_id": "dot_product_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

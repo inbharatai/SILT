@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "3e750150934ef3f231527f6575336542c1dcd3858d90699856187adb361a5638",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 8728.529,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: longest_word accepts a non-empty string of words separated by single spaces and returns the longest word. When several words tie for the longest, the first of them is returned.\n\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) >= len(best):\n            best = word\n    return best\n```",
+    "prompt_tokens": 139,
+    "response": "Let me analyze the bug in this function.\n\nThe specification says:\n- Accepts a non-empty string of words separated by single spaces\n- Returns the longest word\n- When several words tie for the longest, the first of them is returned\n\nThe current code:\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) >= len(best):\n            best = word\n    return best\n```\n\nThe bug: The condition uses `>=` instead of `>`. With `>=`, when a later word ties with the current best, it replaces the best, so the LAST tied word is returned instead of the FIRST.\n\nFor example, with \"cat dog fox\": all words have length 3. With `>=`, best becomes \"dog\", then \"fox\". Returns \"fox\" instead of \"cat\".\n\nFix: change `>=` to `>`.\n\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) > len(best):\n            best = word\n    return best\n```\n\nWait, let me check: with `>`, best starts as words[0]. For each subsequent word, only replace if strictly longer. So the first longest word is kept. Correct.\n\nEdge case: single word \"hello\" \u2014 words = [\"hello\"], best = \"hello\", loop: len(\"hello\") > len(\"hello\") is False, so best stays \"hello\". Correct.\n\nThe specification says words separated by single spaces, so `split(\" \")` is fine (no empty strings from multiple spaces, since it's guaranteed single spaces).\n\nThe fix is simply changing `>=` to `>`.</think>```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) > len(best):\n            best = word\n    return best\n```",
+    "response_tokens": 414,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 11172.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "2412940c8a5e9f50649c8dc046dd25a5393feb368c729f03fc7bd005c799161b",
+  "sample_id": "longest_word_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

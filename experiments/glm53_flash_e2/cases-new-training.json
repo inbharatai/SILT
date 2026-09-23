@@ -1,0 +1,940 @@
+[
+ {
+  "expected": null,
+  "family_id": "reverse_word_order",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "alpha beta gamma"
+    ],
+    "expected": "gamma beta alpha",
+    "function": "reverse_words",
+    "id": "rev_three",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "one two"
+    ],
+    "expected": "two one",
+    "function": "reverse_words",
+    "id": "rev_two",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "solo"
+    ],
+    "expected": "solo",
+    "function": "reverse_words",
+    "id": "rev_single",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "a b c d"
+    ],
+    "expected": "d c b a",
+    "function": "reverse_words",
+    "id": "rev_four",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: reverse_words accepts a non-empty string of words separated by single spaces and returns the same words in reverse order, joined by single spaces. Punctuation stays attached to its word. The input is not mutated.\n\n```python\ndef reverse_words(sentence):\n    return sentence[::-1]\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "reverse_words_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "sum_digit_chars",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "a1b2c3"
+    ],
+    "expected": 6,
+    "function": "sum_digits",
+    "id": "mixed",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     ""
+    ],
+    "expected": 0,
+    "function": "sum_digits",
+    "id": "empty",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "9x0"
+    ],
+    "expected": 9,
+    "function": "sum_digits",
+    "id": "digits_letters",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "hello"
+    ],
+    "expected": 0,
+    "function": "sum_digits",
+    "id": "no_digits",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: sum_digits accepts a string and returns the sum of the integer values of every ASCII digit character '0' through '9' it contains, in the order encountered. A string with no digits returns 0.\n\n```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += 1\n    return total\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "sum_digits_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "interleave_lists",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      1,
+      2
+     ],
+     [
+      "a",
+      "b"
+     ]
+    ],
+    "expected": [
+     1,
+     "a",
+     2,
+     "b"
+    ],
+    "function": "interleave",
+    "id": "two_by_two",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [],
+     []
+    ],
+    "expected": [],
+    "function": "interleave",
+    "id": "empty_pair",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      10,
+      20,
+      30
+     ],
+     [
+      1,
+      2,
+      3
+     ]
+    ],
+    "expected": [
+     10,
+     1,
+     20,
+     2,
+     30,
+     3
+    ],
+    "function": "interleave",
+    "id": "three_by_three",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: interleave accepts two lists of equal length and returns a new list whose elements alternate between the two inputs, starting with the first list: first[0], second[0], first[1], second[1], and so on. The inputs are not mutated.\n\n```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(second[i])\n        result.append(first[i])\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "interleave_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "adjacent_differences",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      3,
+      1,
+      4
+     ]
+    ],
+    "expected": [
+     2,
+     3
+    ],
+    "function": "diffs",
+    "id": "down_up",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      7
+     ]
+    ],
+    "expected": [],
+    "function": "diffs",
+    "id": "single",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      5,
+      5,
+      5
+     ]
+    ],
+    "expected": [
+     0,
+     0
+    ],
+    "function": "diffs",
+    "id": "flat",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      10,
+      2,
+      7
+     ]
+    ],
+    "expected": [
+     8,
+     5
+    ],
+    "function": "diffs",
+    "id": "big_drop",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: diffs accepts a list of numbers with at least one element and returns the list of absolute differences between each pair of adjacent elements, in order. A single-element list returns an empty list.\n\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(numbers[i + 1] - numbers[i])\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "adjacent_diffs_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "matrix_diagonal_sum",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      [
+       1,
+       2
+      ],
+      [
+       3,
+       4
+      ]
+     ]
+    ],
+    "expected": 5,
+    "function": "diagonal_sum",
+    "id": "two_by_two",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      [
+       7
+      ]
+     ]
+    ],
+    "expected": 7,
+    "function": "diagonal_sum",
+    "id": "one_by_one",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      [
+       1,
+       0,
+       0
+      ],
+      [
+       0,
+       2,
+       0
+      ],
+      [
+       0,
+       0,
+       4
+      ]
+     ]
+    ],
+    "expected": 7,
+    "function": "diagonal_sum",
+    "id": "sparse_identity",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      [
+       9,
+       1
+      ],
+      [
+       2,
+       5
+      ]
+     ]
+    ],
+    "expected": 14,
+    "function": "diagonal_sum",
+    "id": "generic_2x2",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: diagonal_sum accepts a square matrix (a list of equal-length row lists of numbers) and returns the sum of the main-diagonal entries, that is matrix[i][i] for each row index i. The matrix is not mutated.\n\n```python\ndef diagonal_sum(matrix):\n    total = 0\n    n = len(matrix)\n    for i in range(n):\n        total += matrix[i][n - 1 - i]\n    return total\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "diagonal_sum_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "letter_frequency",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "AbA"
+    ],
+    "expected": {
+     "a": 2,
+     "b": 1
+    },
+    "function": "char_counts",
+    "id": "mixed_case",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "a1!"
+    ],
+    "expected": {
+     "a": 1
+    },
+    "function": "char_counts",
+    "id": "with_noise",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     ""
+    ],
+    "expected": {},
+    "function": "char_counts",
+    "id": "empty",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "Zz"
+    ],
+    "expected": {
+     "z": 2
+    },
+    "function": "char_counts",
+    "id": "case_folding",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: char_counts accepts a string and returns a dictionary that maps each lowercase letter appearing in the string to the number of times it appears, counting uppercase letters as their lowercase form. Non-letter characters are ignored. The result contains keys only for letters that appear.\n\n```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "char_counts_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "cumulative_products",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      2,
+      3,
+      4
+     ]
+    ],
+    "expected": [
+     2,
+     6,
+     24
+    ],
+    "function": "cumprod",
+    "id": "growing",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      5
+     ]
+    ],
+    "expected": [
+     5
+    ],
+    "function": "cumprod",
+    "id": "single",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      1,
+      0,
+      7
+     ]
+    ],
+    "expected": [
+     1,
+     0,
+     0
+    ],
+    "function": "cumprod",
+    "id": "zero_inside",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      3,
+      -1,
+      2
+     ]
+    ],
+    "expected": [
+     3,
+     -3,
+     -6
+    ],
+    "function": "cumprod",
+    "id": "negative_step",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: cumprod accepts a non-empty list of numbers and returns a list of the same length whose first element is the first input element and whose every following element is the product of all input elements up to and including that position. The input is not mutated.\n\n```python\ndef cumprod(numbers):\n    result = [numbers[0]]\n    for n in numbers[1:]:\n        result.append(result[-1] + n)\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "cumprod_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "sorted_nondecreasing_check",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      1,
+      2,
+      2,
+      3
+     ]
+    ],
+    "expected": true,
+    "function": "is_sorted",
+    "id": "with_ties",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      3,
+      1
+     ]
+    ],
+    "expected": false,
+    "function": "is_sorted",
+    "id": "descending",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     []
+    ],
+    "expected": true,
+    "function": "is_sorted",
+    "id": "empty",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      5
+     ]
+    ],
+    "expected": true,
+    "function": "is_sorted",
+    "id": "single",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: is_sorted accepts a list of numbers and returns True when the list is in non-decreasing order (no element is greater than the one after it) and False otherwise. Empty lists and single-element lists are sorted.\n\n```python\ndef is_sorted(values):\n    for i in range(len(values) - 1):\n        if values[i] >= values[i + 1]:\n            return False\n    return True\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "is_sorted_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "clamp_into_range",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      1,
+      5,
+      9
+     ],
+     2,
+     8
+    ],
+    "expected": [
+     2,
+     5,
+     8
+    ],
+    "function": "clamp",
+    "id": "both_sides",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      0,
+      4
+     ],
+     0,
+     10
+    ],
+    "expected": [
+     0,
+     4
+    ],
+    "function": "clamp",
+    "id": "inside",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      -5,
+      3,
+      15
+     ],
+     -1,
+     1
+    ],
+    "expected": [
+     -1,
+     1,
+     1
+    ],
+    "function": "clamp",
+    "id": "negative_bounds",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: clamp accepts a list of numbers and two bounds lo and hi with lo <= hi, and returns a new list in which every value below lo is replaced by lo, every value above hi is replaced by hi, and values inside the inclusive range are unchanged. The input list is not mutated.\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        else:\n            result.append(v)\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "clamp_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "longest_word_first_tie",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "aa bb cc dd"
+    ],
+    "expected": "aa",
+    "function": "longest_word",
+    "id": "all_ties",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "x yyy"
+    ],
+    "expected": "yyy",
+    "function": "longest_word",
+    "id": "clear_winner",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "cat to bird"
+    ],
+    "expected": "bird",
+    "function": "longest_word",
+    "id": "mid_sentence",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: longest_word accepts a non-empty string of words separated by single spaces and returns the longest word. When several words tie for the longest, the first of them is returned.\n\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) >= len(best):\n            best = word\n    return best\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "longest_word_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "swap_letter_case",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "aB1!"
+    ],
+    "expected": "Ab1!",
+    "function": "swap_case",
+    "id": "mixed",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     ""
+    ],
+    "expected": "",
+    "function": "swap_case",
+    "id": "empty",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "Zz"
+    ],
+    "expected": "zZ",
+    "function": "swap_case",
+    "id": "pair",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "no-op"
+    ],
+    "expected": "NO-OP",
+    "function": "swap_case",
+    "id": "with_punct",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: swap_case accepts a string and returns a new string in which every lowercase letter becomes uppercase, every uppercase letter becomes lowercase, and every non-letter character is unchanged.\n\n```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        else:\n            result += ch\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "swap_case_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "group_by_parity",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      1,
+      2,
+      3
+     ]
+    ],
+    "expected": {
+     "even": [
+      2
+     ],
+     "odd": [
+      1,
+      3
+     ]
+    },
+    "function": "group_parity",
+    "id": "positives",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     []
+    ],
+    "expected": {
+     "even": [],
+     "odd": []
+    },
+    "function": "group_parity",
+    "id": "empty",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      -4,
+      -3
+     ]
+    ],
+    "expected": {
+     "even": [
+      -4
+     ],
+     "odd": [
+      -3
+     ]
+    },
+    "function": "group_parity",
+    "id": "negatives",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: group_parity accepts a list of integers and returns a dictionary with exactly the keys 'even' and 'odd': under 'even' go the even integers in input order and under 'odd' go the odd integers in input order, using mathematical parity (so -3 is odd and -4 is even). The input is not mutated.\n\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0 or n < 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "group_parity_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "repeat_pattern_to_length",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "ab",
+     5
+    ],
+    "expected": "ababa",
+    "function": "repeat_to",
+    "id": "truncate",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "xy",
+     0
+    ],
+    "expected": "",
+    "function": "repeat_to",
+    "id": "zero",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "q",
+     3
+    ],
+    "expected": "qqq",
+    "function": "repeat_to",
+    "id": "single_char",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "abc",
+     4
+    ],
+    "expected": "abca",
+    "function": "repeat_to",
+    "id": "one_cycle_plus",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: repeat_to accepts a non-empty pattern string and a non-negative integer n, and returns the first n characters of the pattern repeated cyclically. When n is 0 the result is the empty string; the result is never longer than n characters.\n\n```python\ndef repeat_to(pattern, n):\n    return pattern * n\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "repeat_to_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "dot_product",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      2,
+      3
+     ],
+     [
+      4,
+      5
+     ]
+    ],
+    "expected": 23,
+    "function": "dot",
+    "id": "basic",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [],
+     []
+    ],
+    "expected": 0,
+    "function": "dot",
+    "id": "empty",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      1,
+      0
+     ],
+     [
+      5,
+      7
+     ]
+    ],
+    "expected": 5,
+    "function": "dot",
+    "id": "zero_element",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: dot accepts two lists of numbers of equal length and returns the sum of the element-wise products of the two lists. The inputs are not mutated.\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] + v[i]\n    return total\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "dot_product_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "filter_palindromes",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     [
+      "aba",
+      "abca",
+      "aa",
+      "ab"
+     ]
+    ],
+    "expected": [
+     "aba",
+     "aa"
+    ],
+    "function": "palindromes",
+    "id": "mixed",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      "a"
+     ]
+    ],
+    "expected": [
+     "a"
+    ],
+    "function": "palindromes",
+    "id": "single_char",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     [
+      "ab"
+     ]
+    ],
+    "expected": [],
+    "function": "palindromes",
+    "id": "none_match",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: palindromes accepts a list of non-empty lowercase strings and returns a new list containing exactly those strings that read the same forwards and backwards, preserving input order. The input list is not mutated.\n\n```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w[0] == w[-1]:\n            result.append(w)\n    return result\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "palindromes_v1",
+  "split": "training"
+ },
+ {
+  "expected": null,
+  "family_id": "greedy_word_wrap",
+  "group": "target",
+  "license": "CC0-1.0",
+  "oracle": [
+   {
+    "args": [
+     "aaa bb cc",
+     5
+    ],
+    "expected": [
+     "aaa",
+     "bb cc"
+    ],
+    "function": "wrap_text",
+    "id": "space_counts",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "one",
+     3
+    ],
+    "expected": [
+     "one"
+    ],
+    "function": "wrap_text",
+    "id": "exact_fit",
+    "kwargs": {}
+   },
+   {
+    "args": [
+     "aa bb cc",
+     2
+    ],
+    "expected": [
+     "aa",
+     "bb",
+     "cc"
+    ],
+    "function": "wrap_text",
+    "id": "every_word_wraps",
+    "kwargs": {}
+   }
+  ],
+  "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: wrap_text accepts a string of words separated by single spaces and a positive integer width, and greedily packs the words into lines: the first word starts a line, and each following word is appended to the current line, joined by a single space, only if the joined line would be at most width characters long; otherwise it starts a new line. Every word is longer than zero characters and at most width characters. The result is the list of lines; every word appears exactly once in order.\n\n```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```",
+  "provenance": "authored 2026-09-19 for the GLM-5.3-Flash capability pilot E2 (expanded training set); original work of the repository operator; no third-party code",
+  "sample_id": "wrap_text_v1",
+  "split": "training"
+ }
+]

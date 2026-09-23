@@ -1,0 +1,37 @@
+{
+  "artifact_sha256": "9f11210cac55f1a7330b6be42f597e4fe07cbf2c78dc810c5bd7c82d1f121cd3",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 7988.229,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: wrap_text accepts a string of words separated by single spaces and a positive integer width, and greedily packs the words into lines: the first word starts a line, and each following word is appended to the current line, joined by a single space, only if the joined line would be at most width characters long; otherwise it starts a new line. Every word is longer than zero characters and at most width characters. The result is the list of lines; every word appears exactly once in order.\n\n```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```",
+    "prompt_tokens": 247,
+    "response": "Let me analyze the function against the specification.\n\nSpecification: wrap_text accepts a string of words separated by single spaces and a positive integer width, and greedily packs the words into lines: the first word starts a line, and each following word is appended to the current line, joined by a single space, only if the joined line would be at most width characters long; otherwise it starts a new line. Every word is longer than zero characters and at most width characters. The result is the list of lines; every word appears exactly once in order.\n\nThe bug: the condition `len(current) + len(word) <= width` doesn't account for the space between the words. The joined line would be `current + \" \" + word`, which has length `len(current) + 1 + len(word)`. So the condition should be `len(current) + 1 + len(word) <= width`.\n\nLet me verify: if current = \"ab\" (2 chars), word = \"cd\" (2 chars), width = 5. Joined line \"ab cd\" is 5 chars, which is at most 5, so it should be appended. Original code: len(current) + len(word) = 4 <= 5, appends \u2014 correct in this case. But if width = 4: joined line \"ab cd\" is 5 chars > 4, so should start a new line. Original code: 4 <= 4, appends \u2014 wrong. So the fix is to add 1 for the space.\n\nFixed function:\n\n```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + 1 + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```\n\nThat's the only bug. Everything else matches the spec: first word starts a line, greedy packing, final line appended, every word appears exactly once in order.</think>```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + 1 + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```",
+    "response_tokens": 539,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "dbb48d43e4b1dbaade522188128662ffefbcb84b185c612f09ca59dabeb3ff28",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "every_word_wraps": true,
+        "exact_fit": true,
+        "space_counts": true
+      }
+    },
+    "success": true,
+    "tests_passed": 3,
+    "tests_total": 3
+  },
+  "prompt_hash": "eb89324e3a490dc0b7aa9275e6ea0e465a75ca3e4d8e54b0deaff0081b04aecf",
+  "sample_id": "wrap_text_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

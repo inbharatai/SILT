@@ -1,0 +1,507 @@
+{
+  "authored_denominator": "the graded total per case is the frozen authored oracle count; unjudged checks (candidate errors) count as FAILED",
+  "capability_id": "python_repo_debugging_v1",
+  "cases": [
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2873.978,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: diffs accepts a list of numbers with at least one element and returns the list of absolute differences between each pair of adjacent elements, in order. A single-element list returns an empty list.\n\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(numbers[i + 1] - numbers[i])\n    return result\n```",
+        "prompt_tokens": 136,
+        "response": "Let me analyze the function against the specification.\n\nSpecification: `diffs` accepts a list of numbers with at least one element and returns the list of **absolute differences** between each pair of adjacent elements, in order. A single-element list returns an empty list.\n\nThe current function:\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(numbers[i + 1] - numbers[i])\n    return result\n```\n\nThe bug: it computes `numbers[i + 1] - numbers[i]` which is a signed difference, not the absolute difference. The specification requires absolute differences, so we need `abs(numbers[i + 1] - numbers[i])`.\n\nEdge case: single-element list. `range(len(numbers) - 1)` = `range(0)` for a single element, so the loop doesn't execute, and it returns `[]`. That's correct.\n\nSo the fix is to wrap the difference in `abs()`.\n\nFixed function:\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(abs(numbers[i + 1] - numbers[i]))\n    return result\n```\n\nThe instruction says to return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should just output the code block.</think>```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(abs(numbers[i + 1] - numbers[i]))\n    return result\n```",
+        "response_tokens": 328,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "12a837569630fd75e67af1ca0fde6704eca576de706368b2a8622ec2aec636ed",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "big_drop": true,
+        "down_up": true,
+        "flat": true,
+        "single": true
+      },
+      "sample_id": "adjacent_diffs_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 1917.326,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: char_counts accepts a string and returns a dictionary that maps each lowercase letter appearing in the string to the number of times it appears, counting uppercase letters as their lowercase form. Non-letter characters are ignored. The result contains keys only for letters that appear.\n\n```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```",
+        "prompt_tokens": 168,
+        "response": "The bug: the function counts uppercase letters as uppercase keys, but the specification says uppercase letters should be counted as their lowercase form. So we need to lowercase the character before counting.\n\nFix:\n\n```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            ch = ch.lower()\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```\n\nThat's it. Return only the code block.</think>```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            ch = ch.lower()\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```",
+        "response_tokens": 183,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "64487adf4015a6602fb4d9b5ffeb3529565b44fc894f37ff6292a46810af59d0",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "case_folding": true,
+        "empty": true,
+        "mixed_case": true,
+        "with_noise": true
+      },
+      "sample_id": "char_counts_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2613.08,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: clamp accepts a list of numbers and two bounds lo and hi with lo <= hi, and returns a new list in which every value below lo is replaced by lo, every value above hi is replaced by hi, and values inside the inclusive range are unchanged. The input list is not mutated.\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        else:\n            result.append(v)\n    return result\n```",
+        "prompt_tokens": 161,
+        "response": "The bug: the function only clamps values below lo, but doesn't clamp values above hi. Need to add the hi check.\n\nFixed:\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        elif v > hi:\n            result.append(hi)\n        else:\n            result.append(v)\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        elif v > hi:\n            result.append(hi)\n        else:\n            result.append(v)\n    return result\n```",
+        "response_tokens": 156,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "258f55d47ce41bb1e2cafb9974afb17359330deb01c57a4f68aa0e2c183d9aa9",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "both_sides": true,
+        "inside": true,
+        "negative_bounds": true
+      },
+      "sample_id": "clamp_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 1632.824,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: cumprod accepts a non-empty list of numbers and returns a list of the same length whose first element is the first input element and whose every following element is the product of all input elements up to and including that position. The input is not mutated.\n\n```python\ndef cumprod(numbers):\n    result = [numbers[0]]\n    for n in numbers[1:]:\n        result.append(result[-1] + n)\n    return result\n```",
+        "prompt_tokens": 147,
+        "response": "The bug: it adds instead of multiplies. Fix: multiply. Also ensure input not mutated \u2014 it doesn't mutate input. The fix is simple: `result.append(result[-1] * n)`.</think>```python\ndef cumprod(numbers):\n    result = [numbers[0]]\n    for n in numbers[1:]:\n        result.append(result[-1] * n)\n    return result\n```",
+        "response_tokens": 83,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "280dd7753ac16c142074a2d2371e6c1e8005b2e9b6ebbcc0f588230252ee1a6c",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "growing": true,
+        "negative_step": true,
+        "single": true,
+        "zero_inside": true
+      },
+      "sample_id": "cumprod_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2660.242,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: diagonal_sum accepts a square matrix (a list of equal-length row lists of numbers) and returns the sum of the main-diagonal entries, that is matrix[i][i] for each row index i. The matrix is not mutated.\n\n```python\ndef diagonal_sum(matrix):\n    total = 0\n    n = len(matrix)\n    for i in range(n):\n        total += matrix[i][n - 1 - i]\n    return total\n```",
+        "prompt_tokens": 150,
+        "response": "The function currently computes the anti-diagonal (secondary diagonal): matrix[i][n - 1 - i]. The specification says main diagonal: matrix[i][i]. So fix: total += matrix[i][i].\n\nAlso ensure no mutation \u2014 there's no mutation. Return only the fixed function in a code block.</think>```python\ndef diagonal_sum(matrix):\n    total = 0\n    n = len(matrix)\n    for i in range(n):\n        total += matrix[i][i]\n    return total\n```",
+        "response_tokens": 105,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "89bdd70dc2120ea4b46fd3274cb7dce9bfb2b83395227929fb2fe2f740ac9731",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "generic_2x2": true,
+        "one_by_one": true,
+        "sparse_identity": true,
+        "two_by_two": true
+      },
+      "sample_id": "diagonal_sum_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 5581.295,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: dot accepts two lists of numbers of equal length and returns the sum of the element-wise products of the two lists. The inputs are not mutated.\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] + v[i]\n    return total\n```",
+        "prompt_tokens": 125,
+        "response": "The user wants me to fix a bug in a Python function. Let me analyze the function:\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] + v[i]\n    return total\n```\n\nThe specification says: dot accepts two lists of numbers of equal length and returns the sum of the element-wise products of the two lists. The inputs are not mutated.\n\nThe bug: `total += u[i] + v[i]` adds the elements instead of multiplying them. It should be `total += u[i] * v[i]`.\n\nThe function doesn't mutate inputs, so that part is fine. The only bug is the `+` instead of `*`.\n\nFixed function:\n\n```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] * v[i]\n    return total\n```\n\nThe user asked to return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should just output the code block.</think>```python\ndef dot(u, v):\n    total = 0\n    for i in range(len(u)):\n        total += u[i] * v[i]\n    return total\n```",
+        "response_tokens": 267,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "1d5258b5824481f6c2651e502720fc1085438a23a6b5a301e1d4b4647b9644f3",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "basic": true,
+        "empty": true,
+        "zero_element": true
+      },
+      "sample_id": "dot_product_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 4095.001,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: group_parity accepts a list of integers and returns a dictionary with exactly the keys 'even' and 'odd': under 'even' go the even integers in input order and under 'odd' go the odd integers in input order, using mathematical parity (so -3 is odd and -4 is even). The input is not mutated.\n\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0 or n < 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```",
+        "prompt_tokens": 192,
+        "response": "Let me analyze the bug in the function.\n\nThe specification says:\n- Group integers by mathematical parity\n- -3 is odd, -4 is even\n- Even integers under 'even', odd under 'odd', in input order\n- Input not mutated\n\nThe buggy code:\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0 or n < 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```\n\nThe condition `n % 2 != 0 or n < 0` is wrong. In Python, `n % 2` for negative numbers: `-3 % 2` = 1 (Python's modulo returns non-negative for positive divisor). So `-3 % 2 != 0` is True, which correctly identifies -3 as odd. But `-4 % 2` = 0, so `-4 % 2 != 0` is False. However, the `or n < 0` part makes -4 go to odd, which is wrong. Also, negative even numbers like -2 would incorrectly go to odd.\n\nThe fix: just use `n % 2 != 0` (which works correctly in Python for negatives since Python's modulo of negative numbers with positive divisor gives non-negative result). Or use `n % 2 == 1` \u2014 wait, in Python `-3 % 2` = 1, so `n % 2 == 1` works too. But safest is `n % 2 != 0`.\n\nFixed:\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```\n\nThis doesn't mutate input, preserves order, uses mathematical parity correctly in Python.</think>```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```",
+        "response_tokens": 487,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "9b3d01f322788851e5c2744a68da33a6bab63f36a6966a76b97008ea10297029",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "empty": true,
+        "negatives": true,
+        "positives": true
+      },
+      "sample_id": "group_parity_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 1742.719,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: interleave accepts two lists of equal length and returns a new list whose elements alternate between the two inputs, starting with the first list: first[0], second[0], first[1], second[1], and so on. The inputs are not mutated.\n\n```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(second[i])\n        result.append(first[i])\n    return result\n```",
+        "prompt_tokens": 150,
+        "response": "The specification says: interleave returns a new list whose elements alternate between the two inputs, starting with the first list: first[0], second[0], first[1], second[1], and so on.\n\nThe buggy code appends second[i] first, then first[i]. So it starts with the second list. Fix: swap the order of appends.\n\n```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(first[i])\n        result.append(second[i])\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(first[i])\n        result.append(second[i])\n    return result\n```",
+        "response_tokens": 166,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "bf2507bf2111e26b27fd53e80377c987ae061e9a397ff0b0f8f14271e3a5c404",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "empty_pair": true,
+        "three_by_three": true,
+        "two_by_two": true
+      },
+      "sample_id": "interleave_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 1934.958,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: is_sorted accepts a list of numbers and returns True when the list is in non-decreasing order (no element is greater than the one after it) and False otherwise. Empty lists and single-element lists are sorted.\n\n```python\ndef is_sorted(values):\n    for i in range(len(values) - 1):\n        if values[i] >= values[i + 1]:\n            return False\n    return True\n```",
+        "prompt_tokens": 142,
+        "response": "The specification says: non-decreasing order means no element is greater than the one after it. So for a sorted list, values[i] <= values[i+1] for all i. The bug: the function returns False when values[i] >= values[i+1], which means it rejects equal adjacent elements. It should return False only when values[i] > values[i+1].\n\nFix: change `>=` to `>`.</think>```python\ndef is_sorted(values):\n    for i in range(len(values) - 1):\n        if values[i] > values[i + 1]:\n            return False\n    return True\n```",
+        "response_tokens": 131,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "1ebdc06fabb363b8e42bbdb3d38da53bc7aadde23763269f139995820bc6c2d0",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "descending": true,
+        "empty": true,
+        "single": true,
+        "with_ties": true
+      },
+      "sample_id": "is_sorted_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 8728.529,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: longest_word accepts a non-empty string of words separated by single spaces and returns the longest word. When several words tie for the longest, the first of them is returned.\n\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) >= len(best):\n            best = word\n    return best\n```",
+        "prompt_tokens": 139,
+        "response": "Let me analyze the bug in this function.\n\nThe specification says:\n- Accepts a non-empty string of words separated by single spaces\n- Returns the longest word\n- When several words tie for the longest, the first of them is returned\n\nThe current code:\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) >= len(best):\n            best = word\n    return best\n```\n\nThe bug: The condition uses `>=` instead of `>`. With `>=`, when a later word ties with the current best, it replaces the best, so the LAST tied word is returned instead of the FIRST.\n\nFor example, with \"cat dog fox\": all words have length 3. With `>=`, best becomes \"dog\", then \"fox\". Returns \"fox\" instead of \"cat\".\n\nFix: change `>=` to `>`.\n\n```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) > len(best):\n            best = word\n    return best\n```\n\nWait, let me check: with `>`, best starts as words[0]. For each subsequent word, only replace if strictly longer. So the first longest word is kept. Correct.\n\nEdge case: single word \"hello\" \u2014 words = [\"hello\"], best = \"hello\", loop: len(\"hello\") > len(\"hello\") is False, so best stays \"hello\". Correct.\n\nThe specification says words separated by single spaces, so `split(\" \")` is fine (no empty strings from multiple spaces, since it's guaranteed single spaces).\n\nThe fix is simply changing `>=` to `>`.</think>```python\ndef longest_word(sentence):\n    words = sentence.split(\" \")\n    best = words[0]\n    for word in words:\n        if len(word) > len(best):\n            best = word\n    return best\n```",
+        "response_tokens": 414,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "35db9cdb2ead914fc04cb33b18fae3d62538be7502f707ea9008724893536500",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "all_ties": true,
+        "clear_winner": true,
+        "mid_sentence": true
+      },
+      "sample_id": "longest_word_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2143.812,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: palindromes accepts a list of non-empty lowercase strings and returns a new list containing exactly those strings that read the same forwards and backwards, preserving input order. The input list is not mutated.\n\n```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w[0] == w[-1]:\n            result.append(w)\n    return result\n```",
+        "prompt_tokens": 139,
+        "response": "The bug: the function checks only first and last characters, but a palindrome must read the same forwards and backwards entirely. Fix: check `w == w[::-1]`.\n\nAlso, the input list is not mutated \u2014 the current function doesn't mutate it, and the fix won't either. Return a new list preserving order.\n\nFixed function:\n\n```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w == w[::-1]:\n            result.append(w)\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w == w[::-1]:\n            result.append(w)\n    return result\n```",
+        "response_tokens": 158,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "59a203275fbdba3a1124c4283fb989ce8d1fb7841acafbef0c0d774ebf30f020",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "mixed": true,
+        "none_match": true,
+        "single_char": true
+      },
+      "sample_id": "palindromes_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 7492.621,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: repeat_to accepts a non-empty pattern string and a non-negative integer n, and returns the first n characters of the pattern repeated cyclically. When n is 0 the result is the empty string; the result is never longer than n characters.\n\n```python\ndef repeat_to(pattern, n):\n    return pattern * n\n```",
+        "prompt_tokens": 124,
+        "response": "The specification: repeat_to accepts a non-empty pattern string and a non-negative integer n, and returns the first n characters of the pattern repeated cyclically. When n is 0 the result is the empty string; the result is never longer than n characters.\n\nSo we need to repeat the pattern cyclically and truncate to n characters.\n\nStandard approach: `(pattern * (n // len(pattern) + 1))[:n]` \u2014 but careful with n=0: `pattern * (0 // len + 1)` = pattern * 1 = pattern, then [:0] = \"\". That works.\n\nBut wait, if n=0, `n // len(pattern) + 1` = 1, so pattern * 1, then [:0] gives \"\". Good.\n\nAlternative: `(pattern * n)[:n]` \u2014 this works too since pattern * n has at least n characters when n >= 1 (pattern non-empty, so len(pattern) >= 1, pattern * n has length >= n). And for n=0, pattern * 0 = \"\", [:0] = \"\". This is simpler and correct. However, it may allocate more memory than needed, but correctness-wise it's fine.\n\nActually `(pattern * n)[:n]` is correct: for n >= 1, len(pattern * n) = len(pattern) * n >= n since len(pattern) >= 1. For n = 0, result is \"\".\n\nBut a more efficient version: `(pattern * (n // len(pattern) + 1))[:n]`. Both are correct. Let me use the efficient one, or the simple one. Either meets spec exactly.\n\nEdge: n=0 with efficient version: n // len = 0, +1 = 1, pattern * 1, [:0] = \"\". Correct.\n\nI'll return the efficient version. Actually, simplest and clearly correct: `(pattern * n)[:n]`. Hmm, but for large n it's wasteful. The spec doesn't mention efficiency. I'll go with the efficient one to be safe... Actually both are fine. Let me pick the efficient one:\n\n```python\ndef repeat_to(pattern, n):\n    if n == 0:\n        return \"\"\n    repeats = n // len(pattern) + 1\n    return (pattern * repeats)[:n]\n```\n\nOr without the special case: `(pattern * (n // len(pattern) + 1))[:n]` handles n=0 correctly. Let me verify: n=0, len(pattern) >= 1, 0 // len = 0, +1 = 1, pattern * 1 = pattern, [:0] = \"\". Yes.\n\nReturn only the code block.</think>```python\ndef repeat_to(pattern, n):\n    return (pattern * (n // len(pattern) + 1))[:n]\n```",
+        "response_tokens": 590,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "08d1215328202e7f7b61ffad6c51865946b63e327b99f47da667e867d2ccb460",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "one_cycle_plus": true,
+        "single_char": true,
+        "truncate": true,
+        "zero": true
+      },
+      "sample_id": "repeat_to_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 3228.17,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: reverse_words accepts a non-empty string of words separated by single spaces and returns the same words in reverse order, joined by single spaces. Punctuation stays attached to its word. The input is not mutated.\n\n```python\ndef reverse_words(sentence):\n    return sentence[::-1]\n```",
+        "prompt_tokens": 114,
+        "response": "The bug: `sentence[::-1]` reverses the characters of the string, not the word order. The fix: split the sentence into words, reverse the list of words, and join with single spaces.\n\n```python\ndef reverse_words(sentence):\n    return ' '.join(sentence.split(' ')[::-1])\n```\n\nSince the spec says words are separated by single spaces, `split(' ')` works fine. `split()` would also work but could collapse multiple spaces; spec guarantees single spaces, so either is fine. Using `split(' ')` preserves exact behavior for single-space-separated words. Actually with single spaces guaranteed, `split()` and `split(' ')` give the same result. I'll use `split(' ')` to be precise, or `split()`. Either is fine.\n\nThe input is not mutated \u2014 strings are immutable in Python, so that's automatically satisfied.\n\nReturn only the code block.```python\ndef reverse_words(sentence):\n    return ' '.join(sentence.split(' ')[::-1])\n```",
+        "response_tokens": 209,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "4819c71873df10997b5ef3a6bda8b8e79a391ba539b9868c68ff8531922e8bd8",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "rev_four": true,
+        "rev_single": true,
+        "rev_three": true,
+        "rev_two": true
+      },
+      "sample_id": "reverse_words_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2750.157,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: sum_digits accepts a string and returns the sum of the integer values of every ASCII digit character '0' through '9' it contains, in the order encountered. A string with no digits returns 0.\n\n```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += 1\n    return total\n```",
+        "prompt_tokens": 142,
+        "response": "The bug: the function counts digits (adds 1) instead of summing their integer values. Fix: total += int(ch) or total += ord(ch) - ord('0').\n\nThe specification says \"returns the sum of the integer values of every ASCII digit character '0' through '9' it contains, in the order encountered.\" Order doesn't matter for sum, but that's fine.\n\nFixed function:\n\n```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += int(ch)\n    return total\n```\n\nNote: `int(ch)` works for ASCII digits. Alternatively `ord(ch) - ord('0')`. Either is fine. Return only the code block.</think>```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += int(ch)\n    return total\n```",
+        "response_tokens": 204,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "08f8a91b1c8fd57ec16626ff3c4a7900b5da9890069716f4ad0c311097e964d2",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "digits_letters": true,
+        "empty": true,
+        "mixed": true,
+        "no_digits": true
+      },
+      "sample_id": "sum_digits_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 2236.76,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: swap_case accepts a string and returns a new string in which every lowercase letter becomes uppercase, every uppercase letter becomes lowercase, and every non-letter character is unchanged.\n\n```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        else:\n            result += ch\n    return result\n```",
+        "prompt_tokens": 138,
+        "response": "The bug: the function only handles lowercase letters, converting them to uppercase. It doesn't handle uppercase letters (should convert to lowercase). Non-letter characters are unchanged, which is fine.\n\nFix: add an elif for \"A\" <= ch <= \"Z\": result += ch.lower().\n\nAlternatively use ch.swapcase(), but the spec says fix the function; simplest fix:\n\n```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        elif \"A\" <= ch <= \"Z\":\n            result += ch.lower()\n        else:\n            result += ch\n    return result\n```\n\nReturn only the code block.</think>```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        elif \"A\" <= ch <= \"Z\":\n            result += ch.lower()\n        else:\n            result += ch\n    return result\n```",
+        "response_tokens": 214,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "d7d0761b6d25a0a1a16e966c2e12c9fd2097a9411576be0e5a5aee3acbd87607",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 4,
+      "oracle_status": "PASSED",
+      "passed": 4,
+      "per_check": {
+        "empty": true,
+        "mixed": true,
+        "pair": true,
+        "with_punct": true
+      },
+      "sample_id": "swap_case_v1",
+      "split": "training",
+      "total": 4,
+      "unjudged_checks": 0
+    },
+    {
+      "behavioural": {
+        "attempts": 1,
+        "corrections": 0,
+        "latency_ms": 7988.229,
+        "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: wrap_text accepts a string of words separated by single spaces and a positive integer width, and greedily packs the words into lines: the first word starts a line, and each following word is appended to the current line, joined by a single space, only if the joined line would be at most width characters long; otherwise it starts a new line. Every word is longer than zero characters and at most width characters. The result is the list of lines; every word appears exactly once in order.\n\n```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```",
+        "prompt_tokens": 247,
+        "response": "Let me analyze the function against the specification.\n\nSpecification: wrap_text accepts a string of words separated by single spaces and a positive integer width, and greedily packs the words into lines: the first word starts a line, and each following word is appended to the current line, joined by a single space, only if the joined line would be at most width characters long; otherwise it starts a new line. Every word is longer than zero characters and at most width characters. The result is the list of lines; every word appears exactly once in order.\n\nThe bug: the condition `len(current) + len(word) <= width` doesn't account for the space between the words. The joined line would be `current + \" \" + word`, which has length `len(current) + 1 + len(word)`. So the condition should be `len(current) + 1 + len(word) <= width`.\n\nLet me verify: if current = \"ab\" (2 chars), word = \"cd\" (2 chars), width = 5. Joined line \"ab cd\" is 5 chars, which is at most 5, so it should be appended. Original code: len(current) + len(word) = 4 <= 5, appends \u2014 correct in this case. But if width = 4: joined line \"ab cd\" is 5 chars > 4, so should start a new line. Original code: 4 <= 4, appends \u2014 wrong. So the fix is to add 1 for the space.\n\nFixed function:\n\n```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + 1 + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```\n\nThat's the only bug. Everything else matches the spec: first word starts a line, greedy packing, final line appended, every word appears exactly once in order.</think>```python\ndef wrap_text(text, width):\n    words = text.split(\" \")\n    lines = []\n    current = \"\"\n    for word in words:\n        if not current:\n            current = word\n        elif len(current) + 1 + len(word) <= width:\n            current = current + \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    if current:\n        lines.append(current)\n    return lines\n```",
+        "response_tokens": 539,
+        "tool_calls": []
+      },
+      "candidate_error": null,
+      "candidate_sha256": "dbb48d43e4b1dbaade522188128662ffefbcb84b185c612f09ca59dabeb3ff28",
+      "diagnostic_event": "return_validated",
+      "extraction": "last_fenced_block",
+      "group": "target",
+      "judged_cases": 3,
+      "oracle_status": "PASSED",
+      "passed": 3,
+      "per_check": {
+        "every_word_wraps": true,
+        "exact_fit": true,
+        "space_counts": true
+      },
+      "sample_id": "wrap_text_v1",
+      "split": "training",
+      "total": 3,
+      "unjudged_checks": 0
+    }
+  ],
+  "cases_fully_passed": 16,
+  "cases_total": 16,
+  "extraction_rule": "last fenced ```python block; whole response if it is itself a def-containing source; else no_code_block failure",
+  "honesty": [
+    "A pass rate on these authored cases is a measurement of THIS case set only; it is not a quality claim about the model.",
+    "Implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it."
+  ],
+  "judge": "host_oracle_function_io_linux_sandbox",
+  "judged_traces_written_to_distill_workspace": [
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-adjacent_diffs_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-char_counts_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-clamp_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-cumprod_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-diagonal_sum_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-dot_product_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-group_parity_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-interleave_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-is_sorted_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-longest_word_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-palindromes_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-repeat_to_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-reverse_words_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-sum_digits_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-swap_case_v1.json",
+    "C:\\Users\\reetu\\Desktop\\SILT\\experiments\\glm53_flash_e2\\workspace-judged\\traces\\python_repo_debugging_v1-wrap_text_v1.json"
+  ],
+  "run": "teacher glm-5.3-flash:cloud (behavioural_remote), E2 new training cases"
+}

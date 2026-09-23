@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "a75d4c42ad690bc810f26673c00216aad13626db824998a24d5a848e05d606dc",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2873.978,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: diffs accepts a list of numbers with at least one element and returns the list of absolute differences between each pair of adjacent elements, in order. A single-element list returns an empty list.\n\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(numbers[i + 1] - numbers[i])\n    return result\n```",
+    "prompt_tokens": 136,
+    "response": "Let me analyze the function against the specification.\n\nSpecification: `diffs` accepts a list of numbers with at least one element and returns the list of **absolute differences** between each pair of adjacent elements, in order. A single-element list returns an empty list.\n\nThe current function:\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(numbers[i + 1] - numbers[i])\n    return result\n```\n\nThe bug: it computes `numbers[i + 1] - numbers[i]` which is a signed difference, not the absolute difference. The specification requires absolute differences, so we need `abs(numbers[i + 1] - numbers[i])`.\n\nEdge case: single-element list. `range(len(numbers) - 1)` = `range(0)` for a single element, so the loop doesn't execute, and it returns `[]`. That's correct.\n\nSo the fix is to wrap the difference in `abs()`.\n\nFixed function:\n```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(abs(numbers[i + 1] - numbers[i]))\n    return result\n```\n\nThe instruction says to return ONLY the complete fixed function inside a single ```python code block, with no other text. So I should just output the code block.</think>```python\ndef diffs(numbers):\n    result = []\n    for i in range(len(numbers) - 1):\n        result.append(abs(numbers[i + 1] - numbers[i]))\n    return result\n```",
+    "response_tokens": 328,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 5297.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "66ac5cdfe50aae9ca2f5dda7e539f31fb63a5a382d4874419a49e9eb38efa66e",
+  "sample_id": "adjacent_diffs_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

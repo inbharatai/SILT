@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "2ca09785cca1a111eebe67fb98e7cca896205c589acd241df6f543de955d226c",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 1934.958,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: is_sorted accepts a list of numbers and returns True when the list is in non-decreasing order (no element is greater than the one after it) and False otherwise. Empty lists and single-element lists are sorted.\n\n```python\ndef is_sorted(values):\n    for i in range(len(values) - 1):\n        if values[i] >= values[i + 1]:\n            return False\n    return True\n```",
+    "prompt_tokens": 142,
+    "response": "The specification says: non-decreasing order means no element is greater than the one after it. So for a sorted list, values[i] <= values[i+1] for all i. The bug: the function returns False when values[i] >= values[i+1], which means it rejects equal adjacent elements. It should return False only when values[i] > values[i+1].\n\nFix: change `>=` to `>`.</think>```python\ndef is_sorted(values):\n    for i in range(len(values) - 1):\n        if values[i] > values[i + 1]:\n            return False\n    return True\n```",
+    "response_tokens": 131,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "1ebdc06fabb363b8e42bbdb3d38da53bc7aadde23763269f139995820bc6c2d0",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "descending": true,
+        "empty": true,
+        "single": true,
+        "with_ties": true
+      }
+    },
+    "success": true,
+    "tests_passed": 4,
+    "tests_total": 4
+  },
+  "prompt_hash": "c8598733e10a82fcf2bf46bf9250254a60f03974d6bd03e13e08842c241c5228",
+  "sample_id": "is_sorted_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

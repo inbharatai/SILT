@@ -1,0 +1,37 @@
+{
+  "artifact_sha256": "83c57777d6d3aee5d45b9d550aed0bca91d25b6182154f0b9aa4158f146bda15",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2143.812,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: palindromes accepts a list of non-empty lowercase strings and returns a new list containing exactly those strings that read the same forwards and backwards, preserving input order. The input list is not mutated.\n\n```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w[0] == w[-1]:\n            result.append(w)\n    return result\n```",
+    "prompt_tokens": 139,
+    "response": "The bug: the function checks only first and last characters, but a palindrome must read the same forwards and backwards entirely. Fix: check `w == w[::-1]`.\n\nAlso, the input list is not mutated \u2014 the current function doesn't mutate it, and the fix won't either. Return a new list preserving order.\n\nFixed function:\n\n```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w == w[::-1]:\n            result.append(w)\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef palindromes(words):\n    result = []\n    for w in words:\n        if w == w[::-1]:\n            result.append(w)\n    return result\n```",
+    "response_tokens": 158,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "59a203275fbdba3a1124c4283fb989ce8d1fb7841acafbef0c0d774ebf30f020",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "mixed": true,
+        "none_match": true,
+        "single_char": true
+      }
+    },
+    "success": true,
+    "tests_passed": 3,
+    "tests_total": 3
+  },
+  "prompt_hash": "95834539b0493a1b4d14b60f3043b871b6303dda012eb942deafcf8ef3e46263",
+  "sample_id": "palindromes_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

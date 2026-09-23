@@ -1039,3 +1039,34 @@ def test_deepapply_config_max_length_default_and_plumb():
     assert raised.to_train_dict()["max_length"] == 1280
     # The knob is a budget, never a generation-length setting.
     assert default.max_new_tokens == 48
+
+
+def test_deepapply_config_model_dtype_default_and_plumb():
+    """Weight-dtype knob: defaults to None (the historical fp32 path stays
+    byte-identical), rides to_train_dict, and an unknown value is refused by
+    the trainer BEFORE any tokenizer or weight is touched (never guessed at)."""
+    pytest.importorskip("torch")
+    default = DeepApplyConfig()
+    assert default.model_dtype is None
+    assert default.to_train_dict()["model_dtype"] is None
+    pinned = DeepApplyConfig(model_dtype="bfloat16")
+    assert pinned.to_train_dict()["model_dtype"] == "bfloat16"
+    from asea.deepapply.trainer import StandardTrainerBackend
+    from asea.deepapply.dataset import TrainingDataset
+    from asea.deepapply.errors import DeepApplyBlocked
+
+    class _Receiver:
+        model_id = "irrelevant"
+
+    backend = StandardTrainerBackend()
+    train_cfg = {"model_dtype": "bfloat8", "max_steps": 0, "seed": 0}
+    try:
+        backend.train(_Receiver(), TrainingDataset([{}], {}), train_cfg,
+                      None)
+    except DeepApplyBlocked as exc:
+        assert "model_dtype" in str(exc)
+    except Exception as exc:  # any other exception means the guard missed
+        pytest.fail("unknown model_dtype must raise DeepApplyBlocked, "
+                    "got {}: {!r}".format(type(exc).__name__, exc))
+    else:
+        pytest.fail("unknown model_dtype must raise DeepApplyBlocked")

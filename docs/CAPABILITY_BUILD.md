@@ -440,6 +440,91 @@ admission remains DeepApply (Gate-1 PROMOTED packets → `DeepApplyRunner` →
 Gate 2 → `AdapterStore`) and was NOT sought. The adapter is a research
 artifact.
 
+## E2 expansion (recorded 2026-09-19 → 2026-09-23; real end-to-end)
+
+The first experiment's honest negative raised the obvious question: was the
+result an artifact of the tiny 6-pair KD set and the 0.5B student? E2
+re-ran the same chain with exactly three recorded differences
+(`experiments/glm53_flash_e2/`; artifacts in `deepapply-run/`):
+
+* **16 newly authored training cases** (16 families, `reverse_words_v1` …
+  `wrap_text_v1`) with the same discipline as v1: every expected value
+  computed by RUNNING the reference, reference must pass every check after
+  a JSON round-trip with recursive exact type matching, buggy variant must
+  fail at least one, arity must equal the signature, and no ID/family/
+  token-shape collision with the frozen v1 set. The authoring self-check
+  caught its own `palindromes_v1` before any model saw it: the first buggy
+  variant (`w[0]==w[-1]`) passed every authored check because no check case
+  had a non-palindrome with matching first/last characters — the check was
+  broadened and the case re-authored.
+* **Dataset v2** (`data/capability_v2/`): the frozen v1 rows verbatim, with
+  only the training split expanded (6 → 22). All four evaluation splits are
+  **byte-identical to the frozen v1 files, verified against BOTH the v2 and
+  v1 manifest hashes** before the pretrain receipt would sign. The final
+  split stayed sealed throughout; the spec keeps v1's capability ID and
+  teacher revision so the six receipted v1 training traces pass the
+  distiller's identity checks unchanged.
+* **Bigger student on GPU:** `Qwen/Qwen2.5-1.5B-Instruct` (vs 0.5B), real
+  LoRA on the RTX 5050 (sm_120). fp32 1.5B weights plus one 1280-token
+  row's logits exceed the 8 GB card, so this run added a second documented
+  production trainer knob: `model_dtype="bfloat16"` (default `None` = the
+  historical fp32 path, byte-identical; unknown values refused fail-closed
+  before any tokenizer or weight is touched; both A/B arms load under the
+  SAME dtype). The torch deviation (2.11.0+cu128 — the only sm_120 build)
+  is isolated to a `--system-site-packages` GPU venv that shadows
+  transformers/peft/accelerate with the exact production pins; the repo's
+  localmodels pin is untouched (the GLM worker's isolated-5.16.1 pattern).
+
+Pretrain stages all real: 16 consented cloud traces (`--allow-remote`,
+per-run), judged **16/16 cases fully passed, 57/57 checks** under authored
+denominators; distill produced **22 KD pairs** (6 receipted v1 + 16 new,
+0 excluded); training ran **64 finite steps, 1,089,536 trainable
+parameters, final loss 0.6476, 61 s on CUDA**. Two signed receipts
+(`e2-receipt-pretrain`, `e2-receipt-training`) verify against the same
+workspace key.
+
+**Independent A/B verdict — net negative on every split.** Same strict
+extraction rule (imported from the v1 judge), same host oracle in the WSL
+Linux sandbox, identical greedy raw-text generation path in both arms
+(bf16 on CUDA), 32 non-final cases / 102 authored checks per arm (the
+expected total is COMPUTED from the frozen rows after the first run's
+hand-typed 45-check guard — v1's non-final count — refused its own report):
+
+| Split (checks) | base (no adapter) | + trained adapter | Δ |
+|---|---|---|---|
+| training | 0.7368 | 0.6447 | **−0.0921** |
+| development | 1.0 | 0.6667 | **−0.3333** |
+| heldout | 1.0 | 0.3333 | **−0.6667** |
+| controls (utility writing) | 0.75 | 0.625 | **−0.125** |
+| **target checks (aggregate)** | **0.7872** | **0.6170** | **−0.1702** |
+
+Unlike v1 (where development and controls improved), the E2 adapter
+regressed every split, including the untouched held-out set and the
+controls. Retention 0.7134 (the same cross-path ratio definition as v1:
+adapter target rate / teacher target rate, here against the receipted v1
+teacher number 0.8649 — a ratio, not a like-for-like comparison). The
+honest verdict: **a 3.7× larger KD set and a 3× larger student did not flip
+the sign; the adapter again degraded the measured capability.** This is
+recorded as a real result — NOT "distillation works" and NOT "distillation
+fails"; 22 sequence-level pairs is still mechanism-scale, and no public
+proof has been attempted. The E2 arms are additionally not comparable to
+v1's fp32 CPU A/B numbers (different student, dtype and device); each
+experiment is compared within itself.
+
+The run again caught real defects, all recorded in the training receipt's
+`failure_history`: the WSL oracle venv resolved a **stale asea checkout**
+(`~/SILT` at an older commit) whose evaluate result predates the
+authored-denominator correction — surfaced as `KeyError: 'status'` and
+fixed by pinning `PYTHONPATH` to this checkout's src inside the E2 drivers
+(the same trap the v1 training stage hit); the hand-typed denominator
+guard described above; and repeated permission-classifier outages that
+delayed but never fabricated output.
+
+Nothing about E2 admits, activates or certifies anything: production
+admission remains DeepApply (Gate-1 PROMOTED packets → `DeepApplyRunner` →
+Gate 2 → `AdapterStore`) and was NOT sought. The adapter is a research
+artifact.
+
 ## Boundary rules (binding, all verified in review)
 
 Package stays `asea`; `asea run` unchanged; Pipeline called, never mutated;

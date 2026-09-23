@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "0b6e1453e4b82f9e5b5ad937229c3802de8e06e22f59be063aa6f00486905b94",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2660.242,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: diagonal_sum accepts a square matrix (a list of equal-length row lists of numbers) and returns the sum of the main-diagonal entries, that is matrix[i][i] for each row index i. The matrix is not mutated.\n\n```python\ndef diagonal_sum(matrix):\n    total = 0\n    n = len(matrix)\n    for i in range(n):\n        total += matrix[i][n - 1 - i]\n    return total\n```",
+    "prompt_tokens": 150,
+    "response": "The function currently computes the anti-diagonal (secondary diagonal): matrix[i][n - 1 - i]. The specification says main diagonal: matrix[i][i]. So fix: total += matrix[i][i].\n\nAlso ensure no mutation \u2014 there's no mutation. Return only the fixed function in a code block.</think>```python\ndef diagonal_sum(matrix):\n    total = 0\n    n = len(matrix)\n    for i in range(n):\n        total += matrix[i][i]\n    return total\n```",
+    "response_tokens": 105,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "89bdd70dc2120ea4b46fd3274cb7dce9bfb2b83395227929fb2fe2f740ac9731",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "generic_2x2": true,
+        "one_by_one": true,
+        "sparse_identity": true,
+        "two_by_two": true
+      }
+    },
+    "success": true,
+    "tests_passed": 4,
+    "tests_total": 4
+  },
+  "prompt_hash": "fa19b1e0d7b9e92f80fea1b5dd0511427ea2c3e5b8e964d497c9d879b4314053",
+  "sample_id": "diagonal_sum_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

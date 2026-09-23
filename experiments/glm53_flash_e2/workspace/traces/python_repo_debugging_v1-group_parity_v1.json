@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "721b82475f5db16df9acddec85feb9d38057bd909b10532f735a126b299c4ec0",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 4095.001,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: group_parity accepts a list of integers and returns a dictionary with exactly the keys 'even' and 'odd': under 'even' go the even integers in input order and under 'odd' go the odd integers in input order, using mathematical parity (so -3 is odd and -4 is even). The input is not mutated.\n\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0 or n < 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```",
+    "prompt_tokens": 192,
+    "response": "Let me analyze the bug in the function.\n\nThe specification says:\n- Group integers by mathematical parity\n- -3 is odd, -4 is even\n- Even integers under 'even', odd under 'odd', in input order\n- Input not mutated\n\nThe buggy code:\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0 or n < 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```\n\nThe condition `n % 2 != 0 or n < 0` is wrong. In Python, `n % 2` for negative numbers: `-3 % 2` = 1 (Python's modulo returns non-negative for positive divisor). So `-3 % 2 != 0` is True, which correctly identifies -3 as odd. But `-4 % 2` = 0, so `-4 % 2 != 0` is False. However, the `or n < 0` part makes -4 go to odd, which is wrong. Also, negative even numbers like -2 would incorrectly go to odd.\n\nThe fix: just use `n % 2 != 0` (which works correctly in Python for negatives since Python's modulo of negative numbers with positive divisor gives non-negative result). Or use `n % 2 == 1` \u2014 wait, in Python `-3 % 2` = 1, so `n % 2 == 1` works too. But safest is `n % 2 != 0`.\n\nFixed:\n```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```\n\nThis doesn't mutate input, preserves order, uses mathematical parity correctly in Python.</think>```python\ndef group_parity(values):\n    result = {\"even\": [], \"odd\": []}\n    for n in values:\n        if n % 2 != 0:\n            result[\"odd\"].append(n)\n        else:\n            result[\"even\"].append(n)\n    return result\n```",
+    "response_tokens": 487,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 6609.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "b315ea0e5ab21eafcfaa8d2caed886d6ba813dc122663af2bfe7b6b617f3596f",
+  "sample_id": "group_parity_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

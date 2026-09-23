@@ -1,0 +1,37 @@
+{
+  "artifact_sha256": "fa1a14c2c5d0c216bff99fa8c9f603bbbdce8ed3bfb9fe5c41d83a0e7574335c",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2613.08,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: clamp accepts a list of numbers and two bounds lo and hi with lo <= hi, and returns a new list in which every value below lo is replaced by lo, every value above hi is replaced by hi, and values inside the inclusive range are unchanged. The input list is not mutated.\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        else:\n            result.append(v)\n    return result\n```",
+    "prompt_tokens": 161,
+    "response": "The bug: the function only clamps values below lo, but doesn't clamp values above hi. Need to add the hi check.\n\nFixed:\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        elif v > hi:\n            result.append(hi)\n        else:\n            result.append(v)\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        elif v > hi:\n            result.append(hi)\n        else:\n            result.append(v)\n    return result\n```",
+    "response_tokens": 156,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "258f55d47ce41bb1e2cafb9974afb17359330deb01c57a4f68aa0e2c183d9aa9",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "both_sides": true,
+        "inside": true,
+        "negative_bounds": true
+      }
+    },
+    "success": true,
+    "tests_passed": 3,
+    "tests_total": 3
+  },
+  "prompt_hash": "f5eb17d12fa2f2e46239be2d52d8840a7b49ad9ad61a98a9aeb4dd953dfdf1d1",
+  "sample_id": "clamp_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

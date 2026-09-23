@@ -157,7 +157,7 @@ Legacy code similarity is not the later function-IO oracle.
 <a id="l08"></a>
 ### L08 — Optional packet-derived deep-apply LoRA
 
-**Mechanism:** StandardTrainerBackend uses HF CausalLM/PEFT, AdamW and backward/step, saves adapter_model. Runner binds provenance, dataset hash, scores, rollback and adapter stores. Packet-derived adapters remain separate from base weights.
+**Mechanism:** StandardTrainerBackend uses HF CausalLM/PEFT, AdamW and backward/step, saves adapter_model. Runner binds provenance, dataset hash, scores, rollback and adapter stores. Packet-derived adapters remain separate from base weights. Two documented run-config knobs extend sequence/precision control without changing any default: `max_length` (default 256, the historical budget; raised only when real teacher responses would truncate mid-response, label masking keeps the objective response-only) and `model_dtype` (default None = the historical fp32 path, byte-identical; explicit float32/bfloat16/float16 only, unknown values refused fail-closed before any tokenizer or weight load — added for the E2 run where fp32 1.5B weights + one row's logits exceed an 8 GB card).
 
 **Default / enablement:** Optional [deep] dependencies and explicit API/Studio action; backend standard by default, rank8/alpha16, lr1e-4, 16 steps capped64, seed0, CPU ceiling1.5B.
 
@@ -881,6 +881,21 @@ admitted by installing/merging the source**. Nothing in it auto-activates.
 **Evidence kind:** Implemented + mechanism-tested offline with synthetic candidates (a mechanism test, not a reduced-model quality result).
 
 **Pinned source / tests:** [src/asea/capability_build/search.py](https://github.com/inbharatai/SILT/blob/main/src/asea/capability_build/search.py) · [tests/test_capability_build.py](https://github.com/inbharatai/SILT/blob/main/tests/test_capability_build.py)
+
+<a id="c30"></a>
+### C30 — E2 KD-set expansion experiment (bigger student, GPU, honest repeat negative)
+
+**Default / enablement:** executed experiment record (2026-09-19 → 2026-09-23), not an enabled feature; research CLI only.
+
+**Invoke / knobs:** same chain as C28 plus the documented `model_dtype` trainer knob (bf16 for this run; see L08) and an isolated `--system-site-packages` GPU venv (torch 2.11.0+cu128 — the only sm_120-compatible build — shadowed by the exact production transformers/peft/accelerate pins; the repo's localmodels pin is untouched, the GLM-worker isolation pattern).
+
+**Mechanism:** The frozen v1 evaluation material was reused BYTE-IDENTICAL (all four evaluation splits hash-verified against BOTH the v2 and v1 manifests) with only the training split expanded from 6 to 22 cases — sixteen newly authored cases with expected values computed by running the reference (the authoring self-check caught and re-authored its own `palindromes_v1` before any model saw it). Teacher traced with per-run remote consent and judged 16/16 cases / 57/57 checks; distill produced 22 KD pairs; a real LoRA run on Qwen2.5-1.5B-Instruct trained 64 finite steps (1,089,536 trainable parameters) on CUDA. The independent oracle A/B (32 non-final cases / 102 authored checks per arm, expected total computed from the frozen rows) measured the trained adapter REGRESSING every split: training 0.7368→0.6447, development 1.0→0.6667, held-out 1.0→0.3333, controls 0.75→0.625, aggregate target 0.7872→0.6170 (retention 0.7134, the same cross-path ratio definition as the v1 correction). Recorded as a real result, not "distillation fails".
+
+**Limits:** 22 sequence-level KD pairs is still mechanism-scale; no public proof attempted. The E2 arms (bf16 CUDA, 1.5B student) are not comparable to the v1 pilot's fp32 CPU A/B (0.5B student); each experiment is compared within itself. The final split stayed sealed. Nothing admitted, activated or certified; production admission remains DeepApply/Gate 2 and was not sought.
+
+**Evidence kind:** REAL run — real consented cloud traces, real host-oracle judgment in the Linux sandbox, real production-trainer LoRA on CUDA, independent A/B, two signed receipts (pretrain + training) that verify against the same workspace key. Real defects the run exposed (stale WSL asea checkout resolved by PYTHONPATH pinning; a hand-typed denominator guard refusal) are recorded in the training receipt's failure_history.
+
+**Pinned source / tests:** [experiments/glm53_flash_e2/](https://github.com/inbharatai/SILT/tree/main/experiments/glm53_flash_e2) · [data/capability_v2/](https://github.com/inbharatai/SILT/tree/main/data/capability_v2) · [src/asea/deepapply/trainer.py](https://github.com/inbharatai/SILT/blob/main/src/asea/deepapply/trainer.py) · [tests/test_deep_apply.py](https://github.com/inbharatai/SILT/blob/main/tests/test_deep_apply.py) · [docs/CAPABILITY_BUILD.md](CAPABILITY_BUILD.md#e2-expansion-recorded-2026-09-19--2026-09-23-real-end-to-end)
 
 ## Recorded evidence and measurement units
 

@@ -1,0 +1,7 @@
+{
+  "final_opened": false,
+  "frozen_before_model_generation": true,
+  "manifest_sha256": "8a9e5796a862e02df6ed5ab5686dfb6ca642d517f7c9bace3f547b0a87e11325",
+  "model_outputs_consulted": false,
+  "schema": "silt.capability_selection_lock.v1"
+}

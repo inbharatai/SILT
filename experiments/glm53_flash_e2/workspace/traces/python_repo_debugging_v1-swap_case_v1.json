@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "cd4f58ee8dcdd211359fa3c96b1da6dca41a2a3492ea3d6df2194dd9a892dbb6",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2236.76,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: swap_case accepts a string and returns a new string in which every lowercase letter becomes uppercase, every uppercase letter becomes lowercase, and every non-letter character is unchanged.\n\n```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        else:\n            result += ch\n    return result\n```",
+    "prompt_tokens": 138,
+    "response": "The bug: the function only handles lowercase letters, converting them to uppercase. It doesn't handle uppercase letters (should convert to lowercase). Non-letter characters are unchanged, which is fine.\n\nFix: add an elif for \"A\" <= ch <= \"Z\": result += ch.lower().\n\nAlternatively use ch.swapcase(), but the spec says fix the function; simplest fix:\n\n```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        elif \"A\" <= ch <= \"Z\":\n            result += ch.lower()\n        else:\n            result += ch\n    return result\n```\n\nReturn only the code block.</think>```python\ndef swap_case(text):\n    result = \"\"\n    for ch in text:\n        if \"a\" <= ch <= \"z\":\n            result += ch.upper()\n        elif \"A\" <= ch <= \"Z\":\n            result += ch.lower()\n        else:\n            result += ch\n    return result\n```",
+    "response_tokens": 214,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 4719.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "55ab0abc25e86e75aa3ab43fd2cc925a6bf5b64c16f381b7c422554964bac4ea",
+  "sample_id": "swap_case_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

@@ -29,3 +29,9 @@ scripts/prepare_specialist_data.py text eol=lf
 # (pre-commit pin audit 2026-09-19; the judgment files are re-committed
 # in their pinned CRLF form).
 experiments/glm53_flash_pilot/** -text
+
+# E2 expansion artifacts: the E2 receipts pin the raw sha256 of these
+# files' on-disk bytes (same failure class as the pilot block above; the
+# stale-checkout PYTHONPATH audit 2026-09-19 predates these records and the
+# pins are computed from the working-tree bytes at signing time).
+experiments/glm53_flash_e2/** -text

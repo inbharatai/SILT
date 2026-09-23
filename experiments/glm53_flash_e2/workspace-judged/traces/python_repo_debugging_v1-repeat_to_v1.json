@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "9df10eb39e3e18696d68c6758919a1ed07635b7a4fe13891a351eb078dc769be",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 7492.621,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: repeat_to accepts a non-empty pattern string and a non-negative integer n, and returns the first n characters of the pattern repeated cyclically. When n is 0 the result is the empty string; the result is never longer than n characters.\n\n```python\ndef repeat_to(pattern, n):\n    return pattern * n\n```",
+    "prompt_tokens": 124,
+    "response": "The specification: repeat_to accepts a non-empty pattern string and a non-negative integer n, and returns the first n characters of the pattern repeated cyclically. When n is 0 the result is the empty string; the result is never longer than n characters.\n\nSo we need to repeat the pattern cyclically and truncate to n characters.\n\nStandard approach: `(pattern * (n // len(pattern) + 1))[:n]` \u2014 but careful with n=0: `pattern * (0 // len + 1)` = pattern * 1 = pattern, then [:0] = \"\". That works.\n\nBut wait, if n=0, `n // len(pattern) + 1` = 1, so pattern * 1, then [:0] gives \"\". Good.\n\nAlternative: `(pattern * n)[:n]` \u2014 this works too since pattern * n has at least n characters when n >= 1 (pattern non-empty, so len(pattern) >= 1, pattern * n has length >= n). And for n=0, pattern * 0 = \"\", [:0] = \"\". This is simpler and correct. However, it may allocate more memory than needed, but correctness-wise it's fine.\n\nActually `(pattern * n)[:n]` is correct: for n >= 1, len(pattern * n) = len(pattern) * n >= n since len(pattern) >= 1. For n = 0, result is \"\".\n\nBut a more efficient version: `(pattern * (n // len(pattern) + 1))[:n]`. Both are correct. Let me use the efficient one, or the simple one. Either meets spec exactly.\n\nEdge: n=0 with efficient version: n // len = 0, +1 = 1, pattern * 1, [:0] = \"\". Correct.\n\nI'll return the efficient version. Actually, simplest and clearly correct: `(pattern * n)[:n]`. Hmm, but for large n it's wasteful. The spec doesn't mention efficiency. I'll go with the efficient one to be safe... Actually both are fine. Let me pick the efficient one:\n\n```python\ndef repeat_to(pattern, n):\n    if n == 0:\n        return \"\"\n    repeats = n // len(pattern) + 1\n    return (pattern * repeats)[:n]\n```\n\nOr without the special case: `(pattern * (n // len(pattern) + 1))[:n]` handles n=0 correctly. Let me verify: n=0, len(pattern) >= 1, 0 // len = 0, +1 = 1, pattern * 1 = pattern, [:0] = \"\". Yes.\n\nReturn only the code block.</think>```python\ndef repeat_to(pattern, n):\n    return (pattern * (n // len(pattern) + 1))[:n]\n```",
+    "response_tokens": 590,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "08d1215328202e7f7b61ffad6c51865946b63e327b99f47da667e867d2ccb460",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "one_cycle_plus": true,
+        "single_char": true,
+        "truncate": true,
+        "zero": true
+      }
+    },
+    "success": true,
+    "tests_passed": 4,
+    "tests_total": 4
+  },
+  "prompt_hash": "415e90f6f2454d6c90a9c308fa28e3f0cdc09b2f3235bb537580f96850904167",
+  "sample_id": "repeat_to_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

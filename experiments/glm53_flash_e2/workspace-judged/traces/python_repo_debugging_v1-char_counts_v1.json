@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "32755374676468d8a129c6d201396d32b167c52c0dc6447701256662b6e20867",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 1917.326,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: char_counts accepts a string and returns a dictionary that maps each lowercase letter appearing in the string to the number of times it appears, counting uppercase letters as their lowercase form. Non-letter characters are ignored. The result contains keys only for letters that appear.\n\n```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```",
+    "prompt_tokens": 168,
+    "response": "The bug: the function counts uppercase letters as uppercase keys, but the specification says uppercase letters should be counted as their lowercase form. So we need to lowercase the character before counting.\n\nFix:\n\n```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            ch = ch.lower()\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```\n\nThat's it. Return only the code block.</think>```python\ndef char_counts(text):\n    counts = {}\n    for ch in text:\n        if \"a\" <= ch <= \"z\" or \"A\" <= ch <= \"Z\":\n            ch = ch.lower()\n            counts[ch] = counts.get(ch, 0) + 1\n    return counts\n```",
+    "response_tokens": 183,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "64487adf4015a6602fb4d9b5ffeb3529565b44fc894f37ff6292a46810af59d0",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "case_folding": true,
+        "empty": true,
+        "mixed_case": true,
+        "with_noise": true
+      }
+    },
+    "success": true,
+    "tests_passed": 4,
+    "tests_total": 4
+  },
+  "prompt_hash": "aa7cea00769986f54c434eb258144592895b00ef1fda536f4b1a5daf13670e93",
+  "sample_id": "char_counts_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

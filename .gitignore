@@ -58,3 +58,7 @@ experiments/glm53_flash_pilot/judging/
 # safetensors file is deliberately re-included below.
 experiments/glm53_flash_pilot/deepapply-run/judging/
 !experiments/glm53_flash_pilot/deepapply-run/adapter_model/*.safetensors
+# --- GLM-5.3-Flash E2 expansion scratch (same discipline) ---
+experiments/glm53_flash_e2/judging/
+experiments/glm53_flash_e2/deepapply-run/judging/
+!experiments/glm53_flash_e2/deepapply-run/adapter_model/*.safetensors

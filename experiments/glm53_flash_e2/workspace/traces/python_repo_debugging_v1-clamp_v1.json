@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "fb71fe74919da1ff7d5c6413a0c478d1886543b25e7213d0e992aea1eb196bfc",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2613.08,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: clamp accepts a list of numbers and two bounds lo and hi with lo <= hi, and returns a new list in which every value below lo is replaced by lo, every value above hi is replaced by hi, and values inside the inclusive range are unchanged. The input list is not mutated.\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        else:\n            result.append(v)\n    return result\n```",
+    "prompt_tokens": 161,
+    "response": "The bug: the function only clamps values below lo, but doesn't clamp values above hi. Need to add the hi check.\n\nFixed:\n\n```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        elif v > hi:\n            result.append(hi)\n        else:\n            result.append(v)\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef clamp(values, lo, hi):\n    result = []\n    for v in values:\n        if v < lo:\n            result.append(lo)\n        elif v > hi:\n            result.append(hi)\n        else:\n            result.append(v)\n    return result\n```",
+    "response_tokens": 156,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "judge": "UNJUDGED_teacher_cannot_grade_itself",
+      "wall_latency_ms": 5109.0
+    },
+    "success": null,
+    "tests_passed": null,
+    "tests_total": null
+  },
+  "prompt_hash": "f5eb17d12fa2f2e46239be2d52d8840a7b49ad9ad61a98a9aeb4dd953dfdf1d1",
+  "sample_id": "clamp_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

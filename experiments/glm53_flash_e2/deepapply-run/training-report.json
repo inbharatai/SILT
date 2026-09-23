@@ -1,0 +1,45 @@
+{
+  "adapter_pass_rates": {
+    "cases_fully_passed": 0.5,
+    "control_checks": 0.625,
+    "controls_split_checks": 0.625,
+    "development_checks": 0.6667,
+    "heldout_checks": 0.3333,
+    "overall_checks": 0.6176,
+    "target_checks": 0.617,
+    "training_checks": 0.6447
+  },
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "base_pass_rates": {
+    "cases_fully_passed": 0.6875,
+    "control_checks": 0.75,
+    "controls_split_checks": 0.75,
+    "development_checks": 1.0,
+    "heldout_checks": 1.0,
+    "overall_checks": 0.7843,
+    "target_checks": 0.7872,
+    "training_checks": 0.7368
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "comparison": "identical deterministic HF generation path (bfloat16 on CUDA, greedy), identical strict extraction, identical host oracle; the ONLY difference between arms is the trained adapter",
+  "control_regressed": true,
+  "deltas_adapter_minus_base": {
+    "control_checks": -0.125,
+    "controls_split_checks": -0.125,
+    "development_checks": -0.3333,
+    "heldout_checks": -0.6667,
+    "target_checks": -0.1702,
+    "training_checks": -0.0921
+  },
+  "heldout_improved": false,
+  "honesty": [
+    "A pass rate on these authored cases measures THIS case set only; it is not a quality claim about the model.",
+    "The mechanism-scale caveat stands: the KD set is small; a null or negative held-out delta is a real result, not a failure to hide.",
+    "The trainer never certified itself: every number here comes from the independent host oracle in the Linux sandbox.",
+    "The final split was never generated or judged.",
+    "Production admission (Gate 1 PROMOTED packets -> DeepApplyRunner -> Gate 2 -> AdapterStore) was NOT sought; this adapter is a research artifact and autoactivates nothing.",
+    "The E2 A/B arms are NOT directly comparable to the v1 pilot's fp32 CPU A/B numbers: different student (1.5B vs 0.5B), different dtype and device, same frozen evaluation cases and the same oracle; each experiment is compared within itself."
+  ],
+  "kd_set": "six receipted v1 training pairs + E2 training cases (host-oracle judged, same distill discipline)",
+  "run": "E2 deepapply training + independent oracle A/B (REAL, GPU)"
+}

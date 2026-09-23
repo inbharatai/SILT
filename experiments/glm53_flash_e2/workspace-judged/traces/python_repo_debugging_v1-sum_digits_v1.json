@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "9063615083d80b12411041c82eda952a48186bca91a911b7c9eb2e47362f04b0",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 2750.157,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: sum_digits accepts a string and returns the sum of the integer values of every ASCII digit character '0' through '9' it contains, in the order encountered. A string with no digits returns 0.\n\n```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += 1\n    return total\n```",
+    "prompt_tokens": 142,
+    "response": "The bug: the function counts digits (adds 1) instead of summing their integer values. Fix: total += int(ch) or total += ord(ch) - ord('0').\n\nThe specification says \"returns the sum of the integer values of every ASCII digit character '0' through '9' it contains, in the order encountered.\" Order doesn't matter for sum, but that's fine.\n\nFixed function:\n\n```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += int(ch)\n    return total\n```\n\nNote: `int(ch)` works for ASCII digits. Alternatively `ord(ch) - ord('0')`. Either is fine. Return only the code block.</think>```python\ndef sum_digits(text):\n    total = 0\n    for ch in text:\n        if \"0\" <= ch <= \"9\":\n            total += int(ch)\n    return total\n```",
+    "response_tokens": 204,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "08f8a91b1c8fd57ec16626ff3c4a7900b5da9890069716f4ad0c311097e964d2",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "digits_letters": true,
+        "empty": true,
+        "mixed": true,
+        "no_digits": true
+      }
+    },
+    "success": true,
+    "tests_passed": 4,
+    "tests_total": 4
+  },
+  "prompt_hash": "f9da1c298175f4dea6a4976fc46afceacd8c158ee5fbc6b2caa4b2992a3758e0",
+  "sample_id": "sum_digits_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

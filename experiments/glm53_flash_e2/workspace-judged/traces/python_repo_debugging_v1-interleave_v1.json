@@ -1,0 +1,37 @@
+{
+  "artifact_sha256": "7da065b34ccab4bc09b288f4b4d34d09f88170cfa7a3b3d9a276e2a0b60f3d31",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 1742.719,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: interleave accepts two lists of equal length and returns a new list whose elements alternate between the two inputs, starting with the first list: first[0], second[0], first[1], second[1], and so on. The inputs are not mutated.\n\n```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(second[i])\n        result.append(first[i])\n    return result\n```",
+    "prompt_tokens": 150,
+    "response": "The specification says: interleave returns a new list whose elements alternate between the two inputs, starting with the first list: first[0], second[0], first[1], second[1], and so on.\n\nThe buggy code appends second[i] first, then first[i]. So it starts with the second list. Fix: swap the order of appends.\n\n```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(first[i])\n        result.append(second[i])\n    return result\n```\n\nThat's it. Return only the code block.</think>```python\ndef interleave(first, second):\n    result = []\n    for i in range(len(first)):\n        result.append(first[i])\n        result.append(second[i])\n    return result\n```",
+    "response_tokens": 166,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "bf2507bf2111e26b27fd53e80377c987ae061e9a397ff0b0f8f14271e3a5c404",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "empty_pair": true,
+        "three_by_three": true,
+        "two_by_two": true
+      }
+    },
+    "success": true,
+    "tests_passed": 3,
+    "tests_total": 3
+  },
+  "prompt_hash": "8255986a12a41658b261ce050bc0b876b08c3fd5095647d735db7e07c2e815a7",
+  "sample_id": "interleave_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

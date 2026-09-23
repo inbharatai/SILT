@@ -228,6 +228,28 @@ class _AdaptedHFModule(ModuleAdapter):
         return text
 
 
+def _resolve_model_dtype(config: Dict[str, Any]):
+    """Weight-dtype knob (E2, 2026-09-19). ``model_dtype`` None keeps the
+    historical fp32 path byte-identical; a GPU host may pin
+    "bfloat16"/"float16" so the resident model fits its VRAM (e.g. a 1.5B
+    student in bf16 on an 8 GB card, where fp32 weights plus the logits
+    tensor alone exceed the VRAM). An unknown value is refused BEFORE any
+    tokenizer or weight is touched (never guessed at); the run record
+    carries the dtype actually used, and an A/B must load both arms under
+    the same dtype or the comparison is not like-for-like."""
+    import torch  # lazy
+
+    dtype_name = config.get("model_dtype")
+    torch_dtype = {"float32": torch.float32,
+                   "bfloat16": torch.bfloat16,
+                   "float16": torch.float16}.get(dtype_name)
+    if dtype_name is not None and torch_dtype is None:
+        raise DeepApplyBlocked(
+            "model_dtype {!r} is not one of float32/bfloat16/float16; "
+            "the trainer refuses to guess a dtype".format(dtype_name))
+    return torch_dtype
+
+
 class StandardLoRAArtifact(AdapterArtifact):
     backend = "standard"
     backend_version = "peft-lora-v1"
@@ -330,6 +352,8 @@ class StandardTrainerBackend(TrainerBackend):
         }
         seed = int(config.get("seed", 0))
         _set_seeds(seed)
+        # Refuse a bad dtype BEFORE any tokenizer or weight is touched.
+        torch_dtype = _resolve_model_dtype(config)
 
         # Hardware ladder: a big model without CUDA is BLOCKED. A small model
         # may train on CPU. We estimate the param count from the config without
@@ -360,7 +384,8 @@ class StandardTrainerBackend(TrainerBackend):
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
-        model = AutoModelForCausalLM.from_pretrained(model_id).to(device)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, torch_dtype=torch_dtype).to(device)
         model.config.use_cache = False
         peft_model = get_peft_model(model, LoraConfig(**lora_config))
         peft_model.train()

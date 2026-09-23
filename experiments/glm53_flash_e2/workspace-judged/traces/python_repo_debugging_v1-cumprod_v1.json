@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "cafeb10fdcf06b54778db3ae595909c8e9f8dccf7a5636b65a75cbdee94684c6",
+  "behavioural": {
+    "attempts": 1,
+    "corrections": 0,
+    "latency_ms": 1632.824,
+    "prompt": "The following Python function has a bug. Fix it so it meets its specification exactly. Keep the function name and signature unchanged. Return ONLY the complete fixed function inside a single ```python code block, with no other text.\n\nSpecification: cumprod accepts a non-empty list of numbers and returns a list of the same length whose first element is the first input element and whose every following element is the product of all input elements up to and including that position. The input is not mutated.\n\n```python\ndef cumprod(numbers):\n    result = [numbers[0]]\n    for n in numbers[1:]:\n        result.append(result[-1] + n)\n    return result\n```",
+    "prompt_tokens": 147,
+    "response": "The bug: it adds instead of multiplies. Fix: multiply. Also ensure input not mutated \u2014 it doesn't mutate input. The fix is simple: `result.append(result[-1] * n)`.</think>```python\ndef cumprod(numbers):\n    result = [numbers[0]]\n    for n in numbers[1:]:\n        result.append(result[-1] * n)\n    return result\n```",
+    "response_tokens": 83,
+    "tool_calls": []
+  },
+  "capability_id": "python_repo_debugging_v1",
+  "group": "target",
+  "internal": null,
+  "model_revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+  "outcome": {
+    "metrics": {
+      "candidate_sha256": "280dd7753ac16c142074a2d2371e6c1e8005b2e9b6ebbcc0f588230252ee1a6c",
+      "extraction": "last_fenced_block",
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "per_check": {
+        "growing": true,
+        "negative_step": true,
+        "single": true,
+        "zero_inside": true
+      }
+    },
+    "success": true,
+    "tests_passed": 4,
+    "tests_total": 4
+  },
+  "prompt_hash": "a6f9168f6a3d4e19dc7fd68a032700495a7bc4dd22e131f397de84da758d35b4",
+  "sample_id": "cumprod_v1",
+  "schema": "silt.capability_trace.v1",
+  "schema_version": 1,
+  "trace_class": "behavioural_remote"
+}

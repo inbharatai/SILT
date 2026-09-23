@@ -1,0 +1,137 @@
+{
+  "artifact_hashes": {
+    "assemble_e2_dataset.py": "0fc9d94ef237636f1d7116094eceb45fb367fbcb9b7e4b01f61cffe858af6f95",
+    "authoring_e2.py": "a316261465a04f5aa6e9788d6d1ccc183d664af39cf3fa2c43393f84a485004f",
+    "cases-new-training.jsonl": "d8484f60e2a0dcacdf39672c82e2bfaa16977c961fcdf725350506d3b8499379",
+    "cases.jsonl": "89b27f66004d0fa9a2e9350e84ae8cd8ee6679396b7028740d116134e3044a58",
+    "dataset_v1_manifest": "12551ddd238e55af72c18444f668ad3a20c3edf60fd17570a86d40ccc361127b",
+    "dataset_v2_manifest": "8a9e5796a862e02df6ed5ab5686dfb6ca642d517f7c9bace3f547b0a87e11325",
+    "judge_e2.py": "f81ef1447457de724278088f868645a473739b1cea0a555dd07a0beb1e6b61fd",
+    "judgment-teacher-e2-new.json": "0575637d98334d96c19b70904a7391c7c02c92a38ba2d5bbc36c8b42118490ae",
+    "kd_pairs": "f962d225893e3c52eaaf85cd8ca9088898a3025cd148612c1fe1b76ea6609bff",
+    "spec.json": "8c5e578fce445052e0e173608df1cb9fd5ecea8e161388fccd101337e00f1c3b"
+  },
+  "artifact_sha256": "08122a4ef4c460f512b9cfbc09d945dcb3e61e438aefb2839cd1d4ddaccba11e",
+  "capability_id": "python_repo_debugging_v1",
+  "capability_retention": "NOT_MEASURED",
+  "command": "glm53-flash-e2-pretrain",
+  "control_regressions": {},
+  "data_split_hashes": {
+    "controls.jsonl": "cdae6cf925526424828e4409639f81f5ae9bb7d4a89a63f2b2eb8caacaf440b4",
+    "development.jsonl": "37361aa41f641f57ca9d28d56dd455dfa7b0c108f73b5806f0a67a3f8ec0b2e0",
+    "final.jsonl": "957027f1963d2e403ffa743c5c143faef1b0f09f426558432e0502793decf21c",
+    "heldout.jsonl": "07c97359d0aec66216bb48768073d9ddfbb5f0dea7f1aaf177d7bb508ccaf2b0",
+    "training.jsonl": "e14256620e2beb2e74bad7606fb417d35664a4870209742579bd7cf6402c8d02"
+  },
+  "error": null,
+  "evidence_class": "behavioural_remote",
+  "failure_history": [],
+  "gates": {
+    "gate1_status": "not_requested (no promotion sought in this experiment)",
+    "gate2_status": "not yet run; the independent A/B happens after training and is recorded in the E2 training receipt",
+    "siltspring_states": {}
+  },
+  "hardware_identity": {
+    "note": "8 GB RTX 5050 laptop; no GPU was used in the pretrain stages (authoring, tracing, judging, distilling)"
+  },
+  "honesty_note": "Signature is a local HMAC over the report bytes with a workspace-local key. It proves the report was not modified after generation to the holder of that same key. It is NOT a portable attestation, NOT proof of authorship to third parties, and NOT a quality certificate.",
+  "key_fingerprint": "6ea5ccad948a1e88",
+  "limitations": [
+    "A pass rate on these authored cases measures THIS case set only; it is not a quality claim about any model.",
+    "Implementation success is not model-quality success.",
+    "The final split was never opened; no measurement exists for it.",
+    "The teacher is behavioural-only: no routers, experts or internal state were observed; no internal claims are made.",
+    "KD pairs are sequence-level text only (GLM->Qwen cross-family); no vocabulary, logit or hidden-state alignment is assumed or performed.",
+    "The KD set is mechanism-scale; a null or negative held-out delta would be a real result, not a failure to hide."
+  ],
+  "measurements": {
+    "dataset_v2": {
+      "counts": {
+        "controls": 4,
+        "development": 3,
+        "final": 3,
+        "heldout": 3,
+        "training": 22
+      },
+      "evaluation_splits": {
+        "controls.jsonl": {
+          "byte_identical_to_v1": true,
+          "v1_manifest_sha256": "cdae6cf925526424828e4409639f81f5ae9bb7d4a89a63f2b2eb8caacaf440b4",
+          "v2_file_sha256": "cdae6cf925526424828e4409639f81f5ae9bb7d4a89a63f2b2eb8caacaf440b4"
+        },
+        "development.jsonl": {
+          "byte_identical_to_v1": true,
+          "v1_manifest_sha256": "37361aa41f641f57ca9d28d56dd455dfa7b0c108f73b5806f0a67a3f8ec0b2e0",
+          "v2_file_sha256": "37361aa41f641f57ca9d28d56dd455dfa7b0c108f73b5806f0a67a3f8ec0b2e0"
+        },
+        "final.jsonl": {
+          "byte_identical_to_v1": true,
+          "v1_manifest_sha256": "957027f1963d2e403ffa743c5c143faef1b0f09f426558432e0502793decf21c",
+          "v2_file_sha256": "957027f1963d2e403ffa743c5c143faef1b0f09f426558432e0502793decf21c"
+        },
+        "heldout.jsonl": {
+          "byte_identical_to_v1": true,
+          "v1_manifest_sha256": "07c97359d0aec66216bb48768073d9ddfbb5f0dea7f1aaf177d7bb508ccaf2b0",
+          "v2_file_sha256": "07c97359d0aec66216bb48768073d9ddfbb5f0dea7f1aaf177d7bb508ccaf2b0"
+        }
+      },
+      "final_opened": false,
+      "selection_lock_verified": true,
+      "training_composition": "six v1 training cases (byte-identical rows) plus sixteen newly authored cases"
+    },
+    "distill": {
+      "compatibility_note": "cross-family (GLM->Qwen) pairs carry text only; no vocabulary, logit or hidden-state alignment is assumed or performed",
+      "composition": "six receipted v1 training pairs (reused; their traces were judged in the v1 pilot) plus E2 positives from the newly judged traces",
+      "negatives": 0,
+      "positives": 22,
+      "protected_splits_enforced": [
+        "development",
+        "heldout",
+        "final",
+        "controls"
+      ],
+      "sequence_level_only": true,
+      "unjudged_excluded": 0
+    },
+    "teacher_e2_new_judged": {
+      "authored_denominator": "the graded total per case is the frozen authored oracle count; unjudged checks (candidate errors) count as FAILED",
+      "cases": 16,
+      "checks": 57,
+      "extraction_rule": "last fenced ```python block; whole response if it is itself a def-containing source; else no_code_block failure",
+      "fully_passed_cases": 16,
+      "judge": "host_oracle_function_io_linux_sandbox",
+      "note": "these are the SIXTEEN NEW training cases only; the v1 pilot's receipted teacher numbers on the frozen 16 non-final evaluation cases stand unchanged and are not re-measured here",
+      "overall_checks_rate": 1.0,
+      "target_cases": 16
+    }
+  },
+  "resources": {
+    "disk_bytes": "NOT_MEASURED",
+    "energy_joules": "NOT_MEASURED",
+    "latency_ms_p50": "NOT_MEASURED",
+    "ram_peak_bytes": "NOT_MEASURED",
+    "tokens_per_second": "NOT_MEASURED",
+    "vram_peak_bytes": "NOT_MEASURED"
+  },
+  "runtime_versions": {
+    "note": "authored and judged on Windows Python; oracle grading ran in WSL2 Ubuntu (Linux sandbox required by the host oracle)",
+    "python": "3.12.10"
+  },
+  "schema": "silt.capability_receipt.v1",
+  "schema_version": 1,
+  "signature": "b1312bf6da1b6d5f0bce73ca8d3795c7ea2330b36d499d81a18cf9ee46a42849",
+  "signature_alg": "hmac-sha256-local",
+  "spec_sha256": "615b865f4856639c85cba4179c796a69c1c836b26249b0341884371f9aaa98cb",
+  "status": "completed",
+  "student": {
+    "e2_student": "Qwen/Qwen2.5-1.5B-Instruct (local HF cache, GPU LoRA receiver; the v1 pilot used the 0.5B Instruct student)"
+  },
+  "teacher": {
+    "access": "behavioural_remote",
+    "model": "glm-5.3-flash:cloud",
+    "provider": "ollama",
+    "remote_consent": "--allow-remote passed for the E2 trace run only; per-run consent, never carried over",
+    "revision": "3e780905abc0e7240dd1489935ec1e3c7fcf1854a6f4e7f8688f9bb0bdacb1a5",
+    "traced_cases": "16 new E2 training cases (v1's 16 non-final traces stay receipted in the v1 pilot; the final split was never traced in either experiment)"
+  }
+}

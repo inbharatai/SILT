@@ -9,6 +9,44 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## GLM-5.3-Flash E2 expansion: bigger KD set, bigger student, GPU — 2026-09-23
+
+The v1 pilot's honest negative left an obvious confound: 6 KD pairs and a 0.5B
+student. E2 re-ran the identical chain with three recorded differences — 16
+newly authored training cases (22-pair KD set; expected values computed by
+running the reference; the authoring self-check caught its own
+`palindromes_v1` fake-difficulty before any model saw it), a 3× larger student
+(Qwen2.5-1.5B-Instruct) and real GPU LoRA on the RTX 5050 through the same
+production `StandardTrainerBackend` (64 steps, 1,089,536 trainable parameters,
+finite losses). The frozen v1 evaluation splits were reused BYTE-IDENTICAL
+(hash-verified against both manifests); the final split stayed sealed; the
+teacher was re-traced with per-run consent and judged 16/16 cases (57/57
+checks).
+
+Two production additions, both fail-closed: the documented `model_dtype`
+trainer knob (default None = unchanged fp32 path; unknown values refused
+before any weight load; bf16 used here because fp32 1.5B weights + one row's
+logits exceed an 8 GB card; both A/B arms load under the same dtype) and the
+isolated `--system-site-packages` GPU venv (torch 2.11.0+cu128, the only
+sm_120 build, shadowed by the exact production transformers/peft/accelerate
+pins — the repo's localmodels pin is untouched, the GLM-worker isolation
+pattern).
+
+**Verdict: net negative on every split.** Independent oracle A/B over the 32
+non-final cases (102 authored checks per arm, expected total computed from
+the frozen rows after the driver's first hand-typed 45-check guard refused
+its own report): training 0.7368→0.6447, development 1.0→0.6667, heldout
+1.0→0.3333, controls 0.75→0.625, aggregate target 0.7872→0.6170 (−0.1702),
+retention 0.7134 (cross-path ratio vs the receipted v1 teacher number). A
+3.7× larger KD set and a 3× larger student did not flip the sign — recorded
+as a real result, not "distillation works" and not "distillation fails".
+Two signed receipts (pretrain + training, both verify); the run's real
+defects (a stale WSL asea checkout that shadowed the corrected oracle until
+PYTHONPATH pinning; the guard refusal) are recorded in the training
+receipt's failure_history. Nothing admitted, activated or certified; the
+E2 arms are not comparable to v1's fp32 CPU arms — each experiment is
+compared within itself.
+
 ## GLM-5.3-Flash pilot: DeepApply training stage — 2026-09-19
 
 The judged pilot's chain was executed past the distill boundary: the 6

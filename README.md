@@ -442,6 +442,18 @@ training data. Installing extras starts neither. Historical
 >   **no GLM intervention has been measured** — the open-weight worker needs
 >   teacher-sized hardware and is honestly blocked on small hosts.
 >   [Full record](docs/CAPABILITY_BUILD.md).
+> - **capability-build E2 expansion** — the honest repeat: 16 newly authored
+>   training cases (expected values computed by running the reference), the
+>   frozen v1 evaluation splits reused BYTE-IDENTICAL, a 3× larger student
+>   (Qwen2.5-1.5B-Instruct) and GPU LoRA (a documented `model_dtype=bf16`
+>   trainer knob; the torch 2.11.0+cu128 deviation isolated to a shadowing
+>   venv, repo pins untouched). Teacher judged 16/16 cases (57/57 checks);
+>   22 KD pairs; 64 real training steps on CUDA. The independent oracle A/B
+>   REGRESSED **every** split — held-out 1.0→0.3333, aggregate target
+>   0.7872→0.6170, retention 0.7134 — recorded as a real result, not
+>   "distillation fails" (mechanism-scale set; each experiment is compared
+>   within itself). Two more signed receipts; nothing admitted or activated.
+>   [Full record](docs/CAPABILITY_BUILD.md).
 > - **SiltSpring** — [opt-in real-HF probe](scripts/real_siltspring_1p5b.py) exists;
 >   raw Qwen0.5B/1.5B certification/revocation receipts are not included here.
 >   Script availability is not an executed outcome, nor evidence that a full

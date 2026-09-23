@@ -125,6 +125,14 @@ class DeepApplyConfig:
     # a larger budget or the supervision target is truncated mid-response.
     # Generation length is NOT governed by this (that is max_new_tokens).
     max_length: int = 256
+    # Weight dtype for the resident model (E2 GPU knob, 2026-09-19). None =
+    # the historical fp32 path, byte-identical for every existing run. A GPU
+    # host may pin "bfloat16"/"float16" so a resident model fits its VRAM
+    # (e.g. a 1.5B student in bf16 on an 8 GB card, where fp32 weights plus
+    # the logits tensor alone exceed the VRAM). The StandardTrainerBackend
+    # records the dtype actually used; an A/B must load BOTH arms under the
+    # same dtype or the comparison is not like-for-like.
+    model_dtype: Optional[str] = None
     cpu_param_ceiling: int = 1_500_000_000
     strict_no_mock: bool = True
     regression_tolerance: float = 0.02
@@ -166,6 +174,7 @@ class DeepApplyConfig:
             "seed": self.seed,
             "max_new_tokens": self.max_new_tokens,
             "max_length": self.max_length,
+            "model_dtype": self.model_dtype,
             "cpu_param_ceiling": self.cpu_param_ceiling,
             "load_in_4bit": self.load_in_4bit,
             "compute_device": self.compute_device,
