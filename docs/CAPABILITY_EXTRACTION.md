@@ -67,32 +67,32 @@ evidence.
 | Item | Description | Status |
 |---|---|---|
 | A1 | Feature branch, integrity record, preregistration | IMPLEMENTED_UNTESTED |
-| C1 | Canonical GLM layer addressing in masking | NOT_IMPLEMENTED |
-| C2 | Internal traces functionally judged (no success=null) | NOT_IMPLEMENTED |
-| C3 | Exact SourceCheckpointManifest incl. per-shard sha256 | NOT_IMPLEMENTED |
-| C4 | Official GLM inference contract (AutoProcessor + apply_chat_template) | NOT_IMPLEMENTED |
-| C5 | CLI exit semantics 0/2/3/4/5, subprocess-tested | NOT_IMPLEMENTED |
-| C6 | Physically sealed final split | NOT_IMPLEMENTED |
-| C7 | Durable failed-attempt evidence records | NOT_IMPLEMENTED |
+| C1 | Canonical GLM layer addressing in masking | FIXTURE_VERIFIED |
+| C2 | Internal traces functionally judged (no success=null) | FIXTURE_VERIFIED |
+| C3 | Exact SourceCheckpointManifest incl. per-shard sha256 | FIXTURE_VERIFIED |
+| C4 | Official GLM inference contract (AutoProcessor + apply_chat_template) | FIXTURE_VERIFIED |
+| C5 | CLI exit semantics 0/2/3/4/5, subprocess-tested | FIXTURE_VERIFIED |
+| C6 | Physically sealed final split | FIXTURE_VERIFIED |
+| C7 | Durable failed-attempt evidence records | FIXTURE_VERIFIED |
 | C8 | Documentation corrections + CI docs-drift check | NOT_IMPLEMENTED |
-| D1 | CapabilityExtractionSpec schema | NOT_IMPLEMENTED |
-| D2 | SourceCheckpointManifest schema | NOT_IMPLEMENTED |
-| D3 | FunctionalCaseManifest schema | NOT_IMPLEMENTED |
-| D4 | RoutingObservation schema | NOT_IMPLEMENTED |
-| D5 | ActivationObservation schema | NOT_IMPLEMENTED |
-| D6 | InterventionAttempt schema | NOT_IMPLEMENTED |
-| D7 | CausalEffectEstimate schema | NOT_IMPLEMENTED |
-| D8 | CausalComponentGraph schema | NOT_IMPLEMENTED |
-| D9 | ExtractionPlan schema | NOT_IMPLEMENTED |
-| D10 | TensorTransformation schema | NOT_IMPLEMENTED |
-| D11 | TensorProvenance schema | NOT_IMPLEMENTED |
-| D12 | CompiledCapabilityConfig schema | NOT_IMPLEMENTED |
-| D13 | CompiledCapabilityManifest schema | NOT_IMPLEMENTED |
-| D14 | RecoveryRun schema | NOT_IMPLEMENTED |
-| D15 | CapabilityExtractionReceipt schema | NOT_IMPLEMENTED |
+| D1 | CapabilityExtractionSpec schema | FIXTURE_VERIFIED |
+| D2 | SourceCheckpointManifest schema | FIXTURE_VERIFIED |
+| D3 | FunctionalCaseManifest schema | FIXTURE_VERIFIED |
+| D4 | RoutingObservation schema | FIXTURE_VERIFIED |
+| D5 | ActivationObservation schema | FIXTURE_VERIFIED |
+| D6 | InterventionAttempt schema | FIXTURE_VERIFIED |
+| D7 | CausalEffectEstimate schema | FIXTURE_VERIFIED |
+| D8 | CausalComponentGraph schema | FIXTURE_VERIFIED |
+| D9 | ExtractionPlan schema | FIXTURE_VERIFIED |
+| D10 | TensorTransformation schema | FIXTURE_VERIFIED |
+| D11 | TensorProvenance schema | FIXTURE_VERIFIED |
+| D12 | CompiledCapabilityConfig schema | FIXTURE_VERIFIED |
+| D13 | CompiledCapabilityManifest schema | FIXTURE_VERIFIED |
+| D14 | RecoveryRun schema | FIXTURE_VERIFIED |
+| D15 | CapabilityExtractionReceipt schema | FIXTURE_VERIFIED |
 | E | Full-source inventory validated against loaded config | NOT_IMPLEMENTED |
-| F | Isolated workers/glm53 runtime (exists, carried forward) | IMPLEMENTED_UNTESTED |
-| G | Hardware honesty / BLOCKED_RESOURCE discipline | NOT_IMPLEMENTED |
+| F | Isolated workers/glm53 runtime (exists, carried forward) | FIXTURE_VERIFIED |
+| G | Hardware honesty / BLOCKED_RESOURCE discipline | FIXTURE_VERIFIED |
 | H | Substantial dataset: 14 task families, controls, power analysis | NOT_IMPLEMENTED |
 | I | Full-source baseline | NOT_IMPLEMENTED |
 | J | Internal traces joined to functional outcomes | NOT_IMPLEMENTED |
@@ -107,11 +107,63 @@ evidence.
 | S | All-arms evaluation | NOT_IMPLEMENTED |
 | T | Statistical proof, sealed final evaluated exactly once | NOT_IMPLEMENTED |
 | U | Further reduction (only after first proof) | NOT_IMPLEMENTED |
-| V | Immutable CapabilityExtractionReceipt | NOT_IMPLEMENTED |
-| W | silt-extract CLI (16 commands) | NOT_IMPLEMENTED |
-| X | Test list incl. exit codes, sealed final, provenance, source immutability | NOT_IMPLEMENTED |
+| V | Immutable CapabilityExtractionReceipt | FIXTURE_VERIFIED |
+| W | silt-extract CLI (18 commands, honest stage refusals) | FIXTURE_VERIFIED |
+| X | Test list — core set landed: schemas, malformed evidence, exact checkpoint identity, unjudged-trace exclusion, sealed final split, failed-attempt ledger, receipt integrity, CLI exit codes | FIXTURE_VERIFIED |
 | Y | Public-claim rules enforced in docs | NOT_IMPLEMENTED |
 | Z | Definition of done (24 items) | NOT_IMPLEMENTED |
+
+Build notes (2026-09-23, statuses above reflect exactly this scope):
+
+- FIXTURE_VERIFIED means the MECHANISM is implemented and tested on
+  fixtures only; it never upgrades any real-model status and never
+  supports an L5 claim.
+- C1: canonical decoder-layer ids (0..44, sparse 3..44) validated,
+  dense/out-of-range refused with typed errors, round-trip tests
+  (`tests/test_capability_build.py`). The remaining C1 sub-item —
+  the end-to-end trace → footprint component id → intervention →
+  exact layer/expert test — lands with the footprint-integration work
+  under J/K.
+- C2 is enforced at the schema layer: `FunctionalJoin` (verdict is a
+  required bool — `success = null` cannot be represented),
+  `judged_only()` excludes unjudged telemetry from all evidence, and
+  joins that cross source revisions are rejected. Trace COLLECTION
+  (J) still needs the real model.
+- C3: the worker `manifest` op (per-file sha256 over the whole tree,
+  disk-only, no model load) is subprocess-tested, and the CLI
+  `source inventory` (names/sizes only) / `source verify` (sha256
+  walk → `silt.extraction.source_manifest.v1` with Merkle-style
+  aggregate verified against the tree) are wired.
+- C4: `_chat_encode` runs the checkpoint's own chat template with
+  `add_generation_prompt=True`; the pinned `clear_thinking=True` /
+  `reasoning_effort="low"` template arguments were verified against
+  the REAL GLM-5.3-Flash chat template (which declares
+  `reasoning_effort`, default 'max', and `clear_thinking`, default
+  false — `enable_thinking` does not exist in it), and every
+  generate response records the full pinned decoding policy. An
+  over-budget templated prompt is refused, never truncated.
+- C5: `silt-extract` exit codes 0/2/3/4/5 are tested against ACTUAL
+  subprocess exit status.
+- C6: `SealedSplit` — physically separate artifact, development
+  access always refused and always logged, final evaluation opens
+  exactly once (consumption recorded BEFORE cases are returned),
+  spec-pin and tamper checks. The CLI's `evaluate --split final`
+  refuses NOT_IMPLEMENTED WITHOUT opening the seal and records the
+  attempt.
+- C7: `FailedAttemptLedger` — append-only, hash-chained (tamper
+  detection tested), all nine required fields.
+- C8 partials already landed: the false "scoring_func absent" claim
+  is corrected everywhere (adapter EXPECTED + detection, CAPABILITIES
+  C27, CHANGELOG, test fixture). Still open: /README.md serving or
+  removal, stale docs/README.md, CAPABILITY_BUILD.md status
+  contradictions, memory estimates, worker descriptions, "gate
+  verdict"/"never opened" wording, and the CI docs-drift check.
+- W: all 18 commands are wired; `spec validate`, `source
+  inventory`, `source verify`, `dataset validate`, `receipt` are
+  implemented, and every real-model stage reports an honest
+  `NOT_IMPLEMENTED` typed refusal (exit 2) naming what it needs —
+  when those stages are implemented, this 8 GB host will report
+  `BLOCKED_RESOURCE` (exit 4), never a substituted fixture result.
 
 Naming rule (binding, owner's brief): the artifact is called the
 **CompiledCapabilityModel** — "GLM-5.3-Flash-derived Repository

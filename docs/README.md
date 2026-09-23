@@ -110,6 +110,7 @@ useful.*
 | **Function-IO external oracle and Linux sandbox; generation/oracle observability and privacy controls** | Explicit validation and `compose preview`; trace options `none`/`digest`/`value`: Compose defaults `none`, specialist evaluate/validate and staged workflow use `digest`; separate storage/reveal/export consent in UI | [C21](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#c21) · [observability](/OBSERVABILITY_WORKFLOW.md); not universal code safety or signed telemetry |
 | **Resource probe/profiles; governed validation; waveform/listening evidence** | `asea.execution probe/run`, `asea.validation`; `observe_only` default, explicit `process_as`; voice evidence stays `pending_human` | [C22–C24](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#c22) · [resource controls](/RESOURCE_CONTROLS.md); cgroup/Windows enforcement and authenticated voice approval unavailable |
 | **Capability-build research layer:** teacher footprinting (behavioural cloud pilot or isolated open-weight GLM worker), causal mask/measure/restore/verify, fresh five-split datasets with near-duplicate guards, local student baselines, sequence-KD hand-off to DeepApply, minimum-capability search | `silt-capability` (separate console script); per-run remote consent; evidence classes never mixed; nothing auto-activates | [C26–C29](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#capability-build-research-layer) · [capability build](/CAPABILITY_BUILD.md); `CANDIDATE_UNADMITTED` — implementation is not capability |
+| **GLM-5.3-Flash capability extraction program:** strict `silt.extraction.*` schemas (judged traces only), exact source-checkpoint identity, sealed final split (opened exactly once), hash-chained failed-attempt ledger, exit codes 0/2/3/4/5 | `silt-extract` (separate console script; feature branch); real-model stages refuse honestly as `NOT_IMPLEMENTED` and will report `BLOCKED_RESOURCE` on an 8 GB host — never a fixture substitute | [C31](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#c31) · [program ledger](/CAPABILITY_EXTRACTION.md); no CompiledCapabilityModel has been built, extracted, evaluated or certified |
 
 All named mechanisms are indexed in the [catalog](/CAPABILITIES.md), including the [remaining gaps](https://github.com/inbharatai/SILT/blob/main/docs/CAPABILITIES.md#remaining-gaps). Typed refusals and policy checks make detected failures explicit; they do not guarantee detection of every harmful or degraded outcome.
 
@@ -422,6 +423,38 @@ training data. Installing extras starts neither. Historical
 >   [Recorded report](/deep_apply_real_run_findings.md). GPU streamed/ZeroForge
 >   [probe scripts](https://github.com/inbharatai/SILT/blob/main/scripts/real_streamed_4bit_gpu.py) exist; matching Qwen2.5-7B /
 >   RTX 5050 execution/parity receipts are not included in this repository.
+> - **capability-build pilot (GLM-5.3-Flash)** — the research layer's judged
+>   end-to-end chain: a frozen five-split dataset (final split never opened),
+>   16 consented cloud-teacher traces, host-oracle judgment of teacher
+>   (0.8649) and local student (0.4595) on identical target checks — a
+>   measurement of that case set only, never a model-quality claim — 6
+>   byte-bound KD pairs, a **REAL DeepApply LoRA training** through the
+>   production trainer and an **independent oracle A/B** whose corrected
+>   verdict (2026-09-19 scoring correction, authored denominators) is a NET
+>   NEGATIVE target result: training 0.8421→0.3158, held-out 0.8889→0.6667,
+>   aggregate target 0.8108→0.5405, retention 0.625 (development +0.2222 and
+>   controls +0.25 improved; the earlier "held-out improved" claim was an
+>   artifact of the scoring defect and is withdrawn) — recorded as the
+>   product, and a real SiltSpring compression proof with genuine revocations.
+>   Three signed receipts (the third corrects and supersedes the second);
+>   nothing admitted, activated or certified. The causal-intervention loop
+>   (mask → generate → judge → restore → verify) is wired end-to-end in code
+>   against the real Transformers-5.16.1 GLM-5.3-Flash routing contract, but
+>   **no GLM intervention has been measured** — the open-weight worker needs
+>   teacher-sized hardware and is honestly blocked on small hosts.
+>   [Full record](/CAPABILITY_BUILD.md).
+> - **capability-build E2 expansion** — the honest repeat: 16 newly authored
+>   training cases (expected values computed by running the reference), the
+>   frozen v1 evaluation splits reused BYTE-IDENTICAL, a 3× larger student
+>   (Qwen2.5-1.5B-Instruct) and GPU LoRA (a documented `model_dtype=bf16`
+>   trainer knob; the torch 2.11.0+cu128 deviation isolated to a shadowing
+>   venv, repo pins untouched). Teacher judged 16/16 cases (57/57 checks);
+>   22 KD pairs; 64 real training steps on CUDA. The independent oracle A/B
+>   REGRESSED **every** split — held-out 1.0→0.3333, aggregate target
+>   0.7872→0.6170, retention 0.7134 — recorded as a real result, not
+>   "distillation fails" (mechanism-scale set; each experiment is compared
+>   within itself). Two more signed receipts; nothing admitted or activated.
+>   [Full record](/CAPABILITY_BUILD.md).
 > - **SiltSpring** — [opt-in real-HF probe](https://github.com/inbharatai/SILT/blob/main/scripts/real_siltspring_1p5b.py) exists;
 >   raw Qwen0.5B/1.5B certification/revocation receipts are not included here.
 >   Script availability is not an executed outcome, nor evidence that a full
@@ -945,7 +978,9 @@ models; SILT connects to them through real connectors in
 
 The model is **operator-selected**, within connector/model/runtime constraints;
 not every tag or HF repository is compatible. Recorded reports include CPU HF
-Qwen/SmolLM2/NLLB and Ollama/cloud-tagged GLM packet runs. Those reports do not
+Qwen/SmolLM2/NLLB, Ollama/cloud-tagged GLM packet runs and the judged
+GLM-5.3-Flash capability pilot (teacher + student + trained-adapter A/B, host
+oracle). Those reports do not
 establish local RTX 5050 execution for every listed model. Model-agnostic means
 interface extensibility, not a universal model or latent-modality bridge.
 

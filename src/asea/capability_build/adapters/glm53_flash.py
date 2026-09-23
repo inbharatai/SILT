@@ -55,15 +55,18 @@ from .base import MoEArchitectureAdapter
 #: (zai-org/GLM-5.3-Flash, config.json: model_type "glm5_next"; expert
 #: counts under ``n_routed_experts``/``n_shared_experts`` (aliased to
 #: ``num_local_experts`` by the transformers config); first-3-MLP-dense
-#: under ``first_k_dense_replace``). The config declares NO ``scoring_func``
-#: field: sigmoid scoring is structural to ``Glm5NextTextTopkRouter``, and
-#: detection verifies the ROUTER MODULE CONTRACT (weight matrix shape,
-#: ``e_score_correction_bias`` buffer, group/scaling attributes), not a
-#: nonexistent config field. Runtime pin: transformers 5.16.1 -- the model
-#: card's own ``transformers_version`` field says 5.16.0, but the 5.16.0
-#: wheel does NOT contain ``models/glm5_next`` (verified: the directory
-#: exists at tag v5.16.1 and 404s at v5.16.0); 5.16.1 is the minimal
-#: release that actually ships the architecture.
+#: under ``first_k_dense_replace``; sigmoid scoring declared by the
+#: config's own ``scoring_func: "sigmoid"`` field, verified against the
+#: published config 2026-09-23). Detection verifies BOTH the config
+#: field AND the ROUTER MODULE CONTRACT (weight matrix shape,
+#: ``e_score_correction_bias`` buffer, group/scaling attributes) -- the
+#: 2026-09-19 audit note that claimed the config has no ``scoring_func``
+#: field was FALSE (extraction-brief C8 correction). Runtime pin:
+#: transformers 5.16.1 -- the model card's own ``transformers_version``
+#: field says 5.16.0, but the 5.16.0 wheel does NOT contain
+#: ``models/glm5_next`` (verified: the directory exists at tag v5.16.1
+#: and 404s at v5.16.0); 5.16.1 is the minimal release that actually
+#: ships the architecture.
 EXPECTED = {
     "model_type": "glm5_next",
     "num_hidden_layers": 45,
@@ -72,6 +75,7 @@ EXPECTED = {
     "num_experts_per_tok": 8,
     "first_k_dense_replace": 3,
     "hidden_size": 4096,
+    "scoring_func": "sigmoid",
     "max_position_embeddings_floor": 1_000_000,
 }
 
@@ -262,6 +266,13 @@ def detect_architecture(model, config) -> Dict[str, Any]:
     _require(
         int(getattr(text, "num_experts_per_tok", -1)) == EXPECTED["num_experts_per_tok"],
         "num_experts_per_tok %r != 8" % getattr(text, "num_experts_per_tok", None),
+    )
+    _require(
+        getattr(text, "scoring_func", None) == EXPECTED["scoring_func"],
+        "scoring_func %r != %r (the real GLM-5.3-Flash config declares "
+        "sigmoid scoring; extraction-brief C8 correction of the false "
+        "2026-09-19 note that the field was absent)"
+        % (getattr(text, "scoring_func", None), EXPECTED["scoring_func"]),
     )
     _require(
         int(getattr(text, "first_k_dense_replace", -1)) == EXPECTED["first_k_dense_replace"],
@@ -635,6 +646,46 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
             "active_masks": sorted(self._masked),
         }
 
+    def _canonical_layer(self, layer: int) -> Tuple[int, Any]:
+        """Resolve a CANONICAL decoder layer id to its sparse block.
+
+        Canonical GLM addressing (extraction-brief C1, 2026-09-23): a
+        component target addresses the model the way the config and the
+        checkpoint's tensor names do -- ``layer`` is the decoder layer id
+        0..num_hidden_layers-1. The sparse layers are exactly
+        ``first_k_dense_replace..num_hidden_layers-1``. The OLD contract
+        silently accepted an index into the adapter's internal sparse-list
+        (0..41): a caller writing ``layer=3`` meaning decoder layer 3 got
+        decoder layer 6, while the registry key recorded the true index --
+        an off-by-``first_k_dense_replace`` misattribution that no later
+        artifact could detect. Both dense layers (< first_k_dense_replace)
+        and out-of-range ids are typed refusals naming the canonical
+        scheme, never best-effort guesses.
+        """
+        n_layers = int(getattr(self.text, "num_hidden_layers"))
+        dense = int(getattr(self.text, "first_k_dense_replace"))
+        if not 0 <= layer < n_layers:
+            raise InterventionInvalid(
+                "canonical decoder layer id %r is outside 0..%d; GLM "
+                "components are addressed by their decoder layer id"
+                % (layer, n_layers - 1)
+            )
+        if layer < dense:
+            raise InterventionInvalid(
+                "decoder layer %d is one of the first %d DENSE MLP layers "
+                "(first_k_dense_replace); there are no routed experts to "
+                "mask before layer %d"
+                % (layer, dense, dense)
+            )
+        for index, block in self.layers:
+            if index == layer:
+                return layer, block
+        raise InterventionInvalid(
+            "decoder layer %d carries no routed-expert container; the "
+            "canonical sparse layers are %d..%d"
+            % (layer, dense, n_layers - 1)
+        )
+
     def temporary_mask(self, target, *, scale: float = 0.0) -> Dict[str, Any]:
         """Suppress the masked expert's ROUTING DECISION, weights untouched.
 
@@ -670,18 +721,17 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
             "and would silently under-suppress"
             % (target.kind, self.experts_per_tok),
         )
-        _require(0 <= target.layer < len(self.layers), "layer index out of range")
-        _require(
-            0 <= target.expert_id < self.n_experts,
-            "expert %d out of range 0..%d" % (target.expert_id, self.n_experts - 1),
-        )
         if self._telemetry:
             raise InterventionInvalid(
                 "cannot mask while telemetry hooks are live: the telemetry "
                 "hook registered first would record the router's UNMASKED "
                 "dispatch; call remove_router_hooks() first"
             )
-        index, block = self.layers[target.layer]
+        _require(
+            0 <= target.expert_id < self.n_experts,
+            "expert %d out of range 0..%d" % (target.expert_id, self.n_experts - 1),
+        )
+        index, block = self._canonical_layer(target.layer)
         router_name, router = self._router_of(block)
         registry_key = "%d:%s" % (index, target.key)
         _require(
@@ -718,8 +768,7 @@ class Glm53FlashAdapter(MoEArchitectureAdapter):
         }
 
     def restore_mask(self, target) -> Dict[str, Any]:
-        _require(0 <= target.layer < len(self.layers), "layer index out of range")
-        index, block = self.layers[target.layer]
+        index, block = self._canonical_layer(target.layer)
         registry_key = "%d:%s" % (index, target.key)
         record = self._masked.get(registry_key)
         _require(

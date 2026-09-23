@@ -792,6 +792,7 @@ def _fake_glm_router_stack(torch):
     cfg.num_experts_per_tok = 8
     cfg.first_k_dense_replace = 3
     cfg.hidden_size = 4096
+    cfg.scoring_func = "sigmoid"  # the REAL config declares this (C8 fix)
     cfg.max_position_embeddings = 1_048_576
     cfg.torch_dtype = "bfloat16"
     return Glm53FlashAdapter(Glm5NextForCausalLM(), torch, config=cfg)
@@ -812,7 +813,9 @@ def test_glm_mask_suppresses_expert_and_restore_succeeds():
     masked."""
     torch = pytest.importorskip("torch")
     adapter = _fake_glm_router_stack(torch)
-    target = InterventionTarget("expert", 0, 17)
+    # CANONICAL addressing (extraction-brief C1): layer is the decoder
+    # layer id 0..44; layer 3 is the FIRST sparse layer.
+    target = InterventionTarget("expert", 3, 17)
     _, block = adapter.layers[0]
     router = adapter._router_of(block)[1]
     hidden = -torch.ones(3, 4096)  # NEGATIVE-sum hidden states
@@ -849,7 +852,7 @@ def test_glm_mask_suppresses_expert_and_restore_succeeds():
     router.e_score_correction_bias[17] = 0.0
     # weights were never modified: unchanged holds DURING the mask window
     assert adapter.verify_unchanged()["unchanged"] is True
-    assert adapter.active_masks() == ["3:expert:0/17"]
+    assert adapter.active_masks() == ["3:expert:3/17"]
     restored = adapter.restore_mask(target)
     assert restored["restored"] is True
     assert restored["weights_modified"] is False
@@ -865,19 +868,55 @@ def test_glm_mask_refuses_partial_scale_layer_kind_and_double_ops():
     torch = pytest.importorskip("torch")
     adapter = _fake_glm_router_stack(torch)
     with pytest.raises(InterventionInvalid):
-        adapter.temporary_mask(InterventionTarget("expert", 0, 5), scale=0.5)
+        adapter.temporary_mask(InterventionTarget("expert", 3, 5), scale=0.5)
     with pytest.raises(InterventionInvalid):
         # masking every expert would leave top-k firing over all -1e9
         # logits: silent under-suppression, refused
-        adapter.temporary_mask(InterventionTarget("layer", 0))
+        adapter.temporary_mask(InterventionTarget("layer", 3))
     with pytest.raises(InterventionInvalid):
-        adapter.temporary_mask(InterventionTarget("expert", 0, 288))
-    adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+        adapter.temporary_mask(InterventionTarget("expert", 3, 288))
+    with pytest.raises(InterventionInvalid) as excinfo:
+        # CANONICAL addressing (C1): layers 0..2 are DENSE MLP layers --
+        # the old contract silently renumbered a sparse-list index 0 to
+        # decoder layer 3; canonical ids are refused, not renumbered
+        adapter.temporary_mask(InterventionTarget("expert", 2, 5))
+    assert "DENSE" in str(excinfo.value)
+    with pytest.raises(InterventionInvalid) as excinfo:
+        adapter.temporary_mask(InterventionTarget("expert", 45, 5))
+    assert "0..44" in str(excinfo.value)
+    adapter.temporary_mask(InterventionTarget("expert", 3, 5))
     with pytest.raises(InterventionInvalid):
-        adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+        adapter.temporary_mask(InterventionTarget("expert", 3, 5))
     with pytest.raises(InterventionInvalid):
         # cannot restore what was never masked
-        adapter.restore_mask(InterventionTarget("expert", 1, 2))
+        adapter.restore_mask(InterventionTarget("expert", 4, 2))
+
+
+def test_glm_canonical_layer_addressing_matches_registry_key():
+    """Extraction-brief C1 (2026-09-23): the OLD masking contract accepted
+    an index into the adapter's internal sparse list (0..41) while the
+    registry key recorded the true decoder id -- a caller addressing
+    decoder layer 3 silently masked decoder layer 6, an off-by-
+    first_k_dense_replace misattribution invisible downstream. The
+    canonical contract: ``target.layer`` IS the decoder layer id, the
+    masked block IS that decoder layer, and the registry key prefix
+    equals the id the caller passed."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch)
+    for decoder_id in (3, 20, 44):
+        target = InterventionTarget("expert", decoder_id, 7)
+        result = adapter.temporary_mask(target)
+        # the mask landed on exactly the decoder layer the caller named
+        assert result["layer"] == decoder_id
+        assert adapter.active_masks() == ["%d:expert:%d/7" % (decoder_id, decoder_id)]
+        # and the masked router belongs to that same decoder block
+        index, block = adapter._canonical_layer(decoder_id)
+        assert index == decoder_id
+        _, router = adapter._router_of(block)
+        assert router is adapter._router_of(
+            adapter._canonical_layer(decoder_id)[1])[1]
+        adapter.restore_mask(target)
+        assert adapter.active_masks() == []
 
 
 def test_switch_mask_suppresses_expert_and_restore_succeeds():
@@ -1306,14 +1345,14 @@ def test_worker_intervention_adapter_proxies_protocol_ops():
 
     client = _RecordingClient()
     adapter = _WorkerInterventionAdapter(client)
-    component = InterventionTarget("expert", 0, 17)
+    component = InterventionTarget("expert", 3, 17)
     assert adapter.verify_unchanged() == {"unchanged": True, "active_masks": []}
     assert adapter.temporary_mask(component) is not None
     assert adapter.restore_mask(component) is not None
     assert [(op, payload) for op, payload in client.requests] == [
         ("verify", {}),
-        ("mask", {"target": {"kind": "expert", "layer": 0, "expert_id": 17}}),
-        ("restore", {"target": {"kind": "expert", "layer": 0, "expert_id": 17}}),
+        ("mask", {"target": {"kind": "expert", "layer": 3, "expert_id": 17}}),
+        ("restore", {"target": {"kind": "expert", "layer": 3, "expert_id": 17}}),
     ]
 
 
@@ -1355,7 +1394,11 @@ def test_worker_judge_end_to_end_intervention_through_fake_worker(monkeypatch):
                         "active_masks": [] if self.masked is None
                         else [self.masked]}
             if op == "mask":
-                self.masked = "3:expert:0/17"
+                # the registry key the real worker records: "<canonical
+                # decoder layer id>:<target.key>"
+                layer = payload["target"]["layer"]
+                expert = payload["target"]["expert_id"]
+                self.masked = "%d:expert:%d/%d" % (layer, layer, expert)
                 return {"key": self.masked, "weights_modified": False}
             if op == "restore":
                 self.masked = None
@@ -1386,7 +1429,7 @@ def test_worker_judge_end_to_end_intervention_through_fake_worker(monkeypatch):
     ]
     entry = run_intervention(
         _WorkerInterventionAdapter(client),
-        InterventionTarget("expert", 0, 17),
+        InterventionTarget("expert", 3, 17),
         target_cases=[c for c in cases if c["group"] == "target"],
         control_cases=[c for c in cases if c["group"] == "control"],
         judge=make_worker_judge(client, max_new_tokens=32),
@@ -2605,11 +2648,11 @@ def test_glm_verify_reports_active_masks_and_hooks_are_idempotent():
     adapter = _fake_glm_router_stack(torch)
     # (a) clean teacher: no active masks reported
     assert adapter.verify_unchanged()["active_masks"] == []
-    adapter.temporary_mask(InterventionTarget("expert", 0, 4))
-    # registry keys are layer-prefixed ("<true layer index>:<target.key>");
-    # layers[0] is the first SPARSE layer, layer 3 of the real stack
-    assert adapter.verify_unchanged()["active_masks"] == ["3:expert:0/4"]
-    adapter.restore_mask(InterventionTarget("expert", 0, 4))
+    adapter.temporary_mask(InterventionTarget("expert", 3, 4))
+    # registry keys are layer-prefixed ("<canonical decoder layer id>:<target.key>");
+    # the caller addresses decoder layer 3 directly (extraction-brief C1)
+    assert adapter.verify_unchanged()["active_masks"] == ["3:expert:3/4"]
+    adapter.restore_mask(InterventionTarget("expert", 3, 4))
     assert adapter.verify_unchanged()["active_masks"] == []
 
     # (b) hook idempotence: register twice, ONE forward pass, the collected
@@ -2641,7 +2684,7 @@ def test_glm_restore_failure_keeps_mask_active():
     hook live with no record of it."""
     torch = pytest.importorskip("torch")
     adapter = _fake_glm_router_stack(torch)
-    target = InterventionTarget("expert", 0, 9)
+    target = InterventionTarget("expert", 3, 9)
     adapter.temporary_mask(target)
 
     class _BrokenHandle:
@@ -2650,12 +2693,12 @@ def test_glm_restore_failure_keeps_mask_active():
 
     # sabotage exactly the failure the fix guards: the handle cannot be
     # removed (the hook stays live on the router). The registry key is
-    # layer-prefixed ("<true layer index>:<target.key>").
-    adapter._masked["3:expert:0/9"]["handle"] = _BrokenHandle()
+    # layer-prefixed ("<canonical decoder layer id>:<target.key>").
+    adapter._masked["3:expert:3/9"]["handle"] = _BrokenHandle()
     with pytest.raises(Exception):
         adapter.restore_mask(target)
     # the mask is still ACTIVE and reported as such -- never "restored"
-    assert adapter.verify_unchanged()["active_masks"] == ["3:expert:0/9"]
+    assert adapter.verify_unchanged()["active_masks"] == ["3:expert:3/9"]
     # and a second mask of the same component is refused (already masked)
     with pytest.raises(InterventionInvalid):
         adapter.temporary_mask(target)
@@ -3018,10 +3061,13 @@ def test_worker_unknown_op_reports_invalid_op_kind(tmp_path):
 
 def test_glm_telemetry_captures_real_bias_corrected_dispatch():
     """Defect fix (external audit 2026-09-19, replaces the old
-    bias-REFUSAL test): the real transformers 5.16.1
+    bias-REFUSAL test; scoring_func note corrected 2026-09-23 under
+    extraction-brief C8): the real transformers 5.16.1
     ``Glm5NextTextTopkRouter`` ALWAYS carries an ``e_score_correction_bias``
-    buffer, and the GLM config declares no ``scoring_func`` field at all.
-    The old adapter refused a config boolean named
+    buffer, and the real GLM config DECLARES ``scoring_func: "sigmoid"``
+    (the 2026-09-19 note claiming the field was absent was false --
+    detection now verifies BOTH the config field and the router module
+    contract). The old adapter refused a config boolean named
     ``e_score_correction_bias`` -- a field the real config never has -- so
     it would refuse the REAL model while claiming a sigmoid-topk equation
     that was never in effect. The corrected adapter accepts the biased
@@ -3078,14 +3124,14 @@ def test_glm_telemetry_and_mask_refuse_to_be_live_together():
     adapter = _fake_glm_router_stack(torch)
     adapter.register_router_hooks()
     with pytest.raises(InterventionInvalid) as excinfo:
-        adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+        adapter.temporary_mask(InterventionTarget("expert", 3, 5))
     assert "telemetry" in str(excinfo.value)
     adapter.remove_router_hooks()
-    adapter.temporary_mask(InterventionTarget("expert", 0, 5))
+    adapter.temporary_mask(InterventionTarget("expert", 3, 5))
     with pytest.raises(InterventionInvalid) as excinfo:
         adapter.register_router_hooks()
     assert "masks are active" in str(excinfo.value)
-    adapter.restore_mask(InterventionTarget("expert", 0, 5))
+    adapter.restore_mask(InterventionTarget("expert", 3, 5))
     # with both sides clean, registration works again
     adapter.register_router_hooks()
     adapter.remove_router_hooks()

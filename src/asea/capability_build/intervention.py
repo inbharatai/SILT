@@ -51,7 +51,16 @@ Judge = Callable[[Dict[str, Any], Dict[str, Any]], bool]
 
 class InterventionTarget:
     """One addressable teacher component: ``("expert", layer, expert_id)``
-    or ``("layer", layer)`` today; the adapter validates existence."""
+    or ``("layer", layer)`` today; the adapter validates existence.
+
+    ``layer`` is the CANONICAL decoder layer id (extraction-brief C1,
+    2026-09-23): the model is addressed the way its config and checkpoint
+    tensor names address it -- ``0..num_hidden_layers-1``. For GLM-5.3-Flash
+    the maskable sparse layers are 3..44 (layers 0..2 are dense MLP under
+    ``first_k_dense_replace=3``); adapters refuse dense and out-of-range
+    ids with typed errors rather than renumbering silently. This class
+    validates shape only (non-negative, consistent kind/id); the adapter
+    owns existence and canonical-range validation."""
 
     __slots__ = ("kind", "layer", "expert_id")
 

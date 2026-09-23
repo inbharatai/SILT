@@ -49,6 +49,8 @@ data/runtime/
 Thumbs.db
 .idea/
 .vscode/
+# --- WSL runner scratch (repo-local scripts reachable from wsl.exe; /tmp is not) ---
+.tmp-wsl/
 # --- GLM-5.3-Flash pilot scratch ---
 # judging/ holds per-case candidate sources + oracle payloads written during
 # judgment; they are derivative (reproducible from cases.jsonl + judgment-*.json)

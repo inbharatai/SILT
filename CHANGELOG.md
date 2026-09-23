@@ -9,6 +9,73 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## GLM-5.3-Flash capability extraction program (Section C + D + W core) — 2026-09-23
+
+New package `src/asea/extraction/` + `silt-extract` CLI implementing the owner's
+master brief on the feature branch `feat/glm-extraction-compiled-capability`
+(preregistration committed BEFORE any implementation; H1: ≥90% retention AND
+≥25% stored-parameter reduction, never weakened after results). The program's
+objective is NOT teacher-to-student distillation: identify the computational
+structure a defined capability requires, extract it into a standalone
+**CompiledCapabilityModel**, repair extraction damage, and prove retention on a
+sealed final split.
+
+### Added
+- **15 strict schemas** (`silt.extraction.*.v1`) with the honesty contract in
+  the types themselves: `FunctionalJoin` (verdict is a required bool — `success = null`
+  cannot be represented), `judged_only()` excluding unjudged telemetry from all
+  evidence, cross-revision joins rejected, graph roles REQUIRED/NEGATIVE_OR_HARMFUL
+  rejected without causal evidence, receipts that cannot validate a `CERTIFIED`
+  verdict below the preregistered thresholds or without exactly-once sealed-final
+  evaluation, `SourceCheckpointManifest` whose Merkle-style aggregate must match
+  the hashed tree, conservative-plan and copied-source provenance guards.
+- **`silt-extract` CLI (18 commands, brief section W)** with the C5 exit-code
+  contract 0/2/3/4/5 tested against ACTUAL subprocess exit status;
+  `spec validate` / `source inventory` / `source verify` / `dataset validate` /
+  `receipt` implemented; every real-model stage reports an honest
+  `NOT_IMPLEMENTED` typed refusal naming what it needs (and will report
+  `BLOCKED_RESOURCE` on this 8 GB host once implemented — never a fixture
+  substitute). Universal `--dry-run --workspace --config --json --resume`.
+- **`SealedSplit` (C6)**: the final split is a physically separate sealed
+  artifact; development commands can NEVER open it (every attempt recorded);
+  the final evaluation opens it exactly once, consumption recorded BEFORE the
+  cases are returned; spec-pin and tamper checks.
+- **`FailedAttemptLedger` (C7)**: append-only, hash-chained (tampering detectable),
+  all nine required fields (source fingerprint, request, component ids, case
+  hashes, error class, timeout info, restoration status, stderr tail, artifact
+  hashes); failed experiments stay visible forever and feed the receipt's
+  failure history.
+- **C4 completion in the GLM worker**: the pinned chat-template arguments
+  `clear_thinking=True` / `reasoning_effort="low"` were verified against the
+  REAL GLM-5.3-Flash chat template (which declares `reasoning_effort`,
+  default 'max', and `clear_thinking`, default false — `enable_thinking` does
+  not exist in it) and are recorded with the full decoding policy in every
+  generate response, so clean and intervention arms provably share one
+  generation policy. An over-budget templated prompt is refused, never
+  truncated.
+- **C3 `source verify`**: disk-only sha256 walk over the whole checkpoint tree
+  (no model load — takable on a host that cannot hold the model) producing the
+  exact-identity manifest, alongside the worker's subprocess-tested `manifest`
+  op.
+
+### Fixed
+- **C1 canonical addressing**: interventions address CANONICAL decoder layer
+  ids (0..44; sparse 3..44), not sparse-list positions — the old contract was
+  off by 3 against every dense layer; dense and out-of-range ids are refused
+  with typed errors (landed earlier in this branch, recorded here).
+- **The false "scoring_func absent" claim is corrected everywhere** (C8
+  partial): the real GLM-5.3-Flash config DECLARES `"scoring_func": "sigmoid"`
+  under text_config — adapter EXPECTED + detection, test fixture, CAPABILITIES
+  C27 and CHANGELOG now state it (landed earlier in this branch).
+
+### Honest scope
+Everything in this entry is FIXTURE_VERIFIED mechanism evidence. No
+CompiledCapabilityModel has been built, extracted, evaluated or certified, and
+no real-model stage claims anything. The preregistered thresholds, the full
+item-by-item ledger and the BLOCKED_RESOURCE constraint for this 8 GB host are
+in [docs/CAPABILITY_EXTRACTION.md](docs/CAPABILITY_EXTRACTION.md). PATENT.md is
+untouched; the private technical disclosure for owner/counsel is NOT committed.
+
 ## GLM-5.3-Flash E2 expansion: bigger KD set, bigger student, GPU — 2026-09-23
 
 The v1 pilot's honest negative left an obvious confound: 6 KD pairs and a 0.5B
@@ -111,13 +178,17 @@ against the real model. All findings were verified against the actual
 - **Routing contract**: the adapter claimed a plain sigmoid-topk
   equation, refused a config boolean `e_score_correction_bias` (a field
   the real config never has — it would have refused the real model) and
-  checked a nonexistent `scoring_func` config field. Rewritten against the
+  did not check the config's `scoring_func` field. Rewritten against the
   real `Glm5NextTextTopkRouter`: sigmoid scores with
   `e_score_correction_bias` added to the SELECTION scores only, group
   top-k, pre-bias weight gather, routed scaling; detection now verifies
-  the ROUTER MODULE CONTRACT (weight shape, bias buffer, group/scaling
-  attributes); telemetry captures the ACTUAL dispatched ids/weights from
-  the router's own `(router_logits, topk_weights, topk_indices)` output —
+  the config's own `scoring_func: "sigmoid"` field (the real
+  GLM-5.3-Flash config DECLARES it — corrected 2026-09-23 under
+  extraction-brief C8; the 2026-09-19 note claiming the field was
+  nonexistent was false) AND the ROUTER MODULE CONTRACT (weight shape,
+  bias buffer, group/scaling attributes); telemetry captures the ACTUAL
+  dispatched ids/weights from the router's own
+  `(router_logits, topk_weights, topk_indices)` output —
   never a re-derived approximation.
 - **The mask was a silent no-op**: the old hook rewrote only
   `output[0]` (the logits) while the dispatch decision lives in the

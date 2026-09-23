@@ -43,10 +43,16 @@ MAX_FRAME_BYTES = 64 * 1024 * 1024
 #: Operations the worker understands. Unknown op -> typed refusal.
 OPS = (
     "hello",        # handshake: versions, arch detection, hardware preflight
+    "manifest",     # EXACT per-file sha256 over the whole checkpoint tree
+                    # (extraction-brief C3); disk-only, no model load
     "inspect",      # read-only architecture/parameter inventory
     "routing",      # router usage telemetry over a batch of prompts
     "generate",     # completions under the CURRENT mask state (item 8:
-                    # the measurement primitive of mask->generate->judge)
+                    # the measurement primitive of mask->generate->judge);
+                    # C4: chat template + PINNED clear_thinking/
+                    # reasoning_effort + recorded decoding params, one
+                    # identical generation policy for every arm
+                    # -- through the checkpoint's own chat template (C4)
     "mask",         # temporary_mask one component (intervention protocol)
     "restore",      # restore_mask one component
     "verify",       # verify_unchanged (parameter hashes)

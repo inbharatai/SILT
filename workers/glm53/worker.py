@@ -66,6 +66,71 @@ def _available_bytes() -> int:
     return mem_available
 
 
+#: The pinned generation policy (extraction-brief C4, verified against
+#: the REAL checkpoint's chat template 2026-09-23): the template declares
+#: ``reasoning_effort`` (allowed low/high/max, template default 'max')
+#: and ``clear_thinking`` (template default false). The extraction
+#: program pins BOTH so the clean and intervention arms of every
+#: measurement provably share one generation policy -- an arm-comparison
+#: requires identity, and identity requires the values to be constants
+#: here, not per-request arguments. Decoding parameters are recorded in
+#: every generate response and hashed into the callers'
+#: generation_policy_hash.
+PINNED_CHAT_TEMPLATE_KWARGS = {
+    "clear_thinking": True,
+    "reasoning_effort": "low",
+}
+PINNED_DECODING = {
+    "do_sample": False,
+    "use_cache": True,
+}
+
+
+def _chat_encode(tokenizer_like, prompt: str, max_length: int = 0):
+    """Official GLM inference contract (extraction-brief C4,
+    2026-09-23): encode prompts through the checkpoint's OWN chat
+    template -- ``apply_chat_template`` with a user message and
+    ``add_generation_prompt=True`` -- exactly the invocation the GLM
+    model card defines for this architecture, with the PINNED
+    ``clear_thinking``/``reasoning_effort`` template arguments. The OLD
+    path encoded the RAW prompt string with no template, so every
+    measured completion ran off-distribution from how the source model
+    is actually served; functional measurements taken that way cannot
+    be compared to the checkpoint's published behaviour. A template
+    that returns no input_ids is a typed refusal -- never a silent
+    fallback to raw encoding."""
+    messages = [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+    try:
+        encoded = tokenizer_like.apply_chat_template(
+            messages, add_generation_prompt=True, tokenize=True,
+            return_tensors="pt", return_dict=True,
+            **PINNED_CHAT_TEMPLATE_KWARGS,
+        )
+    except TypeError:
+        # Stacks whose apply_chat_template lacks return_dict: re-run the
+        # documented form and rebuild the dict the callers expect.
+        encoded = tokenizer_like.apply_chat_template(
+            messages, add_generation_prompt=True, tokenize=True,
+            return_tensors="pt",
+            **PINNED_CHAT_TEMPLATE_KWARGS,
+        )
+    if not hasattr(encoded, "get"):
+        encoded = dict(encoded)
+    if "input_ids" not in encoded:
+        raise InterventionInvalid(
+            "apply_chat_template returned no input_ids; refusing to "
+            "guess an encoding for the GLM inference contract")
+    if max_length and encoded["input_ids"].shape[-1] > max_length:
+        # A BUDGET, not a truncation: slicing a chat-templated encoding
+        # would break the template structure the inference contract
+        # depends on, so an over-budget prompt is a typed refusal.
+        raise InterventionInvalid(
+            "templated prompt is %d tokens, over the %d-token budget; a "
+            "chat-templated encoding is never silently truncated"
+            % (int(encoded["input_ids"].shape[-1]), int(max_length)))
+    return encoded
+
+
 def preflight(parameter_count: int) -> dict:
     """Memory admission BEFORE any weight is loaded."""
     required = parameter_count * _DTYPE_BYTES * 2 + _HEADROOM_MIB * 1024 * 1024
@@ -152,7 +217,11 @@ def main() -> int:
         hello/inspect so every downstream artifact can state EXACTLY which
         checkpoint revision produced it. Weight shards are NOT hashed here
         (~320B params: the reader would run for tens of minutes); the
-        identity pins the manifest that defines the shard set + digests."""
+        identity pins the manifest that defines the shard set + digests.
+        The EXACT per-shard digests come from the dedicated ``manifest``
+        op (extraction-brief C3, 2026-09-23), which hashes every shard
+        with progress notes -- a deliberate, separately-invoked cost,
+        never a surprise inside another op."""
         import os as _os
 
         identity = {}
@@ -166,6 +235,58 @@ def main() -> int:
                 identity[name] = None
                 _stderr("checkpoint identity: cannot read %s: %s" % (path, exc))
         return identity
+
+    def manifest(payload: dict) -> dict:
+        """EXACT SourceCheckpointManifest (extraction-brief C3): sha256 of
+        EVERY file in the checkpoint tree -- config, index, tokenizer/
+        processor assets, and every weight shard -- computed with bounded
+        memory and stderr progress notes. This op reads the checkpoint
+        DIRECTLY FROM DISK (no model load, no preflight): a manifest can
+        be taken on a host that cannot hold the model. The per-shard
+        digests make the manifest binding: any downstream artifact that
+        records a source revision pins these exact bytes."""
+        import os as _os
+        import time as _time
+
+        if not _os.path.isdir(_CHECKPOINT):
+            raise InterventionInvalid(
+                "checkpoint path %r is not a directory" % _CHECKPOINT)
+        files = {}
+        total_bytes = 0
+        for root, _dirs, names in _os.walk(_CHECKPOINT):
+            for name in sorted(names):
+                path = _os.path.join(root, name)
+                relative = _os.path.relpath(path, _CHECKPOINT)
+                if relative in files:
+                    raise InterventionInvalid(
+                        "duplicate checkpoint file %r" % relative)
+                digest = hashlib.sha256()
+                size = 0
+                started = _time.time()
+                with open(path, "rb") as handle:
+                    while True:
+                        chunk = handle.read(1024 * 1024)
+                        if not chunk:
+                            break
+                        digest.update(chunk)
+                        size += len(chunk)
+                files[relative.replace(_os.sep, "/")] = {
+                    "sha256": digest.hexdigest(),
+                    "bytes": size,
+                }
+                total_bytes += size
+                if size > 256 * 1024 * 1024:
+                    _stderr("manifest: hashed %s (%d bytes, %.0fs)"
+                            % (relative, size, _time.time() - started))
+        return {
+            "checkpoint": _CHECKPOINT,
+            "files": files,
+            "total_bytes": total_bytes,
+            "file_count": len(files),
+            "note": "per-file sha256 over the full checkpoint tree; this "
+                    "manifest is the exact source revision every "
+                    "downstream extraction artifact must pin",
+        }
 
     def torch_module():
         nonlocal torch
@@ -264,10 +385,7 @@ def main() -> int:
         try:
             with tm.inference_mode():
                 for item in prompts:
-                    encoded = tokenizer(
-                        item["prompt"], return_tensors="pt", truncation=True,
-                        max_length=max_length,
-                    )
+                    encoded = _chat_encode(tokenizer, item["prompt"], max_length)
                     adapter.model(
                         input_ids=encoded["input_ids"],
                         attention_mask=encoded.get("attention_mask"),
@@ -306,7 +424,12 @@ def main() -> int:
             raise InterventionInvalid("max_new_tokens must be positive")
         import transformers
 
-        tokenizer = transformers.AutoTokenizer.from_pretrained(_CHECKPOINT)
+        # AutoProcessor is the checkpoint's own entry point for this
+        # vision-language architecture (extraction-brief C4); the text
+        # prompt path goes through its chat template like every other
+        # invocation of the model.
+        processor = transformers.AutoProcessor.from_pretrained(_CHECKPOINT)
+        tokenizer = getattr(processor, "tokenizer", processor)
         tm = torch_module()
         per_prompt = []
         with tm.inference_mode():
@@ -316,13 +439,11 @@ def main() -> int:
                     raise InterventionInvalid(
                         "each generate prompt needs a non-empty 'prompt' string"
                     )
-                encoded = tokenizer(prompt, return_tensors="pt",
-                                    truncation=True)
+                encoded = _chat_encode(tokenizer, prompt, 0)
                 output = adapter.model.generate(
                     **encoded,
                     max_new_tokens=max_new_tokens,
-                    do_sample=False,
-                    use_cache=True,
+                    **PINNED_DECODING,
                 )
                 new_tokens = int(
                     output.shape[-1] - encoded["input_ids"].shape[-1]
@@ -344,7 +465,16 @@ def main() -> int:
             # reported here, so the caller never confuses a torn batch with
             # a clean one.
             "active_masks": adapter.active_masks(),
-            "generation": {"greedy": True, "max_new_tokens": max_new_tokens},
+            # The FULL pinned generation policy (C4): every decoding
+            # parameter and both pinned chat-template arguments are
+            # recorded so the caller can hash one generation_policy
+            # shared by the clean and intervention arms.
+            "generation": {
+                "greedy": True,
+                "max_new_tokens": max_new_tokens,
+                "decoding": dict(PINNED_DECODING),
+                "chat_template_kwargs": dict(PINNED_CHAT_TEMPLATE_KWARGS),
+            },
         }
 
     def mask(payload: dict) -> dict:
@@ -382,6 +512,7 @@ def main() -> int:
 
     handlers = {
         "hello": hello,
+        "manifest": manifest,
         "inspect": lambda payload: (
             load_adapter()
             if adapter is None

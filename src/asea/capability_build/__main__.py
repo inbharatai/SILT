@@ -817,8 +817,10 @@ def _cmd_intervene(args) -> Dict[str, Any]:
         )
     if not args.component:
         raise CapabilityBuildError(
-            "intervene needs --component expert:<sparse-layer>/<expert-id> "
-            "(e.g. expert:0/17) or layer:<sparse-layer>"
+            "intervene needs --component expert:<decoder-layer>/<expert-id> "
+            "(e.g. expert:3/17 -- CANONICAL decoder layer ids 0..44, not "
+            "sparse-list positions; layers 0..2 are dense and refused) or "
+            "layer:<decoder-layer>"
         )
     # Judging goes through the host oracle: fail closed BEFORE the worker
     # touches anything on a host where the sandbox cannot run.
