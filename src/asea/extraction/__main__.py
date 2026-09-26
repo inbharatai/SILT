@@ -18,11 +18,22 @@ Commands (brief section W), all 18 wired: ``spec validate``,
 ``baseline``, ``trace``, ``intervene``, ``graph``, ``plan``,
 ``build``, ``provenance verify``, ``standalone verify``, ``recover``,
 ``evaluate``, ``compare``, ``reduce``, ``certify``, ``receipt``.
-Stages whose real-model implementation is still ahead of this build
-report an honest NOT_IMPLEMENTED refusal (exit 2) with the status
-vocabulary -- a missing surface is stated, never faked; and once a
-stage IS implemented, an 8 GB host that cannot hold the source model
-reports BLOCKED_RESOURCE (exit 4), which is what will happen here.
+
+Implementation discipline (status vocabulary, never faked):
+
+  * ``graph`` and ``plan`` are IMPLEMENTED as pure functions over
+    RECORDED artifacts (verified intervention attempts, enrichment
+    records, the source manifest) -- they run offline on any host.
+  * ``baseline``/``trace``/``intervene`` pass through the REAL
+    admission gate first (spec validation, source architecture
+    validation, config-arithmetic memory admission); on an 8 GB host
+    the gate refuses with BLOCKED_RESOURCE (exit 4) -- the honest
+    real-model outcome of this stage on such a host. On a host the
+    gate admits, the beyond-ad admission measurement orchestration is
+    still NOT_IMPLEMENTED in this build and refuses (exit 2) saying
+    exactly that.
+  * the remaining stages (``build`` … ``certify``) are still ahead of
+    this build and report an honest NOT_IMPLEMENTED refusal (exit 2).
 """
 
 from __future__ import annotations
@@ -56,6 +67,12 @@ from asea.extraction.schema import (
     SourceCheckpointManifest,
     source_manifest_fingerprint,
 )
+from asea.extraction.stages import (
+    build_causal_graph,
+    build_extraction_plan,
+    load_intervention_attempts,
+    require_admission,
+)
 
 PROG = "silt-extract"
 
@@ -79,34 +96,9 @@ RETENTION_THRESHOLDS_NOTE = (
 
 #: Real-model stages whose implementation is still ahead of this build.
 #: Each entry: command -> (what the stage will do, what it needs).
+#: baseline/trace/intervene/graph/plan are IMPLEMENTED (see the real
+#: handlers below) and are deliberately absent from this table.
 _NOT_IMPLEMENTED_COMMANDS = {
-    "baseline": (
-        "measure the source model's functional baseline on the "
-        "training/development cases",
-        "the isolated GLM worker on a host its preflight admits; on the "
-        "current 8 GB host the real run would be BLOCKED_RESOURCE",
-    ),
-    "trace": (
-        "collect judged routing/activation observations joined to "
-        "host-oracle outcomes (C2)",
-        "the isolated GLM worker plus the host functional oracle",
-    ),
-    "intervene": (
-        "run the controlled mask/measure/restore intervention on one "
-        "canonical decoder component",
-        "the isolated GLM worker plus the host functional oracle",
-    ),
-    "graph": (
-        "build the causal component graph from verified intervention "
-        "attempts with matched-control arms",
-        "intervention attempts recorded by the intervene stage",
-    ),
-    "plan": (
-        "derive the conservative ExtractionPlan (retain tokenizer, "
-        "embeddings, dense layers, attention, head; causally selected "
-        "routed-expert subset; rebuilt routers)",
-        "a completed causal component graph",
-    ),
     "build": (
         "physically extract and transform the GLM parameters into the "
         "standalone CompiledCapabilityModel",
@@ -404,6 +396,252 @@ def _cmd_dataset_validate(args) -> Dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# Real-model stages E-M (implemented in this build)
+# ---------------------------------------------------------------------------
+
+def _load_stage_spec_and_checkpoint(args, command: str):
+    """Common intake for the real-model stages: a validated spec plus an
+    existing checkpoint directory. Refusals are typed, never crashes."""
+    loaded = _load_spec(args.config)
+    checkpoint = getattr(args, "checkpoint", None)
+    if not checkpoint:
+        raise Refused(
+            "%s requires --checkpoint (the unpacked GLM-5.3-Flash source "
+            "checkpoint directory)" % command,
+            "point --checkpoint at the directory holding config.json")
+    return loaded["spec"], Path(checkpoint)
+
+
+def _cmd_baseline(args) -> Dict[str, Any]:
+    """Section I: pass through the REAL admission gate (spec validation,
+    source architecture validation, config-arithmetic memory admission).
+    On a host the gate admits, the generation/judging loop beyond it is
+    NOT_IMPLEMENTED in this build -- stated, never faked."""
+    spec, checkpoint = _load_stage_spec_and_checkpoint(args, "baseline")
+    admission = require_admission(checkpoint, "silt-extract baseline")
+    return {
+        "ok": False,
+        "command": "baseline",
+        "status": STATUS_NOT_IMPLEMENTED,
+        "capability_id": spec.capability_id,
+        "admission": {
+            "admitted": True,
+            "estimated_parameters": admission["estimated_parameters"],
+            "required_bytes": admission["required_bytes"],
+            "available_bytes": admission["available_bytes"],
+        },
+        "reason": (
+            "this host PASSED the admission gate, but the baseline "
+            "measurement orchestration (isolated GLM worker generation "
+            "joined to host-oracle verdicts) is not implemented in this "
+            "build; refusing honestly rather than emitting a placeholder "
+            "measurement"
+        ),
+    }
+
+
+def _cmd_trace(args) -> Dict[str, Any]:
+    """Section J: same admission-first discipline as baseline; the
+    routing/activation observation collection beyond the gate is
+    NOT_IMPLEMENTED in this build."""
+    spec, checkpoint = _load_stage_spec_and_checkpoint(args, "trace")
+    admission = require_admission(checkpoint, "silt-extract trace")
+    return {
+        "ok": False,
+        "command": "trace",
+        "status": STATUS_NOT_IMPLEMENTED,
+        "capability_id": spec.capability_id,
+        "admission": {
+            "admitted": True,
+            "estimated_parameters": admission["estimated_parameters"],
+            "required_bytes": admission["required_bytes"],
+            "available_bytes": admission["available_bytes"],
+        },
+        "reason": (
+            "this host PASSED the admission gate, but the judged "
+            "routing-observation collection (C2, worker telemetry joined "
+            "to host-oracle outcomes) is not implemented in this build; "
+            "refusing honestly rather than emitting unjudged telemetry as "
+            "capability evidence"
+        ),
+    }
+
+
+def _cmd_intervene(args) -> Dict[str, Any]:
+    """Section K: same admission-first discipline; the controlled
+    mask/measure/restore loop against the live worker beyond the gate is
+    NOT_IMPLEMENTED in this build (the intervention MECHANISM itself is
+    implemented and fixture-verified in asea.capability_build)."""
+    spec, checkpoint = _load_stage_spec_and_checkpoint(args, "intervene")
+    admission = require_admission(checkpoint, "silt-extract intervene")
+    return {
+        "ok": False,
+        "command": "intervene",
+        "status": STATUS_NOT_IMPLEMENTED,
+        "capability_id": spec.capability_id,
+        "admission": {
+            "admitted": True,
+            "estimated_parameters": admission["estimated_parameters"],
+            "required_bytes": admission["required_bytes"],
+            "available_bytes": admission["available_bytes"],
+        },
+        "reason": (
+            "this host PASSED the admission gate, but the worker-orchestrated "
+            "mask/measure/restore loop is not implemented in this build "
+            "(the in-process intervention mechanism IS implemented and "
+            "fixture-verified in asea.capability_build); refusing honestly "
+            "rather than recording a fabricated intervention"
+        ),
+    }
+
+
+def _load_enrichment_records(path: Path) -> Dict[str, Dict[str, Any]]:
+    """Load enrichment records (correlation-only component usage) from a
+    footprint/enrichment artifact. Correlation entries are labelled as
+    such downstream; they can never hold a causal role."""
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, UnicodeError) as exc:
+        raise InvalidEvidence(
+            "enrichment artifact %s is not valid JSON: %s" % (path, exc),
+            "enrichment artifacts are the records compute_enrichment "
+            "writes: {component: {target_cases, control_cases, ...}} or "
+            "a footprint holding a 'components' mapping")
+    components = raw.get("components") if isinstance(raw, dict) else None
+    if not isinstance(components, dict):
+        components = raw if isinstance(raw, dict) else None
+    if not isinstance(components, dict) or not components:
+        raise InvalidEvidence(
+            "enrichment artifact %s holds no component records" % path,
+            "record enrichment with asea.capability_build.footprint."
+            "compute_enrichment and pass that artifact")
+    for component, entry in components.items():
+        if not isinstance(component, str) or not isinstance(entry, dict):
+            raise InvalidEvidence(
+                "enrichment artifact %s has a non-string component key or "
+                "a non-object record" % path,
+                "enrichment records map 'expert:<layer>/<expert>' or "
+                "'layer:<layer>' to an object")
+    return components
+
+
+def _cmd_graph(args) -> Dict[str, Any]:
+    """Section L: build the causal component graph OFFLINE from RECORDED
+    artifacts. Verified interventions decide causal roles (REQUIRED /
+    NEGATIVE_OR_HARMFUL); enrichment-only components stay correlation
+    roles and can never be promoted (schema-enforced)."""
+    loaded = _load_spec(args.config)
+    spec = loaded["spec"]
+    attempts = load_intervention_attempts(
+        [Path(p) for p in args.interventions])
+    enriched = {}
+    if getattr(args, "enrichment", None):
+        enriched = _load_enrichment_records(Path(args.enrichment))
+    source_revision = getattr(args, "source_revision", None)
+    if not source_revision:
+        if not attempts:
+            raise InvalidEvidence(
+                "graph needs --source-revision when no intervention "
+                "attempts are supplied (the revision cannot be invented)",
+                "pass the source checkpoint's commit_sha recorded by "
+                "`source verify`")
+        source_revision = attempts[0].source_revision
+    graph = build_causal_graph(
+        capability_id=spec.capability_id,
+        source_revision=source_revision,
+        attempts=attempts,
+        enriched_components=enriched,
+    )
+    payload = graph.model_dump(mode="json", by_alias=True)
+    written = None
+    if not args.dry_run:
+        out = (Path(args.workspace) / "graphs"
+               / ("%s.json" % spec.capability_id))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(payload, sort_keys=True) + "\n",
+                       encoding="utf-8")
+        written = str(out)
+    roles: Dict[str, int] = {}
+    for node in graph.nodes:
+        roles[node.role] = roles.get(node.role, 0) + 1
+    return {
+        "ok": True,
+        "command": "graph",
+        "status": "completed",
+        "capability_id": spec.capability_id,
+        "source_revision": source_revision,
+        "nodes": len(graph.nodes),
+        "roles": roles,
+        "causal_evidence_components": sorted(
+            node.component for node in graph.nodes if node.causal_evidence),
+        "limitations": graph.limitations,
+        "artifact": written,
+        "dry_run": bool(args.dry_run),
+    }
+
+
+def _cmd_plan(args) -> Dict[str, Any]:
+    """Sections M/N: derive the conservative ExtractionPlan from a
+    completed graph plus the source manifest. Only causally REQUIRED
+    routed experts are retained on that basis; correlation-enriched
+    components are NOT retained on enrichment alone."""
+    loaded = _load_spec(args.config)
+    spec = loaded["spec"]
+    graph_path = Path(args.graph)
+    manifest_path = Path(args.manifest)
+    for path, what in ((graph_path, "graph"), (manifest_path, "manifest")):
+        if not path.is_file():
+            raise InvalidEvidence(
+                "%s artifact %s does not exist" % (what, path),
+                "build the %s first (`silt-extract graph` / `silt-extract "
+                "source verify`)" % what)
+    from asea.extraction.schema import CausalComponentGraph
+
+    try:
+        graph = CausalComponentGraph.model_validate(
+            json.loads(graph_path.read_text(encoding="utf-8")))
+        manifest = SourceCheckpointManifest.model_validate(
+            json.loads(manifest_path.read_text(encoding="utf-8")))
+    except Exception as exc:
+        raise InvalidEvidence(
+            "graph or manifest artifact failed schema validation: %s" % exc,
+            "plans are derived only from valid graph and source-manifest "
+            "artifacts; regenerate them with their commands")
+    plan = build_extraction_plan(
+        capability_id=spec.capability_id,
+        source_manifest_sha256=manifest.aggregate_sha256,
+        graph=graph,
+    )
+    payload = plan.model_dump(mode="json", by_alias=True)
+    written = None
+    if not args.dry_run:
+        out = (Path(args.workspace) / "plans"
+               / ("%s.json" % spec.capability_id))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(payload, sort_keys=True) + "\n",
+                       encoding="utf-8")
+        written = str(out)
+    retained_experts = sum(
+        len(entry.retained_experts) for entry in plan.expert_retention)
+    return {
+        "ok": True,
+        "command": "plan",
+        "status": "completed",
+        "capability_id": spec.capability_id,
+        "selection_arm": plan.selection_arm,
+        "retained_dense": plan.retained_dense,
+        "retained_tokenizer": plan.retained_tokenizer,
+        "retained_attention": plan.retained_attention,
+        "retained_head": plan.retained_head,
+        "layers_with_retained_experts": len(plan.expert_retention),
+        "retained_experts": retained_experts,
+        "graph_sha256": plan.graph_sha256,
+        "artifact": written,
+        "dry_run": bool(args.dry_run),
+    }
+
+
 def _cmd_receipt(args) -> Dict[str, Any]:
     """Materialise and sign a CapabilityExtractionReceipt from a JSON
     payload plus the workspace's failed-attempt ledger. The receipt's
@@ -538,8 +776,54 @@ def parser() -> Parser:
     dataset_validate.add_argument("--dir", required=True)
     _common(dataset_validate)
 
-    for command in ("baseline", "trace", "intervene", "graph", "plan",
-                    "build", "recover", "evaluate", "compare", "reduce",
+    # --- implemented real-model stages (admission-gated / offline) ---
+    baseline_cmd = commands.add_parser(
+        "baseline",
+        help="[real-model stage] admission-gated source baseline")
+    baseline_cmd.add_argument("--config", required=True)
+    baseline_cmd.add_argument("--checkpoint", required=True)
+    _common(baseline_cmd)
+
+    trace_cmd = commands.add_parser(
+        "trace", help="[real-model stage] admission-gated routing trace")
+    trace_cmd.add_argument("--config", required=True)
+    trace_cmd.add_argument("--checkpoint", required=True)
+    _common(trace_cmd)
+
+    intervene_cmd = commands.add_parser(
+        "intervene",
+        help="[real-model stage] admission-gated controlled intervention")
+    intervene_cmd.add_argument("--config", required=True)
+    intervene_cmd.add_argument("--checkpoint", required=True)
+    _common(intervene_cmd)
+
+    graph_cmd = commands.add_parser(
+        "graph",
+        help="build the causal component graph from recorded artifacts")
+    graph_cmd.add_argument("--config", required=True)
+    graph_cmd.add_argument("--interventions", nargs="+", required=True,
+                           help="InterventionAttempt artifacts "
+                                "(.jsonl or .json)")
+    graph_cmd.add_argument("--enrichment",
+                          help="optional correlation-only enrichment "
+                               "records (never causal roles)")
+    graph_cmd.add_argument("--source-revision",
+                           help="source commit_sha; defaults to the "
+                                "attempts' recorded revision")
+    _common(graph_cmd)
+
+    plan_cmd = commands.add_parser(
+        "plan", help="derive the conservative ExtractionPlan")
+    plan_cmd.add_argument("--config", required=True)
+    plan_cmd.add_argument("--graph", required=True,
+                          help="graph artifact from `silt-extract graph`")
+    plan_cmd.add_argument("--manifest", required=True,
+                          help="source manifest from `silt-extract source "
+                               "verify`")
+    _common(plan_cmd)
+
+    # --- stages still ahead of this build ---
+    for command in ("build", "recover", "evaluate", "compare", "reduce",
                     "certify"):
         entry = commands.add_parser(
             command,
@@ -612,6 +896,16 @@ def main(argv=None) -> int:
             handler = _cmd_source_verify
         elif command == "dataset" and dataset_command == "validate":
             handler = _cmd_dataset_validate
+        elif command == "baseline":
+            handler = _cmd_baseline
+        elif command == "trace":
+            handler = _cmd_trace
+        elif command == "intervene":
+            handler = _cmd_intervene
+        elif command == "graph":
+            handler = _cmd_graph
+        elif command == "plan":
+            handler = _cmd_plan
         elif command == "provenance" and provenance_command == "verify":
             handler = _cmd_not_implemented("provenance verify")
         elif command == "standalone" and standalone_command == "verify":

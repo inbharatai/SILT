@@ -77,3 +77,25 @@ jobs:
       - name: No 'bypass' parameter sneaked onto a gate
         run: |
           ! grep -rn "def .*bypass" src/asea/promotion src/asea/deepapply || { echo "FAIL: bypass argument found on a gate"; exit 1; }
+
+  docs-drift:
+    # Served documentation is GENERATED from repo-root sources by
+    # scripts/build_vercel_site.py (Vercel serves docs/ verbatim). A root
+    # README.md/PATENT.md edit without re-running the sync leaves the
+    # public site stale or contradictory -- this job regenerates and fails
+    # on any drift in the synced files.
+    name: served documentation drift check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate served docs, fail on drift
+        run: |
+          python scripts/build_vercel_site.py
+          if ! git diff --exit-code -- docs/README.md docs/PATENT.md docs/sitemap.xml docs/robots.txt docs/favicon.svg; then
+            echo "FAIL: served documentation is stale."
+            echo "Run 'python scripts/build_vercel_site.py' and commit the regenerated docs/ copies."
+            exit 1
+          fi

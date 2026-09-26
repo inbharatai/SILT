@@ -88,6 +88,18 @@ class InterventionTarget:
     def as_dict(self) -> Dict[str, Any]:
         return {"kind": self.kind, "layer": self.layer, "expert_id": self.expert_id}
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, InterventionTarget):
+            return NotImplemented
+        return (
+            self.kind == other.kind
+            and self.layer == other.layer
+            and self.expert_id == other.expert_id
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.kind, self.layer, self.expert_id))
+
 
 def _mean_performance(
     judge: Judge, cases: Sequence[Dict[str, Any]], adapter, seed: int,
@@ -226,6 +238,64 @@ def attempt_intervention(
         return {"entry": entry, "ok": True, "error": None}
     except InterventionInvalid as exc:
         return {"entry": None, "ok": False, "error": str(exc)}
+
+
+def component_target(component_id: str) -> "InterventionTarget":
+    """Resolve a footprint/enrichment component id to an intervention target.
+
+    Component ids are the keys enrichment and footprints record:
+    ``"expert:<layer>/<expert>"`` and ``"layer:<layer>"``. The layer in the
+    id is ALREADY the canonical decoder layer id (0..num_hidden_layers-1)
+    -- traces record canonical ids and this function must never renumber,
+    shift by ``first_k_dense_replace`` or otherwise "help": a mismatch
+    between the id's layer and the layer actually masked is exactly the
+    misattribution class C1 exists to prevent. Malformed ids are typed
+    refusals; existence/dense-range validation stays with the adapter,
+    which owns the model's actual layout.
+    """
+    if not isinstance(component_id, str):
+        raise InterventionInvalid(
+            "component id must be a string, got %r" % (component_id,)
+        )
+    if component_id.startswith("expert:"):
+        rest = component_id[len("expert:"):]
+        if "/" not in rest:
+            raise InterventionInvalid(
+                "expert component id %r must be 'expert:<layer>/<expert>' "
+                "with canonical decoder layer and expert ids" % component_id
+            )
+        layer_s, expert_s = rest.split("/", 1)
+        try:
+            layer, expert = int(layer_s), int(expert_s)
+        except ValueError:
+            raise InterventionInvalid(
+                "expert component id %r carries non-integer ids" % component_id
+            )
+        if str(layer) != layer_s.strip() or str(expert) != expert_s.strip():
+            raise InterventionInvalid(
+                "expert component id %r carries non-canonical integers "
+                "(leading zeros/whitespace are refused)" % component_id
+            )
+        return InterventionTarget("expert", layer, expert)
+    if component_id.startswith("layer:"):
+        layer_s = component_id[len("layer:"):]
+        try:
+            layer = int(layer_s)
+        except ValueError:
+            raise InterventionInvalid(
+                "layer component id %r carries a non-integer layer id"
+                % component_id
+            )
+        if str(layer) != layer_s.strip():
+            raise InterventionInvalid(
+                "layer component id %r carries a non-canonical integer"
+                % component_id
+            )
+        return InterventionTarget("layer", layer)
+    raise InterventionInvalid(
+        "component id %r is neither 'expert:<layer>/<expert>' nor "
+        "'layer:<layer>'" % component_id
+    )
 
 
 def causal_evidence_only(

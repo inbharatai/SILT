@@ -1,0 +1,1 @@
+{"capability_id": "repo_repair_v1", "final_generated": false, "frozen_before_model_generation": true, "model_outputs_consulted": false, "note": "the final split does not exist yet; it will be generated and sealed only at the evaluation stage, on a host the admission gate admits", "schema": "silt.extraction.selection_lock.v1"}

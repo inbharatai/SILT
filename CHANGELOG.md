@@ -9,6 +9,79 @@ are historical snapshots. CI counts describe their own run and environment — s
 the CI badge in the README. The September experimental evidence separately records
 the verified V5 prepublication snapshot; it is not an all-machine CI guarantee.
 
+## GLM-5.3-Flash capability extraction program (Sections E–M + H dataset) — 2026-09-26
+
+Second program increment on the same feature branch, continuing the
+preregistration above. H1 is unchanged and remains untested by any
+real-model run — nothing below is GLM evidence.
+
+### Added
+- **`src/asea/extraction/stages.py`**: the Section E–M machinery with the
+  same honesty ladder as the brief anticipated. `load_checkpoint_config`
+  reads a source `config.json` WITHOUT torch (`text_config` nesting
+  merged); `validate_source_architecture` checks it field-by-field
+  against the pinned GLM-5.3-Flash card (including the 1M-positions
+  FLOOR); `estimate_parameters` mirrors the worker's formula exactly, and
+  `require_admission` runs the same config-arithmetic memory formula the
+  worker preflight uses, so the CLI admission and the worker preflight
+  can never disagree. On an unknown-memory host the available figure is
+  0, so admission never silently passes.
+- **`baseline` / `trace` / `intervene` (I/J/K) now pass through the REAL
+  admission gate**: spec validation → source architecture validation →
+  memory arithmetic, before anything else. On this 8 GB host they report
+  `BLOCKED_RESOURCE` (exit 4) with the exact ~1.2 TiB requirement and
+  host-memory remedy — that refusal IS their honest real-model output
+  here. On a host the gate ADMITS, the beyond-admission
+  orchestration is still NOT_IMPLEMENTED and the stage says exactly
+  that (exit 2) instead of emitting a placeholder measurement.
+- **`graph` and `plan` (L/M/N) implemented as pure offline functions
+  over RECORDED artifacts**: `build_causal_graph` classifies
+  REQUIRED/NEGATIVE_OR_HARMFUL only from verified, restored interventions
+  whose effect exceeds their matched-control arm; correlation-only
+  components can never hold a causal role (schema-enforced).
+  `build_extraction_plan` retains tokenizer/embeddings/dense/attention/
+  head (enforced) plus only the causally REQUIRED routed experts, and
+  refuses when no expert is causally required — binding the plan to
+  the source manifest's aggregate sha256 and the graph's sha256.
+- **Section H dataset** `data/extraction_v1/` (built by
+  `scripts/build_extraction_dataset.py`): 14 target repair families + 4
+  control families, 54 CC0 hand-authored cases, four JSONL splits with
+  `silt.extraction.cases.v1` manifests, a selection lock frozen before
+  any model run (`final_generated: False` — the final split is
+  deliberately NOT generated), and a pure-python two-proportion power
+  analysis (alpha=0.05, power=0.8, MDE=0.3 → ~25 cases/family required).
+  Status is honestly PARTIAL_RESULT: the seed set carries 2–3 cases per
+  family, so it supports mechanism and pilot use only and is NOT
+  evaluation material for the preregistered hypothesis.
+- **`tests/test_extraction_dataset.py`**: dataset-integrity tests
+  including the machine-verified coherence gate — every target case's
+  buggy code must FAIL at least one of its own oracle checks in a real
+  subprocess, because a "repair task" whose buggy code already passes
+  is an incoherent case. All four manifests also validate through the
+  real `silt-extract dataset validate` CLI, and manifest hashes are
+  recomputed and matched against the committed case files.
+
+### Changed
+- C1 completed its last sub-item: the end-to-end chain trace →
+  footprint component id (`expert:3/17`) → live intervention → exact
+  registry key `3:expert:3/17` is tested
+  (`test_c1_end_to_end_trace_to_footprint_id_to_exact_masked_layer_expert`).
+- C8 completed: every brief-listed documentation correction landed and
+  the new `docs-drift` CI job regenerates the served documentation
+  (`scripts/build_vercel_site.py`) and fails on any drift, making
+  `docs/README.md` correct-by-construction from the root README.md.
+- `docs/CAPABILITY_EXTRACTION.md` ledger updated to one-status-per-item:
+  C8/E/L/M/N = FIXTURE_VERIFIED, H = PARTIAL_RESULT,
+  I/J/K = BLOCKED_RESOURCE (their real honest output on this host),
+  with full build notes; `docs/CAPABILITIES.md` C31 updated to match;
+  README mechanism-table row rewritten accordingly.
+
+### Not done (unchanged statuses)
+O/P/Q/R/S/T/U remain NOT_IMPLEMENTED — no CompiledCapabilityModel has
+been built, evaluated or certified; the preregistered H1 remains
+untested by any real-model run, and every implemented stage is
+FIXTURE_VERIFIED mechanism only.
+
 ## GLM-5.3-Flash capability extraction program (Section C + D + W core) — 2026-09-23
 
 New package `src/asea/extraction/` + `silt-extract` CLI implementing the owner's

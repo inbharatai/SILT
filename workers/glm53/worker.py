@@ -16,11 +16,13 @@ are opened READ-ONLY: the worker never writes into the checkpoint tree.
 Hardware honesty (binding): before the model is touched, ``preflight``
 admits or refuses on the same formula the compiler uses
 (stored_parameters x dtype_bytes x 2 + 512 MiB vs available memory, plus
-the cgroup ceiling). A ~320B-parameter BF16 teacher needs ~640 GiB before
-headroom; a laptop is refused with the EXACT blocker and remedy, never a
-swap-death or a fabricated trace. FP8/quantized checkpoints are refused
-for interventions (unrestorable bit-identically) -- the BF16 repository
-variant is the remedy.
+the cgroup ceiling). For a ~320B-parameter BF16 teacher the raw weights
+are ~600 GiB and the admission formula requires ~1.2 TiB of HOST memory
+(the model loads with device_map="cpu", so host RAM — not GPU VRAM — is
+the binding requirement); a laptop is refused with the EXACT blocker and
+remedy, never a swap-death or a fabricated trace. FP8/quantized
+checkpoints are refused for interventions (unrestorable
+bit-identically) -- the BF16 repository variant is the remedy.
 """
 
 from __future__ import annotations
@@ -149,8 +151,10 @@ def preflight(parameter_count: int) -> dict:
                     available,
                 )
             ),
-            remedy="run this worker on a GPU box / host with enough memory "
-            "for the ~320B-parameter teacher, or use the behavioural "
+            remedy="run this worker on a host with enough RAM for the "
+            "~320B-parameter BF16 teacher (the model loads "
+            "device_map='cpu', so host memory is the requirement — a GPU "
+            "alone does not change the admission), or use the behavioural "
             "(cloud) evidence class on small hosts",
         )
     return {"required_bytes": required, "available_bytes": available}

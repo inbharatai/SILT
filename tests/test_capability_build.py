@@ -46,6 +46,7 @@ from asea.capability_build.intervention import (
     InterventionTarget,
     attempt_intervention,
     causal_evidence_only,
+    component_target,
     run_intervention,
 )
 from asea.capability_build.receipt import sign_receipt, verify_receipt
@@ -702,7 +703,7 @@ def test_worker_deadline_covers_request_transmission(tmp_path):
 # Switch capability results)
 # ---------------------------------------------------------------------------
 
-def _fake_glm_router_stack(torch):
+def _fake_glm_router_stack(torch, per_layer_routers=False):
     """A minimal EXACT-SHAPE GLM-5.3-Flash stand-in for detect_architecture:
     45 decoder blocks (first 3 dense, 42 sparse with a router each), a vision
     tower module, and the config fields the adapter pins. The router is a
@@ -712,9 +713,12 @@ def _fake_glm_router_stack(torch):
     groups kept), weights gathered from the PRE-bias scores, renorm,
     routed scaling -- returning the full ``(router_logits, topk_weights,
     topk_indices)`` contract the adapter's telemetry and mask hooks read.
-    One router instance is SHARED by all 42 sparse blocks (the fake is a
-    mechanics fixture; per-layer weights are not under test) so the stack
-    stays small and hashing stays fast. Random weights -- mechanics only."""
+    By default one router instance is SHARED by all 42 sparse blocks (the
+    fake is a mechanics fixture; per-layer weights are not under test) so
+    the stack stays small and hashing stays fast. With
+    ``per_layer_routers=True`` every sparse block gets its OWN router --
+    the end-to-end C1 test needs to observe WHICH decoder layer a mask
+    actually hit. Random weights -- mechanics only."""
     from asea.capability_build.adapters.glm53_flash import Glm53FlashAdapter
 
     class FakeGlm5NextTextTopkRouter(torch.nn.Module):
@@ -776,7 +780,10 @@ def _fake_glm_router_stack(torch):
                     block.mlp = torch.nn.Linear(4096, 4)  # dense: no "experts"
                 else:
                     block.mlp = torch.nn.Module()
-                    block.mlp.gate = router  # the REAL module name
+                    block.mlp.gate = (  # the REAL module name
+                        FakeGlm5NextTextTopkRouter()
+                        if per_layer_routers else router
+                    )
                     block.mlp.experts = torch.nn.Module()
                 self.model.layers.append(block)
             self.vision_tower = torch.nn.Linear(4096, 4)
@@ -917,6 +924,138 @@ def test_glm_canonical_layer_addressing_matches_registry_key():
             adapter._canonical_layer(decoder_id)[1])[1]
         adapter.restore_mask(target)
         assert adapter.active_masks() == []
+
+
+def test_component_target_parses_and_refuses_honestly():
+    """C1 wiring: footprint component ids resolve to canonical targets
+    with NO renumbering, and malformed ids are typed refusals."""
+    assert component_target("expert:3/17") == InterventionTarget("expert", 3, 17)
+    assert component_target("layer:4") == InterventionTarget("layer", 4)
+    for bad in ("expert:3", "expert:03/7", "expert:3/x", "expert:/7",
+                "layer:04", "bogus:1", "expert:3/7/9", ""):
+        with pytest.raises(InterventionInvalid):
+            component_target(bad)
+    with pytest.raises(InterventionInvalid):
+        component_target(7)
+
+
+def test_c1_end_to_end_trace_to_footprint_id_to_exact_masked_layer_expert():
+    """Extraction-brief C1 end-to-end sub-item (MECHANISM TEST: a fake
+    exact-shape GLM stack with per-layer routers, NOT GLM-5.3-Flash).
+
+    The full chain under test, every link in CANONICAL decoder ids:
+
+      judged internal traces -> usage enrichment -> the top enriched
+      component id -> ``component_target`` -> ``run_intervention`` ->
+      the EXACT decoder layer/expert masked.
+
+    The per-layer routers make the mask's landing point OBSERVABLE: the
+    target judge regenerates decoder layer 3's dispatch (expert 17 is
+    forced into its top-8 by a selection-score bias, the exact condition
+    that defeats naive logit masks) and the control probe shows decoder
+    layer 4's dispatch of the SAME expert id untouched while masked. The
+    old sparse-list-index contract would have resolved footprint layer 3
+    to decoder layer 6, leaving layer 3 dispatching -- target_drop would
+    be 0 and this test would fail. A fixture proves the MECHANISM;
+    it is never GLM capability evidence."""
+    torch = pytest.importorskip("torch")
+    adapter = _fake_glm_router_stack(torch, per_layer_routers=True)
+
+    def _usage_trace(layer, expert, layer_mass, expert_mass, group, sample_id):
+        return make_internal_trace(
+            capability_id="cap",
+            sample_id=sample_id,
+            model_revision="rev",
+            prompt="p-" + sample_id,
+            group=group,
+            outcome=TraceOutcome(success=True),
+            internal=InternalRecord(
+                layers={
+                    str(layer): {
+                        "usage_mass": layer_mass,
+                        "experts": {str(expert): {"usage_mass": expert_mass}},
+                    }
+                }
+            ),
+        )
+
+    # Traces record CANONICAL layer ids: target capability usage
+    # concentrates on decoder layer 3 / expert 17, controls on layer 4.
+    traces = [
+        _usage_trace(3, 17, 10.0, 8.0, "target", "t1"),
+        _usage_trace(3, 17, 9.0, 7.0, "target", "t2"),
+        _usage_trace(4, 17, 1.0, 1.0, "control", "c1"),
+    ]
+    result = compute_enrichment(traces)
+    expert_components = {
+        key: entry for key, entry in result["components"].items()
+        if key.startswith("expert:")
+    }
+    top_component = max(
+        expert_components, key=lambda k: expert_components[k]["enrichment_log_ratio"]
+    )
+    assert top_component == "expert:3/17"  # the trace's CANONICAL id, verbatim
+
+    # The id resolves to the canonical target: layer 3 IS decoder layer 3.
+    target = component_target(top_component)
+    assert (target.kind, target.layer, target.expert_id) == ("expert", 3, 17)
+
+    # Force expert 17 into BOTH routers' top-8 dispatch (pre-freeze, so
+    # the baseline hashes include it) and grab per-layer routers by id.
+    _, block3 = adapter._canonical_layer(3)
+    router3 = adapter._router_of(block3)[1]
+    _, block4 = adapter._canonical_layer(4)
+    router4 = adapter._router_of(block4)[1]
+    router3.e_score_correction_bias[17] = 5.0
+    router4.e_score_correction_bias[17] = 5.0
+    probe = -torch.ones(3, 4096)  # negative-sum hidden states
+    with torch.no_grad():
+        _, _, base3 = router3(probe)
+        assert 17 in base3.reshape(-1).tolist()
+        _, _, base4 = router4(probe)
+        assert 17 in base4.reshape(-1).tolist()
+    adapter.freeze_baseline()
+
+    seen_masks = []
+    layer4_dispatches_17_while_masked = []
+
+    def judge(case, note):
+        if case["group"] == "control":
+            return True
+        if note.get("phase") == "masked":
+            seen_masks.append(list(adapter.active_masks()))
+            with torch.no_grad():
+                _, _, idx4 = router4(probe)
+            layer4_dispatches_17_while_masked.append(
+                17 in idx4.reshape(-1).tolist()
+            )
+        with torch.no_grad():
+            _, _, idx3 = router3(probe)
+        return 17 in idx3.reshape(-1).tolist()
+
+    entry = run_intervention(
+        adapter, target,
+        target_cases=_cases(4, group="target"),
+        control_cases=_cases(3, group="control"),
+        judge=judge,
+        seed=42,
+    )
+    # The masked-phase judge observed the mask live: the registry key is
+    # the canonical id pair, and decoder layer 4 kept dispatching expert
+    # 17 -- the mask hit EXACTLY decoder layer 3.
+    assert seen_masks and all(m == ["3:expert:3/17"] for m in seen_masks)
+    assert all(layer4_dispatches_17_while_masked)
+    # Base phase dispatched 17 (all target cases passed); masked phase did
+    # not -- a measured functional drop from the exact component only.
+    assert entry.component == "expert:3/17"
+    assert entry.target_drop == pytest.approx(1.0)
+    assert entry.control_drop == pytest.approx(0.0)
+    assert entry.restored_and_verified is True
+    assert adapter.active_masks() == []
+    # Post-restore: layer 3's dispatch is byte-identical to the baseline.
+    with torch.no_grad():
+        _, _, again3 = router3(probe)
+    assert torch.equal(again3, base3)
 
 
 def test_switch_mask_suppresses_expert_and_restore_succeeds():

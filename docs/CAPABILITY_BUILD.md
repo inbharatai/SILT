@@ -1,7 +1,9 @@
 # Capability build — teacher footprinting, causal intervention, minimum-capability search
 
-**Status: implemented / source_code_verified, with one small executed behavioural
-pilot recorded below. This layer is NOT enabled by default, NOT auto-activated,
+**Status: implemented / source_code_verified, with four executed research
+records below (2026-09-17 behavioural pilot; 2026-09-18 judged pilot;
+2026-09-19 DeepApply training + scoring correction; 2026-09-23 E2
+expansion). This layer is NOT enabled by default, NOT auto-activated,
 and confers no capability on any model by existing.**
 
 This is a research/build layer on top of the existing SILT mechanisms. It answers
@@ -25,7 +27,7 @@ the next:
 |---|---|
 | **Implemented** | Source path + inspected contract exists (`src/asea/capability_build/`). Not installed-verified, not executed, not quality-validated. |
 | **Enabled** | An operator wrote a spec and selected a teacher connector per run. Nothing here is ever enabled by default. |
-| **Executed** | A real command ran in a stated environment (the pilot below). An executed trace is NOT a judged outcome; UNJUDGED is recorded whenever the host oracle has not spoken. |
+| **Executed** | A real command ran in a stated environment (the executed records below). An executed trace is NOT a judged outcome; UNJUDGED is recorded whenever the host oracle has not spoken. |
 | **Admitted** | A named subsystem accepted evidence under its own policy. Here only `CANDIDATE_UNADMITTED` exists: admission is DeepApply/Gate 2's to give, never this package's. |
 | **Activated** | Nothing in this package ever activates anything. No deployment pointer, no auto-load, no background work. |
 

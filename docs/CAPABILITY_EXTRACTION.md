@@ -56,11 +56,13 @@ If hardware insufficiency prevents the measurement, the record is
 substituted estimate.
 
 Known constraint recorded up front (owner's Section G): the present
-8 GB-VRAM machine cannot hold a BF16 ~320B-parameter source
-(~643 GiB). Full-source measurements (I, J, K, S, T) are therefore
-expected to report `BLOCKED_RESOURCE` here. Fixture-level mechanics may
-be `FIXTURE_VERIFIED` on this machine; they are never real-model
-evidence.
+8 GB-VRAM machine cannot hold a BF16 ~320B-parameter source (raw
+weights ~600 GiB; the worker's admission formula requires ~1.2 TiB of
+host RAM — it loads `device_map="cpu"`, so host memory, not GPU VRAM,
+is the binding requirement). Full-source measurements (I, J, K, S, T)
+are therefore expected to report `BLOCKED_RESOURCE` here. Fixture-level
+mechanics may be `FIXTURE_VERIFIED` on this machine; they are never
+real-model evidence.
 
 ## Implementation ledger
 
@@ -74,7 +76,7 @@ evidence.
 | C5 | CLI exit semantics 0/2/3/4/5, subprocess-tested | FIXTURE_VERIFIED |
 | C6 | Physically sealed final split | FIXTURE_VERIFIED |
 | C7 | Durable failed-attempt evidence records | FIXTURE_VERIFIED |
-| C8 | Documentation corrections + CI docs-drift check | NOT_IMPLEMENTED |
+| C8 | Documentation corrections + CI docs-drift check | FIXTURE_VERIFIED |
 | D1 | CapabilityExtractionSpec schema | FIXTURE_VERIFIED |
 | D2 | SourceCheckpointManifest schema | FIXTURE_VERIFIED |
 | D3 | FunctionalCaseManifest schema | FIXTURE_VERIFIED |
@@ -90,16 +92,16 @@ evidence.
 | D13 | CompiledCapabilityManifest schema | FIXTURE_VERIFIED |
 | D14 | RecoveryRun schema | FIXTURE_VERIFIED |
 | D15 | CapabilityExtractionReceipt schema | FIXTURE_VERIFIED |
-| E | Full-source inventory validated against loaded config | NOT_IMPLEMENTED |
+| E | Full-source inventory validated against loaded config | FIXTURE_VERIFIED |
 | F | Isolated workers/glm53 runtime (exists, carried forward) | FIXTURE_VERIFIED |
 | G | Hardware honesty / BLOCKED_RESOURCE discipline | FIXTURE_VERIFIED |
-| H | Substantial dataset: 14 task families, controls, power analysis | NOT_IMPLEMENTED |
-| I | Full-source baseline | NOT_IMPLEMENTED |
-| J | Internal traces joined to functional outcomes | NOT_IMPLEMENTED |
-| K | Real causal interventions (mask/restore/verify) | NOT_IMPLEMENTED |
-| L | CausalComponentGraph classification | NOT_IMPLEMENTED |
-| M | Causal selection vs matched controls | NOT_IMPLEMENTED |
-| N | Conservative first extraction (dense+expert subset+routers) | NOT_IMPLEMENTED |
+| H | Substantial dataset: 14 task families, controls, power analysis | PARTIAL_RESULT |
+| I | Full-source baseline | BLOCKED_RESOURCE |
+| J | Internal traces joined to functional outcomes | BLOCKED_RESOURCE |
+| K | Real causal interventions (mask/restore/verify) | BLOCKED_RESOURCE |
+| L | CausalComponentGraph classification | FIXTURE_VERIFIED |
+| M | Causal selection vs matched controls | FIXTURE_VERIFIED |
+| N | Conservative first extraction (dense+expert subset+routers) | FIXTURE_VERIFIED |
 | O | Physical build of the CompiledCapabilityModel | NOT_IMPLEMENTED |
 | P | Tensor-level provenance | NOT_IMPLEMENTED |
 | Q | Standalone independence tests | NOT_IMPLEMENTED |
@@ -164,6 +166,61 @@ Build notes (2026-09-23, statuses above reflect exactly this scope):
   `NOT_IMPLEMENTED` typed refusal (exit 2) naming what it needs —
   when those stages are implemented, this 8 GB host will report
   `BLOCKED_RESOURCE` (exit 4), never a substituted fixture result.
+
+Build notes (2026-09-26, statuses above reflect exactly this scope):
+
+- C8 COMPLETE: every brief-listed correction landed — the
+  `CAPABILITY_BUILD.md` status sections now name all four executed
+  records; the memory figures everywhere state the preflight's real
+  arithmetic (~320B parameters → ~600 GiB raw, ~1.2 TiB admission,
+  host RAM binding because the worker loads `device_map="cpu"`); the
+  worker preflight remedy no longer suggests a "GPU box" changes the
+  admission; "final split never opened" was corrected to the stronger
+  true statement everywhere (it was never GENERATED); and the new
+  `docs-drift` CI job regenerates the served documentation
+  (`scripts/build_vercel_site.py`) and fails on any drift, which
+  makes `docs/README.md` correct-by-construction from the root
+  README.md instead of a stale copy.
+- C1 COMPLETE including its last sub-item: the end-to-end chain
+  trace → footprint component id (`expert:3/17`) →
+  `component_target()` → live intervention → exact registry key
+  `3:expert:3/17` (layer 4 provably unaffected) is tested
+  (`test_c1_end_to_end_trace_to_footprint_id_to_exact_masked_layer_expert`).
+- E: `asea/extraction/stages.py` validates the on-disk source card
+  WITHOUT torch (config.json read, `text_config` nesting merged,
+  field-by-field check against the pinned GLM-5.3-Flash card including
+  the 1M-positions floor); a mismatch is invalid evidence (exit 3),
+  because a measurement of a different revision is not evidence about
+  the pinned source.
+- I/J/K: the three real-model stages pass through the REAL admission
+  gate (spec validation + source architecture validation + the SAME
+  config-arithmetic memory formula the worker uses) BEFORE anything
+  else. Executed on this host they report `BLOCKED_RESOURCE` (exit 4)
+  with the exact requirement and remedy — that refusal IS their honest
+  real-model output on an 8 GB host. On a host the gate ADMITS, the
+  beyond-admission measurement orchestration (worker generation loops
+  joined to host-oracle verdicts) is still NOT_IMPLEMENTED in this
+  build and the stage says exactly that (exit 2) instead of emitting a
+  placeholder measurement.
+- L/M/N: `graph` and `plan` are implemented as pure functions over
+  RECORDED artifacts and run offline. `graph` classifies REQUIRED /
+  NEGATIVE_OR_HARMFUL only from verified, restored interventions with
+  effects above their matched-control arms (Section M); enrichment-only
+  components can never hold a causal role (schema-enforced).
+  `plan` retains tokenizer/embeddings/dense/attention/head (enforced)
+  and the causally REQUIRED routed experts only, binding to the
+  source manifest's aggregate sha256 and the graph's sha256.
+- H: `data/extraction_v1/` — governed seed dataset built by
+  `scripts/build_extraction_dataset.py`: 14 target repair families +
+  4 control families, 54 CC0 hand-authored cases, manifests validate
+  through the real CLI, selection lock frozen before any model run,
+  final split deliberately NOT generated. PARTIAL_RESULT because the
+  power analysis (alpha=0.05, power=0.8, MDE=0.3) requires ~25 cases
+  per family and the seed set carries 2–3: it supports mechanism and
+  pilot use only and is NOT evaluation material for the preregistered
+  hypothesis. Every target case's buggy code is machine-verified to
+  FAIL at least one of its own oracle checks
+  (`tests/test_extraction_dataset.py`).
 
 Naming rule (binding, owner's brief): the artifact is called the
 **CompiledCapabilityModel** — "GLM-5.3-Flash-derived Repository

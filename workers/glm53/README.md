@@ -58,9 +58,12 @@ pin untouched and never imports Transformers 5.x.
 
 - **Hardware preflight before anything loads.** The `hello` op admits or
   refuses with the compiler's memory formula (parameters x dtype x 2 +
-  512 MiB vs available/cgroup). A ~320B BF16 teacher needs ~640 GiB; a
-  laptop receives a `blocked` frame with the exact requirement + remedy —
-  never a swap-death, never a fabricated trace.
+  512 MiB vs available/cgroup). A ~320B BF16 teacher is ~600 GiB of raw
+  weights and the formula admits only with ~1.2 TiB of HOST memory
+  available — the worker loads `device_map="cpu"`, so host RAM (not GPU
+  VRAM) is the binding requirement. A laptop receives a `blocked` frame
+  with the exact requirement + remedy — never a swap-death, never a
+  fabricated trace.
 - **Quantized checkpoints are refused for interventions.** The main
   zai-org/GLM-5.3-Flash repo ships FP8; packed quantized tensors cannot be
   provably restored bit-identically after a temporary mask. The remedy is
@@ -87,5 +90,6 @@ printf '%s\n' '{"protocol":"silt.capability_worker.v1","protocol_version":1,"op"
 ```
 
 Expected on a small host: a `{"ok": false, "error": {"kind": "blocked",
-"requirement": "GLM-5.3-Flash BF16 needs ~640 GiB ...", "remedy": ...}}`
-frame. That is the correct, honest outcome — not a failure to fix.
+"requirement": "GLM-5.3-Flash BF16 needs ~1192 GiB resident ...", "remedy": ...}}`
+frame (the admission figure follows the formula above). That is the
+correct, honest outcome — not a failure to fix.

@@ -581,8 +581,10 @@ class TestCliExitCodes:
         assert code == 3
 
     def test_not_implemented_stage_is_typed_refusal_exit_2(self):
-        for command in ("baseline", "trace", "intervene", "graph", "plan",
-                        "build", "recover", "compare", "reduce", "certify"):
+        # baseline/trace/intervene/graph/plan are IMPLEMENTED now (their
+        # own tests below); the remaining real-model stages still refuse
+        # honestly.
+        for command in ("build", "recover", "compare", "reduce", "certify"):
             code, payload = _run(command)
             assert code == 2, command
             assert payload["status"] == "NOT_IMPLEMENTED"
@@ -674,3 +676,413 @@ class TestErrors:
         from asea.extraction.errors import ExecutionFailure
 
         assert ExecutionFailure("x", "y").exit_code == 5
+
+
+# ---------------------------------------------------------------------------
+# Sections E-M: implemented real-model stages (FIXTURE-verified mechanisms;
+# the admission gate reads REAL config arithmetic and REAL host memory)
+# ---------------------------------------------------------------------------
+
+#: A shape-correct GLM-5.3-Flash TEXT config for admission/architecture
+#: fixtures. FIXTURE ONLY: no weights exist here and no test is GLM
+#: evidence -- the config arithmetic is verified against the WORKER's
+#: own formula, never against a claimed model measurement.
+GLM_TEXT_CONFIG = {
+    "model_type": "glm5_next",
+    "num_hidden_layers": 45,
+    "n_routed_experts": 288,
+    "n_shared_experts": 1,
+    "num_experts_per_tok": 8,
+    "first_k_dense_replace": 3,
+    "hidden_size": 4096,
+    "scoring_func": "sigmoid",
+    "max_position_embeddings": 1_048_576,
+    "moe_intermediate_size": 2048,
+    "intermediate_size": 12288,
+    "vocab_size": 151552,
+}
+
+
+def _glm_checkpoint(root: Path, **config_overrides) -> Path:
+    checkpoint = root / "glm-config-fixture"
+    checkpoint.mkdir()
+    text = dict(GLM_TEXT_CONFIG)
+    text.update(config_overrides)
+    (checkpoint / "config.json").write_text(json.dumps(text),
+                                           encoding="utf-8")
+    return checkpoint
+
+
+def _attempt(component, target_drop, control_drop, *, seed=7,
+             revision="abc123", restored=True):
+    """One InterventionAttempt record shaped exactly as the intervene
+    stage records them (FIXTURE, never a real intervention)."""
+    return {
+        "schema": "silt.extraction.intervention.v1",
+        "capability_id": "repo_repair_v1",
+        "component": component,
+        "target_drop": target_drop,
+        "control_drop": control_drop,
+        "target_cases": 12,
+        "control_cases": 12,
+        "seed": seed,
+        "restored_and_verified": restored,
+        "source_revision": revision,
+        "functional_joins": [
+            {"case_id": "case-1", "capability_id": "repo_repair_v1",
+             "prompt_hash": _hash("prompt-" + component),
+             "source_revision": revision,
+             "generation_policy_hash": _hash("policy"),
+             "oracle_artifact_hash": _hash("oracle"), "verdict": True},
+        ],
+    }
+
+
+class TestStageAdmission:
+    """The admission gate runs REAL config arithmetic against REAL host
+    memory; on every realistic test host the GLM-sized requirement
+    (~1.2 TiB) exceeds availability and the stage reports
+    BLOCKED_RESOURCE (exit 4) -- the honest outcome, never a
+    substituted estimate."""
+
+    def _spec(self, tmp_path):
+        spec = tmp_path / "spec.json"
+        spec.write_text(json.dumps(_spec_dict()), encoding="utf-8")
+        return spec
+
+    def test_baseline_is_blocked_resource_exit_4(self, tmp_path):
+        spec = self._spec(tmp_path)
+        checkpoint = _glm_checkpoint(tmp_path)
+        code, payload = _run("baseline", "--config", str(spec),
+                             "--checkpoint", str(checkpoint))
+        assert code == 4
+        assert payload["status"] == "BLOCKED_RESOURCE"
+        error = payload["error"]
+        assert error["exit_code"] == 4
+        assert "GiB" in error["message"]
+        assert "host memory" in error["remedy"]
+
+    def test_trace_and_intervene_share_the_blocked_path(self, tmp_path):
+        spec = self._spec(tmp_path)
+        checkpoint = _glm_checkpoint(tmp_path)
+        for command in ("trace", "intervene"):
+            code, payload = _run(command, "--config", str(spec),
+                                "--checkpoint", str(checkpoint))
+            assert code == 4, command
+            assert payload["status"] == "BLOCKED_RESOURCE"
+
+    def test_architecture_mismatch_is_invalid_evidence_exit_3(self, tmp_path):
+        spec = self._spec(tmp_path)
+        checkpoint = _glm_checkpoint(tmp_path, num_hidden_layers=44)
+        code, payload = _run("baseline", "--config", str(spec),
+                             "--checkpoint", str(checkpoint))
+        assert code == 3
+        assert payload["status"] == "invalid_evidence"
+        assert "num_hidden_layers" in payload["error"]["message"]
+
+    def test_missing_checkpoint_argument_is_typed_refusal(self, tmp_path):
+        spec = self._spec(tmp_path)
+        code, payload = _run("baseline", "--config", str(spec))
+        assert code == 2
+        assert payload["status"] == "refused"
+
+    def test_admitted_host_reports_not_implemented_honestly(
+            self, tmp_path, monkeypatch, capsys):
+        """On a host the gate ADMITS (fixture: memory probe patched to
+        2 TiB -- the gate arithmetic itself is NOT patched), the
+        beyond-admission measurement orchestration is stated as
+        NOT_IMPLEMENTED rather than faked."""
+        from asea.extraction import stages as extraction_stages
+        from asea.extraction.__main__ import main
+
+        monkeypatch.setattr(extraction_stages, "available_bytes",
+                            lambda: 2 * 1024 ** 4)
+        spec = self._spec(tmp_path)
+        checkpoint = _glm_checkpoint(tmp_path)
+        code = main(["baseline", "--config", str(spec),
+                     "--checkpoint", str(checkpoint)])
+        assert code == 2
+        out = json.loads(capsys.readouterr().out.strip())
+        assert out["status"] == "NOT_IMPLEMENTED"
+        assert out["admission"]["admitted"] is True
+        assert out["admission"]["estimated_parameters"] > 300e9
+
+
+class TestStagesUnits:
+    def test_parameter_estimate_mirrors_the_worker_formula(self):
+        from asea.extraction.stages import estimate_parameters
+
+        estimate = estimate_parameters(GLM_TEXT_CONFIG)
+        per_expert = 3 * 4096 * 2048  # gate/up/down
+        moe = (288 + 1) * per_expert * (45 - 3)
+        dense_mlp = 45 * 3 * 4096 * 12288
+        vocab = 151552 * 4096
+        attention = 4 * 45 * 4096 * 4096
+        assert estimate == moe + dense_mlp + vocab + attention
+        assert 300e9 < estimate < 350e9
+
+    def test_text_config_nesting_is_merged(self, tmp_path):
+        from asea.extraction.stages import load_checkpoint_config
+
+        checkpoint = tmp_path / "vision-composite"
+        checkpoint.mkdir()
+        (checkpoint / "config.json").write_text(json.dumps({
+            "model_type": "glm5_next",
+            "text_config": dict(GLM_TEXT_CONFIG),
+        }), encoding="utf-8")
+        config = load_checkpoint_config(checkpoint)
+        assert config["num_hidden_layers"] == 45
+        assert config["moe_intermediate_size"] == 2048
+
+    def test_validate_source_architecture_flags_each_mismatch(self):
+        from asea.extraction.stages import validate_source_architecture
+
+        report = validate_source_architecture(
+            dict(GLM_TEXT_CONFIG, scoring_func="softmax"))
+        assert report["valid"] is False
+        assert report["checks"]["scoring_func"]["ok"] is False
+        assert report["checks"]["hidden_size"]["ok"] is True
+
+    def test_position_floor_is_a_floor_not_an_exact_match(self):
+        from asea.extraction.stages import validate_source_architecture
+
+        bigger = validate_source_architecture(
+            dict(GLM_TEXT_CONFIG, max_position_embeddings=2_000_000))
+        smaller = validate_source_architecture(
+            dict(GLM_TEXT_CONFIG, max_position_embeddings=131_072))
+        assert bigger["valid"] is True
+        assert smaller["valid"] is False
+
+    def test_power_analysis_is_monotone_and_degenerate_safe(self):
+        from asea.extraction.errors import InvalidEvidence
+        from asea.extraction.stages import required_sample_size
+
+        small = required_sample_size(
+            baseline_pass_rate=0.9, minimum_detectable_effect=0.3)
+        larger = required_sample_size(
+            baseline_pass_rate=0.9, minimum_detectable_effect=0.15)
+        assert 0 < small < larger
+        with pytest.raises(InvalidEvidence):
+            required_sample_size(
+                baseline_pass_rate=1.0, minimum_detectable_effect=0.1)
+        with pytest.raises(InvalidEvidence):
+            required_sample_size(
+                baseline_pass_rate=0.5, minimum_detectable_effect=0.5)
+
+
+class TestGraphCommand:
+    def _artifacts(self, tmp_path):
+        spec = tmp_path / "spec.json"
+        spec.write_text(json.dumps(_spec_dict()), encoding="utf-8")
+        attempts = tmp_path / "attempts.jsonl"
+        records = [
+            # verified target effect above its matched-control arm
+            _attempt("expert:3/17", 0.8, 0.0),
+            # control regression under intervention: harmful component
+            _attempt("expert:3/18", 0.0, 0.9, seed=8),
+            # verified but no measurable effect either arm
+            _attempt("expert:3/19", 0.0, 0.0, seed=9),
+        ]
+        attempts.write_text(
+            "\n".join(json.dumps(r) for r in records) + "\n",
+            encoding="utf-8")
+        enrichment = tmp_path / "enrichment.json"
+        enrichment.write_text(json.dumps({
+            "expert:3/20": {"target_cases": 30, "control_cases": 0},
+            "expert:3/21": {"target_cases": 5, "control_cases": 5},
+            "expert:3/22": {"target_cases": 4, "control_cases": 2,
+                            "control_unobserved": True},
+        }), encoding="utf-8")
+        return spec, attempts, enrichment
+
+    def test_graph_classifies_roles_offline_exit_0(self, tmp_path):
+        spec, attempts, enrichment = self._artifacts(tmp_path)
+        workspace = tmp_path / "ws"
+        code, payload = _run(
+            "graph", "--config", str(spec),
+            "--interventions", str(attempts),
+            "--enrichment", str(enrichment),
+            "--workspace", str(workspace), "--dry-run")
+        assert code == 0
+        assert payload["ok"] is True
+        assert payload["nodes"] == 6
+        assert payload["roles"] == {
+            "REQUIRED": 1, "NEGATIVE_OR_HARMFUL": 1, "UNKNOWN": 2,
+            "TARGET_ENRICHED": 1, "SHARED_GENERAL": 1,
+        }
+        assert payload["causal_evidence_components"] == [
+            "expert:3/17", "expert:3/18", "expert:3/19"]
+        assert payload["artifact"] is None
+        assert not (workspace / "graphs").exists()
+
+    def test_graph_writes_artifact_and_it_round_trips(self, tmp_path):
+        spec, attempts, enrichment = self._artifacts(tmp_path)
+        workspace = tmp_path / "ws"
+        code, payload = _run(
+            "graph", "--config", str(spec),
+            "--interventions", str(attempts),
+            "--enrichment", str(enrichment),
+            "--workspace", str(workspace))
+        assert code == 0
+        artifact = Path(payload["artifact"])
+        assert artifact == workspace / "graphs" / "repo_repair_v1.json"
+        graph = CausalComponentGraph.model_validate(
+            json.loads(artifact.read_text(encoding="utf-8")))
+        assert graph.source_revision == "abc123"
+        roles = {node.component: node.role for node in graph.nodes}
+        assert roles["expert:3/17"] == "REQUIRED"
+        assert roles["expert:3/18"] == "NEGATIVE_OR_HARMFUL"
+        assert roles["expert:3/21"] == "SHARED_GENERAL"
+
+    def test_unrestorable_attempt_is_invalid_evidence_exit_3(self, tmp_path):
+        spec, attempts, _ = self._artifacts(tmp_path)
+        bad = tmp_path / "bad.jsonl"
+        bad.write_text(json.dumps(
+            _attempt("expert:3/17", 0.5, 0.0, restored=False)) + "\n",
+            encoding="utf-8")
+        code, payload = _run("graph", "--config", str(spec),
+                             "--interventions", str(bad))
+        assert code == 3
+        assert "ledger" in payload["error"]["message"]
+
+    def test_missing_intervention_artifact_is_exit_3(self, tmp_path):
+        spec, _, _ = self._artifacts(tmp_path)
+        code, payload = _run("graph", "--config", str(spec),
+                             "--interventions",
+                             str(tmp_path / "never-recorded.jsonl"))
+        assert code == 3
+
+    def test_enrichment_only_needs_source_revision_exit_3_without_it(
+            self, tmp_path):
+        spec, attempts, _ = self._artifacts(tmp_path)
+        enrichment = tmp_path / "enrichment.json"
+        enrichment.write_text(json.dumps({
+            "expert:3/20": {"target_cases": 30, "control_cases": 0}}),
+            encoding="utf-8")
+        code, payload = _run("graph", "--config", str(spec),
+                             "--interventions", str(attempts),
+                             "--enrichment", str(enrichment))
+        # attempts carry a revision, so this succeeds; the refusal case
+        # is the enrichment-ONLY graph:
+        assert code == 0
+        only_enrichment = tmp_path / "only-enrichment.jsonl"
+        only_enrichment.write_text("", encoding="utf-8")
+        code, payload = _run("graph", "--config", str(spec),
+                             "--interventions", str(only_enrichment),
+                             "--enrichment", str(enrichment))
+        assert code == 3
+        assert "source-revision" in payload["error"]["message"]
+
+    def test_correlation_only_roles_never_become_causal(self, tmp_path):
+        """A massively enriched component (correlation) can never hold
+        REQUIRED -- only a verified intervention can (schema-enforced)."""
+        spec, _, _ = self._artifacts(tmp_path)
+        empty_attempts = tmp_path / "empty.jsonl"
+        empty_attempts.write_text("", encoding="utf-8")
+        enrichment = tmp_path / "enrichment.json"
+        enrichment.write_text(json.dumps({
+            "expert:3/20": {"target_cases": 10_000, "control_cases": 0}}),
+            encoding="utf-8")
+        code, payload = _run("graph", "--config", str(spec),
+                             "--interventions", str(empty_attempts),
+                             "--enrichment", str(enrichment),
+                             "--source-revision", "abc123")
+        assert code == 0
+        assert payload["roles"] == {"TARGET_ENRICHED": 1}
+        assert payload["causal_evidence_components"] == []
+
+
+class TestPlanCommand:
+    def _chain(self, tmp_path):
+        """The full offline chain: source verify -> graph -> plan."""
+        spec = tmp_path / "spec.json"
+        spec.write_text(json.dumps(_spec_dict()), encoding="utf-8")
+        checkpoint = _fixture_checkpoint(tmp_path)
+        card = tmp_path / "card.json"
+        card.write_text(json.dumps({
+            "repository": "zai-org", "model": "GLM-5.3-Flash",
+            "variant": "BF16", "commit_sha": "0" * 40, "license": "MIT",
+        }), encoding="utf-8")
+        workspace = tmp_path / "ws"
+        code, verify_payload = _run(
+            "source", "verify", "--checkpoint", str(checkpoint),
+            "--source-card", str(card), "--workspace", str(workspace))
+        assert code == 0
+        attempts = tmp_path / "attempts.jsonl"
+        records = [
+            _attempt("expert:3/17", 0.8, 0.0),
+            _attempt("expert:4/5", 0.6, 0.1, seed=11),
+            _attempt("expert:3/18", 0.0, 0.9, seed=8),  # harmful: NOT retained
+        ]
+        attempts.write_text(
+            "\n".join(json.dumps(r) for r in records) + "\n",
+            encoding="utf-8")
+        code, graph_payload = _run(
+            "graph", "--config", str(spec),
+            "--interventions", str(attempts),
+            "--workspace", str(workspace))
+        assert code == 0
+        return (spec, workspace, Path(graph_payload["artifact"]),
+                Path(verify_payload["artifact"]))
+
+    def test_plan_retains_only_causally_required_experts(self, tmp_path):
+        spec, workspace, graph_artifact, manifest_artifact = self._chain(tmp_path)
+        code, payload = _run(
+            "plan", "--config", str(spec),
+            "--graph", str(graph_artifact),
+            "--manifest", str(manifest_artifact),
+            "--workspace", str(workspace))
+        assert code == 0
+        assert payload["ok"] is True
+        assert payload["selection_arm"] == "causal"
+        assert payload["retained_dense"] is True
+        assert payload["retained_tokenizer"] is True
+        assert payload["retained_attention"] is True
+        assert payload["retained_head"] is True
+        assert payload["layers_with_retained_experts"] == 2
+        assert payload["retained_experts"] == 2
+        plan = ExtractionPlan.model_validate(
+            json.loads(Path(payload["artifact"]).read_text(encoding="utf-8")))
+        retained = {entry.layer_id: entry.retained_experts
+                    for entry in plan.expert_retention}
+        assert retained == {3: [17], 4: [5]}
+
+    def test_plan_without_required_components_is_exit_3(self, tmp_path):
+        spec = tmp_path / "spec.json"
+        spec.write_text(json.dumps(_spec_dict()), encoding="utf-8")
+        workspace = tmp_path / "ws"
+        attempts = tmp_path / "attempts.jsonl"
+        attempts.write_text(json.dumps(
+            _attempt("expert:3/19", 0.0, 0.0)) + "\n", encoding="utf-8")
+        code, graph_payload = _run(
+            "graph", "--config", str(spec),
+            "--interventions", str(attempts),
+            "--workspace", str(workspace))
+        assert code == 0
+        checkpoint = _fixture_checkpoint(tmp_path)
+        card = tmp_path / "card.json"
+        card.write_text(json.dumps({
+            "repository": "zai-org", "model": "GLM-5.3-Flash",
+            "variant": "BF16", "commit_sha": "0" * 40, "license": "MIT",
+        }), encoding="utf-8")
+        code, verify_payload = _run(
+            "source", "verify", "--checkpoint", str(checkpoint),
+            "--source-card", str(card), "--workspace", str(workspace))
+        assert code == 0
+        code, payload = _run(
+            "plan", "--config", str(spec),
+            "--graph", str(graph_payload["artifact"]),
+            "--manifest", str(verify_payload["artifact"]),
+            "--workspace", str(workspace))
+        assert code == 3
+        assert "REQUIRED" in payload["error"]["message"]
+
+    def test_plan_with_missing_graph_artifact_is_exit_3(self, tmp_path):
+        spec = tmp_path / "spec.json"
+        spec.write_text(json.dumps(_spec_dict()), encoding="utf-8")
+        code, payload = _run(
+            "plan", "--config", str(spec),
+            "--graph", str(tmp_path / "no-graph.json"),
+            "--manifest", str(tmp_path / "no-manifest.json"))
+        assert code == 3
+        assert payload["status"] == "invalid_evidence"
