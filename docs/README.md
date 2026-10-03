@@ -4,14 +4,18 @@
 
 <h1 align="center">SILT — Skill Interchange Layer with Trust-gating</h1>
 
-> **Integrated release snapshot — 2026-09-12; quality not certified.** Hardware-adaptive specialist planning/execution, controller and data-binding safeguards, numeric/state-restoration fixes and Studio usability repairs now accompany the existing packet/LoRA/Spring, composition and reconstruction paths. Linux CPU is the supported validation target; single-NVIDIA-CUDA code is implemented but **GPU_UNVERIFIED**. Existing transfer gates and defaults remain unchanged. Read the [integrated release summary](/INTEGRATED_RELEASE_2026_09_12.md) for current scope and the independently recorded local verification, and the [historical frozen V5 evidence](/EXPERIMENTAL_RELEASE_2026_09.md) for all six final-comparison arms. There is no new 3B quality result, automatic model activation or claim of coverage by the earlier provisional. [HARDENING_PASS2.md](/HARDENING_PASS2.md) and [EXPERIMENTAL_HANDOFF.md](/EXPERIMENTAL_HANDOFF.md) retain historical context.
+> **代码快照 — 2026-09-26；质量尚未认证。** 当前仓库包含硬件自适应 specialist 规划与执行、控制器和数据绑定保护、数值与状态恢复修复、Studio 可用性修复，以及既有的 packet、LoRA、SiltSpring、组合和重建路径。Linux CPU 是支持的验证目标；单 NVIDIA CUDA 路径已有代码，但状态仍为 **GPU_UNVERIFIED**。传输门控和默认策略保持不变。请阅读[集成版本说明](/INTEGRATED_RELEASE_2026_09_12.md)、[历史冻结 V5 证据](/EXPERIMENTAL_RELEASE_2026_09.md)、[HARDENING_PASS2.md](/HARDENING_PASS2.md)和[实验交接记录](/EXPERIMENTAL_HANDOFF.md)了解范围与验证边界；本快照没有新的 3B 质量结果，也不会自动激活模型。
+>
+> **Code snapshot — 2026-09-26; quality not certified.** This tree includes hardware-adaptive specialist planning/execution, controller and data-binding safeguards, numeric/state-restoration fixes, Studio repairs, and the packet/LoRA/SiltSpring, composition and reconstruction paths. Linux CPU is the supported validation target; single-NVIDIA-CUDA code exists but remains **GPU_UNVERIFIED**. Existing gates and defaults remain unchanged. The integrated release summary and historical V5 evidence linked above record their own dates and verification scope.
 
-> **Generation-policy correction included in this source snapshot.** Public deployment is verified separately; publication adds no model weights or new quality result. Fresh governed data and a frozen, verified effective-policy protocol are required for new quality claims; the consumed final set is not a retry set. See the [generation-policy notice](/GENERATION_POLICY_NOTICE.md). The historical comparison below does not establish matched-greedy retention.
+> **生成策略修正仍适用。** 发布不会附带模型权重或新增质量结果。任何新的质量声明都需要新鲜的受治理数据，以及冻结并验证过的有效策略；已经消耗的 final set 不能作为重试集。详见[生成策略通知](/GENERATION_POLICY_NOTICE.md)。历史对比不构成 matched-greedy 保真度证明。
+>
+> **The generation-policy correction remains in force.** Publication adds no model weights or new quality result. New quality claims require fresh governed data and a frozen, verified effective-policy protocol; the consumed final set is not a retry set. See the [generation-policy notice](/GENERATION_POLICY_NOTICE.md). The historical comparison does not establish matched-greedy retention.
 
-<p align="center"><em>Transfer a specialist skill. Measure the gain. Evaluate hardware-aware adaptation.</em></p>
+<p align="center"><strong>传递专长，测量收益，评估硬件适配。</strong><br><em>Transfer a specialist skill. Measure the gain. Evaluate hardware-aware adaptation.</em></p>
 
-<p align="center"><strong>A powerful model can still be missing one specialist capability.<br>Another AI may already have it.<br>The default L3 path transfers an inspectable packet without copying teacher weights; separate experimental paths derive models from source weights.</strong></p>
-<p align="center"><em>Local-first skill interchange · held-out evaluation · trust-gated admission · hardware-aware adaptation.</em></p>
+<p align="center"><strong>强大的模型也可能缺少一个狭窄的专业能力；默认 L3 路径传递可检查的技能包，不复制教师权重；独立的实验路径才会从源权重构建模型。</strong><br><em>A powerful model can still be missing one specialist capability. The default L3 path transfers an inspectable packet without copying teacher weights; separate experimental paths derive models from source weights.</em></p>
+<p align="center"><em>本地优先技能交换 · 留出集评估 · 受信任门控 · 硬件感知适配。<br>Local-first skill interchange · held-out evaluation · trust-gated admission · hardware-aware adaptation.</em></p>
 
 <p align="center">
   <a href="https://github.com/inbharatai/SILT/actions/workflows/ci.yml"><img src="https://github.com/inbharatai/SILT/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -29,6 +33,34 @@
 > Title: *Trust-Gated Skill Packet Transfer and Hardware-Aware Adaptation
 > Across Heterogeneous Artificial Intelligence Systems*. Full notice in
 > [`PATENT.md`](https://github.com/inbharatai/SILT/blob/main/PATENT.md).
+
+## 中文说明
+
+SILT（Skill Interchange Layer with Trust-gating）是一个本地优先、受信任门控的技能交换层：把发送方的狭窄能力提取为可检查的技能包，在接收方的留出集上验证是否真正改善，再按硬件与治理约束决定是否晋级。默认路径是 **L3 packet transfer**，只有显式调用 `asea run` 才会运行；提取、留出集 A/B、回归与控制评估、Gate 1 和审计记忆共同组成这条路径。安装、导入、规划或构建都不会自动传递、训练或激活模型，也不会复制教师权重。
+
+L4 LoRA、L5 数据集导出，以及 packet-derived deep-apply（含 SiltStream 和 ZeroForge 后端）是可选路径，需要额外依赖和显式启用。`implemented` 或 `source_code_verified` 只表示代码路径存在；`enabled`、`executed`、`admitted`、`activated` 是彼此独立的状态。演示、fixture 和导入的证据不能代替模型质量证明。仓库不包含模型权重；真实连接器和 GPU 结果取决于本机资源，当前 CUDA 代码仍需逐机验证。
+
+### 最短路径
+
+下面的检查不下载模型，四条 examples 流程全部是确定性的 mock，用来验证管线行为，不代表真实模型能力：
+
+```bash
+git clone https://github.com/inbharatai/SILT.git
+cd SILT
+python -m pip install -r requirements.txt
+PYTHONPATH=src python -m pytest tests/ -q
+cd examples && python run_all.py
+```
+
+要连接 Ollama 或 Hugging Face，或启用 Studio、deep-apply 和本地模型运行时，请按 [`LOCAL_SETUP.md`](https://github.com/inbharatai/SILT/blob/main/LOCAL_SETUP.md) 安装对应 extras，并显式配置模型。Studio 只在启动前设置 `SILT_ENABLE_EXPERIMENTAL=1` 时挂载实验 UI 路由。
+
+### 当前边界
+
+默认 L3 是“接收方模型 + 已批准技能包”，不是新训练的模型；L4 适配器必须再次通过 Gate 2，L5 仍然是导出给外部训练器的 dataset/job spec。Linux CPU 是当前有验证记录的目标，单 NVIDIA CUDA 路径仍标记为 `GPU_UNVERIFIED`；Windows、macOS MPS、ROCm/HIP、多 GPU 和 offload specialist 路径不受支持。GLM-5.3-Flash 的 C31 提取命令会在资源不足时返回 `BLOCKED_RESOURCE`，编译模型的真实 build/evaluate/certify 仍明确返回 `NOT_IMPLEMENTED`，不会用 fixture 冒充真实提取。
+
+## English technical reference
+
+The detailed sections below retain the repository's existing terminology, evidence links, tables and runnable contracts. They describe the same current code in English for readers who need API names, CLI flags and source-level boundaries.
 
 ### Capability status and activation
 
